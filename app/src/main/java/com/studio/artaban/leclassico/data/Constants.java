@@ -1,4 +1,4 @@
-package artaban.studio.com.leclassico.data;
+package com.studio.artaban.leclassico.data;
 
 /**
  * Created by pascal on 15/07/16.

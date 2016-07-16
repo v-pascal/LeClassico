@@ -1,4 +1,4 @@
-package artaban.studio.com.leclassico;
+package com.studio.artaban.leclassico;
 
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
@@ -18,8 +18,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import artaban.studio.com.leclassico.data.Constants;
-import artaban.studio.com.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
  * Created by pascal on 15/07/16.
@@ -46,8 +46,13 @@ public class IntroActivity extends AppCompatActivity {
         private static final String DATA_KEY_POSITION = "position";
         private ImageView mFrameImage;
 
+
+
+
+        /*
         private int mPointerId = Constants.NO_DATA;
         private float mPrevX = 0.f;
+
         private boolean moveLimit(boolean begin, MotionEvent event, View view) {
 
 
@@ -62,7 +67,7 @@ public class IntroActivity extends AppCompatActivity {
                         Logs.add(Logs.Type.I, "Start limit scroll");
                         mPointerId = event.getPointerId(0);
                         mPrevX = event.getX(0);
-                        return true;
+                        //return true;
                     }
                     break;
                 }
@@ -84,7 +89,8 @@ public class IntroActivity extends AppCompatActivity {
                             break;
                         }
                     }
-                    return true;
+                    //return true;
+                    break;
                 }
                 case MotionEvent.ACTION_MOVE: {
                     if (mPointerId == Constants.NO_DATA)
@@ -117,7 +123,8 @@ public class IntroActivity extends AppCompatActivity {
                             break;
                         }
                     }
-                    return true;
+                    //return true;
+                    break;
                 }
             }
 
@@ -126,8 +133,10 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-            return false;
+            //return false;
+            return view.onTouchEvent(event);
         }
+        */
 
         //////
         @Override
@@ -148,6 +157,7 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+            /*
             switch (getArguments().getInt(DATA_KEY_POSITION, 0)) {
                 case 0: {
                     container.setOnTouchListener(new View.OnTouchListener() {
@@ -172,6 +182,7 @@ public class IntroActivity extends AppCompatActivity {
                     break;
                 }
             }
+            */
 
 
 
@@ -202,25 +213,6 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-    public class CustomViewPager extends ViewPager {
-
-        public CustomViewPager(Context context) {
-            super(context);
-        }
-        public CustomViewPager(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        @Override
-        public boolean onTouchEvent(MotionEvent event) {
-            return super.onTouchEvent(event);
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(MotionEvent event) {
-            return super.onInterceptTouchEvent(event);
-        }
-    }
 
 
 
@@ -231,6 +223,10 @@ public class IntroActivity extends AppCompatActivity {
     //private ViewPager mViewPager;
     private CustomViewPager mViewPager;
     private float mAlphaFab = 0.f;
+
+
+
+
 
     //////
     @Override
@@ -258,15 +254,15 @@ public class IntroActivity extends AppCompatActivity {
         fab.setAlpha(mAlphaFab);
 
 
+
+
+
+
         //mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager = (CustomViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
 
-            @Override
-            public int getCount() {
-                return 5;
-            }
-
+            @Override public int getCount() { return 5; }
             @Override
             public Fragment getItem(int position) {
                 return PlaceholderFragment.newInstance(position);
@@ -276,16 +272,35 @@ public class IntroActivity extends AppCompatActivity {
             @Override
             public void transformPage(View page, float position) {
 
-                if (position <= 0) // This page is moving out to the left
+                if (position <= 0) { // This page is moving out to the left
+
+
+
+
+                    if ((!(position > 0)) && (!(position < 0))) { // == 0
+                        int delta = mViewPager.test();
+                        Logs.add(Logs.Type.E, "DeltaX: " + delta);
+                        page.setRotationY(delta * 0.1f);
+                    }
+
+
+
+
                     page.setAlpha(1.f + (position * 2.f));
-                else if (position <= 1) // This page is moving in from the right
+                } else if (position <= 1) // This page is moving in from the right
                     page.setAlpha(1.f - (position * 2.f));
             }
         });
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            @Override public void onPageSelected(int position) { }
-            @Override public void onPageScrollStateChanged(int state) { }
+            @Override
+            public void onPageSelected(int position) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == 3) {

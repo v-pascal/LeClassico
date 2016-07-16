@@ -7,7 +7,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:gravity="center"
-                tools:context="artaban.studio.com.leclassico.IntroActivity$PlaceholderFragment">
+                tools:context="com.studio.artaban.leclassico.IntroActivity$PlaceholderFragment">
 
     <TextView
         android:id="@+id/section_label"

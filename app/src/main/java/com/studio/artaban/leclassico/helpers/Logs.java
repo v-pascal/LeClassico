@@ -1,9 +1,9 @@
-package artaban.studio.com.leclassico.helpers;
+package com.studio.artaban.leclassico.helpers;
 
 import android.util.Log;
 
-import artaban.studio.com.leclassico.BuildConfig;
-import artaban.studio.com.leclassico.data.Constants;
+import com.studio.artaban.leclassico.BuildConfig;
+import com.studio.artaban.leclassico.data.Constants;
 
 /**
  * Created by pascal on 15/07/16.

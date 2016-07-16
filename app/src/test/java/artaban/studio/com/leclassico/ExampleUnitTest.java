@@ -1,4 +1,4 @@
-package artaban.studio.com.leclassico;
+package com.studio.artaban.leclassico;
 
 import org.junit.Test;
 
