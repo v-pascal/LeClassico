@@ -22,14 +22,18 @@ public class CustomViewPager extends ViewPager {
 
 
 
-    private int mDeltaX = 0;
+    /*
+
     public int test() {
         return mDeltaX;
     }
+    */
 
     //
     private int mPointerId = Constants.NO_DATA;
+
     private float mPrevX = 0.f;
+    private int mDeltaX = 0;
 
     //////
     @Override
@@ -61,12 +65,15 @@ public class CustomViewPager extends ViewPager {
                             Logs.add(Logs.Type.I, "Finish limit scroll");
                             mPointerId = Constants.NO_DATA;
                             mPrevX = 0f;
-                            mDeltaX = 0;
+
 
 
                             //view.setRotationY(0);
+                            findViewWithTag("left").setRotationY(0.f);
 
 
+
+                            mDeltaX = 0;
                             break;
                         }
                     }
@@ -83,6 +90,8 @@ public class CustomViewPager extends ViewPager {
 
 
                             mDeltaX = (int)(event.getX(i) - mPrevX);
+                            findViewWithTag("left").setRotationY(mDeltaX * 0.07f);
+
                             /*
                             if (deltaX > 10) {
 

@@ -1,6 +1,5 @@
 package com.studio.artaban.leclassico;
 
-import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,16 +8,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -149,6 +145,15 @@ public class IntroActivity extends AppCompatActivity {
 
 
             View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
+
+
+
+
+            if (getArguments().getInt(DATA_KEY_POSITION) == 0)
+                rootView.setTag("left");
+
+
+
             TextView framePosition = (TextView) rootView.findViewById(R.id.section_label);
             framePosition.setText("#" + getArguments().getInt(DATA_KEY_POSITION));
             //mFrameImage = (ImageView)rootView.findViewById(R.id.frame_image);
@@ -220,9 +225,10 @@ public class IntroActivity extends AppCompatActivity {
 
 
     //
-    //private ViewPager mViewPager;
     private CustomViewPager mViewPager;
     private float mAlphaFab = 0.f;
+
+
 
 
 
@@ -243,6 +249,8 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
+
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -258,11 +266,15 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-        //mViewPager = (ViewPager) findViewById(R.id.container);
+
         mViewPager = (CustomViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
 
-            @Override public int getCount() { return 5; }
+            @Override
+            public int getCount() {
+                return 5;
+            }
+
             @Override
             public Fragment getItem(int position) {
                 return PlaceholderFragment.newInstance(position);
@@ -272,35 +284,16 @@ public class IntroActivity extends AppCompatActivity {
             @Override
             public void transformPage(View page, float position) {
 
-                if (position <= 0) { // This page is moving out to the left
-
-
-
-
-                    if ((!(position > 0)) && (!(position < 0))) { // == 0
-                        int delta = mViewPager.test();
-                        Logs.add(Logs.Type.E, "DeltaX: " + delta);
-                        page.setRotationY(delta * 0.1f);
-                    }
-
-
-
-
+                if (position <= 0) // This page is moving out to the left
                     page.setAlpha(1.f + (position * 2.f));
-                } else if (position <= 1) // This page is moving in from the right
+                else if (position <= 1) // This page is moving in from the right
                     page.setAlpha(1.f - (position * 2.f));
             }
         });
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            @Override
-            public void onPageSelected(int position) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-
+            @Override public void onPageSelected(int position) { }
+            @Override public void onPageScrollStateChanged(int state) { }
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == 3) {
