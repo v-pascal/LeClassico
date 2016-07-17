@@ -12,9 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.studio.artaban.leclassico.components.CurvedViewPager;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -24,6 +24,9 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class IntroActivity extends AppCompatActivity {
 
     private static final String DATA_KEY_ALPHA = "alpha";
+    // Data keys
+
+    private static final int INTRO_PAGE_COUNT = 5;
 
     //
     public static class PlaceholderFragment extends Fragment {
@@ -40,99 +43,6 @@ public class IntroActivity extends AppCompatActivity {
 
         //
         private static final String DATA_KEY_POSITION = "position";
-        private ImageView mFrameImage;
-
-
-
-
-        /*
-        private int mPointerId = Constants.NO_DATA;
-        private float mPrevX = 0.f;
-
-        private boolean moveLimit(boolean begin, MotionEvent event, View view) {
-
-
-
-
-
-            switch (event.getActionMasked()) {
-
-                case MotionEvent.ACTION_DOWN: {
-                    if (mPointerId == Constants.NO_DATA) {
-
-                        Logs.add(Logs.Type.I, "Start limit scroll");
-                        mPointerId = event.getPointerId(0);
-                        mPrevX = event.getX(0);
-                        //return true;
-                    }
-                    break;
-                }
-                case MotionEvent.ACTION_UP: {
-                    if (mPointerId == Constants.NO_DATA)
-                        break;
-
-                    for (int i = 0; i < event.getPointerCount(); ++i) {
-                        if (event.getPointerId(i) == mPointerId) {
-
-                            Logs.add(Logs.Type.I, "Finish limit scroll");
-                            mPointerId = Constants.NO_DATA;
-                            mPrevX = 0f;
-
-
-                            view.setRotationY(0);
-
-
-                            break;
-                        }
-                    }
-                    //return true;
-                    break;
-                }
-                case MotionEvent.ACTION_MOVE: {
-                    if (mPointerId == Constants.NO_DATA)
-                        break;
-
-                    for (int i = 0; i < event.getPointerCount(); ++i) {
-                        if (event.getPointerId(i) == mPointerId) {
-
-
-
-
-                            int deltaX = (int)(event.getX(i) - mPrevX);
-                            if (deltaX > 10) {
-
-
-                                //view.setRotationX(deltaX << 1);
-                                Logs.add(Logs.Type.V, "OK: " + deltaX);
-                                //view.setRotationY(45);
-                                view.setRotationY(deltaX);
-
-
-                            }
-                            else
-                                Logs.add(Logs.Type.V, "BAD: " + deltaX);
-
-
-
-
-                            //mPrevX = event.getX(i);
-                            break;
-                        }
-                    }
-                    //return true;
-                    break;
-                }
-            }
-
-
-
-
-
-
-            //return false;
-            return view.onTouchEvent(event);
-        }
-        */
 
         //////
         @Override
@@ -140,17 +50,18 @@ public class IntroActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
 
             Logs.add(Logs.Type.V, null);
-
-
-
-
             View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
 
-
-
-
+            // Assign left & right page tag
             if (getArguments().getInt(DATA_KEY_POSITION) == 0)
-                rootView.setTag("left");
+                rootView.setTag(CurvedViewPager.TAG_LEFT_PAGE);
+            else if (getArguments().getInt(DATA_KEY_POSITION) == (INTRO_PAGE_COUNT - 1))
+                rootView.setTag(CurvedViewPager.TAG_RIGHT_PAGE);
+
+
+
+
+
 
 
 
@@ -161,33 +72,6 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-
-            /*
-            switch (getArguments().getInt(DATA_KEY_POSITION, 0)) {
-                case 0: {
-                    container.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View view, MotionEvent event) {
-
-                            //Logs.add(Logs.Type.V, "event: " + event);
-                            return moveLimit(true, event, view);
-                        }
-                    });
-                    break;
-                }
-                case 4: {
-                    container.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View view, MotionEvent event) {
-
-                            //Logs.add(Logs.Type.V, "event: " + event);
-                            return moveLimit(false, event, view);
-                        }
-                    });
-                    break;
-                }
-            }
-            */
 
 
 
@@ -214,25 +98,9 @@ public class IntroActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
     //
-    private CustomViewPager mViewPager;
-    private float mAlphaFab = 0.f;
-
-
-
-
-
-
+    private CurvedViewPager mViewPager;
+    private float mAlphaFab;
 
     //////
     @Override
@@ -267,12 +135,12 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-        mViewPager = (CustomViewPager) findViewById(R.id.container);
+        mViewPager = (CurvedViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
 
             @Override
             public int getCount() {
-                return 5;
+                return INTRO_PAGE_COUNT;
             }
 
             @Override
@@ -292,11 +160,17 @@ public class IntroActivity extends AppCompatActivity {
         });
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            @Override public void onPageSelected(int position) { }
-            @Override public void onPageScrollStateChanged(int state) { }
+            @Override
+            public void onPageSelected(int position) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (position == 3) {
+                if (position == (INTRO_PAGE_COUNT - 2)) {
 
                     mAlphaFab = positionOffset;
                     fab.setAlpha(positionOffset);

@@ -9,7 +9,7 @@
                                                  android:background="@color/colorPrimary"
                                                  tools:context="com.studio.artaban.leclassico.IntroActivity">
 
-    <com.studio.artaban.leclassico.CustomViewPager
+    <com.studio.artaban.leclassico.components.CurvedViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
