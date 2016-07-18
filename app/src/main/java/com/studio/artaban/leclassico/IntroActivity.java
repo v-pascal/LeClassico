@@ -1,7 +1,5 @@
 package com.studio.artaban.leclassico;
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.Fragment;
@@ -119,6 +117,7 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+        /*
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,6 +127,7 @@ public class IntroActivity extends AppCompatActivity {
             }
         });
         fab.setAlpha(mAlphaFab);
+        */
 
 
 
@@ -172,8 +172,22 @@ public class IntroActivity extends AppCompatActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == (INTRO_PAGE_COUNT - 2)) {
 
+
+
+
+
+
+
                     mAlphaFab = positionOffset;
-                    fab.setAlpha(positionOffset);
+                    //fab.setAlpha(positionOffset);
+
+
+
+
+
+
+
+
                 }
             }
         });

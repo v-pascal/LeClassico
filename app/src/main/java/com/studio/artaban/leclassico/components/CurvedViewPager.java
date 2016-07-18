@@ -2,10 +2,13 @@ package com.studio.artaban.leclassico.components;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -17,12 +20,20 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class CurvedViewPager extends ViewPager {
 
+
+
+
+
     public static final String TAG_LEFT_PAGE = "left";
     public static final String TAG_RIGHT_PAGE = "right";
 
     private static final float RATIO_ROTATION = 0.06f;
+    // Tags
 
-    //
+
+
+
+
     public CurvedViewPager(Context context) {
         super(context);
     }
@@ -33,7 +44,16 @@ public class CurvedViewPager extends ViewPager {
 
     private int mPointerId = Constants.NO_DATA;
     private float mPrevX;
+
+
+
+
+
     private float mRotation;
+
+
+
+
 
     //////
     @Override
@@ -47,7 +67,22 @@ public class CurvedViewPager extends ViewPager {
                         Logs.add(Logs.Type.I, "Start limit scroll");
                         mPointerId = event.getPointerId(0);
                         mPrevX = event.getX(0);
-                        mRotation = 0.f;
+
+
+
+
+
+
+                        //mRotation = 0.f;
+
+                        if (getCurrentItem() != 0)
+                            return true;
+
+
+
+
+
+
                     }
                     break;
                 }
@@ -71,12 +106,41 @@ public class CurvedViewPager extends ViewPager {
                                 Logs.add(Logs.Type.F, "Tag of the left or right pages not defined");
                                 mPointerId = Constants.NO_DATA;
 
-                            } else if ((mRotation > 0.f)||(mRotation < 0.f)) {
+                            } else {
 
-                                ObjectAnimator animation = ObjectAnimator.ofFloat(page, "rotationY",
-                                        mRotation, 0.f);
-                                animation.setDuration(500);
-                                animation.start();
+
+
+
+
+
+                                /*
+                                if ((mRotation > 0.f)||(mRotation < 0.f)) {
+
+                                    ObjectAnimator animation = ObjectAnimator.ofFloat(page, "rotationY",
+                                            mRotation, 0.f);
+                                    animation.setDuration(500);
+                                    animation.start();
+                                }
+                                */
+
+                                if (getCurrentItem() != 0) {
+
+                                    //((CoordinatorLayout)getParent()).setTranslationX(0.f);
+
+                                    ((CoordinatorLayout)getParent()).clearAnimation();
+                                    ((CoordinatorLayout)getParent()).setTranslationX(0);
+                                    TranslateAnimation anim = new TranslateAnimation(mRotation, 0.f,
+                                            0.f, 0.f);
+                                    anim.setDuration(500);
+                                    ((CoordinatorLayout)getParent()).startAnimation(anim);
+                                    return true;
+                                }
+
+
+
+
+
+
                             }
                             break;
                         }
@@ -94,7 +158,6 @@ public class CurvedViewPager extends ViewPager {
                             View page = (getCurrentItem() == 0)?
                                     findViewWithTag(TAG_LEFT_PAGE):findViewWithTag(TAG_RIGHT_PAGE);
 
-                            int deltaX = (int)(event.getX(i) - mPrevX);
                             if (page == null) {
 
                                 Logs.add(Logs.Type.F, "Tag of the left or right pages not defined");
@@ -102,8 +165,31 @@ public class CurvedViewPager extends ViewPager {
 
                             } else {
 
+
+
+
+
+
+
+                                int deltaX = (int)(event.getX(i) - mPrevX);
+                                if (getCurrentItem() != 0) {
+
+                                    //setTranslationX(deltaX);
+
+                                    mRotation = deltaX;
+                                    ((CoordinatorLayout)getParent()).setTranslationX(deltaX);
+                                    return  true;
+                                }
+
+                                /*
                                 mRotation = deltaX * RATIO_ROTATION;
                                 page.setRotationY(mRotation);
+                                */
+
+
+
+
+
                             }
                             break;
                         }
