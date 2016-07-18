@@ -9,20 +9,78 @@
                                                  android:background="@color/colorPrimary"
                                                  tools:context="com.studio.artaban.leclassico.IntroActivity">
 
-    <com.studio.artaban.leclassico.components.CurvedViewPager
+    <!-- Intro -->
+    <com.studio.artaban.leclassico.components.LimitlessViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <!--
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email"/>
-        -->
+    <!-- Controls panel -->
+    <RelativeLayout
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Skip step -->
+        <ImageButton
+            android:background="@null"
+            android:onClick="onSkipIntro"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/image_skip"
+            android:alpha="0"
+            android:src="@drawable/ic_skip_next_white_36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Step marker -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/image_step_1"
+                android:alpha="0"
+                android:src="@drawable/ic_more_horiz_white_36dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/image_step_2"
+                android:alpha="0"
+                android:src="@drawable/ic_more_horiz_white_36dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/image_step_3"
+                android:alpha="0"
+                android:src="@drawable/ic_more_horiz_white_36dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/image_step_4"
+                android:alpha="0"
+                android:src="@drawable/ic_more_horiz_white_36dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <!-- Next step -->
+        <ImageButton
+            android:background="@null"
+            android:onClick="onNextStep"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_navigate_next_white_36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

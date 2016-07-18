@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Introduction -->
+    <string name="welcome">Bienvenue...</string>
+    <string name="welcome_text">Dans l\'application\nLeClassico!</string>
+
+    <!-- Titles -->
+    <string name="title_activity_intro">Introduction</string>
+
+</resources>

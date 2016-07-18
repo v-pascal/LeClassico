@@ -1,7 +1,11 @@
 <resources>
 
     <!-- Application -->
-    <string name="app_name">LeClassico</string>
+    <string name="app_name" translatable="false">LeClassico</string>
+
+    <!-- Introduction -->
+    <string name="welcome">Welcome...</string>
+    <string name="welcome_text">To the application\nLeClassico!</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>
