@@ -9,6 +9,9 @@
                 android:gravity="center"
                 tools:context="com.studio.artaban.leclassico.IntroActivity$PlaceholderFragment">
 
+
+
+
     <TextView
         android:id="@+id/section_label"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -20,5 +23,9 @@
         android:layout_below="@id/section_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
+
+
+
 
 </RelativeLayout>
