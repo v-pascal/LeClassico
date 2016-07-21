@@ -6,6 +6,8 @@
     <!-- Introduction -->
     <string name="welcome">Welcome...</string>
     <string name="welcome_text">To the application\nLeClassico!</string>
+    <string name="publications">News...</string>
+    <string name="publications_text">Follow all publication\nof your friends!</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

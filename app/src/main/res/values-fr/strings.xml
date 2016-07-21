@@ -4,6 +4,8 @@
     <!-- Introduction -->
     <string name="welcome">Bienvenue...</string>
     <string name="welcome_text">Dans l\'application\nLeClassico!</string>
+    <string name="publications">Fil d\'actualité...</string>
+    <string name="publications_text">Suivez toute l\'actualité\nde vos amis!</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

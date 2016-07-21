@@ -11,8 +11,7 @@
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
         android:textSize="32sp"
-        android:textStyle="bold"
-        android:text="@string/welcome"/>
+        android:textStyle="bold"/>
 
     <!-- Description -->
     <TextView
@@ -23,7 +22,6 @@
         android:textColor="@android:color/white"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:typeface="serif"
-        android:text="@string/welcome_text"/>
+        android:typeface="serif"/>
 
 </RelativeLayout>

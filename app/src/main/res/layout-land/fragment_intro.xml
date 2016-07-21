@@ -14,10 +14,10 @@
         android:layout_height="wrap_content"/>
 
     <!-- Representation -->
-    <include
-        layout="@layout/layout_intro_representation"
+    <ViewStub
+        android:id="@+id/representation_container"
         android:layout_gravity="center"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_width="0dp"
         android:layout_height="match_parent"/>
 

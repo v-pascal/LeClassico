@@ -2,11 +2,9 @@ package com.studio.artaban.leclassico;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.Fragment;
@@ -17,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.ViewStub;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -26,6 +25,8 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by pascal on 15/07/16.
@@ -151,6 +152,61 @@ public class IntroActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
 
             Logs.add(Logs.Type.V, null);
+            //View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
+            ViewStub representation;
+
+
+
+            View rootView;
+
+
+
+
+
+            switch (getArguments().getInt(DATA_KEY_POSITION)) {
+
+                case 0: {
+
+
+
+                    rootView = inflater.inflate(R.layout.fragment_intro, container, false);
+
+
+
+
+                    representation = (ViewStub)rootView.findViewById(R.id.representation_container);
+                    representation.setLayoutResource(R.layout.layout_intro_welcome);
+
+
+
+
+
+                    representation.inflate();
+
+
+
+
+                    break;
+                }
+                case 1: {
+
+
+
+                    rootView = inflater.inflate(R.layout.fragment_intro, container, false);
+
+
+
+                    representation = (ViewStub)rootView.findViewById(R.id.representation_container);
+                    representation.setLayoutResource(R.layout.layout_intro_publications);
+
+
+
+                    representation.inflate();
+
+
+
+                    break;
+                }
 
 
 
@@ -158,9 +214,19 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-            View rootView = (getArguments().getInt(DATA_KEY_POSITION) == 0)?
-                    inflater.inflate(R.layout.fragment_intro, container, false):
-                    inflater.inflate(R.layout.fragment_temp, container, false);
+
+
+                default: {
+                    rootView = inflater.inflate(R.layout.fragment_temp, container, false);
+                    break;
+                }
+
+
+
+
+
+
+            }
 
             // Assign left & right page tag
             if (getArguments().getInt(DATA_KEY_POSITION) == 0)
@@ -168,15 +234,43 @@ public class IntroActivity extends AppCompatActivity {
             else if (getArguments().getInt(DATA_KEY_POSITION) == (INTRO_PAGE_COUNT - 1))
                 rootView.setTag(LimitlessViewPager.TAG_PAGE_RIGHT_BOTTOM);
 
+            // Position representation images
             position(rootView);
 
+            // Configure comments
+            TextView title = (TextView)rootView.findViewById(R.id.title);
+            TextView description = (TextView)rootView.findViewById(R.id.description);
+            switch (getArguments().getInt(DATA_KEY_POSITION)) {
+
+                case 0: { // Welcome
+
+
+
+
+
+                    title.setText(getResources().getString(R.string.welcome));
+                    description.setText(getResources().getString(R.string.welcome_text));
+
+
+
+
+
+                    break;
+                }
+                case 1: { // Publications
+                    title.setText(getResources().getString(R.string.publications));
+                    description.setText(getResources().getString(R.string.publications_text));
+                    break;
+                }
+            }
 
 
 
 
 
 
-            if (getArguments().getInt(DATA_KEY_POSITION) != 0) {
+
+            if (getArguments().getInt(DATA_KEY_POSITION) > 1) {
                 TextView framePosition = (TextView) rootView.findViewById(R.id.section_label);
                 framePosition.setText("#" + getArguments().getInt(DATA_KEY_POSITION));
                 //mFrameImage = (ImageView)rootView.findViewById(R.id.frame_image);
@@ -189,28 +283,6 @@ public class IntroActivity extends AppCompatActivity {
 
 
             return rootView;
-        }
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-            Logs.add(Logs.Type.V, null);
-
-
-
-
-
-            /*
-            Bitmap bitmap = openBitmapFile(getArguments().getInt(DATA_KEY_SYNCHRO_OFFSET),
-                    getArguments().getBoolean(DATA_KEY_SYNCHRO_LOCAL));
-            if (bitmap != null)
-                mFrameImage.setImageBitmap(bitmap);
-                */
-
-
-
-
-
         }
     }
 
@@ -316,11 +388,11 @@ public class IntroActivity extends AppCompatActivity {
         });
         mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
-            private static final float TRANSLATE_RATIO_INTRO_LIGHT_1 = 130f;
-            private static final float TRANSLATE_RATIO_INTRO_BALL = 100f;
-            private static final float TRANSLATE_RATIO_INTRO_LIGHT_2 = 90f;
-            private static final float TRANSLATE_RATIO_DISK_TRAY = 80f;
-            private static final float TRANSLATE_RATIO_SOUND_SPEAKER = 60f;
+            private static final float TRANSLATE_RATIO_INTRO_LIGHT_1 = 170f;
+            private static final float TRANSLATE_RATIO_INTRO_BALL = 130f;
+            private static final float TRANSLATE_RATIO_INTRO_LIGHT_2 = 100f;
+            private static final float TRANSLATE_RATIO_DISK_TRAY = 90f;
+            private static final float TRANSLATE_RATIO_SOUND_SPEAKER = 70f;
             private static final float TRANSLATE_RATIO_SMILEY = 50f;
             private static final float TRANSLATE_RATIO_UN_SMILEY = 40f;
 
