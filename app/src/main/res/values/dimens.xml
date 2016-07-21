@@ -8,6 +8,6 @@
 
     <!-- Introduction -->
     <dimen name="intro_padding_bottom">68dp</dimen><!-- activity_vertical_margin * 2 + 36dp (image) -->
-    <dimen name="container_padding_bottom">16dp</dimen>
+    <dimen name="container_padding_bottom">32dp</dimen>
 
 </resources>

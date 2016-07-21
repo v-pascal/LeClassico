@@ -1,10 +1,12 @@
 package com.studio.artaban.leclassico;
 
 import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.Fragment;
@@ -43,78 +45,104 @@ public class IntroActivity extends AppCompatActivity {
     private static final int INTRO_PAGE_COUNT = 5;
 
     //
-    public static class PlaceholderFragment extends Fragment {
+    public static class IntroFragment extends Fragment {
 
         public static final String DATA_KEY_POSITION = "position";
-        public static final String DATA_KEY_SCREEN_HEIGHT = "height";
         // Data keys
 
-        public static Fragment newInstance(int position, int height) {
+        public static Fragment newInstance(int position) {
 
             Bundle args = new Bundle();
-            args.putInt(PlaceholderFragment.DATA_KEY_POSITION, position);
-            args.putInt(PlaceholderFragment.DATA_KEY_SCREEN_HEIGHT, height);
+            args.putInt(DATA_KEY_POSITION, position);
 
-            PlaceholderFragment fragment = new PlaceholderFragment();
+            IntroFragment fragment = new IntroFragment();
             fragment.setArguments(args);
             return fragment;
         }
 
         //
-        private float getSizeRatio() { // Return size ratio for all representation images
+        public static final int INTRO_LIGHT_1_TRANS_X = -143; // Light #1 horizontal position (from middle screen)
+        private static final int INTRO_LIGHT_1_TRANS_Y = 32; // Light #1 vertical position (from screen top)
+        public static final int INTRO_LIGHT_2_TRANS_X = 132; // Light #2 horizontal position (from middle screen)
+        private static final int INTRO_LIGHT_2_TRANS_Y = 106; // Light #2 vertical position (from screen top)
+        public static final int INTRO_DISK_TRAY_TRANS_X = -89; // Disk tray horizontal position (from middle screen)
+        private static final int INTRO_DISK_TRAY_TRANS_Y = 243; // Disk tray vertical position (from screen top)
+        public static final int INTRO_SOUND_SPEAKER_TRANS_X = 128; // Sound speaker horizontal position (from middle screen)
+        private static final int INTRO_SOUND_SPEAKER_TRANS_Y = 273; // Sound speaker vertical position (from screen top)
+        public static final int INTRO_SMILEY_TRANS_X = -124; // Smiley horizontal position (from middle screen)
+        private static final int INTRO_SMILEY_TRANS_Y = 193; // Smiley vertical position (from screen top)
+        public static final int INTRO_UN_SMILEY_TRANS_X = 64; // Un smiley horizontal position (from middle screen)
+        private static final int INTRO_UN_SMILEY_TRANS_Y = 225; // Un smiley vertical position (from screen top)
 
-            int backHeight = getArguments().getInt(DATA_KEY_SCREEN_HEIGHT);
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        public static float getSizeRatio(Activity activity) {
+        // Return size ratio for all representation images
+
+            Point screenSize = new Point();
+            activity.getWindowManager().getDefaultDisplay().getSize(screenSize);
+
+            int backHeight = screenSize.y;
+            if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
                 backHeight >>= 1; // Half height for portrait
             else // Include layout padding for landscape
-                backHeight -= getResources().getDimensionPixelSize(R.dimen.intro_padding_bottom);
+                backHeight -= activity.getResources().getDimensionPixelSize(R.dimen.intro_padding_bottom);
 
             // Include background image padding
-            backHeight -= getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin) << 1;
+            backHeight -= activity.getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin) << 1;
 
             return (float)backHeight / (float)Constants.INTRO_BACKGROUND_IMAGE_HEIGHT;
         }
+
         private void position(View root) { // Position the representation images
 
+            float sizeRatio = getSizeRatio(getActivity());
+            switch (getArguments().getInt(DATA_KEY_POSITION)) {
+
+                case 0: { // Welcome
+
+                    ImageView container = (ImageView)root.findViewById(R.id.image_container);
+                    ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
+                            (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
+
+                    ImageView ball = (ImageView)root.findViewById(R.id.image_ball);
+                    ((RelativeLayout.LayoutParams)ball.getLayoutParams()).height =
+                            (int)(Constants.INTRO_BALL_IMAGE_HEIGHT * sizeRatio);
+
+                    ImageView light1 = (ImageView)root.findViewById(R.id.image_light1);
+                    light1.setTranslationX(INTRO_LIGHT_1_TRANS_X * sizeRatio);
+                    light1.setTranslationY(INTRO_LIGHT_1_TRANS_Y * sizeRatio);
+
+                    ImageView light2 = (ImageView)root.findViewById(R.id.image_light2);
+                    light2.setTranslationX(INTRO_LIGHT_2_TRANS_X * sizeRatio);
+                    light2.setTranslationY(INTRO_LIGHT_2_TRANS_Y * sizeRatio);
+
+                    ImageView diskTray = (ImageView)root.findViewById(R.id.image_disk_tray);
+                    diskTray.setTranslationX(INTRO_DISK_TRAY_TRANS_X * sizeRatio);
+                    diskTray.setTranslationY(INTRO_DISK_TRAY_TRANS_Y * sizeRatio);
+
+                    ImageView speaker = (ImageView)root.findViewById(R.id.image_sound_speaker);
+                    speaker.setTranslationX(INTRO_SOUND_SPEAKER_TRANS_X * sizeRatio);
+                    speaker.setTranslationY(INTRO_SOUND_SPEAKER_TRANS_Y * sizeRatio);
+
+                    ImageView smiley = (ImageView)root.findViewById(R.id.image_smiley);
+                    smiley.setTranslationX(INTRO_SMILEY_TRANS_X * sizeRatio);
+                    smiley.setTranslationY(INTRO_SMILEY_TRANS_Y * sizeRatio);
+
+                    ImageView unSmiley = (ImageView)root.findViewById(R.id.image_un_smiley);
+                    unSmiley.setTranslationX(INTRO_UN_SMILEY_TRANS_X * sizeRatio);
+                    unSmiley.setTranslationY(INTRO_UN_SMILEY_TRANS_Y * sizeRatio);
+                    break;
+                }
+                case 1: { // Publications
 
 
 
 
-            if (getArguments().getInt(DATA_KEY_POSITION) != 0)
-                return;
 
 
 
-
-            //int pixel = getResources().getDimensionPixelSize(R.dimen.appbar_padding_top);
-            //Logs.add(Logs.Type.I, "p: " + pixel);
-
-            /*
-            ImageView back = (ImageView)root.findViewById(R.id.image_background);
-            Logs.add(Logs.Type.I, "w: " + ((RelativeLayout.LayoutParams)back.getLayoutParams()).width);
-            Logs.add(Logs.Type.I, "h: " + ((RelativeLayout.LayoutParams)back.getLayoutParams()).height);
-            */
-
-
-
-
-
-
-            float sizeRatio = getSizeRatio();
-
-
-            Logs.add(Logs.Type.I, "ratio: " + sizeRatio);
-
-
-            ImageView container = (ImageView)root.findViewById(R.id.image_container);
-            ((RelativeLayout.LayoutParams)container.getLayoutParams()).width =
-                    (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
-
-
-
-
-
-
+                    break;
+                }
+            }
         }
 
         //////
@@ -273,9 +301,6 @@ public class IntroActivity extends AppCompatActivity {
         applyAlpha(skip, step1, step2, step3, step4);
 
         // Set up the ViewPager
-        final Point screenSize = new Point();
-        getWindowManager().getDefaultDisplay().getSize(screenSize);
-
         mViewPager = (LimitlessViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
 
@@ -286,26 +311,55 @@ public class IntroActivity extends AppCompatActivity {
 
             @Override
             public Fragment getItem(int position) {
-                return PlaceholderFragment.newInstance(position, screenSize.y);
+                return IntroFragment.newInstance(position);
             }
         });
         mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
+
+            private static final float TRANSLATE_RATIO_INTRO_LIGHT_1 = 130f;
+            private static final float TRANSLATE_RATIO_INTRO_BALL = 100f;
+            private static final float TRANSLATE_RATIO_INTRO_LIGHT_2 = 90f;
+            private static final float TRANSLATE_RATIO_DISK_TRAY = 80f;
+            private static final float TRANSLATE_RATIO_SOUND_SPEAKER = 60f;
+            private static final float TRANSLATE_RATIO_SMILEY = 50f;
+            private static final float TRANSLATE_RATIO_UN_SMILEY = 40f;
 
             private void scroll(boolean toTheLeft, View page, float position) {
             // Apply a scrolling to the representation images
 
                 if (((toTheLeft) && (position < 0f)) || (((!toTheLeft) && (position < 1f)))) {
+                    float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
+
+                    // Welcome
+                    ImageView light1 = (ImageView)page.findViewById(R.id.image_light1);
+                    if (light1 != null)
+                        light1.setTranslationX((IntroFragment.INTRO_LIGHT_1_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_INTRO_LIGHT_1));
+                    ImageView ball = (ImageView)page.findViewById(R.id.image_ball);
+                    if (ball != null)
+                        ball.setTranslationX(position * TRANSLATE_RATIO_INTRO_BALL);
+                    ImageView light2 = (ImageView)page.findViewById(R.id.image_light2);
+                    if (light2 != null)
+                        light2.setTranslationX((IntroFragment.INTRO_LIGHT_2_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_INTRO_LIGHT_2));
+                    ImageView diskTray = (ImageView)page.findViewById(R.id.image_disk_tray);
+                    if (diskTray != null)
+                        diskTray.setTranslationX((IntroFragment.INTRO_DISK_TRAY_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_DISK_TRAY));
+                    ImageView speaker = (ImageView)page.findViewById(R.id.image_sound_speaker);
+                    if (speaker != null)
+                        speaker.setTranslationX((IntroFragment.INTRO_SOUND_SPEAKER_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_SOUND_SPEAKER));
+                    ImageView smiley = (ImageView)page.findViewById(R.id.image_smiley);
+                    if (smiley != null)
+                        smiley.setTranslationX((IntroFragment.INTRO_SMILEY_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_SMILEY));
+                    ImageView unSmiley = (ImageView)page.findViewById(R.id.image_un_smiley);
+                    if (unSmiley != null)
+                        unSmiley.setTranslationX((IntroFragment.INTRO_UN_SMILEY_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_UN_SMILEY));
 
 
-
-
-
-
-
-
-
-                    //ImageView ball = (ImageView)page.findViewById(R.id.image_ball);
-                    //ball.setTranslationX(position * 120f);
 
 
 
@@ -319,27 +373,11 @@ public class IntroActivity extends AppCompatActivity {
             @Override
             public void transformPage(View page, float position) {
 
-
-
-
-
-
                 if (position <= 0f) { // This page is moving out to the left
-
                     scroll(true, page, position);
-                    //page.setAlpha(1f + (position * 2f));
-
                 } else if (position <= 1f) { // This page is moving in from the right
-
                     scroll(false, page, position);
-                    //page.setAlpha(1f - (position * 2f));
                 }
-
-
-
-
-
-
             }
         });
         mViewPager.setOnLimitlessListener(new LimitlessViewPager.OnLimitCrossedListener() {

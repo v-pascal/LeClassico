@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
-        android:textSize="24sp"
+        android:textSize="32sp"
         android:textStyle="bold"
         android:text="@string/welcome"/>
 
@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
-        android:textSize="18sp"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:typeface="serif"
         android:text="@string/welcome_text"/>

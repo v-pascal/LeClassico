@@ -1,65 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
-    <!--
-    <ImageView
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/projo"
-        android:rotationY="180"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <ImageView
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/projo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <ImageView
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/platine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <ImageView
-        android:id="@+id/image_ball"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/ball"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <ImageView
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/baffle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <ImageView
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/baffle"
-        android:rotationY="180"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    -->
 
     <!-- Background -->
     <ImageView
         android:id="@+id/image_background"
         android:layout_centerInParent="true"
-        android:src="@drawable/representation"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:src="@drawable/welcome_back"
         android:adjustViewBounds="true"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"/>
+
+    <!-- Un smiley -->
+    <ImageView
+        android:id="@+id/image_un_smiley"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/un_smiley"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Smiley -->
+    <ImageView
+        android:id="@+id/image_smiley"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/smiley"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Sound speaker -->
+    <ImageView
+        android:id="@+id/image_sound_speaker"
+        android:scaleType="center"
+        android:scaleX="1.875"
+        android:scaleY="1.875"
+        android:rotationY="180"
+        android:rotation="-15"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/baffle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Disk tray -->
+    <ImageView
+        android:id="@+id/image_disk_tray"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/platine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Light #2 -->
+    <ImageView
+        android:id="@+id/image_light2"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/projo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Ball -->
+    <ImageView
+        android:id="@+id/image_ball"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ball"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Light #1 -->
+    <ImageView
+        android:id="@+id/image_light1"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:scaleType="center"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:rotationY="180"
+        android:src="@drawable/projo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <!-- Images container -->
     <ImageView
