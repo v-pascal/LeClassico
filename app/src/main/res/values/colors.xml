@@ -7,6 +7,7 @@
     <color name="colorAccent">#7c4dff</color>
 
     <!-- Introduction -->
-    <color name="colorIntroPublications">#8000ff00</color>
+    <color name="colorIntroPublications">#800000ff</color>
+    <color name="colorIntroAlbums">#8000ff00</color>
 
 </resources>

@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import org.w3c.dom.Text;
+
+import java.util.regex.Pattern;
 
 /**
  * Created by pascal on 15/07/16.
@@ -75,6 +78,13 @@ public class IntroActivity extends AppCompatActivity {
         public static final int INTRO_UN_SMILEY_TRANS_X = 64; // Un smiley horizontal position (from middle screen)
         private static final int INTRO_UN_SMILEY_TRANS_Y = 225; // Un smiley vertical position (from screen top)
 
+        public static final int INTRO_LINK_TRANS_X = -71; // Publication link horizontal position (from middle screen)
+        public static final int INTRO_LINK_TRANS_Y = 255; // Publication link vertical position (from screen top)
+        public static final int INTRO_PHOTO_TRANS_X = 60; // Publication photo horizontal position (from middle screen)
+        public static final int INTRO_PHOTO_TRANS_Y = 73; // Publication photo vertical position (from screen top)
+        public static final int INTRO_FRIEND_TRANS_X = -118; // Publication friend horizontal position (from middle screen)
+        public static final int INTRO_FRIEND_TRANS_Y = 142; // Publication friend vertical position (from screen top)
+
         public static float getSizeRatio(Activity activity) {
         // Return size ratio for all representation images
 
@@ -100,41 +110,106 @@ public class IntroActivity extends AppCompatActivity {
 
                 case 0: { // Welcome
 
+
+
+
                     ImageView container = (ImageView)root.findViewById(R.id.image_container);
                     ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
                             (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
+
+
+
+
+
 
                     ImageView ball = (ImageView)root.findViewById(R.id.image_ball);
                     ((RelativeLayout.LayoutParams)ball.getLayoutParams()).height =
                             (int)(Constants.INTRO_BALL_IMAGE_HEIGHT * sizeRatio);
 
                     ImageView light1 = (ImageView)root.findViewById(R.id.image_light1);
+                    ((RelativeLayout.LayoutParams)light1.getLayoutParams()).height =
+                            (int)(Constants.INTRO_LIGHT_IMAGE_HEIGHT * sizeRatio);
                     light1.setTranslationX(INTRO_LIGHT_1_TRANS_X * sizeRatio);
                     light1.setTranslationY(INTRO_LIGHT_1_TRANS_Y * sizeRatio);
 
                     ImageView light2 = (ImageView)root.findViewById(R.id.image_light2);
+                    ((RelativeLayout.LayoutParams)light2.getLayoutParams()).height =
+                            (int)(Constants.INTRO_LIGHT_IMAGE_HEIGHT * sizeRatio);
                     light2.setTranslationX(INTRO_LIGHT_2_TRANS_X * sizeRatio);
                     light2.setTranslationY(INTRO_LIGHT_2_TRANS_Y * sizeRatio);
 
                     ImageView diskTray = (ImageView)root.findViewById(R.id.image_disk_tray);
+                    ((RelativeLayout.LayoutParams)diskTray.getLayoutParams()).height =
+                            (int)(Constants.INTRO_DISK_TRAY_IMAGE_HEIGHT * sizeRatio);
                     diskTray.setTranslationX(INTRO_DISK_TRAY_TRANS_X * sizeRatio);
                     diskTray.setTranslationY(INTRO_DISK_TRAY_TRANS_Y * sizeRatio);
 
                     ImageView speaker = (ImageView)root.findViewById(R.id.image_sound_speaker);
+                    ((RelativeLayout.LayoutParams)speaker.getLayoutParams()).height =
+                            (int)(Constants.INTRO_SOUND_SPEAKER_IMAGE_HEIGHT * sizeRatio);
                     speaker.setTranslationX(INTRO_SOUND_SPEAKER_TRANS_X * sizeRatio);
                     speaker.setTranslationY(INTRO_SOUND_SPEAKER_TRANS_Y * sizeRatio);
 
                     ImageView smiley = (ImageView)root.findViewById(R.id.image_smiley);
+                    ((RelativeLayout.LayoutParams)smiley.getLayoutParams()).height =
+                            (int)(Constants.INTRO_SMILEY_IMAGE_HEIGHT * sizeRatio);
                     smiley.setTranslationX(INTRO_SMILEY_TRANS_X * sizeRatio);
                     smiley.setTranslationY(INTRO_SMILEY_TRANS_Y * sizeRatio);
 
                     ImageView unSmiley = (ImageView)root.findViewById(R.id.image_un_smiley);
+                    ((RelativeLayout.LayoutParams)unSmiley.getLayoutParams()).height =
+                            (int)(Constants.INTRO_SMILEY_IMAGE_HEIGHT * sizeRatio);
                     unSmiley.setTranslationX(INTRO_UN_SMILEY_TRANS_X * sizeRatio);
                     unSmiley.setTranslationY(INTRO_UN_SMILEY_TRANS_Y * sizeRatio);
                     break;
                 }
                 case 1: { // Publications
 
+
+
+
+
+
+
+                    ImageView container = (ImageView)root.findViewById(R.id.image_container);
+                    ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
+                            (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
+
+
+
+
+
+
+
+                    ImageView link = (ImageView)root.findViewById(R.id.image_link);
+                    ((RelativeLayout.LayoutParams)link.getLayoutParams()).height =
+                            (int)(Constants.INTRO_LINK_IMAGE_HEIGHT * sizeRatio);
+                    link.setTranslationX(INTRO_LINK_TRANS_X * sizeRatio);
+                    link.setTranslationY(INTRO_LINK_TRANS_Y * sizeRatio);
+
+                    ImageView photo = (ImageView)root.findViewById(R.id.image_photo);
+                    ((RelativeLayout.LayoutParams)photo.getLayoutParams()).height =
+                            (int)(Constants.INTRO_PHOTO_IMAGE_HEIGHT * sizeRatio);
+                    photo.setTranslationX(INTRO_PHOTO_TRANS_X * sizeRatio);
+                    photo.setTranslationY(INTRO_PHOTO_TRANS_Y * sizeRatio);
+
+                    ImageView friend = (ImageView)root.findViewById(R.id.image_friend);
+                    ((RelativeLayout.LayoutParams)friend.getLayoutParams()).height =
+                            (int)(Constants.INTRO_FRIEND_IMAGE_HEIGHT * sizeRatio);
+                    friend.setTranslationX(INTRO_FRIEND_TRANS_X * sizeRatio);
+                    friend.setTranslationY(INTRO_FRIEND_TRANS_Y * sizeRatio);
+                    break;
+                }
+                case 2: { // Album photos
+
+
+
+
+
+
+                    ImageView container = (ImageView)root.findViewById(R.id.image_container);
+                    ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
+                            (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
 
 
 
@@ -165,7 +240,7 @@ public class IntroActivity extends AppCompatActivity {
 
             switch (getArguments().getInt(DATA_KEY_POSITION)) {
 
-                case 0: {
+                case 0: { // Welcome
 
 
 
@@ -188,7 +263,7 @@ public class IntroActivity extends AppCompatActivity {
 
                     break;
                 }
-                case 1: {
+                case 1: { // Publications
 
 
 
@@ -207,7 +282,24 @@ public class IntroActivity extends AppCompatActivity {
 
                     break;
                 }
+                case 2: { // Album photos
 
+
+
+                    rootView = inflater.inflate(R.layout.fragment_intro, container, false);
+
+
+
+                    representation = (ViewStub)rootView.findViewById(R.id.representation_container);
+                    representation.setLayoutResource(R.layout.layout_intro_albums);
+
+
+
+                    representation.inflate();
+
+
+                    break;
+                }
 
 
 
@@ -244,22 +336,25 @@ public class IntroActivity extends AppCompatActivity {
 
                 case 0: { // Welcome
 
-
-
-
-
                     title.setText(getResources().getString(R.string.welcome));
-                    description.setText(getResources().getString(R.string.welcome_text));
+                    description.setText(getResources().getString(R.string.welcome_text, Constants.APP_NAME));
 
-
-
-
-
+                    // Add web site link to "LeClassico"
+                    Pattern linkMatcher = Pattern.compile(Constants.APP_NAME);
+                    String urlLeClassico = Constants.APP_WEBSITE;
+                    Linkify.addLinks(description, linkMatcher, urlLeClassico);
                     break;
                 }
                 case 1: { // Publications
+
                     title.setText(getResources().getString(R.string.publications));
                     description.setText(getResources().getString(R.string.publications_text));
+                    break;
+                }
+                case 2: { // Album photos
+
+                    title.setText(getResources().getString(R.string.albums));
+                    description.setText(getResources().getString(R.string.albums_text));
                     break;
                 }
             }
@@ -270,7 +365,10 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-            if (getArguments().getInt(DATA_KEY_POSITION) > 1) {
+
+
+
+            if (getArguments().getInt(DATA_KEY_POSITION) > 2) {
                 TextView framePosition = (TextView) rootView.findViewById(R.id.section_label);
                 framePosition.setText("#" + getArguments().getInt(DATA_KEY_POSITION));
                 //mFrameImage = (ImageView)rootView.findViewById(R.id.frame_image);
@@ -388,13 +486,20 @@ public class IntroActivity extends AppCompatActivity {
         });
         mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
-            private static final float TRANSLATE_RATIO_INTRO_LIGHT_1 = 170f;
-            private static final float TRANSLATE_RATIO_INTRO_BALL = 130f;
-            private static final float TRANSLATE_RATIO_INTRO_LIGHT_2 = 100f;
+            private static final float TRANSLATE_RATIO_LIGHT_1 = 170f;
+            private static final float TRANSLATE_RATIO_BALL = 130f;
+            private static final float TRANSLATE_RATIO_LIGHT_2 = 100f;
             private static final float TRANSLATE_RATIO_DISK_TRAY = 90f;
             private static final float TRANSLATE_RATIO_SOUND_SPEAKER = 70f;
             private static final float TRANSLATE_RATIO_SMILEY = 50f;
             private static final float TRANSLATE_RATIO_UN_SMILEY = 40f;
+
+            private static final float TRANSLATE_RATIO_LINK_X = 50f;
+            private static final float TRANSLATE_RATIO_LINK_Y = 100f;
+            private static final float TRANSLATE_RATIO_PHOTO_X = -81f;
+            private static final float TRANSLATE_RATIO_PHOTO_Y = 100f;
+            private static final float TRANSLATE_RATIO_FRIEND_X = 81f;
+            private static final float TRANSLATE_RATIO_FRIEND_Y = 100f;
 
             private void scroll(boolean toTheLeft, View page, float position) {
             // Apply a scrolling to the representation images
@@ -406,14 +511,14 @@ public class IntroActivity extends AppCompatActivity {
                     ImageView light1 = (ImageView)page.findViewById(R.id.image_light1);
                     if (light1 != null)
                         light1.setTranslationX((IntroFragment.INTRO_LIGHT_1_TRANS_X * sizeRatio) +
-                                (position * TRANSLATE_RATIO_INTRO_LIGHT_1));
+                                (position * TRANSLATE_RATIO_LIGHT_1));
                     ImageView ball = (ImageView)page.findViewById(R.id.image_ball);
                     if (ball != null)
-                        ball.setTranslationX(position * TRANSLATE_RATIO_INTRO_BALL);
+                        ball.setTranslationX(position * TRANSLATE_RATIO_BALL);
                     ImageView light2 = (ImageView)page.findViewById(R.id.image_light2);
                     if (light2 != null)
                         light2.setTranslationX((IntroFragment.INTRO_LIGHT_2_TRANS_X * sizeRatio) +
-                                (position * TRANSLATE_RATIO_INTRO_LIGHT_2));
+                                (position * TRANSLATE_RATIO_LIGHT_2));
                     ImageView diskTray = (ImageView)page.findViewById(R.id.image_disk_tray);
                     if (diskTray != null)
                         diskTray.setTranslationX((IntroFragment.INTRO_DISK_TRAY_TRANS_X * sizeRatio) +
@@ -430,6 +535,34 @@ public class IntroActivity extends AppCompatActivity {
                     if (unSmiley != null)
                         unSmiley.setTranslationX((IntroFragment.INTRO_UN_SMILEY_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_UN_SMILEY));
+
+                    // Publications
+                    ImageView link = (ImageView)page.findViewById(R.id.image_link);
+                    if (link != null) {
+                        link.setTranslationX((IntroFragment.INTRO_LINK_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_LINK_X));
+                        link.setTranslationY((IntroFragment.INTRO_LINK_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_LINK_Y));
+                    }
+                    ImageView photo = (ImageView)page.findViewById(R.id.image_photo);
+                    if (photo != null) {
+                        photo.setTranslationX((IntroFragment.INTRO_PHOTO_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_PHOTO_X));
+                        photo.setTranslationY((IntroFragment.INTRO_PHOTO_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_PHOTO_Y));
+                    }
+                    ImageView friend = (ImageView)page.findViewById(R.id.image_friend);
+                    if (friend != null) {
+                        friend.setTranslationX((IntroFragment.INTRO_FRIEND_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_FRIEND_X));
+                        friend.setTranslationY((IntroFragment.INTRO_FRIEND_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_FRIEND_Y));
+                    }
+
+
+
+
+
 
 
 
@@ -582,6 +715,7 @@ public class IntroActivity extends AppCompatActivity {
                         if (positionOffset > 0f) {
                             mAlphaStep3 = (positionOffset * (ALPHA_NO_SELECTION - 1f)) + 1f;
                             mAlphaStep4 = (positionOffset * (1f - ALPHA_NO_SELECTION)) + ALPHA_NO_SELECTION;
+                            mAlphaSkip = 1f - positionOffset;
                         }
                         break;
                     }

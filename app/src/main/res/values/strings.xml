@@ -5,9 +5,11 @@
 
     <!-- Introduction -->
     <string name="welcome">Welcome...</string>
-    <string name="welcome_text">To the application\nLeClassico!</string>
+    <string name="welcome_text">To the application\n%1$s!</string>
     <string name="publications">News...</string>
     <string name="publications_text">Follow all publication\nof your friends!</string>
+    <string name="albums">Albums...</string>
+    <string name="albums_text">Create &amp; share\nphoto albums!</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>
