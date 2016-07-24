@@ -10,6 +10,8 @@
     <string name="albums_text">Créer &amp; partager vos\nalbums de photos!</string>
     <string name="events">Evènements...</string>
     <string name="events_text">Tenez-vous informé de\ntous les évènements!</string>
+    <string name="location">Géolocation...</string>
+    <string name="location_text">Géolocaliser tous\nvos amis!</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

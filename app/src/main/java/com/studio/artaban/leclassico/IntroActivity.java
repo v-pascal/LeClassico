@@ -64,6 +64,24 @@ public class IntroActivity extends AppCompatActivity {
             return fragment;
         }
 
+        public static float getSizeRatio(Activity activity) {
+        // Return size ratio for all representation images
+
+            Point screenSize = new Point();
+            activity.getWindowManager().getDefaultDisplay().getSize(screenSize);
+
+            int backHeight = screenSize.y;
+            if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+                backHeight >>= 1; // Half height for portrait
+            else // Include layout padding for landscape
+                backHeight -= activity.getResources().getDimensionPixelSize(R.dimen.intro_padding_bottom);
+
+            // Include background image padding
+            backHeight -= activity.getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin) << 1;
+
+            return (float)backHeight / (float)Constants.INTRO_BACKGROUND_IMAGE_HEIGHT;
+        }
+
         //
         public static final int INTRO_LIGHT_1_TRANS_X = -143; // Light #1 image horizontal position (from middle screen)
         private static final int INTRO_LIGHT_1_TRANS_Y = 32; // Light #1 image vertical position (from screen top)
@@ -108,42 +126,16 @@ public class IntroActivity extends AppCompatActivity {
         private static final int INTRO_CALENDAR_TRANS_X = 109; // Flyer image horizontal position (from middle screen)
         private static final int INTRO_CALENDAR_TRANS_Y = 218; // Flyer image vertical position (from screen top)
 
-        public static float getSizeRatio(Activity activity) {
-        // Return size ratio for all representation images
-
-            Point screenSize = new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(screenSize);
-
-            int backHeight = screenSize.y;
-            if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-                backHeight >>= 1; // Half height for portrait
-            else // Include layout padding for landscape
-                backHeight -= activity.getResources().getDimensionPixelSize(R.dimen.intro_padding_bottom);
-
-            // Include background image padding
-            backHeight -= activity.getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin) << 1;
-
-            return (float)backHeight / (float)Constants.INTRO_BACKGROUND_IMAGE_HEIGHT;
-        }
-
         private void position(View root) { // Position the representation images
 
             float sizeRatio = getSizeRatio(getActivity());
+            ImageView container = (ImageView)root.findViewById(R.id.image_container);
+            ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
+                    (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
+
             switch (getArguments().getInt(DATA_KEY_POSITION)) {
 
                 case 0: { // Welcome
-
-
-
-
-                    ImageView container = (ImageView)root.findViewById(R.id.image_container);
-                    ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
-                            (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
-
-
-
-
-
 
                     ImageView ball = (ImageView)root.findViewById(R.id.image_ball);
                     ((RelativeLayout.LayoutParams)ball.getLayoutParams()).height =
@@ -188,22 +180,6 @@ public class IntroActivity extends AppCompatActivity {
                 }
                 case 1: { // Publications
 
-
-
-
-
-
-
-                    ImageView container = (ImageView)root.findViewById(R.id.image_container);
-                    ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
-                            (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
-
-
-
-
-
-
-
                     ImageView link = (ImageView)root.findViewById(R.id.image_link);
                     ((RelativeLayout.LayoutParams)link.getLayoutParams()).height =
                             (int)(Constants.INTRO_LINK_IMAGE_HEIGHT * sizeRatio);
@@ -224,22 +200,6 @@ public class IntroActivity extends AppCompatActivity {
                     break;
                 }
                 case 2: { // Album photos
-
-
-
-
-
-
-
-                    ImageView container = (ImageView)root.findViewById(R.id.image_container);
-                    ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
-                            (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
-
-
-
-
-
-
 
                     ImageView girls = (ImageView)root.findViewById(R.id.image_girls);
                     ((RelativeLayout.LayoutParams)girls.getLayoutParams()).height =
@@ -277,21 +237,6 @@ public class IntroActivity extends AppCompatActivity {
                 }
                 case 3: { // Events
 
-
-
-
-
-
-
-                    ImageView container = (ImageView)root.findViewById(R.id.image_container);
-                    ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
-                            (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
-
-
-
-
-
-
                     ImageView events = (ImageView)root.findViewById(R.id.image_events);
                     ((RelativeLayout.LayoutParams)events.getLayoutParams()).height =
                             (int)(Constants.INTRO_EVENTS_IMAGE_HEIGHT * sizeRatio);
@@ -315,6 +260,15 @@ public class IntroActivity extends AppCompatActivity {
                     flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE);
                     break;
                 }
+                case 4: { // Location
+
+
+
+
+
+
+                    break;
+                }
             }
         }
 
@@ -324,115 +278,32 @@ public class IntroActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
 
             Logs.add(Logs.Type.V, null);
-            //View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
-            ViewStub representation;
-
-
-
-            View rootView;
-
-
-
-
-
+            View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
+            ViewStub representation = (ViewStub)rootView.findViewById(R.id.representation_container);
             switch (getArguments().getInt(DATA_KEY_POSITION)) {
 
                 case 0: { // Welcome
-
-
-
-                    rootView = inflater.inflate(R.layout.fragment_intro, container, false);
-
-
-
-
-                    representation = (ViewStub)rootView.findViewById(R.id.representation_container);
                     representation.setLayoutResource(R.layout.layout_intro_welcome);
-
-
-
-
-
-                    representation.inflate();
-
-
-
-
                     break;
                 }
                 case 1: { // Publications
-
-
-
-                    rootView = inflater.inflate(R.layout.fragment_intro, container, false);
-
-
-
-                    representation = (ViewStub)rootView.findViewById(R.id.representation_container);
                     representation.setLayoutResource(R.layout.layout_intro_publications);
-
-
-
-                    representation.inflate();
-
-
-
                     break;
                 }
                 case 2: { // Album photos
-
-
-
-                    rootView = inflater.inflate(R.layout.fragment_intro, container, false);
-
-
-
-                    representation = (ViewStub)rootView.findViewById(R.id.representation_container);
                     representation.setLayoutResource(R.layout.layout_intro_albums);
-
-
-
-                    representation.inflate();
-
-
                     break;
                 }
                 case 3: { // Events
-
-
-                    rootView = inflater.inflate(R.layout.fragment_intro, container, false);
-
-
-
-                    representation = (ViewStub)rootView.findViewById(R.id.representation_container);
                     representation.setLayoutResource(R.layout.layout_intro_events);
-
-
-
-                    representation.inflate();
-
-
                     break;
                 }
-
-
-
-
-
-
-
-
-                default: {
-                    rootView = inflater.inflate(R.layout.fragment_temp, container, false);
+                case 4: { // Location
+                    representation.setLayoutResource(R.layout.layout_intro_location);
                     break;
                 }
-
-
-
-
-
-
             }
+            representation.inflate();
 
             // Assign left & right page tag
             if (getArguments().getInt(DATA_KEY_POSITION) == 0)
@@ -477,29 +348,13 @@ public class IntroActivity extends AppCompatActivity {
                     description.setText(getResources().getString(R.string.events_text));
                     break;
                 }
+                case 4: { // Location
+
+                    title.setText(getResources().getString(R.string.location));
+                    description.setText(getResources().getString(R.string.location_text));
+                    break;
+                }
             }
-
-
-
-
-
-
-
-
-
-
-            if (getArguments().getInt(DATA_KEY_POSITION) > 3) {
-                TextView framePosition = (TextView) rootView.findViewById(R.id.section_label);
-                framePosition.setText("#" + getArguments().getInt(DATA_KEY_POSITION));
-                //mFrameImage = (ImageView)rootView.findViewById(R.id.frame_image);
-            }
-
-
-
-
-
-
-
             return rootView;
         }
     }
