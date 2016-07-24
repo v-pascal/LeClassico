@@ -85,6 +85,20 @@ public class IntroActivity extends AppCompatActivity {
         public static final int INTRO_FRIEND_TRANS_X = -118; // Publication friend horizontal position (from middle screen)
         public static final int INTRO_FRIEND_TRANS_Y = 142; // Publication friend vertical position (from screen top)
 
+        private static final int INTRO_GIRLS_TRANS_X = -128; // Girls photo horizontal position (from middle screen)
+        private static final int INTRO_GIRLS_TRANS_Y = 253; // Girls photo vertical position (from screen top)
+        public static final int INTRO_GIRLS_ROTATION_Y = 30; // Girls photo vertical rotation
+        private static final int INTRO_COUPLE_TRANS_X = 94; // Couple photo horizontal position (from middle screen)
+        private static final int INTRO_COUPLE_TRANS_Y = 137; // Couple photo vertical position (from screen top)
+        public static final int INTRO_COUPLE_ROTATION_Y = -25; // Couple photo vertical rotation
+        private static final int INTRO_OUTDOOR_TRANS_X = -118; // Outdoor party photo horizontal position (from middle screen)
+        private static final int INTRO_OUTDOOR_TRANS_Y = 141; // Outdoor party photo vertical position (from screen top)
+        private static final int INTRO_DJ_TRANS_X = 59; // DJ photo horizontal position (from middle screen)
+        private static final int INTRO_DJ_TRANS_Y = 38; // DJ photo vertical position (from screen top)
+        private static final int INTRO_INDOOR_TRANS_X = -73; // Indoor party photo horizontal position (from middle screen)
+        private static final int INTRO_INDOOR_TRANS_Y = 50; // Indoor party photo vertical position (from screen top)
+        public static final int INTRO_INDOOR_ROTATION_Y = -35; // Indoor party photo vertical rotation
+
         public static float getSizeRatio(Activity activity) {
         // Return size ratio for all representation images
 
@@ -215,7 +229,38 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+                    ImageView girls = (ImageView)root.findViewById(R.id.image_girls);
+                    ((RelativeLayout.LayoutParams)girls.getLayoutParams()).height =
+                            (int)(Constants.INTRO_GIRLS_IMAGE_HEIGHT * sizeRatio);
+                    girls.setTranslationX(INTRO_GIRLS_TRANS_X * sizeRatio);
+                    girls.setTranslationY(INTRO_GIRLS_TRANS_Y * sizeRatio);
+                    girls.setRotationY(INTRO_GIRLS_ROTATION_Y);
 
+                    ImageView couple = (ImageView)root.findViewById(R.id.image_couple);
+                    ((RelativeLayout.LayoutParams)couple.getLayoutParams()).height =
+                            (int)(Constants.INTRO_COUPLE_IMAGE_HEIGHT * sizeRatio);
+                    couple.setTranslationX(INTRO_COUPLE_TRANS_X * sizeRatio);
+                    couple.setTranslationY(INTRO_COUPLE_TRANS_Y * sizeRatio);
+                    couple.setRotationY(INTRO_COUPLE_ROTATION_Y);
+
+                    ImageView outdoor = (ImageView)root.findViewById(R.id.image_outdoor);
+                    ((RelativeLayout.LayoutParams)outdoor.getLayoutParams()).height =
+                            (int)(Constants.INTRO_OUTDOOR_IMAGE_HEIGHT * sizeRatio);
+                    outdoor.setTranslationX(INTRO_OUTDOOR_TRANS_X * sizeRatio);
+                    outdoor.setTranslationY(INTRO_OUTDOOR_TRANS_Y * sizeRatio);
+
+                    ImageView dj = (ImageView)root.findViewById(R.id.image_dj);
+                    ((RelativeLayout.LayoutParams)dj.getLayoutParams()).height =
+                            (int)(Constants.INTRO_DJ_IMAGE_HEIGHT * sizeRatio);
+                    dj.setTranslationX(INTRO_DJ_TRANS_X * sizeRatio);
+                    dj.setTranslationY(INTRO_DJ_TRANS_Y * sizeRatio);
+
+                    ImageView indoor = (ImageView)root.findViewById(R.id.image_indoor);
+                    ((RelativeLayout.LayoutParams)indoor.getLayoutParams()).height =
+                            (int)(Constants.INTRO_INDOOR_IMAGE_HEIGHT * sizeRatio);
+                    indoor.setTranslationX(INTRO_INDOOR_TRANS_X * sizeRatio);
+                    indoor.setTranslationY(INTRO_INDOOR_TRANS_Y * sizeRatio);
+                    indoor.setRotationY(INTRO_INDOOR_ROTATION_Y);
                     break;
                 }
             }
@@ -501,13 +546,19 @@ public class IntroActivity extends AppCompatActivity {
             private static final float TRANSLATE_RATIO_FRIEND_X = 81f;
             private static final float TRANSLATE_RATIO_FRIEND_Y = 100f;
 
+            private static final float ROTATION_RATIO_GIRLS_Y = -80f;
+            private static final float ROTATION_RATIO_COUPLE_Y = -120f;
+            private static final float ROTATION_RATIO_INDOOR_Y = -65f;
+            private static final float ROTATION_RATIO_OUTDOOR_Y = 180f;
+            private static final float ROTATION_RATIO_DJ_Y = -145f;
+
             private void scroll(boolean toTheLeft, View page, float position) {
             // Apply a scrolling to the representation images
 
                 if (((toTheLeft) && (position < 0f)) || (((!toTheLeft) && (position < 1f)))) {
                     float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
 
-                    // Welcome
+                    ////// Welcome
                     ImageView light1 = (ImageView)page.findViewById(R.id.image_light1);
                     if (light1 != null)
                         light1.setTranslationX((IntroFragment.INTRO_LIGHT_1_TRANS_X * sizeRatio) +
@@ -536,7 +587,7 @@ public class IntroActivity extends AppCompatActivity {
                         unSmiley.setTranslationX((IntroFragment.INTRO_UN_SMILEY_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_UN_SMILEY));
 
-                    // Publications
+                    ////// Publications
                     ImageView link = (ImageView)page.findViewById(R.id.image_link);
                     if (link != null) {
                         link.setTranslationX((IntroFragment.INTRO_LINK_TRANS_X * sizeRatio) +
@@ -559,6 +610,25 @@ public class IntroActivity extends AppCompatActivity {
                                 (position * TRANSLATE_RATIO_FRIEND_Y));
                     }
 
+                    ////// Album photos
+                    ImageView girls = (ImageView)page.findViewById(R.id.image_girls);
+                    if (girls != null)
+                        girls.setRotationY(IntroFragment.INTRO_GIRLS_ROTATION_Y +
+                                (position * ROTATION_RATIO_GIRLS_Y));
+                    ImageView couple = (ImageView)page.findViewById(R.id.image_couple);
+                    if (couple != null)
+                        couple.setRotationY(IntroFragment.INTRO_COUPLE_ROTATION_Y +
+                                (position * ROTATION_RATIO_COUPLE_Y));
+                    ImageView indoor = (ImageView)page.findViewById(R.id.image_indoor);
+                    if (indoor != null)
+                        indoor.setRotationY(IntroFragment.INTRO_INDOOR_ROTATION_Y +
+                                (position * ROTATION_RATIO_INDOOR_Y));
+                    ImageView outdoor = (ImageView)page.findViewById(R.id.image_outdoor);
+                    if (outdoor != null)
+                        outdoor.setRotationY(position * ROTATION_RATIO_OUTDOOR_Y);
+                    ImageView dj = (ImageView)page.findViewById(R.id.image_dj);
+                    if (dj != null)
+                        dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
 
 
 

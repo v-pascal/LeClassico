@@ -17,6 +17,61 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"/>
 
+    <!-- Outdoor party -->
+    <ImageView
+        android:id="@+id/image_outdoor"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:rotation="15"
+        android:src="@drawable/party_outdoor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Couple -->
+    <ImageView
+        android:id="@+id/image_couple"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:rotation="25"
+        android:src="@drawable/couple"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- DJ -->
+    <ImageView
+        android:id="@+id/image_dj"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:rotation="-20"
+        android:src="@drawable/dj"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Indoor party -->
+    <ImageView
+        android:id="@+id/image_indoor"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:rotation="-10"
+        android:src="@drawable/party_indoor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Girls -->
+    <ImageView
+        android:id="@+id/image_girls"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:rotation="-35"
+        android:src="@drawable/girls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <!-- Images container -->
     <ImageView
         android:id="@+id/image_container"
