@@ -101,8 +101,10 @@ public class IntroActivity extends AppCompatActivity {
 
         private static final int INTRO_EVENTS_TRANS_X = -90; // Events image horizontal position (from middle screen)
         private static final int INTRO_EVENTS_TRANS_Y = 172; // Events image vertical position (from screen top)
-        private static final int INTRO_FLYER_TRANS_X = -18; // Calendar image horizontal position (from middle screen)
+        public static final float INTRO_EVENTS_SCALE = 0.7846f; // Events image scale
+        private static final int INTRO_FLYER_TRANS_X = -40; // Calendar image horizontal position (from middle screen)
         private static final int INTRO_FLYER_TRANS_Y = -57; // Calendar image vertical position (from screen top)
+        public static final float INTRO_FLYER_SCALE = 0.7942f; // Flyer image scale
         private static final int INTRO_CALENDAR_TRANS_X = 109; // Flyer image horizontal position (from middle screen)
         private static final int INTRO_CALENDAR_TRANS_Y = 218; // Flyer image vertical position (from screen top)
 
@@ -295,6 +297,8 @@ public class IntroActivity extends AppCompatActivity {
                             (int)(Constants.INTRO_EVENTS_IMAGE_HEIGHT * sizeRatio);
                     events.setTranslationX(INTRO_EVENTS_TRANS_X * sizeRatio);
                     events.setTranslationY(INTRO_EVENTS_TRANS_Y * sizeRatio);
+                    events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE);
+                    events.setScaleY(IntroFragment.INTRO_EVENTS_SCALE);
 
                     ImageView calendar = (ImageView)root.findViewById(R.id.image_calendar);
                     ((RelativeLayout.LayoutParams)calendar.getLayoutParams()).height =
@@ -307,6 +311,8 @@ public class IntroActivity extends AppCompatActivity {
                             (int)(Constants.INTRO_FLYER_IMAGE_HEIGHT * sizeRatio);
                     flyer.setTranslationX(INTRO_FLYER_TRANS_X * sizeRatio);
                     flyer.setTranslationY(INTRO_FLYER_TRANS_Y * sizeRatio);
+                    flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE);
+                    flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE);
                     break;
                 }
             }
@@ -608,18 +614,22 @@ public class IntroActivity extends AppCompatActivity {
             private static final float TRANSLATE_RATIO_SMILEY = 50f;
             private static final float TRANSLATE_RATIO_UN_SMILEY = 40f;
 
-            private static final float TRANSLATE_RATIO_LINK_X = 50f;
-            private static final float TRANSLATE_RATIO_LINK_Y = 100f;
-            private static final float TRANSLATE_RATIO_PHOTO_X = -81f;
-            private static final float TRANSLATE_RATIO_PHOTO_Y = 100f;
-            private static final float TRANSLATE_RATIO_FRIEND_X = 81f;
-            private static final float TRANSLATE_RATIO_FRIEND_Y = 100f;
+            private static final float TRANSLATE_RATIO_LINK_X = 25f;
+            private static final float TRANSLATE_RATIO_LINK_Y = 50;
+            private static final float TRANSLATE_RATIO_PHOTO_X = -40f;
+            private static final float TRANSLATE_RATIO_PHOTO_Y = 50f;
+            private static final float TRANSLATE_RATIO_FRIEND_X = 40f;
+            private static final float TRANSLATE_RATIO_FRIEND_Y = 50f;
 
-            private static final float ROTATION_RATIO_GIRLS_Y = -80f;
+            private static final float ROTATION_RATIO_GIRLS_Y = -180f;
             private static final float ROTATION_RATIO_COUPLE_Y = -120f;
             private static final float ROTATION_RATIO_INDOOR_Y = -65f;
-            private static final float ROTATION_RATIO_OUTDOOR_Y = 180f;
-            private static final float ROTATION_RATIO_DJ_Y = -145f;
+            private static final float ROTATION_RATIO_OUTDOOR_Y = 90f;
+            private static final float ROTATION_RATIO_DJ_Y = -165f;
+
+            private static final float SCALE_RATIO_EVENTS = 0.3f;
+            private static final float SCALE_RATIO_CALENDAR = 0.4f;
+            private static final float SCALE_RATIO_FLYER = 0.2f;
 
             private void scroll(boolean toTheLeft, View page, float position) {
             // Apply a scrolling to the representation images
@@ -699,7 +709,26 @@ public class IntroActivity extends AppCompatActivity {
                     if (dj != null)
                         dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
 
-
+                    ////// Events
+                    ImageView events = (ImageView) page.findViewById(R.id.image_events);
+                    if (events != null) {
+                        events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE +
+                                (position * SCALE_RATIO_EVENTS));
+                        events.setScaleY(IntroFragment.INTRO_EVENTS_SCALE +
+                                (position * SCALE_RATIO_EVENTS));
+                    }
+                    ImageView calendar = (ImageView)page.findViewById(R.id.image_calendar);
+                    if (calendar != null) {
+                        calendar.setScaleX(1f + (position * SCALE_RATIO_CALENDAR));
+                        calendar.setScaleY(1f + (position * SCALE_RATIO_CALENDAR));
+                    }
+                    ImageView flyer = (ImageView)page.findViewById(R.id.image_flyer);
+                    if (flyer != null) {
+                        flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE +
+                                (position * SCALE_RATIO_FLYER));
+                        flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE +
+                                (position * SCALE_RATIO_FLYER));
+                    }
 
 
 
