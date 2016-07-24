@@ -10,6 +10,8 @@
     <string name="publications_text">Follow all publication\nof your friends!</string>
     <string name="albums">Albums...</string>
     <string name="albums_text">Create &amp; share\nphoto albums!</string>
+    <string name="events">Events...</string>
+    <string name="events_text">Stay informed of\nall events!</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

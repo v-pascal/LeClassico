@@ -30,4 +30,8 @@ public final class Constants {
     public static final int INTRO_OUTDOOR_IMAGE_HEIGHT = 166; // Fixed outdoor party image height (in pixel)
     public static final int INTRO_DJ_IMAGE_HEIGHT = 150; // Fixed DJ image height (in pixel)
 
+    public static final int INTRO_EVENTS_IMAGE_HEIGHT = 337; // Fixed events image height (in pixel)
+    public static final int INTRO_CALENDAR_IMAGE_HEIGHT = 188; // Fixed calendar image height (in pixel)
+    public static final int INTRO_FLYER_IMAGE_HEIGHT = 420; // Fixed flyer image height (in pixel)
+
 }

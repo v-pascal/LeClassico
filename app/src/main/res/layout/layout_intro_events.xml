@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <!-- Background -->
+    <ImageView
+        android:id="@+id/image_background"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:src="@drawable/intro_back"
+        android:tint="@color/colorIntroEvents"
+        android:adjustViewBounds="true"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"/>
+
+    <!-- Flyer -->
+    <ImageView
+        android:id="@+id/image_flyer"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:scaleType="center"
+        android:scaleX="0.7942"
+        android:scaleY="0.7942"
+        android:rotation="-10"
+        android:src="@drawable/flyer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Calendar -->
+    <ImageView
+        android:id="@+id/image_calendar"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:scaleType="center"
+        android:rotation="35"
+        android:src="@drawable/calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Events -->
+    <ImageView
+        android:id="@+id/image_events"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:scaleType="center"
+        android:scaleX="0.7846"
+        android:scaleY="0.7846"
+        android:rotation="-25"
+        android:src="@drawable/events"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Images container -->
+    <ImageView
+        android:id="@+id/image_container"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:paddingBottom="@dimen/container_padding_bottom"
+        android:adjustViewBounds="true"
+        android:src="@drawable/lc_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

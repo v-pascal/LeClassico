@@ -65,25 +65,25 @@ public class IntroActivity extends AppCompatActivity {
         }
 
         //
-        public static final int INTRO_LIGHT_1_TRANS_X = -143; // Light #1 horizontal position (from middle screen)
-        private static final int INTRO_LIGHT_1_TRANS_Y = 32; // Light #1 vertical position (from screen top)
-        public static final int INTRO_LIGHT_2_TRANS_X = 132; // Light #2 horizontal position (from middle screen)
-        private static final int INTRO_LIGHT_2_TRANS_Y = 106; // Light #2 vertical position (from screen top)
-        public static final int INTRO_DISK_TRAY_TRANS_X = -89; // Disk tray horizontal position (from middle screen)
-        private static final int INTRO_DISK_TRAY_TRANS_Y = 243; // Disk tray vertical position (from screen top)
-        public static final int INTRO_SOUND_SPEAKER_TRANS_X = 128; // Sound speaker horizontal position (from middle screen)
-        private static final int INTRO_SOUND_SPEAKER_TRANS_Y = 273; // Sound speaker vertical position (from screen top)
-        public static final int INTRO_SMILEY_TRANS_X = -124; // Smiley horizontal position (from middle screen)
-        private static final int INTRO_SMILEY_TRANS_Y = 193; // Smiley vertical position (from screen top)
-        public static final int INTRO_UN_SMILEY_TRANS_X = 64; // Un smiley horizontal position (from middle screen)
-        private static final int INTRO_UN_SMILEY_TRANS_Y = 225; // Un smiley vertical position (from screen top)
+        public static final int INTRO_LIGHT_1_TRANS_X = -143; // Light #1 image horizontal position (from middle screen)
+        private static final int INTRO_LIGHT_1_TRANS_Y = 32; // Light #1 image vertical position (from screen top)
+        public static final int INTRO_LIGHT_2_TRANS_X = 132; // Light #2 image horizontal position (from middle screen)
+        private static final int INTRO_LIGHT_2_TRANS_Y = 106; // Light #2 image vertical position (from screen top)
+        public static final int INTRO_DISK_TRAY_TRANS_X = -89; // Disk tray image horizontal position (from middle screen)
+        private static final int INTRO_DISK_TRAY_TRANS_Y = 243; // Disk tray image vertical position (from screen top)
+        public static final int INTRO_SOUND_SPEAKER_TRANS_X = 128; // Sound speaker image horizontal position (from middle screen)
+        private static final int INTRO_SOUND_SPEAKER_TRANS_Y = 273; // Sound speaker image vertical position (from screen top)
+        public static final int INTRO_SMILEY_TRANS_X = -124; // Smiley image horizontal position (from middle screen)
+        private static final int INTRO_SMILEY_TRANS_Y = 193; // Smiley image vertical position (from screen top)
+        public static final int INTRO_UN_SMILEY_TRANS_X = 64; // Un smiley image horizontal position (from middle screen)
+        private static final int INTRO_UN_SMILEY_TRANS_Y = 225; // Un smiley image vertical position (from screen top)
 
-        public static final int INTRO_LINK_TRANS_X = -71; // Publication link horizontal position (from middle screen)
-        public static final int INTRO_LINK_TRANS_Y = 255; // Publication link vertical position (from screen top)
+        public static final int INTRO_LINK_TRANS_X = -71; // Publication link image horizontal position (from middle screen)
+        public static final int INTRO_LINK_TRANS_Y = 255; // Publication link image vertical position (from screen top)
         public static final int INTRO_PHOTO_TRANS_X = 60; // Publication photo horizontal position (from middle screen)
         public static final int INTRO_PHOTO_TRANS_Y = 73; // Publication photo vertical position (from screen top)
-        public static final int INTRO_FRIEND_TRANS_X = -118; // Publication friend horizontal position (from middle screen)
-        public static final int INTRO_FRIEND_TRANS_Y = 142; // Publication friend vertical position (from screen top)
+        public static final int INTRO_FRIEND_TRANS_X = -118; // Publication friend image horizontal position (from middle screen)
+        public static final int INTRO_FRIEND_TRANS_Y = 142; // Publication friend image vertical position (from screen top)
 
         private static final int INTRO_GIRLS_TRANS_X = -128; // Girls photo horizontal position (from middle screen)
         private static final int INTRO_GIRLS_TRANS_Y = 253; // Girls photo vertical position (from screen top)
@@ -98,6 +98,13 @@ public class IntroActivity extends AppCompatActivity {
         private static final int INTRO_INDOOR_TRANS_X = -73; // Indoor party photo horizontal position (from middle screen)
         private static final int INTRO_INDOOR_TRANS_Y = 50; // Indoor party photo vertical position (from screen top)
         public static final int INTRO_INDOOR_ROTATION_Y = -35; // Indoor party photo vertical rotation
+
+        private static final int INTRO_EVENTS_TRANS_X = -90; // Events image horizontal position (from middle screen)
+        private static final int INTRO_EVENTS_TRANS_Y = 172; // Events image vertical position (from screen top)
+        private static final int INTRO_FLYER_TRANS_X = -18; // Calendar image horizontal position (from middle screen)
+        private static final int INTRO_FLYER_TRANS_Y = -57; // Calendar image vertical position (from screen top)
+        private static final int INTRO_CALENDAR_TRANS_X = 109; // Flyer image horizontal position (from middle screen)
+        private static final int INTRO_CALENDAR_TRANS_Y = 218; // Flyer image vertical position (from screen top)
 
         public static float getSizeRatio(Activity activity) {
         // Return size ratio for all representation images
@@ -221,9 +228,12 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
                     ImageView container = (ImageView)root.findViewById(R.id.image_container);
                     ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
                             (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
+
+
 
 
 
@@ -261,6 +271,42 @@ public class IntroActivity extends AppCompatActivity {
                     indoor.setTranslationX(INTRO_INDOOR_TRANS_X * sizeRatio);
                     indoor.setTranslationY(INTRO_INDOOR_TRANS_Y * sizeRatio);
                     indoor.setRotationY(INTRO_INDOOR_ROTATION_Y);
+                    break;
+                }
+                case 3: { // Events
+
+
+
+
+
+
+
+                    ImageView container = (ImageView)root.findViewById(R.id.image_container);
+                    ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
+                            (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
+
+
+
+
+
+
+                    ImageView events = (ImageView)root.findViewById(R.id.image_events);
+                    ((RelativeLayout.LayoutParams)events.getLayoutParams()).height =
+                            (int)(Constants.INTRO_EVENTS_IMAGE_HEIGHT * sizeRatio);
+                    events.setTranslationX(INTRO_EVENTS_TRANS_X * sizeRatio);
+                    events.setTranslationY(INTRO_EVENTS_TRANS_Y * sizeRatio);
+
+                    ImageView calendar = (ImageView)root.findViewById(R.id.image_calendar);
+                    ((RelativeLayout.LayoutParams)calendar.getLayoutParams()).height =
+                            (int)(Constants.INTRO_CALENDAR_IMAGE_HEIGHT * sizeRatio);
+                    calendar.setTranslationX(INTRO_CALENDAR_TRANS_X * sizeRatio);
+                    calendar.setTranslationY(INTRO_CALENDAR_TRANS_Y * sizeRatio);
+
+                    ImageView flyer = (ImageView)root.findViewById(R.id.image_flyer);
+                    ((RelativeLayout.LayoutParams)flyer.getLayoutParams()).height =
+                            (int)(Constants.INTRO_FLYER_IMAGE_HEIGHT * sizeRatio);
+                    flyer.setTranslationX(INTRO_FLYER_TRANS_X * sizeRatio);
+                    flyer.setTranslationY(INTRO_FLYER_TRANS_Y * sizeRatio);
                     break;
                 }
             }
@@ -345,6 +391,23 @@ public class IntroActivity extends AppCompatActivity {
 
                     break;
                 }
+                case 3: { // Events
+
+
+                    rootView = inflater.inflate(R.layout.fragment_intro, container, false);
+
+
+
+                    representation = (ViewStub)rootView.findViewById(R.id.representation_container);
+                    representation.setLayoutResource(R.layout.layout_intro_events);
+
+
+
+                    representation.inflate();
+
+
+                    break;
+                }
 
 
 
@@ -402,6 +465,12 @@ public class IntroActivity extends AppCompatActivity {
                     description.setText(getResources().getString(R.string.albums_text));
                     break;
                 }
+                case 3: { // Events
+
+                    title.setText(getResources().getString(R.string.events));
+                    description.setText(getResources().getString(R.string.events_text));
+                    break;
+                }
             }
 
 
@@ -413,7 +482,7 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-            if (getArguments().getInt(DATA_KEY_POSITION) > 2) {
+            if (getArguments().getInt(DATA_KEY_POSITION) > 3) {
                 TextView framePosition = (TextView) rootView.findViewById(R.id.section_label);
                 framePosition.setText("#" + getArguments().getInt(DATA_KEY_POSITION));
                 //mFrameImage = (ImageView)rootView.findViewById(R.id.frame_image);
