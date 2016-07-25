@@ -17,8 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.ViewStub;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -56,6 +54,7 @@ public class IntroActivity extends AppCompatActivity {
 
         public static Fragment newInstance(int position) {
 
+            Logs.add(Logs.Type.V, "position: " + position);
             Bundle args = new Bundle();
             args.putInt(DATA_KEY_POSITION, position);
 
@@ -67,6 +66,7 @@ public class IntroActivity extends AppCompatActivity {
         public static float getSizeRatio(Activity activity) {
         // Return size ratio for all representation images
 
+            Logs.add(Logs.Type.V, "activity: " + activity);
             Point screenSize = new Point();
             activity.getWindowManager().getDefaultDisplay().getSize(screenSize);
 
@@ -137,6 +137,7 @@ public class IntroActivity extends AppCompatActivity {
 
         private void position(View root) { // Position the representation images
 
+            Logs.add(Logs.Type.V, "root: " + root);
             float sizeRatio = getSizeRatio(getActivity());
             ImageView container = (ImageView)root.findViewById(R.id.image_container);
             ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
@@ -436,6 +437,7 @@ public class IntroActivity extends AppCompatActivity {
     private void animEvents(View page, float position) {
     // Anim events elements according the scrolling position
 
+        //Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
         ImageView events = (ImageView) page.findViewById(R.id.image_events);
         if (events != null) {
             events.clearAnimation();
@@ -457,17 +459,12 @@ public class IntroActivity extends AppCompatActivity {
                     (position * SCALE_RATIO_FLYER));
             flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE +
                     (position * SCALE_RATIO_FLYER));
-
-
-
-            Logs.add(Logs.Type.E, "scl: " + flyer.getScaleX());
-
-
         }
     }
     private void cancelEventsAnim(View page) {
     // Reset events elements scale changes (to cancel scale changes when cancel right limitless)
 
+        Logs.add(Logs.Type.V, "page: " + page);
         ImageView events = (ImageView) page.findViewById(R.id.image_events);
         if (events != null) {
             events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE);
@@ -491,7 +488,6 @@ public class IntroActivity extends AppCompatActivity {
         Logs.add(Logs.Type.V, "sender: " + sender);
         if (mViewPager.getCurrentItem() < (INTRO_PAGE_COUNT - 1))
             mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
-
         else
             skipIntro();
     }
@@ -585,6 +581,8 @@ public class IntroActivity extends AppCompatActivity {
             private void anim(boolean toTheLeft, View page, float position) {
                 // Apply animation to the representation images
 
+                //Logs.add(Logs.Type.V, "toTheLeft: " + toTheLeft + ";page: " + page +
+                //        ";position: " + position);
                 if (((toTheLeft) && (position < 0f)) || (((!toTheLeft) && (position < 1f)))) {
                     float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
 
@@ -718,6 +716,9 @@ public class IntroActivity extends AppCompatActivity {
 
             @Override
             public boolean onStartBehavior(boolean leftTop, float originX, float originY) {
+
+                Logs.add(Logs.Type.V, "leftTop: " + leftTop + ";originX: " + originX +
+                        ";originY: " + originX);
                 if ((!leftTop) && (originX > (mViewPager.getWidth() - (mViewPager.getWidth() *
                         RATIO_START_BEHAVIOR)))) {
 
@@ -732,6 +733,7 @@ public class IntroActivity extends AppCompatActivity {
             @Override
             public boolean onFinishBehavior(boolean leftTop) {
 
+                Logs.add(Logs.Type.V, "leftTop: " + leftTop);
                 View page = mViewPager.findViewWithTag((leftTop) ?
                         LimitlessViewPager.TAG_PAGE_LEFT_TOP : LimitlessViewPager.TAG_PAGE_RIGHT_BOTTOM);
                 if (leftTop) {
@@ -775,6 +777,8 @@ public class IntroActivity extends AppCompatActivity {
 
             @Override
             public boolean onLeftTopLimitCrossed(View page, float deltaX, float deltaY) {
+
+                //Logs.add(Logs.Type.V, "page: " + page + ";deltaX: " + deltaX + ";deltaY: " + deltaY);
                 if (deltaX > 0f) {
 
                     float screenRatio = mViewPager.getWidth() * RATIO_ROTATION;
@@ -786,6 +790,8 @@ public class IntroActivity extends AppCompatActivity {
 
             @Override
             public boolean onRightBottomLimitCrossed(View page, float deltaX, float deltaY) {
+
+                //Logs.add(Logs.Type.V, "page: " + page + ";deltaX: " + deltaX + ";deltaY: " + deltaY);
                 if (!mScrolling)
                     return false;
 
@@ -807,6 +813,7 @@ public class IntroActivity extends AppCompatActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             // Display or hide panel controls according current scroll position
 
+                //Logs.add(Logs.Type.V, "position: " + position);
                 switch (position) {
                     case 0: { // 0 -> 1
 
