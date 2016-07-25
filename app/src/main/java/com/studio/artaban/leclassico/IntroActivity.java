@@ -27,8 +27,6 @@ import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
-import org.w3c.dom.Text;
-
 import java.util.regex.Pattern;
 
 /**
@@ -235,7 +233,16 @@ public class IntroActivity extends AppCompatActivity {
                     indoor.setRotationY(INTRO_INDOOR_ROTATION_Y);
                     break;
                 }
-                case 3: { // Events
+                case 3: { // Location
+
+
+
+
+
+
+                    break;
+                }
+                case 4: { // Events
 
                     ImageView events = (ImageView)root.findViewById(R.id.image_events);
                     ((RelativeLayout.LayoutParams)events.getLayoutParams()).height =
@@ -258,15 +265,6 @@ public class IntroActivity extends AppCompatActivity {
                     flyer.setTranslationY(INTRO_FLYER_TRANS_Y * sizeRatio);
                     flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE);
                     flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE);
-                    break;
-                }
-                case 4: { // Location
-
-
-
-
-
-
                     break;
                 }
             }
@@ -294,12 +292,12 @@ public class IntroActivity extends AppCompatActivity {
                     representation.setLayoutResource(R.layout.layout_intro_albums);
                     break;
                 }
-                case 3: { // Events
-                    representation.setLayoutResource(R.layout.layout_intro_events);
+                case 3: { // Location
+                    representation.setLayoutResource(R.layout.layout_intro_location);
                     break;
                 }
-                case 4: { // Location
-                    representation.setLayoutResource(R.layout.layout_intro_location);
+                case 4: { // Events
+                    representation.setLayoutResource(R.layout.layout_intro_events);
                     break;
                 }
             }
@@ -342,16 +340,16 @@ public class IntroActivity extends AppCompatActivity {
                     description.setText(getResources().getString(R.string.albums_text));
                     break;
                 }
-                case 3: { // Events
-
-                    title.setText(getResources().getString(R.string.events));
-                    description.setText(getResources().getString(R.string.events_text));
-                    break;
-                }
-                case 4: { // Location
+                case 3: { // Location
 
                     title.setText(getResources().getString(R.string.location));
                     description.setText(getResources().getString(R.string.location_text));
+                    break;
+                }
+                case 4: { // Events
+
+                    title.setText(getResources().getString(R.string.events));
+                    description.setText(getResources().getString(R.string.events_text));
                     break;
                 }
             }
@@ -482,9 +480,9 @@ public class IntroActivity extends AppCompatActivity {
             private static final float ROTATION_RATIO_OUTDOOR_Y = 90f;
             private static final float ROTATION_RATIO_DJ_Y = -165f;
 
-            private static final float SCALE_RATIO_EVENTS = 0.3f;
-            private static final float SCALE_RATIO_CALENDAR = 0.4f;
-            private static final float SCALE_RATIO_FLYER = 0.2f;
+            private static final float SCALE_RATIO_EVENTS = 0.5f;
+            private static final float SCALE_RATIO_CALENDAR = 0.6f;
+            private static final float SCALE_RATIO_FLYER = 0.3f;
 
             private void scroll(boolean toTheLeft, View page, float position) {
             // Apply a scrolling to the representation images
@@ -564,6 +562,17 @@ public class IntroActivity extends AppCompatActivity {
                     if (dj != null)
                         dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
 
+                    ////// Location
+
+
+
+
+
+
+
+
+
+
                     ////// Events
                     ImageView events = (ImageView) page.findViewById(R.id.image_events);
                     if (events != null) {
@@ -584,17 +593,6 @@ public class IntroActivity extends AppCompatActivity {
                         flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE +
                                 (position * SCALE_RATIO_FLYER));
                     }
-
-
-
-
-
-
-
-
-
-
-
                 }
             }
 
