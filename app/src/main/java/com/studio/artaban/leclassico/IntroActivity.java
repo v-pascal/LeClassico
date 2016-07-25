@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.ViewStub;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -31,7 +33,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by pascal on 15/07/16.
- * Introduction activity class
+ * Introduction & connection activity class
  */
 public class IntroActivity extends AppCompatActivity {
 
@@ -423,7 +425,68 @@ public class IntroActivity extends AppCompatActivity {
         step4.setAlpha(mAlphaStep4);
     }
 
-    public void onNextStep(View sender) {
+    private static final float SCALE_RATIO_EVENTS = 0.5f;
+    private static final float SCALE_RATIO_CALENDAR = 0.6f;
+    private static final float SCALE_RATIO_FLYER = 0.3f;
+    // Scale ratio of the events representation elements: scale calendar
+
+    private static final int ANIMATION_DURATION_SHOW_CONNECT = 200;
+    private static final int ANIMATION_DURATION_HIDE_CONNECT = 300;
+
+    private void animEvents(View page, float position) {
+    // Anim events elements according the scrolling position
+
+        ImageView events = (ImageView) page.findViewById(R.id.image_events);
+        if (events != null) {
+            events.clearAnimation();
+            events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE +
+                    (position * SCALE_RATIO_EVENTS));
+            events.setScaleY(IntroFragment.INTRO_EVENTS_SCALE +
+                    (position * SCALE_RATIO_EVENTS));
+        }
+        ImageView calendar = (ImageView) page.findViewById(R.id.image_calendar);
+        if (calendar != null) {
+            calendar.clearAnimation();
+            calendar.setScaleX(1f + (position * SCALE_RATIO_CALENDAR));
+            calendar.setScaleY(1f + (position * SCALE_RATIO_CALENDAR));
+        }
+        ImageView flyer = (ImageView) page.findViewById(R.id.image_flyer);
+        if (flyer != null) {
+            flyer.clearAnimation();
+            flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE +
+                    (position * SCALE_RATIO_FLYER));
+            flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE +
+                    (position * SCALE_RATIO_FLYER));
+
+
+
+            Logs.add(Logs.Type.E, "scl: " + flyer.getScaleX());
+
+
+        }
+    }
+    private void cancelEventsAnim(View page) {
+    // Reset events elements scale changes (to cancel scale changes when cancel right limitless)
+
+        ImageView events = (ImageView) page.findViewById(R.id.image_events);
+        if (events != null) {
+            events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE);
+            events.setScaleY(IntroFragment.INTRO_EVENTS_SCALE);
+        }
+        ImageView calendar = (ImageView) page.findViewById(R.id.image_calendar);
+        if (calendar != null) {
+            calendar.setScaleX(1f);
+            calendar.setScaleY(1f);
+        }
+        ImageView flyer = (ImageView) page.findViewById(R.id.image_flyer);
+        if (flyer != null) {
+            flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE);
+            flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE);
+        }
+    }
+
+    //
+    public void onNextStep(View sender) { // Next step click event
 
         Logs.add(Logs.Type.V, "sender: " + sender);
         if (mViewPager.getCurrentItem() < (INTRO_PAGE_COUNT - 1))
@@ -432,7 +495,7 @@ public class IntroActivity extends AppCompatActivity {
         else
             skipIntro();
     }
-    public void onSkipIntro(View sender) {
+    public void onSkipIntro(View sender) { // Cancel introduction click event
 
         Logs.add(Logs.Type.V, "sender: " + sender);
         skipIntro();
@@ -504,17 +567,12 @@ public class IntroActivity extends AppCompatActivity {
             private static final float TRANSLATE_RATIO_FRIEND_Y = 50f;
             // Translation ratio of the publications representation elements: move publications.
 
-            private static final float ROTATION_RATIO_GIRLS_Y = -180f;
+            private static final float ROTATION_RATIO_GIRLS_Y = -220f;
             private static final float ROTATION_RATIO_COUPLE_Y = -120f;
             private static final float ROTATION_RATIO_INDOOR_Y = -65f;
             private static final float ROTATION_RATIO_OUTDOOR_Y = 90f;
             private static final float ROTATION_RATIO_DJ_Y = -165f;
             // Rotation ratio of the albums representation elements (photos): flip photos.
-
-            private static final float SCALE_RATIO_EVENTS = 0.5f;
-            private static final float SCALE_RATIO_CALENDAR = 0.6f;
-            private static final float SCALE_RATIO_FLYER = 0.3f;
-            // Scale ratio of the events representation elements: scale calendar
 
             private static final float TRANSLATE_RATIO_GREEN_MARKER_Y = 100f;
             private static final float TRANSLATE_RATIO_YELLOW_MARKER_X = 130f;
@@ -525,56 +583,56 @@ public class IntroActivity extends AppCompatActivity {
             // Translation ratio of the location representation elements (markers): follow map.
 
             private void anim(boolean toTheLeft, View page, float position) {
-            // Apply animation to the representation images
+                // Apply animation to the representation images
 
                 if (((toTheLeft) && (position < 0f)) || (((!toTheLeft) && (position < 1f)))) {
                     float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
 
                     ////// Welcome: scroll elements!
-                    ImageView light1 = (ImageView)page.findViewById(R.id.image_light1);
+                    ImageView light1 = (ImageView) page.findViewById(R.id.image_light1);
                     if (light1 != null)
                         light1.setTranslationX((IntroFragment.INTRO_LIGHT_1_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_LIGHT_1));
-                    ImageView ball = (ImageView)page.findViewById(R.id.image_ball);
+                    ImageView ball = (ImageView) page.findViewById(R.id.image_ball);
                     if (ball != null)
                         ball.setTranslationX(position * TRANSLATE_RATIO_BALL);
-                    ImageView light2 = (ImageView)page.findViewById(R.id.image_light2);
+                    ImageView light2 = (ImageView) page.findViewById(R.id.image_light2);
                     if (light2 != null)
                         light2.setTranslationX((IntroFragment.INTRO_LIGHT_2_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_LIGHT_2));
-                    ImageView diskTray = (ImageView)page.findViewById(R.id.image_disk_tray);
+                    ImageView diskTray = (ImageView) page.findViewById(R.id.image_disk_tray);
                     if (diskTray != null)
                         diskTray.setTranslationX((IntroFragment.INTRO_DISK_TRAY_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_DISK_TRAY));
-                    ImageView speaker = (ImageView)page.findViewById(R.id.image_sound_speaker);
+                    ImageView speaker = (ImageView) page.findViewById(R.id.image_sound_speaker);
                     if (speaker != null)
                         speaker.setTranslationX((IntroFragment.INTRO_SOUND_SPEAKER_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_SOUND_SPEAKER));
-                    ImageView smiley = (ImageView)page.findViewById(R.id.image_smiley);
+                    ImageView smiley = (ImageView) page.findViewById(R.id.image_smiley);
                     if (smiley != null)
                         smiley.setTranslationX((IntroFragment.INTRO_SMILEY_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_SMILEY));
-                    ImageView unSmiley = (ImageView)page.findViewById(R.id.image_un_smiley);
+                    ImageView unSmiley = (ImageView) page.findViewById(R.id.image_un_smiley);
                     if (unSmiley != null)
                         unSmiley.setTranslationX((IntroFragment.INTRO_UN_SMILEY_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_UN_SMILEY));
 
                     ////// Publications: move publications!
-                    ImageView link = (ImageView)page.findViewById(R.id.image_link);
+                    ImageView link = (ImageView) page.findViewById(R.id.image_link);
                     if (link != null) {
                         link.setTranslationX((IntroFragment.INTRO_LINK_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_LINK_X));
                         link.setTranslationY((IntroFragment.INTRO_LINK_TRANS_Y * sizeRatio) +
                                 (position * TRANSLATE_RATIO_LINK_Y));
                     }
-                    ImageView photo = (ImageView)page.findViewById(R.id.image_photo);
+                    ImageView photo = (ImageView) page.findViewById(R.id.image_photo);
                     if (photo != null) {
                         photo.setTranslationX((IntroFragment.INTRO_PHOTO_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_PHOTO_X));
                         photo.setTranslationY((IntroFragment.INTRO_PHOTO_TRANS_Y * sizeRatio) +
                                 (position * TRANSLATE_RATIO_PHOTO_Y));
                     }
-                    ImageView friend = (ImageView)page.findViewById(R.id.image_friend);
+                    ImageView friend = (ImageView) page.findViewById(R.id.image_friend);
                     if (friend != null) {
                         friend.setTranslationX((IntroFragment.INTRO_FRIEND_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_FRIEND_X));
@@ -583,42 +641,42 @@ public class IntroActivity extends AppCompatActivity {
                     }
 
                     ////// Album photos: flip photos!
-                    ImageView girls = (ImageView)page.findViewById(R.id.image_girls);
+                    ImageView girls = (ImageView) page.findViewById(R.id.image_girls);
                     if (girls != null)
                         girls.setRotationY(IntroFragment.INTRO_GIRLS_ROTATION_Y +
                                 (position * ROTATION_RATIO_GIRLS_Y));
-                    ImageView couple = (ImageView)page.findViewById(R.id.image_couple);
+                    ImageView couple = (ImageView) page.findViewById(R.id.image_couple);
                     if (couple != null)
                         couple.setRotationY(IntroFragment.INTRO_COUPLE_ROTATION_Y +
                                 (position * ROTATION_RATIO_COUPLE_Y));
-                    ImageView indoor = (ImageView)page.findViewById(R.id.image_indoor);
+                    ImageView indoor = (ImageView) page.findViewById(R.id.image_indoor);
                     if (indoor != null)
                         indoor.setRotationY(IntroFragment.INTRO_INDOOR_ROTATION_Y +
                                 (position * ROTATION_RATIO_INDOOR_Y));
-                    ImageView outdoor = (ImageView)page.findViewById(R.id.image_outdoor);
+                    ImageView outdoor = (ImageView) page.findViewById(R.id.image_outdoor);
                     if (outdoor != null)
                         outdoor.setRotationY(position * ROTATION_RATIO_OUTDOOR_Y);
-                    ImageView dj = (ImageView)page.findViewById(R.id.image_dj);
+                    ImageView dj = (ImageView) page.findViewById(R.id.image_dj);
                     if (dj != null)
                         dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
 
                     ////// Location: follow the map!
-                    ImageView greenMark = (ImageView)page.findViewById(R.id.image_green_marker);
+                    ImageView greenMark = (ImageView) page.findViewById(R.id.image_green_marker);
                     if (greenMark != null)
                         greenMark.setTranslationY((IntroFragment.INTRO_GREEN_MARKER_TRANS_Y * sizeRatio) +
                                 (position * TRANSLATE_RATIO_GREEN_MARKER_Y));
-                    ImageView yellowMark = (ImageView)page.findViewById(R.id.image_yellow_marker);
+                    ImageView yellowMark = (ImageView) page.findViewById(R.id.image_yellow_marker);
                     if (yellowMark != null)
                         yellowMark.setTranslationX((IntroFragment.INTRO_YELLOW_MARKER_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_YELLOW_MARKER_X));
-                    ImageView blueMark = (ImageView)page.findViewById(R.id.image_blue_marker);
+                    ImageView blueMark = (ImageView) page.findViewById(R.id.image_blue_marker);
                     if (blueMark != null) {
                         blueMark.setTranslationX((IntroFragment.INTRO_BLUE_MARKER_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_BLUE_MARKER_X));
                         blueMark.setTranslationY((IntroFragment.INTRO_BLUE_MARKER_TRANS_Y * sizeRatio) +
                                 (position * TRANSLATE_RATIO_BLUE_MARKER_Y));
                     }
-                    ImageView redMark = (ImageView)page.findViewById(R.id.image_red_marker);
+                    ImageView redMark = (ImageView) page.findViewById(R.id.image_red_marker);
                     if (redMark != null) {
 
                         redMark.setTranslationX((IntroFragment.INTRO_RED_MARKER_TRANS_X * sizeRatio) +
@@ -628,25 +686,7 @@ public class IntroActivity extends AppCompatActivity {
                     }
 
                     ////// Events: scale calendar!
-                    ImageView events = (ImageView) page.findViewById(R.id.image_events);
-                    if (events != null) {
-                        events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE +
-                                (position * SCALE_RATIO_EVENTS));
-                        events.setScaleY(IntroFragment.INTRO_EVENTS_SCALE +
-                                (position * SCALE_RATIO_EVENTS));
-                    }
-                    ImageView calendar = (ImageView)page.findViewById(R.id.image_calendar);
-                    if (calendar != null) {
-                        calendar.setScaleX(1f + (position * SCALE_RATIO_CALENDAR));
-                        calendar.setScaleY(1f + (position * SCALE_RATIO_CALENDAR));
-                    }
-                    ImageView flyer = (ImageView)page.findViewById(R.id.image_flyer);
-                    if (flyer != null) {
-                        flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE +
-                                (position * SCALE_RATIO_FLYER));
-                        flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE +
-                                (position * SCALE_RATIO_FLYER));
-                    }
+                    animEvents(page, position);
                 }
             }
 
@@ -664,14 +704,17 @@ public class IntroActivity extends AppCompatActivity {
 
             private static final float RATIO_ROTATION = 0.05f / 800f;
             private float mRotation;
+            // Left limitless page rotation
 
             private static final float RATIO_START_BEHAVIOR = 0.25f;
             // Start to translate ViewPager when this % of the screen width is reached
             private static final float RATIO_DISPLAY_CONNECT = 0.4f;
             // Display connection layout when this % of the screen width is reached
 
-            private boolean mScrolling; // Right page scrolling flag
-            private float mTranslate;
+            private boolean mScrolling; // Scrolling flag
+            private float mTranslate; // Horizontal translation (in pixels)
+            private static final float SCALE_DELTA_RATIO_EVENTS = 0.5f; // Ratio between the horizontal
+            // translation & the scale of events elements (according the screen width)
 
             @Override
             public boolean onStartBehavior(boolean leftTop, float originX, float originY) {
@@ -715,13 +758,14 @@ public class IntroActivity extends AppCompatActivity {
 
                         anim = new TranslateAnimation(mTranslate, -mViewPager.getWidth(), 0f, 0f);
                         anim.setFillAfter(true);
-                        anim.setDuration(200);
+                        anim.setDuration(ANIMATION_DURATION_SHOW_CONNECT);
 
                         mIntroDisplayed = true;
 
                     } else {
                         anim = new TranslateAnimation(mTranslate, 0f, 0f, 0f);
-                        anim.setDuration(500);
+                        anim.setDuration(ANIMATION_DURATION_HIDE_CONNECT);
+                        cancelEventsAnim(page); // Cancel events elements scale changes
                     }
                     layout.startAnimation(anim);
                 }
@@ -745,11 +789,13 @@ public class IntroActivity extends AppCompatActivity {
                 if (!mScrolling)
                     return false;
 
-                if (deltaX < 0f) {
+                mTranslate += deltaX;
+                if (mTranslate > 0f)
+                    mTranslate = 0f;
+                ((CoordinatorLayout) page.getParent().getParent()).setTranslationX(mTranslate);
 
-                    mTranslate += deltaX;
-                    ((CoordinatorLayout) page.getParent().getParent()).setTranslationX(mTranslate);
-                }
+                ////// Events: scale calendar!
+                animEvents(page, mTranslate * SCALE_DELTA_RATIO_EVENTS / (float)mViewPager.getWidth());
                 return true;
             }
         });
