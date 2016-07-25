@@ -2,16 +2,16 @@
 <resources>
 
     <!-- Introduction -->
-    <string name="welcome">Bienvenue...</string>
-    <string name="welcome_text">Dans l\'application\n%1$s!</string>
-    <string name="publications">Fil d\'actualité...</string>
-    <string name="publications_text">Suivez toute l\'actualité\nde vos amis!</string>
-    <string name="albums">Albums...</string>
-    <string name="albums_text">Créer &amp; partager vos\nalbums de photos!</string>
-    <string name="events">Evènements...</string>
-    <string name="events_text">Tenez-vous informé de\ntous les évènements!</string>
-    <string name="location">Géolocation...</string>
-    <string name="location_text">Géolocaliser tous\nvos amis!</string>
+    <string name="intro_welcome">Bienvenue...</string>
+    <string name="intro_welcome_text">Dans l\'application\n%1$s!</string>
+    <string name="intro_publications">Fil d\'actualité...</string>
+    <string name="intro_publications_text">Suivez toute l\'actualité\nde vos amis!</string>
+    <string name="intro_albums">Albums...</string>
+    <string name="intro_albums_text">Créer &amp; partager vos\nalbums de photos!</string>
+    <string name="intro_events">Evènements...</string>
+    <string name="intro_events_text">Tenez-vous informé de\ntous les évènements!</string>
+    <string name="intro_location">Géolocation...</string>
+    <string name="intro_location_text">Géolocaliser tous\nvos amis!</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

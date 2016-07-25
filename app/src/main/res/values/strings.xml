@@ -4,16 +4,16 @@
     <string name="app_name" translatable="false">LeClassico</string>
 
     <!-- Introduction -->
-    <string name="welcome">Welcome...</string>
-    <string name="welcome_text">To the application\n%1$s!</string>
-    <string name="publications">News...</string>
-    <string name="publications_text">Follow all publication\nof your friends!</string>
-    <string name="albums">Albums...</string>
-    <string name="albums_text">Create &amp; share\nphoto albums!</string>
-    <string name="events">Events...</string>
-    <string name="events_text">Stay informed of\nall events!</string>
-    <string name="location">Location...</string>
-    <string name="location_text">Locate all of\nyour friends!</string>
+    <string name="intro_welcome">Welcome...</string>
+    <string name="intro_welcome_text">To the application\n%1$s!</string>
+    <string name="intro_publications">News...</string>
+    <string name="intro_publications_text">Follow all publication\nof your friends!</string>
+    <string name="intro_albums">Albums...</string>
+    <string name="intro_albums_text">Create &amp; share\nphoto albums!</string>
+    <string name="intro_events">Events...</string>
+    <string name="intro_events_text">Stay informed of\nall events!</string>
+    <string name="intro_location">Location...</string>
+    <string name="intro_location_text">Locate all of\nyour friends!</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

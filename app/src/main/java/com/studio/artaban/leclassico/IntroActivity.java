@@ -346,8 +346,9 @@ public class IntroActivity extends AppCompatActivity {
 
                 case 0: { // Welcome
 
-                    title.setText(getResources().getString(R.string.welcome));
-                    description.setText(getResources().getString(R.string.welcome_text, Constants.APP_NAME));
+                    title.setText(getResources().getString(R.string.intro_welcome));
+                    description.setText(getResources().getString(R.string.intro_welcome_text,
+                            Constants.APP_NAME));
 
                     // Add web site link to "LeClassico"
                     Pattern linkMatcher = Pattern.compile(Constants.APP_NAME);
@@ -357,26 +358,26 @@ public class IntroActivity extends AppCompatActivity {
                 }
                 case 1: { // Publications
 
-                    title.setText(getResources().getString(R.string.publications));
-                    description.setText(getResources().getString(R.string.publications_text));
+                    title.setText(getResources().getString(R.string.intro_publications));
+                    description.setText(getResources().getString(R.string.intro_publications_text));
                     break;
                 }
                 case 2: { // Album photos
 
-                    title.setText(getResources().getString(R.string.albums));
-                    description.setText(getResources().getString(R.string.albums_text));
+                    title.setText(getResources().getString(R.string.intro_albums));
+                    description.setText(getResources().getString(R.string.intro_albums_text));
                     break;
                 }
                 case 3: { // Location
 
-                    title.setText(getResources().getString(R.string.location));
-                    description.setText(getResources().getString(R.string.location_text));
+                    title.setText(getResources().getString(R.string.intro_location));
+                    description.setText(getResources().getString(R.string.intro_location_text));
                     break;
                 }
                 case 4: { // Events
 
-                    title.setText(getResources().getString(R.string.events));
-                    description.setText(getResources().getString(R.string.events_text));
+                    title.setText(getResources().getString(R.string.intro_events));
+                    description.setText(getResources().getString(R.string.intro_events_text));
                     break;
                 }
             }
