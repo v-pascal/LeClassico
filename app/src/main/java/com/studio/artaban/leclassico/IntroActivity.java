@@ -124,6 +124,15 @@ public class IntroActivity extends AppCompatActivity {
         private static final int INTRO_CALENDAR_TRANS_X = 109; // Flyer image horizontal position (from middle screen)
         private static final int INTRO_CALENDAR_TRANS_Y = 218; // Flyer image vertical position (from screen top)
 
+        private static final int INTRO_GREEN_MARKER_TRANS_X = 94; // Green marker image horizontal position (from middle screen)
+        public static final int INTRO_GREEN_MARKER_TRANS_Y = 2; // Green marker image vertical position (from screen top)
+        public static final int INTRO_RED_MARKER_TRANS_X = -83; // Red marker image horizontal position (from middle screen)
+        public static final int INTRO_RED_MARKER_TRANS_Y = 77; // Red marker image vertical position (from screen top)
+        public static final int INTRO_BLUE_MARKER_TRANS_X = 136; // Blue marker image horizontal position (from middle screen)
+        public static final int INTRO_BLUE_MARKER_TRANS_Y = 143; // Blue marker image vertical position (from screen top)
+        public static final int INTRO_YELLOW_MARKER_TRANS_X = 2; // Yellow marker image horizontal position (from middle screen)
+        private static final int INTRO_YELLOW_MARKER_TRANS_Y = 162; // Yellow marker image vertical position (from screen top)
+
         private void position(View root) { // Position the representation images
 
             float sizeRatio = getSizeRatio(getActivity());
@@ -235,11 +244,29 @@ public class IntroActivity extends AppCompatActivity {
                 }
                 case 3: { // Location
 
+                    ImageView greenMark = (ImageView)root.findViewById(R.id.image_green_marker);
+                    ((RelativeLayout.LayoutParams)greenMark.getLayoutParams()).height =
+                            (int)(Constants.INTRO_MARKER_IMAGE_HEIGHT * sizeRatio);
+                    greenMark.setTranslationX(INTRO_GREEN_MARKER_TRANS_X * sizeRatio);
+                    greenMark.setTranslationY(INTRO_GREEN_MARKER_TRANS_Y * sizeRatio);
 
+                    ImageView redMark = (ImageView)root.findViewById(R.id.image_red_marker);
+                    ((RelativeLayout.LayoutParams)redMark.getLayoutParams()).height =
+                            (int)(Constants.INTRO_MARKER_IMAGE_HEIGHT * sizeRatio);
+                    redMark.setTranslationX(INTRO_RED_MARKER_TRANS_X * sizeRatio);
+                    redMark.setTranslationY(INTRO_RED_MARKER_TRANS_Y * sizeRatio);
 
+                    ImageView blueMark = (ImageView)root.findViewById(R.id.image_blue_marker);
+                    ((RelativeLayout.LayoutParams)blueMark.getLayoutParams()).height =
+                            (int)(Constants.INTRO_MARKER_IMAGE_HEIGHT * sizeRatio);
+                    blueMark.setTranslationX(INTRO_BLUE_MARKER_TRANS_X * sizeRatio);
+                    blueMark.setTranslationY(INTRO_BLUE_MARKER_TRANS_Y * sizeRatio);
 
-
-
+                    ImageView yellowMark = (ImageView)root.findViewById(R.id.image_yellow_marker);
+                    ((RelativeLayout.LayoutParams)yellowMark.getLayoutParams()).height =
+                            (int)(Constants.INTRO_MARKER_IMAGE_HEIGHT * sizeRatio);
+                    yellowMark.setTranslationX(INTRO_YELLOW_MARKER_TRANS_X * sizeRatio);
+                    yellowMark.setTranslationY(INTRO_YELLOW_MARKER_TRANS_Y * sizeRatio);
                     break;
                 }
                 case 4: { // Events
@@ -466,6 +493,7 @@ public class IntroActivity extends AppCompatActivity {
             private static final float TRANSLATE_RATIO_SOUND_SPEAKER = 70f;
             private static final float TRANSLATE_RATIO_SMILEY = 50f;
             private static final float TRANSLATE_RATIO_UN_SMILEY = 40f;
+            // Translation ratio of the welcome representation elements: scroll concert scene elements.
 
             private static final float TRANSLATE_RATIO_LINK_X = 25f;
             private static final float TRANSLATE_RATIO_LINK_Y = 50;
@@ -473,24 +501,35 @@ public class IntroActivity extends AppCompatActivity {
             private static final float TRANSLATE_RATIO_PHOTO_Y = 50f;
             private static final float TRANSLATE_RATIO_FRIEND_X = 40f;
             private static final float TRANSLATE_RATIO_FRIEND_Y = 50f;
+            // Translation ratio of the publications representation elements: move publications.
 
             private static final float ROTATION_RATIO_GIRLS_Y = -180f;
             private static final float ROTATION_RATIO_COUPLE_Y = -120f;
             private static final float ROTATION_RATIO_INDOOR_Y = -65f;
             private static final float ROTATION_RATIO_OUTDOOR_Y = 90f;
             private static final float ROTATION_RATIO_DJ_Y = -165f;
+            // Rotation ratio of the albums representation elements (photos): flip photos.
 
             private static final float SCALE_RATIO_EVENTS = 0.5f;
             private static final float SCALE_RATIO_CALENDAR = 0.6f;
             private static final float SCALE_RATIO_FLYER = 0.3f;
+            // Scale ratio of the events representation elements: scale calendar
 
-            private void scroll(boolean toTheLeft, View page, float position) {
-            // Apply a scrolling to the representation images
+            private static final float TRANSLATE_RATIO_GREEN_MARKER_Y = 100f;
+            private static final float TRANSLATE_RATIO_YELLOW_MARKER_X = 130f;
+            private static final float TRANSLATE_RATIO_BLUE_MARKER_X = -90f;
+            private static final float TRANSLATE_RATIO_BLUE_MARKER_Y = -20f;
+            private static final float TRANSLATE_RATIO_RED_MARKER_X = -90f;
+            private static final float TRANSLATE_RATIO_RED_MARKER_Y = 20f;
+            // Translation ratio of the location representation elements (markers): follow map.
+
+            private void anim(boolean toTheLeft, View page, float position) {
+            // Apply animation to the representation images
 
                 if (((toTheLeft) && (position < 0f)) || (((!toTheLeft) && (position < 1f)))) {
                     float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
 
-                    ////// Welcome
+                    ////// Welcome: scroll elements!
                     ImageView light1 = (ImageView)page.findViewById(R.id.image_light1);
                     if (light1 != null)
                         light1.setTranslationX((IntroFragment.INTRO_LIGHT_1_TRANS_X * sizeRatio) +
@@ -519,7 +558,7 @@ public class IntroActivity extends AppCompatActivity {
                         unSmiley.setTranslationX((IntroFragment.INTRO_UN_SMILEY_TRANS_X * sizeRatio) +
                                 (position * TRANSLATE_RATIO_UN_SMILEY));
 
-                    ////// Publications
+                    ////// Publications: move publications!
                     ImageView link = (ImageView)page.findViewById(R.id.image_link);
                     if (link != null) {
                         link.setTranslationX((IntroFragment.INTRO_LINK_TRANS_X * sizeRatio) +
@@ -542,7 +581,7 @@ public class IntroActivity extends AppCompatActivity {
                                 (position * TRANSLATE_RATIO_FRIEND_Y));
                     }
 
-                    ////// Album photos
+                    ////// Album photos: flip photos!
                     ImageView girls = (ImageView)page.findViewById(R.id.image_girls);
                     if (girls != null)
                         girls.setRotationY(IntroFragment.INTRO_GIRLS_ROTATION_Y +
@@ -562,18 +601,32 @@ public class IntroActivity extends AppCompatActivity {
                     if (dj != null)
                         dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
 
-                    ////// Location
+                    ////// Location: follow the map!
+                    ImageView greenMark = (ImageView)page.findViewById(R.id.image_green_marker);
+                    if (greenMark != null)
+                        greenMark.setTranslationY((IntroFragment.INTRO_GREEN_MARKER_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_GREEN_MARKER_Y));
+                    ImageView yellowMark = (ImageView)page.findViewById(R.id.image_yellow_marker);
+                    if (yellowMark != null)
+                        yellowMark.setTranslationX((IntroFragment.INTRO_YELLOW_MARKER_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_YELLOW_MARKER_X));
+                    ImageView blueMark = (ImageView)page.findViewById(R.id.image_blue_marker);
+                    if (blueMark != null) {
+                        blueMark.setTranslationX((IntroFragment.INTRO_BLUE_MARKER_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_BLUE_MARKER_X));
+                        blueMark.setTranslationY((IntroFragment.INTRO_BLUE_MARKER_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_BLUE_MARKER_Y));
+                    }
+                    ImageView redMark = (ImageView)page.findViewById(R.id.image_red_marker);
+                    if (redMark != null) {
 
+                        redMark.setTranslationX((IntroFragment.INTRO_RED_MARKER_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_RED_MARKER_X));
+                        redMark.setTranslationY((IntroFragment.INTRO_RED_MARKER_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_RED_MARKER_Y));
+                    }
 
-
-
-
-
-
-
-
-
-                    ////// Events
+                    ////// Events: scale calendar!
                     ImageView events = (ImageView) page.findViewById(R.id.image_events);
                     if (events != null) {
                         events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE +
@@ -600,9 +653,9 @@ public class IntroActivity extends AppCompatActivity {
             public void transformPage(View page, float position) {
 
                 if (position <= 0f) { // This page is moving out to the left
-                    scroll(true, page, position);
+                    anim(true, page, position);
                 } else if (position <= 1f) { // This page is moving in from the right
-                    scroll(false, page, position);
+                    anim(false, page, position);
                 }
             }
         });
@@ -705,6 +758,8 @@ public class IntroActivity extends AppCompatActivity {
 
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            // Display or hide panel controls according current scroll position
+
                 switch (position) {
                     case 0: { // 0 -> 1
 

@@ -11,23 +11,50 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:src="@drawable/intro_back"
+        android:src="@drawable/intro_map"
         android:adjustViewBounds="true"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"/>
 
-    <!-- Flyer
+    <!-- Green marker -->
     <ImageView
-        android:id="@+id/image_flyer"
+        android:id="@+id/image_green_marker"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:adjustViewBounds="true"
-        android:scaleType="center"
-        android:rotation="-10"
-        android:src="@drawable/flyer"
+        android:src="@drawable/marker_green"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-    -->
+
+    <!-- Red marker -->
+    <ImageView
+        android:id="@+id/image_red_marker"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/marker_red"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Blue marker -->
+    <ImageView
+        android:id="@+id/image_blue_marker"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/marker_blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Yellow marker -->
+    <ImageView
+        android:id="@+id/image_yellow_marker"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/marker_yellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <!-- Images container -->
     <ImageView
