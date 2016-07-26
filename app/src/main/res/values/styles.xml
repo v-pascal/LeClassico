@@ -2,16 +2,62 @@
 
     <!-- Application themes. -->
     <style name="MainAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+
+
+
+
+        <!--
+        <item name="actionBarStyle">@style/AppActionBarStyle</item>
+        -->
+        <item name="android:textColorPrimary">@android:color/white</item>
+
+
+
+
+        <item name="colorPrimary">@color/colorPrimaryMain</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkMain</item>
+        <item name="colorAccent">@color/colorAccentMain</item>
     </style>
-    <style name="IntroAppTheme" parent="Theme.AppCompat.Light">
+    <style name="SettingAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+
+
+
+        <!--
+        <item name="actionMenuTextColor">@android:color/white</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">12sp</item>
+        -->
+
+
+        <item name="colorPrimary">@color/colorPrimarySetting</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkSetting</item>
+        <item name="colorAccent">@color/colorAccentSetting</item>
+    </style>
+    <style name="IntroAppTheme" parent="MainAppTheme">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/colorPrimaryMain</item>
     </style>
+
+
+
+
+
+    <!--
+    <style name="AppActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="android:titleTextStyle">@style/ActionBarTitleTextStyle</item>
+    </style>
+    <style name="ActionBarTitleTextStyle" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    -->
+
+
+
+
 
 </resources>

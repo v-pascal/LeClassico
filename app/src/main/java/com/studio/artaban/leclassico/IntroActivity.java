@@ -11,8 +11,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -66,7 +68,7 @@ public class IntroActivity extends AppCompatActivity {
         public static float getSizeRatio(Activity activity) {
         // Return size ratio for all representation images
 
-            Logs.add(Logs.Type.V, "activity: " + activity);
+            //Logs.add(Logs.Type.V, "activity: " + activity);
             Point screenSize = new Point();
             activity.getWindowManager().getDefaultDisplay().getSize(screenSize);
 
@@ -480,6 +482,7 @@ public class IntroActivity extends AppCompatActivity {
             flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE);
             flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE);
         }
+        // TODO: Use 'ScaleAnimation'. Not done coz a little bit hard due to the elements translation!
     }
 
     //
@@ -503,6 +506,26 @@ public class IntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_intro);
+
+
+
+
+
+
+
+        // Set action bar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(getString(R.string.connection));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+
+
+
+
+
+
 
         // Restore data
         if (savedInstanceState != null) {
@@ -801,7 +824,7 @@ public class IntroActivity extends AppCompatActivity {
                 ((CoordinatorLayout) page.getParent().getParent()).setTranslationX(mTranslate);
 
                 ////// Events: scale calendar!
-                animEvents(page, mTranslate * SCALE_DELTA_RATIO_EVENTS / (float)mViewPager.getWidth());
+                animEvents(page, mTranslate * SCALE_DELTA_RATIO_EVENTS / (float) mViewPager.getWidth());
                 return true;
             }
         });
@@ -863,6 +886,14 @@ public class IntroActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        Logs.add(Logs.Type.V, "menu: " + menu);
+        getMenuInflater().inflate(R.menu.menu_connect, menu);
+        return true;
     }
 
     @Override

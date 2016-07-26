@@ -2,6 +2,7 @@
 
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>
+    <string name="connection">connection</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome...</string>
@@ -17,5 +18,9 @@
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>
+
+    <!-- Menus -->
+    <string name="mnu_help">Help</string>
+    <string name="mnu_quit">Quit</string>
 
 </resources>

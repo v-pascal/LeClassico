@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Application theme color -->
-    <color name="colorPrimary">#9c27b0</color>
-    <color name="colorPrimaryDark">#7b1fa2</color>
-    <color name="colorAccent">#7c4dff</color>
+    <!-- Application theme colors -->
+    <color name="colorPrimaryMain">#9c27b0</color>
+    <color name="colorPrimaryDarkMain">#7b1fa2</color>
+    <color name="colorAccentMain">#7c4dff</color>
+
+    <color name="colorPrimarySetting">#ff5722</color>
+    <color name="colorPrimaryDarkSetting">#e64a19</color>
+    <color name="colorAccentSetting">#ffeb3b</color>
 
     <!-- Introduction -->
     <color name="colorIntroPublications">#800080ff</color>
