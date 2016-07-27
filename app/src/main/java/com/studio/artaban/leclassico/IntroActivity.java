@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -15,10 +16,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.ViewStub;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -119,13 +123,16 @@ public class IntroActivity extends AppCompatActivity {
         private static final int INTRO_INDOOR_TRANS_Y = 50; // Indoor party photo vertical position (from screen top)
         public static final int INTRO_INDOOR_ROTATION_Y = -35; // Indoor party photo vertical rotation
 
-        private static final int INTRO_EVENTS_TRANS_X = -90; // Events image horizontal position (from middle screen)
+        private static final float INTRO_EVENTS_TRANS_RATIO_X = 0.2f;
+        // Events image horizontal position (from left linear parent item  & according screen width)
         private static final int INTRO_EVENTS_TRANS_Y = 172; // Events image vertical position (from screen top)
         public static final float INTRO_EVENTS_SCALE = 0.7846f; // Events image scale
-        private static final int INTRO_FLYER_TRANS_X = -40; // Calendar image horizontal position (from middle screen)
+        private static final float INTRO_FLYER_TRANS_RATIO_X = 0.3f;
+        // Calendar image horizontal position (from left linear parent item  & according screen width)
         private static final int INTRO_FLYER_TRANS_Y = -57; // Calendar image vertical position (from screen top)
         public static final float INTRO_FLYER_SCALE = 0.7942f; // Flyer image scale
-        private static final int INTRO_CALENDAR_TRANS_X = 109; // Flyer image horizontal position (from middle screen)
+        private static final float INTRO_CALENDAR_TRANS_RATIO_X = 0.5f;
+        // Flyer image horizontal position (from left linear parent item & according screen width)
         private static final int INTRO_CALENDAR_TRANS_Y = 218; // Flyer image vertical position (from screen top)
 
         private static final int INTRO_GREEN_MARKER_TRANS_X = 94; // Green marker image horizontal position (from middle screen)
@@ -276,25 +283,38 @@ public class IntroActivity extends AppCompatActivity {
                 }
                 case 4: { // Events
 
+                    Point screenSize = new Point();
+                    getActivity().getWindowManager().getDefaultDisplay().getSize(screenSize);
+                    int width = screenSize.x;
+                    if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                        width = (int)((float)(screenSize.x << 1) / 3f);
+                        // Representation takes 2/3 of the screen in landscape mode
+
                     ImageView events = (ImageView)root.findViewById(R.id.image_events);
-                    ((RelativeLayout.LayoutParams)events.getLayoutParams()).height =
+                    ((RelativeLayout.LayoutParams) events.getLayoutParams()).height =
                             (int)(Constants.INTRO_EVENTS_IMAGE_HEIGHT * sizeRatio);
-                    events.setTranslationX(INTRO_EVENTS_TRANS_X * sizeRatio);
-                    events.setTranslationY(INTRO_EVENTS_TRANS_Y * sizeRatio);
+                    ((RelativeLayout.LayoutParams) events.getLayoutParams()).leftMargin =
+                            (int)(INTRO_EVENTS_TRANS_RATIO_X * width);
+                    ((RelativeLayout.LayoutParams) events.getLayoutParams()).topMargin =
+                            (int)(INTRO_EVENTS_TRANS_Y * sizeRatio);
                     events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE);
                     events.setScaleY(IntroFragment.INTRO_EVENTS_SCALE);
 
                     ImageView calendar = (ImageView)root.findViewById(R.id.image_calendar);
-                    ((RelativeLayout.LayoutParams)calendar.getLayoutParams()).height =
+                    ((RelativeLayout.LayoutParams) calendar.getLayoutParams()).height =
                             (int)(Constants.INTRO_CALENDAR_IMAGE_HEIGHT * sizeRatio);
-                    calendar.setTranslationX(INTRO_CALENDAR_TRANS_X * sizeRatio);
-                    calendar.setTranslationY(INTRO_CALENDAR_TRANS_Y * sizeRatio);
+                    ((RelativeLayout.LayoutParams) calendar.getLayoutParams()).leftMargin =
+                            (int)(INTRO_CALENDAR_TRANS_RATIO_X * width);
+                    ((RelativeLayout.LayoutParams) calendar.getLayoutParams()).topMargin =
+                            (int)(INTRO_CALENDAR_TRANS_Y * sizeRatio);
 
                     ImageView flyer = (ImageView)root.findViewById(R.id.image_flyer);
                     ((RelativeLayout.LayoutParams)flyer.getLayoutParams()).height =
                             (int)(Constants.INTRO_FLYER_IMAGE_HEIGHT * sizeRatio);
-                    flyer.setTranslationX(INTRO_FLYER_TRANS_X * sizeRatio);
-                    flyer.setTranslationY(INTRO_FLYER_TRANS_Y * sizeRatio);
+                    ((RelativeLayout.LayoutParams) flyer.getLayoutParams()).leftMargin =
+                            (int)(INTRO_FLYER_TRANS_RATIO_X * width);
+                    ((RelativeLayout.LayoutParams) flyer.getLayoutParams()).topMargin =
+                            (int)(INTRO_FLYER_TRANS_Y * sizeRatio);
                     flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE);
                     flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE);
                     break;
@@ -304,8 +324,7 @@ public class IntroActivity extends AppCompatActivity {
 
         //////
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
             Logs.add(Logs.Type.V, null);
             View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
@@ -390,6 +409,10 @@ public class IntroActivity extends AppCompatActivity {
         }
     }
 
+    private static final int ANIMATION_DURATION_SHOW_CONNECT = 200; // Display connection layout partially duration
+    private static final int ANIMATION_DURATION_HIDE_CONNECT = 300; // Hide connection layout duration
+    private static final int ANIMATION_DURATION_DISPLAY = 300; // Display connection/introduction layout entirely duration
+
     private void skipIntro() { // Display connection layout
 
         Logs.add(Logs.Type.V, null);
@@ -397,16 +420,56 @@ public class IntroActivity extends AppCompatActivity {
         layout.clearAnimation();
         layout.setTranslationX(0);
         TranslateAnimation anim = new TranslateAnimation(0f, -mViewPager.getWidth(), 0f, 0f);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                Logs.add(Logs.Type.V, "animation: " + animation);
+                displayConnection(true);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
         anim.setFillAfter(true);
-        anim.setDuration(300);
+        anim.setDuration(ANIMATION_DURATION_DISPLAY);
         layout.startAnimation(anim);
 
-        mIntroDisplayed = true;
+        mIntroDone = true;
+    }
+    private void displayConnection(boolean show) {
+
+        Logs.add(Logs.Type.V, "show: " + show);
+        if (show) { // Show connection layout (hide introduction)
+
+            ((CoordinatorLayout) findViewById(R.id.intro_content)).setVisibility(View.GONE);
+            View connect = findViewById(R.id.connect_content);
+            connect.bringToFront();
+
+        } else { // Hide connection layout (show introduction)
+
+            View intro = findViewById(R.id.intro_content);
+            intro.clearAnimation();
+            intro.setTranslationX(0f);
+            TranslateAnimation anim = new TranslateAnimation(-mViewPager.getWidth(), 0f, 0f, 0f);
+            anim.setDuration(ANIMATION_DURATION_DISPLAY);
+
+            ((CoordinatorLayout) findViewById(R.id.intro_content)).setVisibility(View.VISIBLE);
+            intro.bringToFront();
+            intro.startAnimation(anim);
+        }
     }
 
     //
     private LimitlessViewPager mViewPager; // Introduction view pager component
-    private boolean mIntroDisplayed; // Introduction display flag
+    private boolean mIntroDone; // Introduction flag
 
     private float mAlphaSkip;
     private float mAlphaStep1;
@@ -428,13 +491,10 @@ public class IntroActivity extends AppCompatActivity {
         step4.setAlpha(mAlphaStep4);
     }
 
-    private static final float SCALE_RATIO_EVENTS = 0.5f;
+    private static final float SCALE_RATIO_EVENTS = 0.3f;
     private static final float SCALE_RATIO_CALENDAR = 0.6f;
-    private static final float SCALE_RATIO_FLYER = 0.3f;
+    private static final float SCALE_RATIO_FLYER = 0.5f;
     // Scale ratio of the events representation elements: scale calendar
-
-    private static final int ANIMATION_DURATION_SHOW_CONNECT = 200;
-    private static final int ANIMATION_DURATION_HIDE_CONNECT = 300;
 
     private void animEvents(View page, float position) {
     // Anim events elements according the scrolling position
@@ -463,26 +523,40 @@ public class IntroActivity extends AppCompatActivity {
                     (position * SCALE_RATIO_FLYER));
         }
     }
-    private void cancelEventsAnim(View page) {
-    // Reset events elements scale changes (to cancel scale changes when cancel right limitless)
+    private void animEvents(View page) {
+    // Anim events elements to reset scale changes (when cancelling to display connection activity)
 
         Logs.add(Logs.Type.V, "page: " + page);
         ImageView events = (ImageView) page.findViewById(R.id.image_events);
         if (events != null) {
-            events.setScaleX(IntroFragment.INTRO_EVENTS_SCALE);
-            events.setScaleY(IntroFragment.INTRO_EVENTS_SCALE);
+            events.clearAnimation();
+            ScaleAnimation anim = new ScaleAnimation(1f, IntroFragment.INTRO_EVENTS_SCALE / events.getScaleX(),
+                    1f, IntroFragment.INTRO_EVENTS_SCALE / events.getScaleY(),
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            anim.setFillAfter(true);
+            anim.setDuration(ANIMATION_DURATION_HIDE_CONNECT);
+            events.startAnimation(anim);
         }
         ImageView calendar = (ImageView) page.findViewById(R.id.image_calendar);
         if (calendar != null) {
-            calendar.setScaleX(1f);
-            calendar.setScaleY(1f);
+            calendar.clearAnimation();
+            ScaleAnimation anim = new ScaleAnimation(1f, 1f / calendar.getScaleX(),
+                    1f, 1f / calendar.getScaleY(),
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            anim.setFillAfter(true);
+            anim.setDuration(ANIMATION_DURATION_HIDE_CONNECT);
+            calendar.startAnimation(anim);
         }
         ImageView flyer = (ImageView) page.findViewById(R.id.image_flyer);
         if (flyer != null) {
-            flyer.setScaleX(IntroFragment.INTRO_FLYER_SCALE);
-            flyer.setScaleY(IntroFragment.INTRO_FLYER_SCALE);
+            flyer.clearAnimation();
+            ScaleAnimation anim = new ScaleAnimation(1f, IntroFragment.INTRO_FLYER_SCALE / flyer.getScaleX(),
+                    1f, IntroFragment.INTRO_FLYER_SCALE / flyer.getScaleY(),
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            anim.setFillAfter(true);
+            anim.setDuration(ANIMATION_DURATION_HIDE_CONNECT);
+            flyer.startAnimation(anim);
         }
-        // TODO: Use 'ScaleAnimation'. Not done coz a little bit hard due to the elements translation!
     }
 
     //
@@ -491,7 +565,7 @@ public class IntroActivity extends AppCompatActivity {
         Logs.add(Logs.Type.V, "sender: " + sender);
         if (mViewPager.getCurrentItem() < (INTRO_PAGE_COUNT - 1))
             mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
-        else
+        else // Last representation (events)
             skipIntro();
     }
     public void onSkipIntro(View sender) { // Cancel introduction click event
@@ -507,30 +581,17 @@ public class IntroActivity extends AppCompatActivity {
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_intro);
 
-
-
-
-
-
-
         // Set action bar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.connection));
+        toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
-
-
-
-
-
-
 
         // Restore data
         if (savedInstanceState != null) {
 
-            mIntroDisplayed = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
+            mIntroDone = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
 
             mAlphaSkip = savedInstanceState.getFloat(DATA_KEY_ALPHA_SKIP);
             mAlphaStep1 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP1);
@@ -540,10 +601,8 @@ public class IntroActivity extends AppCompatActivity {
         }
 
         // Check to display intro
-        if (mIntroDisplayed) {
-            ((CoordinatorLayout)findViewById(R.id.main_content)).setVisibility(View.GONE);
-            return;
-        }
+        if (mIntroDone)
+            displayConnection(true);
 
         // Set up controls panel
         final ImageButton skip = (ImageButton)findViewById(R.id.image_skip);
@@ -757,7 +816,7 @@ public class IntroActivity extends AppCompatActivity {
             public boolean onFinishBehavior(boolean leftTop) {
 
                 Logs.add(Logs.Type.V, "leftTop: " + leftTop);
-                View page = mViewPager.findViewWithTag((leftTop) ?
+                final View page = mViewPager.findViewWithTag((leftTop) ?
                         LimitlessViewPager.TAG_PAGE_LEFT_TOP : LimitlessViewPager.TAG_PAGE_RIGHT_BOTTOM);
                 if (leftTop) {
 
@@ -780,17 +839,40 @@ public class IntroActivity extends AppCompatActivity {
                     layout.setTranslationX(0);
                     TranslateAnimation anim;
                     if (mTranslate < (-mViewPager.getWidth() * RATIO_DISPLAY_CONNECT)) {
+                        // Display connection layout
 
                         anim = new TranslateAnimation(mTranslate, -mViewPager.getWidth(), 0f, 0f);
+                        anim.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                Logs.add(Logs.Type.V, "animation: " + animation);
+
+                                animEvents(page, 0f);
+                                // Reset any scale changes (needed for further display)
+
+                                displayConnection(true);
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        });
                         anim.setFillAfter(true);
                         anim.setDuration(ANIMATION_DURATION_SHOW_CONNECT);
 
-                        mIntroDisplayed = true;
+                        mIntroDone = true;
 
-                    } else {
+                    } else { // Cancel displaying connection layout
+
                         anim = new TranslateAnimation(mTranslate, 0f, 0f, 0f);
                         anim.setDuration(ANIMATION_DURATION_HIDE_CONNECT);
-                        cancelEventsAnim(page); // Cancel events elements scale changes
+                        animEvents(page); // Cancel events elements scale changes
                     }
                     layout.startAnimation(anim);
                 }
@@ -897,9 +979,24 @@ public class IntroActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        Logs.add(Logs.Type.V, "item: " + item);
+        if (item.getItemId() == android.R.id.home) {
+
+            // Back to introduction layout
+            mIntroDone = false;
+
+            displayConnection(false);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        outState.putBoolean(DATA_KEY_INTRO_DISPLAYED, mIntroDisplayed);
+        outState.putBoolean(DATA_KEY_INTRO_DISPLAYED, mIntroDone);
 
         outState.putFloat(DATA_KEY_ALPHA_SKIP, mAlphaSkip);
         outState.putFloat(DATA_KEY_ALPHA_STEP1, mAlphaStep1);

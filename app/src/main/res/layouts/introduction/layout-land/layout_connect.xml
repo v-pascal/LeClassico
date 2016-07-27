@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 android:id="@+id/connect_content"
                                                  android:background="@android:color/white"
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent">
@@ -7,7 +8,8 @@
     <!-- Action bar -->
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:theme="@style/SettingAppTheme">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -17,12 +19,19 @@
     </android.support.design.widget.AppBarLayout>
 
     <!-- Connection -->
-    <LinearLayout android:orientation="vertical"
+    <LinearLayout android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
-            android:text="Hello: Landscape"
+            android:text="Landscape"
+            android:textSize="128sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"/>
+        <TextView
+            android:text="test"
+            android:textSize="28sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"/>

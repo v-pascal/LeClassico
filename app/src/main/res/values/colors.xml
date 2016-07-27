@@ -14,5 +14,6 @@
     <color name="colorIntroPublications">#800080ff</color>
     <color name="colorIntroAlbums">#80ff8000</color>
     <color name="colorIntroEvents">#8000ff00</color>
+    <color name="secondary_text_material_light">#ffffff</color>
 
 </resources>

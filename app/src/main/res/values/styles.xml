@@ -2,37 +2,16 @@
 
     <!-- Application themes. -->
     <style name="MainAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-
-
-
-
-        <!--
-        <item name="actionBarStyle">@style/AppActionBarStyle</item>
-        -->
-        <item name="android:textColorPrimary">@android:color/white</item>
-
-
-
-
         <item name="colorPrimary">@color/colorPrimaryMain</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkMain</item>
         <item name="colorAccent">@color/colorAccentMain</item>
+        <item name="android:textColorSecondary">@color/secondary_text_material_light</item>
     </style>
     <style name="SettingAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-
-
-
-
-        <!--
-        <item name="actionMenuTextColor">@android:color/white</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">12sp</item>
-        -->
-
-
         <item name="colorPrimary">@color/colorPrimarySetting</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkSetting</item>
         <item name="colorAccent">@color/colorAccentSetting</item>
+        <item name="android:textColorSecondary">@color/secondary_text_material_light</item>
     </style>
     <style name="IntroAppTheme" parent="MainAppTheme">
         <item name="windowNoTitle">true</item>
@@ -41,23 +20,5 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowBackground">@color/colorPrimaryMain</item>
     </style>
-
-
-
-
-
-    <!--
-    <style name="AppActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
-        <item name="android:titleTextStyle">@style/ActionBarTitleTextStyle</item>
-    </style>
-    <style name="ActionBarTitleTextStyle" parent="@android:style/TextAppearance">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-    -->
-
-
-
-
 
 </resources>

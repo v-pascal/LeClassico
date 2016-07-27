@@ -21,7 +21,7 @@
     <ImageView
         android:id="@+id/image_flyer"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentStart="true"
         android:adjustViewBounds="true"
         android:scaleType="center"
         android:rotation="-10"
@@ -33,7 +33,7 @@
     <ImageView
         android:id="@+id/image_calendar"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentStart="true"
         android:adjustViewBounds="true"
         android:scaleType="center"
         android:rotation="35"
@@ -45,7 +45,7 @@
     <ImageView
         android:id="@+id/image_events"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentStart="true"
         android:adjustViewBounds="true"
         android:scaleType="center"
         android:rotation="-25"
