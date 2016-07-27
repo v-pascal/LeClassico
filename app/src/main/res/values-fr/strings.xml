@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Application -->
+    <!-- Connection -->
     <string name="connection">Connexion</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="password">Mot de passe</string>
+    <string name="wait">Veuillez patienter...</string>
+    <string name="check_internet">Vérification connexion Internet</string>
+    <string name="error">Erreur</string>
+    <string name="no_internet">Pas de connection Internet!</string>
+    <string name="data_synchro">Synchronisation des données</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Bienvenue...</string>
@@ -22,5 +29,6 @@
     <!-- Menus -->
     <string name="mnu_help">Aide</string>
     <string name="mnu_quit">Quitter</string>
+    <string name="mnu_about">A propos</string>
 
 </resources>

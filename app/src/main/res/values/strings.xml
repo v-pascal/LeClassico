@@ -2,7 +2,16 @@
 
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>
-    <string name="connection">connection</string>
+
+    <!-- Connection -->
+    <string name="connection">Connection</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="password">Password</string>
+    <string name="wait">Please wait...</string>
+    <string name="check_internet">Check Internet connection</string>
+    <string name="error">Error</string>
+    <string name="no_internet">No Internet connection!</string>
+    <string name="data_synchro">Data synchronisation</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome...</string>
@@ -22,5 +31,6 @@
     <!-- Menus -->
     <string name="mnu_help">Help</string>
     <string name="mnu_quit">Quit</string>
+    <string name="mnu_about">About</string>
 
 </resources>

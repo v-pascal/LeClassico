@@ -4,7 +4,7 @@
                 android:layout_height="match_parent">
 
     <!-- Connection layout -->
-    <include layout="@layout/layout_connect" />
+    <include layout="@layout/activity_connect" />
 
     <!-- Introduction layout -->
     <include layout="@layout/layout_intro" />

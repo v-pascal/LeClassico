@@ -1,41 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                 android:id="@+id/connect_content"
-                                                 android:background="@android:color/white"
-                                                 android:layout_width="match_parent"
-                                                 android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
 
-    <!-- Action bar -->
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/SettingAppTheme">
+    <!-- LeClassico icon -->
+    <ImageView
+        android:src="@drawable/lc_icon"
+        android:layout_gravity="center"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_weight="1"
+        android:layout_height="0dp"
+        android:layout_width="wrap_content"/>
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
+    <!-- Login -->
+    <include
+        layout="@layout/layout_login"
+        android:layout_weight="1"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"/>
 
-    </android.support.design.widget.AppBarLayout>
-
-    <!-- Connection -->
-    <LinearLayout android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:text="Portrait"
-            android:textSize="128sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"/>
-        <TextView
-            android:text="test"
-            android:textSize="28sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"/>
-
-    </LinearLayout>
-
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>

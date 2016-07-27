@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.ViewStub;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
@@ -31,6 +33,7 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.regex.Pattern;
@@ -573,6 +576,48 @@ public class IntroActivity extends AppCompatActivity {
         Logs.add(Logs.Type.V, "sender: " + sender);
         skipIntro();
     }
+    public void onConnection(View sender) { // Connection
+
+        Logs.add(Logs.Type.V, "sender: " + sender);
+        final ProgressDialog dialog = ProgressDialog.show(this, getString(R.string.wait),
+                getString(R.string.check_internet), true, true);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                // Check Internet connection
+                if (!Internet.isOnline(IntroActivity.this)) {
+                    if (!dialog.isShowing()) return; // Cancelled
+
+                    // No Internet connection so check existing DB to work offline
+                    //if ()
+                    //else
+
+                    dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning));
+                    dialog.setTitle(getString(R.string.error));
+                    dialog.setMessage(getString(R.string.no_internet));
+
+                } else {
+
+
+
+
+
+
+                    dialog.setMessage(getString(R.string.data_synchro));
+
+
+
+
+
+
+
+                }
+            }
+
+        }).start();
+    }
 
     //////
     @Override
@@ -580,6 +625,9 @@ public class IntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_intro);
+
+        // Avoid to display keyboard automatically
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         // Set action bar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -604,7 +652,7 @@ public class IntroActivity extends AppCompatActivity {
         if (mIntroDone)
             displayConnection(true);
 
-        // Set up controls panel
+        // Set controls panel
         final ImageButton skip = (ImageButton)findViewById(R.id.image_skip);
         final ImageView step1 = (ImageView)findViewById(R.id.image_step_1);
         final ImageView step2 = (ImageView)findViewById(R.id.image_step_2);
@@ -612,7 +660,7 @@ public class IntroActivity extends AppCompatActivity {
         final ImageView step4 = (ImageView)findViewById(R.id.image_step_4);
         applyAlpha(skip, step1, step2, step3, step4);
 
-        // Set up the ViewPager
+        // Set the introduction limitless view pager
         mViewPager = (LimitlessViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
 
@@ -661,7 +709,7 @@ public class IntroActivity extends AppCompatActivity {
             // Translation ratio of the location representation elements (markers): follow map.
 
             private void anim(boolean toTheLeft, View page, float position) {
-                // Apply animation to the representation images
+            // Apply animation to the representation images
 
                 //Logs.add(Logs.Type.V, "toTheLeft: " + toTheLeft + ";page: " + page +
                 //        ";position: " + position);
@@ -982,13 +1030,42 @@ public class IntroActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         Logs.add(Logs.Type.V, "item: " + item);
-        if (item.getItemId() == android.R.id.home) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
 
-            // Back to introduction layout
-            mIntroDone = false;
+                // Back to introduction layout
+                mIntroDone = false;
 
-            displayConnection(false);
-            return true;
+                displayConnection(false);
+                return true;
+            }
+            case R.id.menu_about: {
+
+
+
+
+
+
+
+                return true;
+            }
+            case R.id.menu_quit: {
+
+                Logs.add(Logs.Type.I, "Finish");
+                finish();
+                return true;
+            }
+            case R.id.menu_help: {
+
+
+
+
+
+
+
+
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
