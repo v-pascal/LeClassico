@@ -2,6 +2,8 @@
 
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>
+    <string name="app_author" translatable="false">Pascal VIGUIE</string>
+    <string name="app_about" translatable="false">APP: %1$s\nVERSION: %2$s\nAUTHOR: %3$s\nDATE: %4$s</string>
 
     <!-- Connection -->
     <string name="connection">Connection</string>
