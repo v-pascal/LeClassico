@@ -605,11 +605,19 @@ public class IntroActivity extends AppCompatActivity {
                     // No Internet connection so check existing DB to work offline
                     ContentResolver cr = getContentResolver();
                     Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                            new String[]{ IDataTable.DataField.COLUMN_ID }, null, null, null);
-                    int membersCount = result.getCount();
+                            new String[]{ "count(*)" }, null, null, null);
+                    int membersCount = 0;
+                    if (result.getCount() > 0) {
+                        result.moveToFirst();
+                        membersCount = result.getInt(0);
+                    }
                     result.close();
 
                     if (membersCount > 0) { // Existing DB found
+
+
+
+
 
 
 
@@ -630,7 +638,11 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
+
                     dialog.setMessage(getString(R.string.data_synchro));
+
+
 
 
 
