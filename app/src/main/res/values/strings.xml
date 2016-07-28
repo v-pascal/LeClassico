@@ -2,29 +2,28 @@
 
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>
-    <string name="app_author" translatable="false">Pascal VIGUIE</string>
-    <string name="app_about" translatable="false">APP: %1$s\nVERSION: %2$s\nAUTHOR: %3$s\nDATE: %4$s</string>
+    <string name="app_about" translatable="false">APP: %1$s\nVERSION: 1.0\nAUTHOR: Pascal VIGUIE\nDATE: 2016&#8211;07&#8211;15</string>
 
     <!-- Connection -->
     <string name="connection">Connection</string>
     <string name="pseudo">Pseudo</string>
     <string name="password">Password</string>
-    <string name="wait">Please wait...</string>
+    <string name="wait">Please wait&#8230;</string>
     <string name="check_internet">Check Internet connection</string>
     <string name="error">Error</string>
-    <string name="no_internet">No Internet connection!</string>
+    <string name="no_internet">No Internet connection!\nNeeded during the first connection.</string>
     <string name="data_synchro">Data synchronisation</string>
 
     <!-- Introduction -->
-    <string name="intro_welcome">Welcome...</string>
+    <string name="intro_welcome">Welcome&#8230;</string>
     <string name="intro_welcome_text">To the application\n%1$s!</string>
-    <string name="intro_publications">News...</string>
+    <string name="intro_publications">News&#8230;</string>
     <string name="intro_publications_text">Follow all publication\nof your friends!</string>
-    <string name="intro_albums">Albums...</string>
+    <string name="intro_albums">Albums&#8230;</string>
     <string name="intro_albums_text">Create &amp; share\nphoto albums!</string>
-    <string name="intro_events">Events...</string>
+    <string name="intro_events">Events&#8230;</string>
     <string name="intro_events_text">Stay informed of\nall events!</string>
-    <string name="intro_location">Location...</string>
+    <string name="intro_location">Location&#8230;</string>
     <string name="intro_location_text">Locate all of\nyour friends!</string>
 
     <!-- Titles -->

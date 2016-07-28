@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.Fragment;
@@ -587,16 +588,26 @@ public class IntroActivity extends AppCompatActivity {
             public void run() {
 
                 // Check Internet connection
-                if (!Internet.isOnline(IntroActivity.this)) {
-                    if (!dialog.isShowing()) return; // Cancelled
+                boolean connected = Internet.isOnline(IntroActivity.this);
+                if (!dialog.isShowing()) return; // Cancelled
 
+                if (!connected) {
                     // No Internet connection so check existing DB to work offline
+
+
+
+
+
                     //if ()
                     //else
 
                     dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning));
                     dialog.setTitle(getString(R.string.error));
                     dialog.setMessage(getString(R.string.no_internet));
+
+
+
+
 
                 } else {
 
@@ -1041,12 +1052,10 @@ public class IntroActivity extends AppCompatActivity {
             }
             case R.id.menu_about: {
 
-
-
-
-
-
-
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.mnu_about)
+                        .setMessage(getString(R.string.app_about, getString(R.string.app_name)))
+                        .show();
                 return true;
             }
             case R.id.menu_quit: {

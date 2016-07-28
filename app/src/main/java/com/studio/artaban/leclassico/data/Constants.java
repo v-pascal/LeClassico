@@ -36,4 +36,22 @@ public final class Constants {
 
     public static final int INTRO_MARKER_IMAGE_HEIGHT = 100; // Fixed location marker image height (in pixel)
 
+
+    ////// Database
+    public static final String DATA_CONTENT_URI = "com.studio.artaban.provider.leclassico"; // DB content URI
+    public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field
+
+    // Database table IDs
+    public static final int DATA_CAMARADES_TABLE_ID = 1;
+    public static final int DATA_ABONNEMENTS_TABLE_ID = 2;
+    public static final int DATA_ACTUALITES_TABLE_ID = 3;
+    public static final int DATA_ALBUMS_TABLE_ID = 4;
+    public static final int DATA_COMMENTAIRES_TABLE_ID = 5;
+    public static final int DATA_EVENEMENTS_TABLE_ID = 6;
+    public static final int DATA_MESSAGERIE_TABLE_ID = 7;
+    public static final int DATA_MUSIC_TABLE_ID = 8;
+    public static final int DATA_PHOTOS_TABLE_ID = 9;
+    public static final int DATA_PRESENTS_TABLE_ID = 10;
+    public static final int DATA_VOTES_TABLE_ID = 11;
+
 }

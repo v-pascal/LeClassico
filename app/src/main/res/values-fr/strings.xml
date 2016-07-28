@@ -5,22 +5,22 @@
     <string name="connection">Connexion</string>
     <string name="pseudo">Pseudo</string>
     <string name="password">Mot de passe</string>
-    <string name="wait">Veuillez patienter...</string>
+    <string name="wait">Veuillez patienter&#8230;</string>
     <string name="check_internet">Vérification connexion Internet</string>
     <string name="error">Erreur</string>
-    <string name="no_internet">Pas de connection Internet!</string>
+    <string name="no_internet">Pas de connection Internet!\nNécessaire lors la première connexion.</string>
     <string name="data_synchro">Synchronisation des données</string>
 
     <!-- Introduction -->
-    <string name="intro_welcome">Bienvenue...</string>
+    <string name="intro_welcome">Bienvenue&#8230;</string>
     <string name="intro_welcome_text">Dans l\'application\n%1$s!</string>
-    <string name="intro_publications">Fil d\'actualité...</string>
+    <string name="intro_publications">Fil d\'actualité&#8230;</string>
     <string name="intro_publications_text">Suivez toute l\'actualité\nde vos amis!</string>
-    <string name="intro_albums">Albums...</string>
+    <string name="intro_albums">Albums&#8230;</string>
     <string name="intro_albums_text">Créer &amp; partager vos\nalbums de photos!</string>
-    <string name="intro_events">Evènements...</string>
+    <string name="intro_events">Evènements&#8230;</string>
     <string name="intro_events_text">Tenez-vous informé de\ntous les évènements!</string>
-    <string name="intro_location">Géolocation...</string>
+    <string name="intro_location">Géolocation&#8230;</string>
     <string name="intro_location_text">Géolocaliser tous\nvos amis!</string>
 
     <!-- Titles -->

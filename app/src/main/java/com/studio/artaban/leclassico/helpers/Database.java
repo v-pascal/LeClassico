@@ -6,6 +6,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
+import com.studio.artaban.leclassico.data.tables.ActualitesTable;
+import com.studio.artaban.leclassico.data.tables.AlbumsTable;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.data.tables.CommentairesTable;
+import com.studio.artaban.leclassico.data.tables.EvenementsTable;
+import com.studio.artaban.leclassico.data.tables.MessagerieTable;
+import com.studio.artaban.leclassico.data.tables.MusicTable;
+import com.studio.artaban.leclassico.data.tables.PhotosTable;
+import com.studio.artaban.leclassico.data.tables.PresentsTable;
+import com.studio.artaban.leclassico.data.tables.VotesTable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,28 +28,24 @@ import java.util.Map;
  */
 public class Database extends SQLiteOpenHelper {
 
-    private static final String NAME = "anaglyph.db"; // Database name
+    private static final String NAME = Constants.APP_NAME + ".db"; // Database name
     public static final int VERSION = 1; // Database version
 
     protected SQLiteDatabase mDatabase;
 
     protected static Map<String, IDataTable> mTableMap = new HashMap<>();
     static {
-
-
-
-
-
-
-
-        //mTableMap.put(AlbumTable.TABLE_NAME, AlbumTable.newInstance());
-
-
-
-
-
-
-
+        mTableMap.put(CamaradesTable.TABLE_NAME, CamaradesTable.newInstance());
+        mTableMap.put(AbonnementsTable.TABLE_NAME, AbonnementsTable.newInstance());
+        mTableMap.put(ActualitesTable.TABLE_NAME, ActualitesTable.newInstance());
+        mTableMap.put(AlbumsTable.TABLE_NAME, AlbumsTable.newInstance());
+        mTableMap.put(CommentairesTable.TABLE_NAME, CommentairesTable.newInstance());
+        mTableMap.put(EvenementsTable.TABLE_NAME, EvenementsTable.newInstance());
+        mTableMap.put(MessagerieTable.TABLE_NAME, MessagerieTable.newInstance());
+        mTableMap.put(MusicTable.TABLE_NAME, MusicTable.newInstance());
+        mTableMap.put(PhotosTable.TABLE_NAME, PhotosTable.newInstance());
+        mTableMap.put(PresentsTable.TABLE_NAME, PresentsTable.newInstance());
+        mTableMap.put(VotesTable.TABLE_NAME, VotesTable.newInstance());
     }
 
     //////

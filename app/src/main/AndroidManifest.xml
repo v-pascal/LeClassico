@@ -2,19 +2,23 @@
 <manifest package="com.studio.artaban.leclassico"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Features -->
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false"/>
 
+    <!-- Screens -->
     <supports-screens
         android:largeScreens="true"
         android:normalScreens="true"
         android:smallScreens="false"
         android:xlargeScreens="true"/>
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- Application -->
     <application
         android:name="com.studio.artaban.leclassico.LeClassicoApplication"
         android:allowBackup="true"
@@ -22,6 +26,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/MainAppTheme">
+
+        <!-- Activities -->
         <activity
             android:name="com.studio.artaban.leclassico.IntroActivity"
             android:theme="@style/IntroAppTheme">
@@ -31,6 +37,15 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <!-- Content providers -->
+        <provider
+            android:authorities="com.studio.artaban.provider.leclassico"
+            android:name="com.studio.artaban.leclassico.data.DataProvider"/>
+
+        <!-- Services -->
+        <!-- Receivers -->
+
     </application>
 
 </manifest>
