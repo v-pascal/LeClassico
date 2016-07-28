@@ -3,9 +3,14 @@ package com.studio.artaban.leclassico;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentProvider;
+import android.content.ContentResolver;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +32,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -34,6 +40,9 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -150,7 +159,7 @@ public class IntroActivity extends AppCompatActivity {
 
         private void position(View root) { // Position the representation images
 
-            Logs.add(Logs.Type.V, "root: " + root);
+            //Logs.add(Logs.Type.V, "root: " + root);
             float sizeRatio = getSizeRatio(getActivity());
             ImageView container = (ImageView)root.findViewById(R.id.image_container);
             ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
@@ -530,7 +539,7 @@ public class IntroActivity extends AppCompatActivity {
     private void animEvents(View page) {
     // Anim events elements to reset scale changes (when cancelling to display connection activity)
 
-        Logs.add(Logs.Type.V, "page: " + page);
+        //Logs.add(Logs.Type.V, "page: " + page);
         ImageView events = (ImageView) page.findViewById(R.id.image_events);
         if (events != null) {
             events.clearAnimation();
@@ -592,22 +601,27 @@ public class IntroActivity extends AppCompatActivity {
                 if (!dialog.isShowing()) return; // Cancelled
 
                 if (!connected) {
+
                     // No Internet connection so check existing DB to work offline
+                    ContentResolver cr = getContentResolver();
+                    Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                            new String[]{ IDataTable.DataField.COLUMN_ID }, null, null, null);
+                    int membersCount = result.getCount();
+                    result.close();
+
+                    if (membersCount > 0) { // Existing DB found
 
 
 
 
 
-                    //if ()
-                    //else
 
-                    dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning));
-                    dialog.setTitle(getString(R.string.error));
-                    dialog.setMessage(getString(R.string.no_internet));
+                    } else {
 
-
-
-
+                        dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning));
+                        dialog.setTitle(getString(R.string.error));
+                        dialog.setMessage(getString(R.string.no_internet));
+                    }
 
                 } else {
 
@@ -635,6 +649,23 @@ public class IntroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
+
+        // Restore data
+        SharedPreferences settings = getSharedPreferences(Constants.APP_PREFERENCE, 0);
+        mIntroDone = settings.getBoolean(Constants.APP_PREFERENCE_INTRO_DONE, false);
+        if (savedInstanceState != null) {
+
+            mIntroDone = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
+
+            mAlphaSkip = savedInstanceState.getFloat(DATA_KEY_ALPHA_SKIP);
+            mAlphaStep1 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP1);
+            mAlphaStep2 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP2);
+            mAlphaStep3 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP3);
+            mAlphaStep4 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP4);
+
+        } else if (mIntroDone)
+            setTheme(R.style.ConnectAppTheme); // To display white background
+
         setContentView(R.layout.activity_intro);
 
         // Avoid to display keyboard automatically
@@ -646,18 +677,6 @@ public class IntroActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Restore data
-        if (savedInstanceState != null) {
-
-            mIntroDone = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
-
-            mAlphaSkip = savedInstanceState.getFloat(DATA_KEY_ALPHA_SKIP);
-            mAlphaStep1 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP1);
-            mAlphaStep2 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP2);
-            mAlphaStep3 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP3);
-            mAlphaStep4 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP4);
-        }
 
         // Check to display intro
         if (mIntroDone)
@@ -1092,5 +1111,20 @@ public class IntroActivity extends AppCompatActivity {
 
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+
+        Logs.add(Logs.Type.V, null);
+        SharedPreferences prefs = getSharedPreferences(Constants.APP_PREFERENCE, 0);
+        if (prefs != null) {
+
+            Logs.add(Logs.Type.I, "mIntroDone: " + mIntroDone);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean(Constants.APP_PREFERENCE_INTRO_DONE, mIntroDone);
+            editor.apply();
+        }
     }
 }

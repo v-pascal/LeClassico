@@ -8,7 +8,7 @@
     <string name="wait">Veuillez patienter&#8230;</string>
     <string name="check_internet">Vérification connexion Internet</string>
     <string name="error">Erreur</string>
-    <string name="no_internet">Pas de connection Internet!\nNécessaire lors la première connexion.</string>
+    <string name="no_internet">Pas de connection Internet!\nNécessaire lors de la première connexion.</string>
     <string name="data_synchro">Synchronisation des données</string>
 
     <!-- Introduction -->

@@ -6,9 +6,16 @@ package com.studio.artaban.leclassico.data;
  */
 public final class Constants {
 
+    public static final int NO_DATA = -1; // No value (integer)
+
+
+    ////// Application
     public static final String APP_NAME = "LeClassico"; // Application name
     public static final String APP_WEBSITE = "http://leclassico.fr"; // Social network application web site
-    public static final int NO_DATA = -1; // No value (integer)
+
+    // Preferences
+    public static final String APP_PREFERENCE = APP_NAME + "Preferences";
+    public static final String APP_PREFERENCE_INTRO_DONE = "introDone";
 
 
     ////// Introduction
@@ -38,7 +45,7 @@ public final class Constants {
 
 
     ////// Database
-    public static final String DATA_CONTENT_URI = "com.studio.artaban.provider.leclassico"; // DB content URI
+    public static final String DATA_CONTENT_URI = "com.studio.artaban.provider.leclassico"; // DB content provider URI
     public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field
 
     // Database table IDs

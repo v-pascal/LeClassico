@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
@@ -28,12 +29,13 @@ import com.studio.artaban.leclassico.helpers.Database;
  */
 public class DataProvider extends ContentProvider {
 
-    public static final Uri CONTENT_URI = Uri.parse("content://" + Constants.DATA_CONTENT_URI);
+    public static final String CONTENT_URI = "content://" + Constants.DATA_CONTENT_URI + "/";
 
     private static final UriMatcher URI_MATCHER;
     static {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
+        // Table requests
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME, Constants.DATA_CAMARADES_TABLE_ID);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, AbonnementsTable.TABLE_NAME, Constants.DATA_ABONNEMENTS_TABLE_ID);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, ActualitesTable.TABLE_NAME, Constants.DATA_ACTUALITES_TABLE_ID);
@@ -52,6 +54,7 @@ public class DataProvider extends ContentProvider {
 
         public DB(Context context) { super(context); }
         public SQLiteDatabase getDB() { return mDatabase; }
+        public boolean isOpened() { return isReady(); };
     }
     private DB mDB;
 
@@ -66,11 +69,37 @@ public class DataProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
+        // Open database (if not already opened)
+        if (!mDB.isOpened())
+            mDB.open(true); // Always open DB in writable mode
 
 
 
+
+
+
+
+        switch (URI_MATCHER.match(uri)) {
+            case Constants.DATA_CAMARADES_TABLE_ID:
+            case Constants.DATA_ABONNEMENTS_TABLE_ID:
+            case Constants.DATA_ACTUALITES_TABLE_ID:
+            case Constants.DATA_ALBUMS_TABLE_ID:
+            case Constants.DATA_COMMENTAIRES_TABLE_ID:
+            case Constants.DATA_EVENEMENTS_TABLE_ID:
+            case Constants.DATA_MESSAGERIE_TABLE_ID:
+            case Constants.DATA_MUSIC_TABLE_ID:
+            case Constants.DATA_PHOTOS_TABLE_ID:
+            case Constants.DATA_PRESENTS_TABLE_ID:
+            case Constants.DATA_VOTES_TABLE_ID: {
+                break;
+            }
+        }
+
+        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+        builder.setTables("");
 
         //mDB.getDB().query()
+
 
 
 

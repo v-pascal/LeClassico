@@ -49,7 +49,7 @@ public class Database extends SQLiteOpenHelper {
     }
 
     //////
-    private boolean isReady() {
+    protected boolean isReady() {
 
         Logs.add(Logs.Type.V, null);
         if ((mDatabase == null) || (!mDatabase.isOpen())) {
