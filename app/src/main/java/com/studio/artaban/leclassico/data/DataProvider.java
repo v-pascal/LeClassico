@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
@@ -207,20 +208,54 @@ public class DataProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
 
+        Logs.add(Logs.Type.V, null);
 
+        // Open database (if not already opened)
+        if (!mDB.isOpened())
+            mDB.open(true);
 
+        String table = getUriTable(URI_MATCHER_SINGLE, uri);
+        if (table != null)
+            selection = IDataTable.DataField.COLUMN_ID + "=" + uri.getPathSegments().get(1) +
+                    ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
+        else {
 
+            table = getUriTable(URI_MATCHER, uri);
+            if (table == null)
+                throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
-        return 0;
+            // To delete all entries add a where clause...
+            if (selection == null)
+                selection = "1"; // ...by assigning '1'
+        }
+        int result = mDB.getDB().delete(table, selection, selectionArgs);
+        getContext().getContentResolver().notifyChange(uri, null);
+
+        return result; // Return deleted entries count
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
+        Logs.add(Logs.Type.V, null);
 
+        // Open database (if not already opened)
+        if (!mDB.isOpened())
+            mDB.open(true);
 
+        String table = getUriTable(URI_MATCHER_SINGLE, uri);
+        if (table != null)
+            selection = IDataTable.DataField.COLUMN_ID + "=" + uri.getPathSegments().get(1) +
+                    ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
+        else {
 
+            table = getUriTable(URI_MATCHER, uri);
+            if (table == null)
+                throw new IllegalArgumentException("Unexpected content URI: " + uri);
+        }
+        int result = mDB.getDB().update(table, values, selection, selectionArgs);
+        getContext().getContentResolver().notifyChange(uri, null);
 
-        return 0;
+        return result; // Return updated entries count
     }
 }

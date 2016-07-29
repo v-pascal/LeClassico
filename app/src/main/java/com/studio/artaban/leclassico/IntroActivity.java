@@ -6,12 +6,15 @@ import android.app.ProgressDialog;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
@@ -626,9 +629,14 @@ public class IntroActivity extends AppCompatActivity {
 
                     } else {
 
-                        dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning));
-                        dialog.setTitle(getString(R.string.error));
-                        dialog.setMessage(getString(R.string.no_internet));
+                        dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
+                        IntroActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.setTitle(getString(R.string.error));
+                                dialog.setMessage(getString(R.string.no_internet));
+                            }
+                        });
                     }
 
                 } else {
