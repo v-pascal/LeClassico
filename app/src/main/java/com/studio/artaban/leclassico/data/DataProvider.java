@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -146,6 +147,7 @@ public class DataProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
 
+        Logs.add(Logs.Type.V, null);
         switch (URI_MATCHER_SINGLE.match(uri)) {
             case Constants.DATA_CAMARADES_TABLE_ID: return MIME_TYPE_SINGLE + CamaradesTable.TABLE_NAME;
             case Constants.DATA_ABONNEMENTS_TABLE_ID: return MIME_TYPE_SINGLE + AbonnementsTable.TABLE_NAME;
@@ -180,9 +182,25 @@ public class DataProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
 
+        Logs.add(Logs.Type.V, null);
 
+        // Open database (if not already opened)
+        if (!mDB.isOpened())
+            mDB.open(true);
 
+        String table = getUriTable(URI_MATCHER, uri);
+        if (table == null)
+            throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
+        long id = mDB.getDB().insert(table, null, values);
+        if (id > Constants.NO_DATA) {
+
+            // Make URI to return
+            Uri result = ContentUris.withAppendedId(uri, id);
+
+            getContext().getContentResolver().notifyChange(result, null); // To notify observers
+            return result;
+        }
         return null;
     }
 
