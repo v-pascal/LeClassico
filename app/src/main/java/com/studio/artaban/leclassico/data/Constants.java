@@ -12,7 +12,7 @@ public final class Constants {
     ////// Application
     public static final String APP_NAME = "LeClassico"; // Application name
     public static final String APP_WEBSITE = "http://leclassico.fr"; // Social network application web site
-    public static final String APP_COMPANY = "studio.artaban"; // Application company name
+    public static final String APP_COMPANY = "studio.artaban"; // Application company URI
 
     // Preferences
     public static final String APP_PREFERENCE = APP_NAME + "Preferences";

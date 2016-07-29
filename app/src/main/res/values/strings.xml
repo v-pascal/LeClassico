@@ -10,9 +10,9 @@
     <string name="password">Password</string>
     <string name="wait">Please wait&#8230;</string>
     <string name="check_internet">Check Internet connection</string>
-    <string name="error">Error</string>
     <string name="no_internet">No Internet connection!\nNeeded during the first connection.</string>
     <string name="data_synchro">Data synchronisation</string>
+    <string name="help_connection">bla bla bla</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome&#8230;</string>
@@ -28,6 +28,9 @@
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>
+
+    <string name="error">Error</string>
+    <string name="help">Help</string>
 
     <!-- Menus -->
     <string name="mnu_help">Help</string>

@@ -13,6 +13,8 @@
     <!-- Colors -->
     <color name="green">#ff00ff00</color>
     <color name="red">#ffff0000</color>
+    <color name="blue">#ff0000ff</color>
+    <color name="yellow">#ffffff00</color>
 
     <!-- Introduction -->
     <color name="colorIntroPublications">#800080ff</color>

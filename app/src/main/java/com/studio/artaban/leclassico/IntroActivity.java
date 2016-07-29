@@ -3,18 +3,14 @@ package com.studio.artaban.leclassico;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
@@ -35,7 +31,6 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -44,7 +39,6 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -617,9 +611,13 @@ public class IntroActivity extends AppCompatActivity {
                     result.close();
 
                     if (membersCount > 0) { // Existing DB found
+                        // Work offline
 
 
 
+
+
+                        // Check login
 
 
 
@@ -629,7 +627,10 @@ public class IntroActivity extends AppCompatActivity {
 
                     } else {
 
-                        dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
+                        try { dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
+                        } catch (IllegalStateException e) {
+                            Logs.add(Logs.Type.E, "Failed to display warning icon");
+                        }
                         IntroActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -646,12 +647,12 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-
-
-                    dialog.setMessage(getString(R.string.data_synchro));
-
-
-
+                    IntroActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.setMessage(getString(R.string.data_synchro));
+                        }
+                    });
 
 
 
@@ -1091,6 +1092,7 @@ public class IntroActivity extends AppCompatActivity {
             }
             case R.id.menu_about: {
 
+                // Display about application info
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.mnu_about)
                         .setMessage(getString(R.string.app_about, getString(R.string.app_name)))
@@ -1099,19 +1101,19 @@ public class IntroActivity extends AppCompatActivity {
             }
             case R.id.menu_quit: {
 
-                Logs.add(Logs.Type.I, "Finish");
+                Logs.add(Logs.Type.I, "Finish...");
                 finish();
                 return true;
             }
             case R.id.menu_help: {
 
-
-
-
-
-
-
-
+                // Display connection help info
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.help)
+                        .setIcon(getDrawable(R.drawable.info_orange))
+                        .setMessage(R.string.help_connection)
+                        .setCancelable(true)
+                        .create().show();
                 return true;
             }
         }

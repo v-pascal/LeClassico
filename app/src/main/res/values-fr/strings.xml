@@ -7,9 +7,9 @@
     <string name="password">Mot de passe</string>
     <string name="wait">Veuillez patienter&#8230;</string>
     <string name="check_internet">Vérification connexion Internet</string>
-    <string name="error">Erreur</string>
     <string name="no_internet">Pas de connection Internet!\nNécessaire lors de la première connexion.</string>
     <string name="data_synchro">Synchronisation des données</string>
+    <string name="help_connection">bla bla bla</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Bienvenue&#8230;</string>
@@ -25,6 +25,9 @@
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>
+
+    <string name="error">Erreur</string>
+    <string name="help">Aide</string>
 
     <!-- Menus -->
     <string name="mnu_help">Aide</string>

@@ -17,10 +17,11 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.studio.artaban.permission.LECLASSICO_SERVICE"/>
 
     <!-- Application -->
     <application
-        android:name="com.studio.artaban.leclassico.LeClassicoApplication"
+        android:name=".LeClassicoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -29,7 +30,7 @@
 
         <!-- Activities -->
         <activity
-            android:name="com.studio.artaban.leclassico.IntroActivity"
+            android:name=".IntroActivity"
             android:theme="@style/IntroAppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -40,11 +41,23 @@
 
         <!-- Content providers -->
         <provider
-            android:authorities="com.studio.artaban.provider.leclassico"
-            android:name="com.studio.artaban.leclassico.data.DataProvider"/>
+            android:name=".data.DataProvider"
+            android:authorities="com.studio.artaban.provider.leclassico"/>
 
         <!-- Services -->
+        <service
+            android:name=".connection.DataService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.studio.artaban.permission.LECLASSICO_SERVICE">
+        </service>
+
         <!-- Receivers -->
+        <receiver android:name=".helpers.Internet$ConnectivityReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

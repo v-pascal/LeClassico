@@ -1,6 +1,8 @@
 package com.studio.artaban.leclassico.helpers;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -152,6 +154,16 @@ public final class Internet {
             catch (IOException e) {
                 Logs.add(Logs.Type.E, "Failed to close IO streams");
             }
+        }
+    }
+
+    //////
+    public boolean isConnected() { return mConnected; }
+    public static class ConnectivityReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            isOnline(context);
         }
     }
 }
