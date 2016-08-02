@@ -14,7 +14,7 @@
         android:shadowDx="2.0"
         android:shadowDy="2.0"
         android:shadowRadius="1.5"
-        android:textSize="32sp"
+        android:textSize="@dimen/comments_text_title"
         android:textStyle="bold"/>
 
     <!-- Description -->
@@ -28,7 +28,7 @@
         android:shadowDx="2.0"
         android:shadowDy="2.0"
         android:shadowRadius="1.5"
-        android:textSize="24sp"
+        android:textSize="@dimen/comments_text_desc"
         android:textStyle="bold"
         android:typeface="serif"/>
 

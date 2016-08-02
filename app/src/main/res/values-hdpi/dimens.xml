@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Introduction -->
+    <item name="limitless_rotation_ratio" format="float" type="dimen">0.01</item>
+    <item name="translation_ratio" format="float" type="dimen">1.2</item>
+
+</resources>

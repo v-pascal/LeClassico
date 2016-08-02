@@ -5,13 +5,21 @@
               android:layout_height="match_parent">
 
     <!-- LeClassico icon -->
-    <ImageView
-        android:src="@drawable/lc_icon"
-        android:layout_gravity="center"
+    <FrameLayout
+        android:gravity="center"
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_weight="1"
         android:layout_height="0dp"
-        android:layout_width="wrap_content"/>
+        android:layout_width="match_parent">
+
+        <ImageView
+            android:id="@+id/image_app"
+            android:src="@drawable/lc_icon"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
 
     <!-- Login -->
     <include

@@ -12,7 +12,8 @@ public final class Constants {
     ////// Application
     public static final String APP_NAME = "LeClassico"; // Application name
     public static final String APP_WEBSITE = "http://leclassico.fr"; // Social network application web site
-    public static final String APP_COMPANY = "studio.artaban"; // Application company URI
+    public static final String APP_URI_COMPANY = "studio.artaban"; // Application company URI
+    public static final String APP_URI = "leclassico"; // Application URI
 
     // Preferences
     public static final String APP_PREFERENCE = APP_NAME + "Preferences";
@@ -46,7 +47,7 @@ public final class Constants {
 
 
     ////// Database
-    public static final String DATA_CONTENT_URI = "com.studio.artaban.provider.leclassico"; // DB content provider URI
+    public static final String DATA_CONTENT_URI = "com." + APP_URI_COMPANY + ".provider." + APP_URI; // DB content provider URI
     public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field
 
     // Database table IDs

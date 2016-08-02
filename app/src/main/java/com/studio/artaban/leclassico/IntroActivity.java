@@ -20,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Linkify;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +43,7 @@ import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.tools.SizeUtils;
 
 import java.util.regex.Pattern;
 
@@ -156,11 +158,49 @@ public class IntroActivity extends AppCompatActivity {
 
         private void position(View root) { // Position the representation images
 
+
+
+
+
+
+
+
+
+
+
+
+
+
             //Logs.add(Logs.Type.V, "root: " + root);
             float sizeRatio = getSizeRatio(getActivity());
             ImageView container = (ImageView)root.findViewById(R.id.image_container);
-            ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
-                    (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
+            //((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
+            //        (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
+
+
+
+            //((RelativeLayout.LayoutParams)container.getLayoutParams()).height = 300;
+            //((RelativeLayout.LayoutParams)container.getLayoutParams()).width = 300;
+            /*
+            RelativeLayout.LayoutParams params =
+                    new  RelativeLayout.LayoutParams((RelativeLayout.LayoutParams)container.getLayoutParams());
+            params.height = 300;
+            params.width = 300;
+            */
+            container.setLayoutParams(new RelativeLayout.LayoutParams(300, 300));
+            container.invalidate();
+            container.requestLayout();
+
+
+
+
+
+
+
+
+
+
+
 
             switch (getArguments().getInt(DATA_KEY_POSITION)) {
 
@@ -617,7 +657,11 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
+
                         // Check login
+
+
 
 
 
@@ -628,7 +672,7 @@ public class IntroActivity extends AppCompatActivity {
                     } else {
 
                         try { dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
-                        } catch (IllegalStateException e) {
+                        } catch (Exception e) {
                             Logs.add(Logs.Type.E, "Failed to display warning icon");
                         }
                         IntroActivity.this.runOnUiThread(new Runnable() {
@@ -647,12 +691,16 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
+
                     IntroActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             dialog.setMessage(getString(R.string.data_synchro));
                         }
                     });
+
+
 
 
 
@@ -702,6 +750,12 @@ public class IntroActivity extends AppCompatActivity {
         // Check to display intro
         if (mIntroDone)
             displayConnection(true);
+
+        // Set application icon size (connection layout)
+        ImageView appIcon = (ImageView)findViewById(R.id.image_app);
+        SizeUtils.screenRatio(this, appIcon, true,
+                (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ?
+                        0.5f : 0.25f);
 
         // Set controls panel
         final ImageButton skip = (ImageButton)findViewById(R.id.image_skip);
@@ -767,6 +821,30 @@ public class IntroActivity extends AppCompatActivity {
                 if (((toTheLeft) && (position < 0f)) || (((!toTheLeft) && (position < 1f)))) {
                     float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
 
+                    ////// Album photos: flip photos!
+                    ImageView girls = (ImageView) page.findViewById(R.id.image_girls);
+                    if (girls != null)
+                        girls.setRotationY(IntroFragment.INTRO_GIRLS_ROTATION_Y +
+                                (position * ROTATION_RATIO_GIRLS_Y));
+                    ImageView couple = (ImageView) page.findViewById(R.id.image_couple);
+                    if (couple != null)
+                        couple.setRotationY(IntroFragment.INTRO_COUPLE_ROTATION_Y +
+                                (position * ROTATION_RATIO_COUPLE_Y));
+                    ImageView indoor = (ImageView) page.findViewById(R.id.image_indoor);
+                    if (indoor != null)
+                        indoor.setRotationY(IntroFragment.INTRO_INDOOR_ROTATION_Y +
+                                (position * ROTATION_RATIO_INDOOR_Y));
+                    ImageView outdoor = (ImageView) page.findViewById(R.id.image_outdoor);
+                    if (outdoor != null)
+                        outdoor.setRotationY(position * ROTATION_RATIO_OUTDOOR_Y);
+                    ImageView dj = (ImageView) page.findViewById(R.id.image_dj);
+                    if (dj != null)
+                        dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
+
+                    TypedValue translateRatio = new TypedValue();
+                    getResources().getValue(R.dimen.translation_ratio, translateRatio, true);
+                    position *=  translateRatio.getFloat();
+
                     ////// Welcome: scroll elements!
                     ImageView light1 = (ImageView) page.findViewById(R.id.image_light1);
                     if (light1 != null)
@@ -819,26 +897,6 @@ public class IntroActivity extends AppCompatActivity {
                                 (position * TRANSLATE_RATIO_FRIEND_Y));
                     }
 
-                    ////// Album photos: flip photos!
-                    ImageView girls = (ImageView) page.findViewById(R.id.image_girls);
-                    if (girls != null)
-                        girls.setRotationY(IntroFragment.INTRO_GIRLS_ROTATION_Y +
-                                (position * ROTATION_RATIO_GIRLS_Y));
-                    ImageView couple = (ImageView) page.findViewById(R.id.image_couple);
-                    if (couple != null)
-                        couple.setRotationY(IntroFragment.INTRO_COUPLE_ROTATION_Y +
-                                (position * ROTATION_RATIO_COUPLE_Y));
-                    ImageView indoor = (ImageView) page.findViewById(R.id.image_indoor);
-                    if (indoor != null)
-                        indoor.setRotationY(IntroFragment.INTRO_INDOOR_ROTATION_Y +
-                                (position * ROTATION_RATIO_INDOOR_Y));
-                    ImageView outdoor = (ImageView) page.findViewById(R.id.image_outdoor);
-                    if (outdoor != null)
-                        outdoor.setRotationY(position * ROTATION_RATIO_OUTDOOR_Y);
-                    ImageView dj = (ImageView) page.findViewById(R.id.image_dj);
-                    if (dj != null)
-                        dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
-
                     ////// Location: follow the map!
                     ImageView greenMark = (ImageView) page.findViewById(R.id.image_green_marker);
                     if (greenMark != null)
@@ -881,9 +939,7 @@ public class IntroActivity extends AppCompatActivity {
         });
         mViewPager.setOnLimitlessListener(new LimitlessViewPager.OnLimitCrossedListener() {
 
-            private static final float RATIO_ROTATION = 0.05f / 800f;
-            private float mRotation;
-            // Left limitless page rotation
+            private float mRotation; // Left limitless page rotation
 
             private static final float RATIO_START_BEHAVIOR = 0.25f;
             // Start to translate ViewPager when this % of the screen width is reached
@@ -985,8 +1041,9 @@ public class IntroActivity extends AppCompatActivity {
                 //Logs.add(Logs.Type.V, "page: " + page + ";deltaX: " + deltaX + ";deltaY: " + deltaY);
                 if (deltaX > 0f) {
 
-                    float screenRatio = mViewPager.getWidth() * RATIO_ROTATION;
-                    mRotation = deltaX * screenRatio;
+                    TypedValue screenRatio = new TypedValue();
+                    getResources().getValue(R.dimen.limitless_rotation_ratio, screenRatio, true);
+                    mRotation = deltaX * screenRatio.getFloat();
                     page.setRotationY(mRotation);
                 }
                 return false;

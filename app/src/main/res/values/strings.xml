@@ -12,7 +12,7 @@
     <string name="check_internet">Check Internet connection</string>
     <string name="no_internet">No Internet connection!\nNeeded during the first connection.</string>
     <string name="data_synchro">Data synchronisation</string>
-    <string name="help_connection">bla bla bla</string>
+    <string name="help_connection">If you do not have an account, please note that only a Classico member can create you one.\nAnd if it was chance that brought you here, so keep on practicing it by entering a username &amp; password to chance!</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome&#8230;</string>

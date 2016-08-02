@@ -12,6 +12,8 @@
         <item name="colorAccent">@color/colorAccentSetting</item>
         <item name="android:textColorSecondary">@color/colorSecondaryText</item>
     </style>
+
+    <!-- Custom theme -->
     <style name="IntroAppTheme" parent="MainAppTheme">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
@@ -21,6 +23,9 @@
     </style>
     <style name="ConnectAppTheme" parent="IntroAppTheme">
         <item name="android:windowBackground">@android:color/white</item>
+    </style>
+    <style name="LoginAppTheme" parent="ConnectAppTheme">
+        <item name="colorAccent">@color/green</item>
     </style>
 
 </resources>

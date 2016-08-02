@@ -9,7 +9,7 @@
     <string name="check_internet">Vérification connexion Internet</string>
     <string name="no_internet">Pas de connection Internet!\nNécessaire lors de la première connexion.</string>
     <string name="data_synchro">Synchronisation des données</string>
-    <string name="help_connection">bla bla bla</string>
+    <string name="help_connection">Si vous n\'avez pas de compte, sachez que seul un membre du Classico peut vous en créer un.\nEt si c\'est le hasard qui vous a conduit ici, alors continuez à vous exercer en tapant un pseudo &amp; mot de passe au hasard!</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Bienvenue&#8230;</string>
