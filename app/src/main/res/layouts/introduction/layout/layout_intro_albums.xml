@@ -77,7 +77,7 @@
         android:id="@+id/image_container"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:paddingBottom="@dimen/container_padding_bottom"
+        android:layout_marginBottom="@dimen/container_padding_bottom"
         android:adjustViewBounds="true"
         android:src="@drawable/lc_icon"
         android:layout_width="wrap_content"

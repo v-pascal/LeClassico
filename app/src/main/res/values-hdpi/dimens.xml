@@ -2,7 +2,10 @@
 <resources>
 
     <!-- Introduction -->
+    <item name="comments_shadow" format="float" type="dimen">3.0</item>
+    <item name="comments_radius" format="float" type="dimen">2.0</item>
+
     <item name="limitless_rotation_ratio" format="float" type="dimen">0.01</item>
-    <item name="translation_ratio" format="float" type="dimen">1.2</item>
+    <item name="translation_ratio" format="float" type="dimen">1.3</item>
 
 </resources>

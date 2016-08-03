@@ -135,72 +135,34 @@ public class IntroActivity extends AppCompatActivity {
         private static final int INTRO_INDOOR_TRANS_Y = 50; // Indoor party photo vertical position (from screen top)
         public static final int INTRO_INDOOR_ROTATION_Y = -35; // Indoor party photo vertical rotation
 
-        private static final float INTRO_EVENTS_TRANS_RATIO_X = 0.2f;
+        private static final float INTRO_EVENTS_TRANS_RATIO_X = 0.18f;
         // Events image horizontal position (from left linear parent item  & according screen width)
         private static final int INTRO_EVENTS_TRANS_Y = 172; // Events image vertical position (from screen top)
         public static final float INTRO_EVENTS_SCALE = 0.7846f; // Events image scale
-        private static final float INTRO_FLYER_TRANS_RATIO_X = 0.3f;
+        private static final float INTRO_FLYER_TRANS_RATIO_X = 0.27f;
         // Calendar image horizontal position (from left linear parent item  & according screen width)
         private static final int INTRO_FLYER_TRANS_Y = -57; // Calendar image vertical position (from screen top)
         public static final float INTRO_FLYER_SCALE = 0.7942f; // Flyer image scale
-        private static final float INTRO_CALENDAR_TRANS_RATIO_X = 0.5f;
+        private static final float INTRO_CALENDAR_TRANS_RATIO_X = 0.45f;
         // Flyer image horizontal position (from left linear parent item & according screen width)
         private static final int INTRO_CALENDAR_TRANS_Y = 218; // Flyer image vertical position (from screen top)
 
         private static final int INTRO_GREEN_MARKER_TRANS_X = 94; // Green marker image horizontal position (from middle screen)
-        public static final int INTRO_GREEN_MARKER_TRANS_Y = 2; // Green marker image vertical position (from screen top)
+        public static final int INTRO_GREEN_MARKER_TRANS_Y = 12; // Green marker image vertical position (from screen top)
         public static final int INTRO_RED_MARKER_TRANS_X = -83; // Red marker image horizontal position (from middle screen)
-        public static final int INTRO_RED_MARKER_TRANS_Y = 77; // Red marker image vertical position (from screen top)
+        public static final int INTRO_RED_MARKER_TRANS_Y = 87; // Red marker image vertical position (from screen top)
         public static final int INTRO_BLUE_MARKER_TRANS_X = 136; // Blue marker image horizontal position (from middle screen)
-        public static final int INTRO_BLUE_MARKER_TRANS_Y = 143; // Blue marker image vertical position (from screen top)
+        public static final int INTRO_BLUE_MARKER_TRANS_Y = 153; // Blue marker image vertical position (from screen top)
         public static final int INTRO_YELLOW_MARKER_TRANS_X = 2; // Yellow marker image horizontal position (from middle screen)
-        private static final int INTRO_YELLOW_MARKER_TRANS_Y = 162; // Yellow marker image vertical position (from screen top)
+        private static final int INTRO_YELLOW_MARKER_TRANS_Y = 172; // Yellow marker image vertical position (from screen top)
 
         private void position(View root) { // Position the representation images
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             //Logs.add(Logs.Type.V, "root: " + root);
             float sizeRatio = getSizeRatio(getActivity());
             ImageView container = (ImageView)root.findViewById(R.id.image_container);
-            //((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
-            //        (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
-
-
-
-            //((RelativeLayout.LayoutParams)container.getLayoutParams()).height = 300;
-            //((RelativeLayout.LayoutParams)container.getLayoutParams()).width = 300;
-            /*
-            RelativeLayout.LayoutParams params =
-                    new  RelativeLayout.LayoutParams((RelativeLayout.LayoutParams)container.getLayoutParams());
-            params.height = 300;
-            params.width = 300;
-            */
-            container.setLayoutParams(new RelativeLayout.LayoutParams(300, 300));
-            container.invalidate();
-            container.requestLayout();
-
-
-
-
-
-
-
-
-
-
-
+            ((RelativeLayout.LayoutParams)container.getLayoutParams()).height =
+                    (int)(Constants.INTRO_CONTAINER_IMAGE_HEIGHT * sizeRatio);
 
             switch (getArguments().getInt(DATA_KEY_POSITION)) {
 

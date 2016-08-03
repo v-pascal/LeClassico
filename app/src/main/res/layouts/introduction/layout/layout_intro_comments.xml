@@ -11,9 +11,9 @@
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
         android:shadowColor="@android:color/black"
-        android:shadowDx="2.0"
-        android:shadowDy="2.0"
-        android:shadowRadius="1.5"
+        android:shadowDx="@dimen/comments_shadow"
+        android:shadowDy="@dimen/comments_shadow"
+        android:shadowRadius="@dimen/comments_radius"
         android:textSize="@dimen/comments_text_title"
         android:textStyle="bold"/>
 
@@ -25,9 +25,9 @@
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
         android:shadowColor="@android:color/black"
-        android:shadowDx="2.0"
-        android:shadowDy="2.0"
-        android:shadowRadius="1.5"
+        android:shadowDx="@dimen/comments_shadow"
+        android:shadowDy="@dimen/comments_shadow"
+        android:shadowRadius="@dimen/comments_radius"
         android:textSize="@dimen/comments_text_desc"
         android:textStyle="bold"
         android:typeface="serif"/>

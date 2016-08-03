@@ -8,10 +8,12 @@
 
     <!-- Introduction -->
     <dimen name="intro_padding_bottom">68dp</dimen><!-- activity_vertical_margin * 2 + 36dp (image) -->
-    <dimen name="container_padding_bottom">32dp</dimen>
+    <dimen name="container_padding_bottom">28dp</dimen>
 
     <dimen name="comments_text_title">21sp</dimen>
     <dimen name="comments_text_desc">19sp</dimen>
+    <item name="comments_shadow" format="float" type="dimen">2.0</item>
+    <item name="comments_radius" format="float" type="dimen">1.5</item>
 
     <item name="limitless_rotation_ratio" format="float" type="dimen">0.05</item>
     <item name="translation_ratio" format="float" type="dimen">1.0</item>

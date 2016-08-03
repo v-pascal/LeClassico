@@ -18,7 +18,7 @@
     <string name="intro_welcome">Welcome&#8230;</string>
     <string name="intro_welcome_text">To the application\n%1$s!</string>
     <string name="intro_publications">News&#8230;</string>
-    <string name="intro_publications_text">Follow all publication\nof your friends!</string>
+    <string name="intro_publications_text">Follow publications\nof your friends!</string>
     <string name="intro_albums">Albums&#8230;</string>
     <string name="intro_albums_text">Create &amp; share\nphoto albums!</string>
     <string name="intro_events">Events&#8230;</string>

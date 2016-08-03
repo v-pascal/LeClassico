@@ -15,11 +15,11 @@
     <string name="intro_welcome">Bienvenue&#8230;</string>
     <string name="intro_welcome_text">Dans l\'application\n%1$s!</string>
     <string name="intro_publications">Fil d\'actualité&#8230;</string>
-    <string name="intro_publications_text">Suivez toute l\'actualité\nde vos amis!</string>
+    <string name="intro_publications_text">Suivez l\'actualité\nde vos amis!</string>
     <string name="intro_albums">Albums&#8230;</string>
-    <string name="intro_albums_text">Créer &amp; partager vos\nalbums de photos!</string>
+    <string name="intro_albums_text">Partager vos\nalbums photos!</string>
     <string name="intro_events">Evènements&#8230;</string>
-    <string name="intro_events_text">Tenez-vous informé de\ntous les évènements!</string>
+    <string name="intro_events_text">Restez informé\ndes évènements!</string>
     <string name="intro_location">Géolocation&#8230;</string>
     <string name="intro_location_text">Géolocaliser tous\nvos amis!</string>
 
