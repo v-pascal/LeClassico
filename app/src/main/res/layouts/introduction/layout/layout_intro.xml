@@ -27,8 +27,8 @@
 
         <!-- Skip step -->
         <ImageButton
-            android:background="@drawable/button_bckg"
             android:onClick="onSkipIntro"
+            style="@style/IntroSelectableItemBackground"
             android:layout_alignParentBottom="true"
             android:id="@+id/image_skip"
             android:alpha="0"
@@ -73,8 +73,8 @@
 
         <!-- Next step -->
         <ImageButton
-            android:background="@drawable/button_bckg"
             android:onClick="onNextStep"
+            style="@style/IntroSelectableItemBackground"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:src="@drawable/ic_navigate_next_white_36dp"
