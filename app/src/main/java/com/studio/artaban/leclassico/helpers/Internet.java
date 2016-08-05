@@ -26,14 +26,14 @@ public final class Internet {
     private static final int DEFAULT_ONLINE_TIMEOUT = 2000; // Default Internet connection check timeout (in millisecond)
     private static final String DEFAULT_ONLINE_URL = "http://www.google.com"; // Default Internet connection check URL
 
-    private static boolean mConnected; // Connected flag (see 'isOnline' method below)
+    private static boolean isConnected; // Connected flag (see 'isOnline' method below)
 
     public static boolean isOnline(Context context) { return isOnline(context, DEFAULT_ONLINE_TIMEOUT); }
     public static boolean isOnline(Context context, final int timeOut) {
 
         // Check Internet connection from any thread even UI thread (check INTERNET permission first)
         Logs.add(Logs.Type.V, "context: " + context + ", timeOut: " + timeOut);
-        mConnected = false;
+        isConnected = false;
 
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -53,7 +53,7 @@ public final class Internet {
                     if (connURL.getResponseCode() == 200) {
 
                         Logs.add(Logs.Type.I, "Connected");
-                        mConnected = true;
+                        isConnected = true;
                     }
                 }
                 catch (MalformedURLException e) { Logs.add(Logs.Type.F, e.getMessage()); }
@@ -76,7 +76,7 @@ public final class Internet {
                 Logs.add(Logs.Type.E, e.getMessage());
             }
         }
-        return mConnected;
+        return isConnected;
     }
 
     //////
@@ -158,7 +158,7 @@ public final class Internet {
     }
 
     //////
-    public boolean isConnected() { return mConnected; }
+    public static boolean isConnected() { return isConnected; }
     public static class ConnectivityReceiver extends BroadcastReceiver {
 
         @Override

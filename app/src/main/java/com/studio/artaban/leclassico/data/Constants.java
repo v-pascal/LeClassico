@@ -21,6 +21,8 @@ public final class Constants {
 
 
     ////// Introduction
+    public static final int INTRO_PAGE_COUNT = 5; // Introduction page count
+
     public static final int INTRO_BACKGROUND_IMAGE_HEIGHT = 507; // Fixed background image height (in pixel)
     public static final int INTRO_CONTAINER_IMAGE_HEIGHT = 192; // Fixed container image height (in pixel)
     public static final int INTRO_BALL_IMAGE_HEIGHT = 222; // Fixed ball image height (in pixel)
