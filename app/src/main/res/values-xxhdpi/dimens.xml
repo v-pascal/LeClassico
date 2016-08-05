@@ -5,7 +5,7 @@
     <item name="comments_shadow" format="float" type="dimen">4.0</item>
     <item name="comments_radius" format="float" type="dimen">3.0</item>
 
-    <item name="limitless_rotation_ratio" format="float" type="dimen">0.006</item>
-    <item name="translation_ratio" format="float" type="dimen">1.8</item>
+    <item name="limitless_rotation_ratio" format="float" type="dimen">0.007</item>
+    <item name="translation_ratio" format="float" type="dimen">1.9</item>
 
 </resources>

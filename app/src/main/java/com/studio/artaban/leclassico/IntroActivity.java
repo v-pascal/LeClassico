@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 
 import android.view.ViewStub;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
@@ -148,13 +149,13 @@ public class IntroActivity extends AppCompatActivity {
         private static final int INTRO_CALENDAR_TRANS_Y = 218; // Flyer image vertical position (from screen top)
 
         private static final int INTRO_GREEN_MARKER_TRANS_X = 94; // Green marker image horizontal position (from middle screen)
-        public static final int INTRO_GREEN_MARKER_TRANS_Y = 12; // Green marker image vertical position (from screen top)
+        public static final int INTRO_GREEN_MARKER_TRANS_Y = 7; // Green marker image vertical position (from screen top)
         public static final int INTRO_RED_MARKER_TRANS_X = -83; // Red marker image horizontal position (from middle screen)
-        public static final int INTRO_RED_MARKER_TRANS_Y = 87; // Red marker image vertical position (from screen top)
+        public static final int INTRO_RED_MARKER_TRANS_Y = 82; // Red marker image vertical position (from screen top)
         public static final int INTRO_BLUE_MARKER_TRANS_X = 136; // Blue marker image horizontal position (from middle screen)
-        public static final int INTRO_BLUE_MARKER_TRANS_Y = 153; // Blue marker image vertical position (from screen top)
+        public static final int INTRO_BLUE_MARKER_TRANS_Y = 148; // Blue marker image vertical position (from screen top)
         public static final int INTRO_YELLOW_MARKER_TRANS_X = 2; // Yellow marker image horizontal position (from middle screen)
-        private static final int INTRO_YELLOW_MARKER_TRANS_Y = 172; // Yellow marker image vertical position (from screen top)
+        private static final int INTRO_YELLOW_MARKER_TRANS_Y = 167; // Yellow marker image vertical position (from screen top)
 
         private void position(View root) { // Position the representation images
 
@@ -423,36 +424,24 @@ public class IntroActivity extends AppCompatActivity {
 
     private static final int ANIMATION_DURATION_SHOW_CONNECT = 200; // Display connection layout partially duration
     private static final int ANIMATION_DURATION_HIDE_CONNECT = 300; // Hide connection layout duration
-    private static final int ANIMATION_DURATION_DISPLAY = 300; // Display connection/introduction layout entirely duration
+    private static final int ANIMATION_DURATION_DISPLAY = 400; // Display connection/introduction layout entirely duration
 
     private void skipIntro() { // Display connection layout
 
         Logs.add(Logs.Type.V, null);
-        CoordinatorLayout layout = ((CoordinatorLayout) mViewPager.getParent());
-        layout.clearAnimation();
-        layout.setTranslationX(0);
-        TranslateAnimation anim = new TranslateAnimation(0f, -mViewPager.getWidth(), 0f, 0f);
-        anim.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        final CoordinatorLayout layout = ((CoordinatorLayout) mViewPager.getParent());
+        layout.animate()
+                .setDuration(ANIMATION_DURATION_DISPLAY)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .translationX(-mViewPager.getWidth())
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
 
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-                Logs.add(Logs.Type.V, "animation: " + animation);
-                displayConnection(true);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        anim.setFillAfter(true);
-        anim.setDuration(ANIMATION_DURATION_DISPLAY);
-        layout.startAnimation(anim);
+                        Logs.add(Logs.Type.V, null);
+                        displayConnection(true);
+                    }
+                });
 
         mIntroDone = true;
     }
@@ -467,15 +456,17 @@ public class IntroActivity extends AppCompatActivity {
 
         } else { // Hide connection layout (show introduction)
 
-            View intro = findViewById(R.id.intro_content);
-            intro.clearAnimation();
-            intro.setTranslationX(0f);
-            TranslateAnimation anim = new TranslateAnimation(-mViewPager.getWidth(), 0f, 0f, 0f);
-            anim.setDuration(ANIMATION_DURATION_DISPLAY);
+            final View intro = findViewById(R.id.intro_content);
+            Point screenSize = new Point();
+            getWindowManager().getDefaultDisplay().getSize(screenSize);
 
-            ((CoordinatorLayout) findViewById(R.id.intro_content)).setVisibility(View.VISIBLE);
+            intro.setVisibility(View.VISIBLE);
+            intro.setTranslationX(-screenSize.x);
             intro.bringToFront();
-            intro.startAnimation(anim);
+            intro.animate()
+                    .setDuration(ANIMATION_DURATION_DISPLAY)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .translationX(0f);
         }
     }
 
@@ -901,6 +892,7 @@ public class IntroActivity extends AppCompatActivity {
         });
         mViewPager.setOnLimitlessListener(new LimitlessViewPager.OnLimitCrossedListener() {
 
+            private static final int DURATION_CANCEL_ROTATION = 500;
             private float mRotation; // Left limitless page rotation
 
             private static final float RATIO_START_BEHAVIOR = 0.25f;
@@ -941,7 +933,7 @@ public class IntroActivity extends AppCompatActivity {
 
                         ObjectAnimator animation = ObjectAnimator.ofFloat(page, "rotationY",
                                 mRotation, 0f);
-                        animation.setDuration(500);
+                        animation.setDuration(DURATION_CANCEL_ROTATION);
                         animation.start();
                     }
                     return false;
