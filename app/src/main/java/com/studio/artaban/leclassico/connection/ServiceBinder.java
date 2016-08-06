@@ -21,18 +21,20 @@ public class ServiceBinder {
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
+        public void onServiceConnected(ComponentName name, IBinder binder) {
 
-            Logs.add(Logs.Type.V, "name: " + name + ";service: " + service);
-            mDataService = ((DataService.DataBinder)service).getService();
+            Logs.add(Logs.Type.V, "name: " + name + ";binder: " + binder);
+            mDataService = ((DataService.DataBinder)binder).getService();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
 
             Logs.add(Logs.Type.W, "name: " + name);
-            mDataService.stop();
-            mDataService = null;
+            if (mDataService != null) {
+                mDataService.stop();
+                mDataService = null;
+            }
         }
     };
 
@@ -53,7 +55,6 @@ public class ServiceBinder {
 
         Logs.add(Logs.Type.V, "activity: " + activity);
         if (mBound) {
-
             activity.unbindService(mConnection);
             mBound = false;
         }

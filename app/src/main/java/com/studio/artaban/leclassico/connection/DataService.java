@@ -6,9 +6,12 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
-public class DataService extends Service {
+import java.util.Date;
+
+public class DataService extends Service implements Internet.OnConnectivityListener {
 
     private static boolean isRunning; // Service running flag
     public static boolean isRunning() {
@@ -16,6 +19,14 @@ public class DataService extends Service {
     }
 
     // Broadcast actions
+    public static final String STATUS_CONNECTION = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.STATUS_CONNECTION";
+    public static final String STATUS_SYNCHRONIZATION = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.STATUS_SYNCHRONIZATION";
+
+    public static final String NEW_NOTIFICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.NEW_NOTIFICATIONS";
+
     public static final String NEW_PUBLICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
             Constants.APP_URI + ".action.NEW_PUBLICATIONS";
     public static final String NEW_COMMENTS = "com." + Constants.APP_URI_COMPANY + "." +
@@ -26,10 +37,31 @@ public class DataService extends Service {
             Constants.APP_URI + ".action.NEW_LOCATIONS";
     public static final String NEW_EVENTS = "com." + Constants.APP_URI_COMPANY + "." +
             Constants.APP_URI + ".action.NEW_EVENTS";
-    public static final String NEW_NOTIFICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.NEW_NOTIFICATIONS";
 
-    //
+    //////
+    @Override
+    public void onConnection() {
+
+
+
+
+
+
+
+
+    }
+    @Override
+    public void onDisconnection() {
+
+
+
+
+
+
+
+    }
+
+    //////
     public class DataBinder extends Binder {
         public DataService getService() {
             return DataService.this;
@@ -37,14 +69,79 @@ public class DataService extends Service {
     };
     private final Binder mBinder = new DataBinder();
 
+    private String mToken; // Token used to identify the user when requesting remote DB
+    private long mTimeLag; // Time lag between remote DB & current OS (in milliseconds)
+
     //
-    private Thread mThread;
+    private Thread mThread; // Thread to manage updates from remote DB to local DB
 
     public void stop() {
 
         Logs.add(Logs.Type.V, null);
         isRunning = false;
-        mThread.interrupt();
+
+        if (mThread != null) {
+            mThread.interrupt();
+            mThread = null;
+        }
+    }
+
+    private String mPseudo;
+    private String mPassword;
+    // Login
+
+    public void login(String pseudo, String password) {
+
+        Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";password: " + password);
+        mPseudo = pseudo;
+        mPassword = password;
+
+        if (Internet.isConnected()) {
+
+
+
+
+
+
+
+
+
+        }
+    }
+    public boolean synchronize() {
+
+        Logs.add(Logs.Type.V, null);
+        if ((!Internet.isConnected()) || (mToken == null))
+            return false;
+
+
+
+
+
+        return true;
+    }
+    public void logout() {
+
+        Logs.add(Logs.Type.V, null);
+        mPseudo = null;
+        mPassword = null;
+
+
+
+
+
+
+
+
+        mToken = null;
+
+
+
+
+
+
+
+
     }
 
     //////
@@ -62,33 +159,27 @@ public class DataService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Logs.add(Logs.Type.V, "intent: " + intent + ";flags: " + flags + ";startId: " + startId);
+        isRunning = true;
+
+
+
+
+
+        /*
         mThread = new Thread(new Runnable() {
             @Override
             public void run() {
 
                 Logs.add(Logs.Type.V, "Thread started");
-                isRunning = true;
-
                 while (isRunning) {
-
-
-
-
-
-
 
 
 
                     try { Thread.sleep(10000, 0);
                     } catch (InterruptedException e) {
-                        Logs.add(Logs.Type.E, "Sleep interrupted");
+                        Logs.add(Logs.Type.W, "Sleep interrupted");
+                        break;
                     }
-
-
-
-
-
-
 
 
 
@@ -98,6 +189,14 @@ public class DataService extends Service {
 
         });
         mThread.start();
+        */
+
+
+
+
+
+
+
         return START_NOT_STICKY;
     }
 }

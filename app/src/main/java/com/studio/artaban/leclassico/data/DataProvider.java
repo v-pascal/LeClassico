@@ -32,6 +32,17 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class DataProvider extends ContentProvider {
 
+    public enum Synchronized {
+
+        TODO(0), IN_PROGRESS(1), DONE(2);
+
+        //
+        private final int id;
+        Synchronized(int id) { this.id = id; }
+        public int getValue() { return this.id; }
+    }
+
+    //////
     public static final String CONTENT_URI = "content://" + Constants.DATA_CONTENT_URI + "/";
 
     private static final String MIME_TYPE_SINGLE = "vnd.android.cursor.item/vnd." + Constants.APP_URI_COMPANY +
@@ -195,6 +206,7 @@ public class DataProvider extends ContentProvider {
         if (table == null)
             throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
+        // NB: No need to check exiting synchronized field value (not null field)
         long id = mDB.getDB().insert(table, null, values);
         if (id > Constants.NO_DATA) {
 
@@ -230,8 +242,29 @@ public class DataProvider extends ContentProvider {
             if (selection == null)
                 selection = "1"; // ...by assigning '1'
         }
+
+
+
+
+
+
+
+
+
         int result = mDB.getDB().delete(table, selection, selectionArgs);
         getContext().getContentResolver().notifyChange(uri, null);
+
+
+
+
+
+
+
+
+
+
+
+
 
         return result; // Return deleted entries count
     }
@@ -255,6 +288,11 @@ public class DataProvider extends ContentProvider {
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
         }
+
+        // Check exiting synchronized field value (always needed)
+        if (!values.containsKey(Constants.DATA_COLUMN_SYNCHRONIZED))
+            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TODO.getValue());
+
         int result = mDB.getDB().update(table, values, selection, selectionArgs);
         getContext().getContentResolver().notifyChange(uri, null);
 

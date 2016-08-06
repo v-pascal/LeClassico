@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -158,12 +159,37 @@ public final class Internet {
     }
 
     //////
+    public interface OnConnectivityListener {
+
+        void onConnection();
+        void onDisconnection();
+    };
+    private static WeakReference<OnConnectivityListener> connectivityListener;
+    public static void setConnectivityListener(OnConnectivityListener listener) {
+        connectivityListener = new WeakReference<OnConnectivityListener>(listener);
+    }
+    // Connectivity listener
+
     public static boolean isConnected() { return isConnected; }
     public static class ConnectivityReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
+
+            boolean previousConnection = isConnected;
             isOnline(context);
+            if (previousConnection != isConnected) {
+                try {
+                    if (isConnected)
+                        connectivityListener.get().onConnection();
+                    else
+                        connectivityListener.get().onDisconnection();
+
+                } catch (NullPointerException e) {
+                    Logs.add(Logs.Type.I, "No connectivity listener");
+                }
+            }
         }
     }
 }

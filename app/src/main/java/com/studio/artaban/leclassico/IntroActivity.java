@@ -1,9 +1,13 @@
 package com.studio.artaban.leclassico;
 
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -29,6 +33,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -41,6 +46,7 @@ import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SizeUtils;
+import com.studio.artaban.leclassico.tools.WaitUiThread;
 
 /**
  * Created by pascal on 15/07/16.
@@ -108,14 +114,15 @@ public class IntroActivity extends AppCompatActivity {
 
         Logs.add(Logs.Type.V, null);
         mIntroDone = false;
+
         if (DataService.isRunning())
             stopService(new Intent(IntroActivity.this, DataService.class));
+            // NB: Will call "DataService.stop" method when the service connection will disconnect
+            //     (see "onServiceDisconnected" in "ServiceBinder" class), and this B4 the service
+            //     is stopped. No need to call "DataService.stop" method here.
+
         finish();
     }
-
-    //
-    private LimitlessViewPager mViewPager; // Introduction view pager component
-    private boolean mIntroDone; // Introduction flag
 
     private float mAlphaSkip;
     private float mAlphaStep1;
@@ -205,6 +212,39 @@ public class IntroActivity extends AppCompatActivity {
         }
     }
 
+    private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
+
+    private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
+    private class DataReceiver extends BroadcastReceiver { // Data receiver
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
+            if (intent.getAction().equals(DataService.STATUS_CONNECTION)) {
+
+
+
+
+
+
+
+                mDataService.get().synchronize();
+                mProgressDialog.setMessage(getString(R.string.data_synchro));
+
+            } else if (intent.getAction().equals(DataService.STATUS_SYNCHRONIZATION)) {
+
+
+
+
+
+
+
+            }
+        }
+    };
+    private DataReceiver mDataReceiver;
+
     //
     public void onNextStep(View sender) { // Next step click event
 
@@ -222,44 +262,19 @@ public class IntroActivity extends AppCompatActivity {
     public void onConnection(View sender) { // Connection
 
         Logs.add(Logs.Type.V, "sender: " + sender);
-        final ProgressDialog dialog = ProgressDialog.show(this, getString(R.string.wait),
+        mProgressDialog = ProgressDialog.show(this, getString(R.string.wait),
                 getString(R.string.check_internet), true, true);
+
+        final EditText pseudoText = (EditText)findViewById(R.id.edit_pseudo);
+        final EditText passwordText = (EditText)findViewById(R.id.edit_password);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
 
-
-
-
-
-
-
-
-
-
-                if (mDataService.get() != null)
-                    Logs.add(Logs.Type.E, "!= null");
-                else
-                    Logs.add(Logs.Type.E, "== null");
-
-
-                /*
-                Intent intent = new Intent(getApplicationContext(), Home.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                */
-
-
-                //if (mDataService.get() == null)
-                //    startService(new Intent(IntroActivity.this, DataService.class));
-
-
-
-
                 // Check Internet connection
                 boolean connected = Internet.isOnline(IntroActivity.this);
-                if (!dialog.isShowing()) return; // Cancelled
+                if (!mProgressDialog.isShowing()) return; // Cancelled
 
                 if (!connected) {
 
@@ -274,13 +289,31 @@ public class IntroActivity extends AppCompatActivity {
                     }
                     result.close();
 
-                    if (membersCount > 0) { // Existing DB found
-                        // Work offline
+                    if (membersCount > 0) { // Found existing DB (work offline)
 
 
 
 
-                        // Check login
+
+
+
+
+                        // Offline identification
+                        WaitUiThread.run(IntroActivity.this, new WaitUiThread.TaskToRun() {
+                            @Override
+                            public void proceed() {
+                                mProgressDialog.setMessage(getString(R.string.data_synchro));
+                            }
+                        });
+                        mDataService.get().login(
+                                pseudoText.getText().toString(),
+                                passwordText.getText().toString());
+
+
+                        //mProgressDialog.cancel();
+                        //startActivity
+
+
 
 
 
@@ -288,15 +321,16 @@ public class IntroActivity extends AppCompatActivity {
 
                     } else {
 
-                        try { dialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
+                        try { mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
                         } catch (Exception e) {
                             Logs.add(Logs.Type.E, "Failed to display warning icon");
                         }
                         IntroActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                dialog.setTitle(getString(R.string.error));
-                                dialog.setMessage(getString(R.string.no_internet));
+                                mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
+                                mProgressDialog.setTitle(getString(R.string.error));
+                                mProgressDialog.setMessage(getString(R.string.no_internet));
                             }
                         });
                     }
@@ -306,32 +340,31 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-                    IntroActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.setMessage(getString(R.string.data_synchro));
-                        }
-                    });
+
+
+                    // Identification
+                    // Data synchronization
+
+
+
+                    //mProgressDialog.cancel();
+                    //startActivity
+
+
+
 
 
 
                 }
-
-
-
-
-
-
-
-
-
 
             }
 
         }).start();
     }
 
-    private final ServiceBinder mDataService = new ServiceBinder();
+    //
+    private LimitlessViewPager mViewPager; // Introduction view pager component
+    private boolean mIntroDone; // Introduction flag
 
     //////
     @Override
@@ -757,6 +790,12 @@ public class IntroActivity extends AppCompatActivity {
 
         Logs.add(Logs.Type.V, null);
         mDataService.bind(this); // Bind data service
+
+        // Register broadcast receiver
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DataService.STATUS_CONNECTION);
+        filter.addAction(DataService.STATUS_SYNCHRONIZATION);
+        registerReceiver(mDataReceiver, filter);
     }
 
     @Override
@@ -830,6 +869,7 @@ public class IntroActivity extends AppCompatActivity {
 
         Logs.add(Logs.Type.V, null);
         mDataService.unbind(this); // Unbind data service
+        unregisterReceiver(mDataReceiver); // Unregister broadcast receiver
     }
 
     @Override
