@@ -19,6 +19,14 @@ public final class Constants {
     public static final String APP_PREFERENCE = APP_NAME + "Preferences";
     public static final String APP_PREFERENCE_INTRO_DONE = "introDone";
 
+    public static final String APP_WEBSERVICES = APP_WEBSITE + "/WebServices"; // LeClassico web services URL
+
+
+    ////// Web services
+    public static final String WEBSERVICE_CONNECTION = "/connection.php"; // Connection web service
+    public static final String WEBSERVICE_PUBLICATIONS = "/actualites.php"; // Publications web service
+    public static final String WEBSERVICE_COMMENTS = "/commentaires.php"; // Comments web service
+
 
     ////// Introduction
     public static final int INTRO_PAGE_COUNT = 5; // Introduction page count
@@ -51,6 +59,9 @@ public final class Constants {
     ////// Database
     public static final String DATA_CONTENT_URI = "com." + APP_URI_COMPANY + ".provider." + APP_URI; // DB content provider URI
     public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field
+
+    public static final String DATA_DELETE_SELECTION = DATA_COLUMN_SYNCHRONIZED + "=" + DataProvider.Synchronized.TO_DELETE;
+    // Selection criteria to delete records from DB definitively
 
     // Database table IDs
     public static final int DATA_CAMARADES_TABLE_ID = 1;

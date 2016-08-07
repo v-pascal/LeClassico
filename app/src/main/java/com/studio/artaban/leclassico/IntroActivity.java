@@ -1,7 +1,6 @@
 package com.studio.artaban.leclassico;
 
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -212,6 +211,8 @@ public class IntroActivity extends AppCompatActivity {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////// Login
+
     private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
 
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
@@ -223,16 +224,35 @@ public class IntroActivity extends AppCompatActivity {
             Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
             if (intent.getAction().equals(DataService.STATUS_CONNECTION)) {
 
+                byte connectState = intent.getByteExtra(DataService.CONNECTION_STATE, DataService.STATE_ERROR);
+                if (connectState == DataService.CONNECTION_STATE_CONNECTED) {
+                    Logs.add(Logs.Type.I, "Data synchronization");
 
+                    // Data synchronization
+                    mProgressDialog.setMessage(getString(R.string.data_synchro));
+                    mDataService.get().synchronize();
 
+                } else {
 
-
-
-
-                mDataService.get().synchronize();
-                mProgressDialog.setMessage(getString(R.string.data_synchro));
+                    mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
+                    mProgressDialog.setTitle(getString(R.string.error));
+                    mProgressDialog.setMessage(getString(
+                            (connectState == DataService.CONNECTION_STATE_LOGIN_FAILED)?
+                                    R.string.login_failed : R.string.webservice_error));
+                }
 
             } else if (intent.getAction().equals(DataService.STATUS_SYNCHRONIZATION)) {
+
+
+
+
+
+
+
+
+                //mProgressDialog.cancel();
+                //startActivity
+
 
 
 
@@ -269,100 +289,111 @@ public class IntroActivity extends AppCompatActivity {
         final EditText passwordText = (EditText)findViewById(R.id.edit_password);
 
         new Thread(new Runnable() {
+
+            private void displayOfflineError() {
+                Logs.add(Logs.Type.V, null);
+
+                try { mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
+                } catch (Exception e) {
+                    Logs.add(Logs.Type.W, "Failed to display warning icon");
+                }
+                IntroActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
+                        mProgressDialog.setTitle(getString(R.string.error));
+                        mProgressDialog.setMessage(getString(R.string.no_internet));
+                    }
+                });
+            }
+
             @Override
             public void run() {
+                Logs.add(Logs.Type.V, null);
 
                 // Check Internet connection
                 boolean connected = Internet.isOnline(IntroActivity.this);
                 if (!mProgressDialog.isShowing()) return; // Cancelled
+                try {
 
-                if (!connected) {
+                    if (!connected) {
 
-                    // No Internet connection so check existing DB to work offline
-                    ContentResolver cr = getContentResolver();
-                    Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                            new String[]{ "count(*)" }, null, null, null);
-                    int membersCount = 0;
-                    if (result.getCount() > 0) {
-                        result.moveToFirst();
-                        membersCount = result.getInt(0);
-                    }
-                    result.close();
+                        // No Internet connection so check existing DB to work offline
+                        ContentResolver cr = getContentResolver();
+                        Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                                new String[]{ "count(*)" }, null, null, null);
+                        int membersCount = 0;
+                        if (result.getCount() > 0) {
+                            result.moveToFirst();
+                            membersCount = result.getInt(0);
+                        }
+                        result.close();
 
-                    if (membersCount > 0) { // Found existing DB (work offline)
+                        if (!mProgressDialog.isShowing()) return; // Cancelled
+                        if (membersCount > 0) { // Found existing DB (work offline)
 
-
-
-
-
-
-
-
-                        // Offline identification
-                        WaitUiThread.run(IntroActivity.this, new WaitUiThread.TaskToRun() {
-                            @Override
-                            public void proceed() {
-                                mProgressDialog.setMessage(getString(R.string.data_synchro));
-                            }
-                        });
-                        mDataService.get().login(
-                                pseudoText.getText().toString(),
-                                passwordText.getText().toString());
-
-
-                        //mProgressDialog.cancel();
-                        //startActivity
+                            // Offline identification
+                            WaitUiThread.run(IntroActivity.this, new WaitUiThread.TaskToRun() {
+                                @Override
+                                public void proceed() {
+                                    mProgressDialog.setMessage(getString(R.string.offline_identification));
+                                }
+                            });
+                            mDataService.get().login(
+                                    pseudoText.getText().toString(),
+                                    passwordText.getText().toString());
 
 
 
 
 
 
+
+
+
+
+
+
+                        } else
+                            displayOfflineError();
 
                     } else {
 
-                        try { mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
-                        } catch (Exception e) {
-                            Logs.add(Logs.Type.E, "Failed to display warning icon");
-                        }
-                        IntroActivity.this.runOnUiThread(new Runnable() {
+                        // Identification
+                        WaitUiThread.run(IntroActivity.this, new WaitUiThread.TaskToRun() {
                             @Override
-                            public void run() {
-                                mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
-                                mProgressDialog.setTitle(getString(R.string.error));
-                                mProgressDialog.setMessage(getString(R.string.no_internet));
+                            public void proceed() {
+                                mProgressDialog.setMessage(getString(R.string.identification));
                             }
                         });
+                        if (!mDataService.get().login(pseudoText.getText().toString(),
+                                passwordText.getText().toString()))
+                            displayOfflineError();
                     }
 
-                } else {
+                } catch (NullPointerException e) {
 
-
-
-
-
-
-                    // Identification
-                    // Data synchronization
-
-
-
-                    //mProgressDialog.cancel();
-                    //startActivity
-
-
-
-
-
-
+                    Logs.add(Logs.Type.E, "Unexpected service disconnection");
+                    try { mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
+                    } catch (Exception x) {
+                        Logs.add(Logs.Type.W, "Failed to display error icon");
+                    }
+                    IntroActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
+                            mProgressDialog.setTitle(getString(R.string.error));
+                            mProgressDialog.setMessage(getString(R.string.service_unavailable));
+                        }
+                    });
                 }
-
             }
 
         }).start();
     }
 
-    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private LimitlessViewPager mViewPager; // Introduction view pager component
     private boolean mIntroDone; // Introduction flag
 

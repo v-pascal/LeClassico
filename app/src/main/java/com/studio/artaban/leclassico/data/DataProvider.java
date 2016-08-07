@@ -34,12 +34,12 @@ public class DataProvider extends ContentProvider {
 
     public enum Synchronized {
 
-        TODO(0), IN_PROGRESS(1), DONE(2);
+        TODO((byte)0), IN_PROGRESS((byte)1), DONE((byte)2), TO_DELETE((byte)3);
 
         //
-        private final int id;
-        Synchronized(int id) { this.id = id; }
-        public int getValue() { return this.id; }
+        private final byte id;
+        Synchronized(byte id) { this.id = id; }
+        public byte getValue() { return this.id; }
     }
 
     //////
@@ -242,29 +242,20 @@ public class DataProvider extends ContentProvider {
             if (selection == null)
                 selection = "1"; // ...by assigning '1'
         }
+        int result;
 
+        // Do not delete records without "TO_DELETE" synchronized flag but set it to this value instead
+        if ((selection == null) || (!selection.contains(Constants.DATA_DELETE_SELECTION))) {
 
+            ContentValues values = new ContentValues();
+            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TO_DELETE.getValue());
+            result = mDB.getDB().update(table, values, selection, selectionArgs);
 
+            getContext().getContentResolver().notifyChange(uri, null);
 
-
-
-
-
-
-        int result = mDB.getDB().delete(table, selection, selectionArgs);
-        getContext().getContentResolver().notifyChange(uri, null);
-
-
-
-
-
-
-
-
-
-
-
-
+        } else
+            result = mDB.getDB().delete(table, selection, selectionArgs);
+            // NB: Do not notify observer when deleting records definitively
 
         return result; // Return deleted entries count
     }

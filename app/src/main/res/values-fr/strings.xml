@@ -10,6 +10,11 @@
     <string name="no_internet">Pas de connection Internet!\nNécessaire lors de la première connexion.</string>
     <string name="data_synchro">Synchronisation des données</string>
     <string name="help_connection">Si vous n\'avez pas de compte, sachez que seul un membre du Classico peut vous en créer un.\nEt si c\'est le hasard qui vous a conduit ici, alors continuez à vous exercer en tapant un pseudo &amp; mot de passe au hasard!</string>
+    <string name="offline_identification">Identification hors ligne</string>
+    <string name="identification">Identification</string>
+    <string name="service_unavailable">Service indisponible!\nQuitter l\'application si cette erreur persiste.</string>
+    <string name="login_failed">Echec durant l\'identification!\nPseudo et/ou mot de passe incorrecte.</string>
+    <string name="webservice_error">Web service indisponible!\nVeuillez ré-essayer plus tard.</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Bienvenue&#8230;</string>

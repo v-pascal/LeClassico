@@ -13,6 +13,11 @@
     <string name="no_internet">No Internet connection!\nNeeded during the first connection.</string>
     <string name="data_synchro">Data synchronisation</string>
     <string name="help_connection">If you do not have an account, please note that only a Classico member can create you one.\nAnd if it was chance that brought you here, so keep on practicing it by entering a username &amp; password to chance!</string>
+    <string name="offline_identification">Offline identification</string>
+    <string name="identification">Identification</string>
+    <string name="service_unavailable">Service unavailable!\nQuit application if error persists.</string>
+    <string name="login_failed">Login failed!\nWrong pseudo and/or password.</string>
+    <string name="webservice_error">Web service unavailable!\nPlease try later.</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome&#8230;</string>

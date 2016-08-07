@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.helpers;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -8,15 +9,20 @@ import android.net.NetworkInfo;
 
 import com.studio.artaban.leclassico.data.Constants;
 
+import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * Created by pascal on 26/05/16.
@@ -51,7 +57,7 @@ public final class Internet {
                     connURL.setConnectTimeout(timeOut);
                     connURL.connect();
 
-                    if (connURL.getResponseCode() == 200) {
+                    if (connURL.getResponseCode() == HttpURLConnection.HTTP_OK) {
 
                         Logs.add(Logs.Type.I, "Connected");
                         isConnected = true;
@@ -82,6 +88,7 @@ public final class Internet {
 
     //////
     private static final int BUFFER_SIZE = 4096;
+    private static final String POST_CONTENT_ENCODING = "UTF-8";
 
     public enum DownloadResult {
 
@@ -95,11 +102,14 @@ public final class Internet {
         boolean onCheckCancelled();
         void onPublishProgress(int read);
     }
+    public interface OnRequestListener {
+        void onReceiveReply(String response);
+    }
 
     //
     public static DownloadResult downloadHttpFile(String url, String file, OnDownloadListener listener) {
 
-        Logs.add(Logs.Type.V, "url: " + url + ", file: " + file + ", listener: " + listener);
+        Logs.add(Logs.Type.V, "url: " + url + ";file: " + file + ";listener: " + listener);
 
         InputStream is = null;
         OutputStream os = null;
@@ -154,6 +164,98 @@ public final class Internet {
             }
             catch (IOException e) {
                 Logs.add(Logs.Type.E, "Failed to close IO streams");
+            }
+        }
+    }
+
+    private static String getPostContent(ContentValues data) {
+
+        Logs.add(Logs.Type.V, "data: " + data);
+        StringBuilder postContent = new StringBuilder();
+        boolean firstData = true;
+
+        for (Map.Entry<String, Object> entry : data.valueSet()) {
+            if (firstData)
+                firstData = false;
+            else
+                postContent.append("&");
+
+            try {
+                postContent.append(URLEncoder.encode(entry.getKey(), POST_CONTENT_ENCODING));
+                postContent.append("=");
+                postContent.append(URLEncoder.encode(entry.getValue().toString(), POST_CONTENT_ENCODING));
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        return postContent.toString();
+    }
+    public static DownloadResult downloadHttpRequest(String url, ContentValues postData,
+                                                     OnRequestListener listener) {
+
+        Logs.add(Logs.Type.V, "url: " + url + ";postData: " + postData + ";listener: " + listener);
+
+        InputStream is = null;
+        OutputStream os = null;
+        BufferedWriter bw = null;
+        HttpURLConnection httpConnection = null;
+        try {
+
+            URL urlRequest = new URL(url);
+            httpConnection = (HttpURLConnection)urlRequest.openConnection();
+            httpConnection.setDoInput(true);
+            if (postData != null) {
+
+                httpConnection.setRequestMethod("POST");
+                httpConnection.setDoOutput(true);
+                os = httpConnection.getOutputStream();
+                bw = new BufferedWriter(new OutputStreamWriter(os, POST_CONTENT_ENCODING));
+                bw.write(getPostContent(postData));
+            }
+            httpConnection.connect();
+
+            if (httpConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
+                throw new IOException();
+
+            // Store reply into string (if needed)
+            if (listener != null) {
+
+                is = httpConnection.getInputStream();
+                byte[] buffer = new byte[is.available()];
+                is.read(buffer);
+                listener.onReceiveReply(new String(buffer));
+
+            } else
+                Logs.add(Logs.Type.W, "No request listener");
+
+            return DownloadResult.SUCCEEDED;
+        }
+        catch (MalformedURLException e) {
+
+            Logs.add(Logs.Type.F, "Wrong web service URL: " + e.getMessage());
+            return DownloadResult.WRONG_URL;
+        }
+        catch (IOException e) {
+
+            Logs.add(Logs.Type.E, "Failed to connect to web service: " + e.getMessage());
+            return DownloadResult.CONNECTION_FAILED;
+        }
+        finally {
+
+            if (httpConnection != null)
+                httpConnection.disconnect();
+
+            try {
+                if (is != null) is.close();
+                if (os != null) os.close();
+                if (bw != null) {
+                    bw.flush();
+                    bw.close();
+                }
+
+            } catch (IOException e) {
+                Logs.add(Logs.Type.E, "Failed to close input stream");
             }
         }
     }
