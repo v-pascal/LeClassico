@@ -64,16 +64,18 @@ public final class Constants {
     // Selection criteria to delete records from DB definitively
 
     // Database table IDs
-    public static final int DATA_CAMARADES_TABLE_ID = 1;
-    public static final int DATA_ABONNEMENTS_TABLE_ID = 2;
-    public static final int DATA_ACTUALITES_TABLE_ID = 3;
-    public static final int DATA_ALBUMS_TABLE_ID = 4;
-    public static final int DATA_COMMENTAIRES_TABLE_ID = 5;
-    public static final int DATA_EVENEMENTS_TABLE_ID = 6;
-    public static final int DATA_MESSAGERIE_TABLE_ID = 7;
-    public static final int DATA_MUSIC_TABLE_ID = 8;
-    public static final int DATA_PHOTOS_TABLE_ID = 9;
-    public static final int DATA_PRESENTS_TABLE_ID = 10;
-    public static final int DATA_VOTES_TABLE_ID = 11;
+    public static final byte DATA_TABLE_ID_CAMARADES = 1;
+    public static final byte DATA_TABLE_ID_ABONNEMENTS = 2;
+    public static final byte DATA_TABLE_ID_ACTUALITES = 3;
+    public static final byte DATA_TABLE_ID_ALBUMS = 4;
+    public static final byte DATA_TABLE_ID_COMMENTAIRES = 5;
+    public static final byte DATA_TABLE_ID_EVENEMENTS = 6;
+    public static final byte DATA_TABLE_ID_MESSAGERIE = 7;
+    public static final byte DATA_TABLE_ID_MUSIC = 8;
+    public static final byte DATA_TABLE_ID_PHOTOS = 9;
+    public static final byte DATA_TABLE_ID_PRESENTS = 10;
+    public static final byte DATA_TABLE_ID_VOTES = 11;
+
+    public static final byte DATA_LAST_TABLE_ID = DATA_TABLE_ID_VOTES;
 
 }

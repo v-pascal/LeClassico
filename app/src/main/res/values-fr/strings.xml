@@ -7,8 +7,8 @@
     <string name="password">Mot de passe</string>
     <string name="wait">Veuillez patienter&#8230;</string>
     <string name="check_internet">Vérification connexion Internet</string>
-    <string name="no_internet">Pas de connection Internet!\nNécessaire lors de la première connexion.</string>
-    <string name="data_synchro">Synchronisation des données</string>
+    <string name="no_internet">Pas de connexion Internet!\nNécessaire lors de la première identification.</string>
+    <string name="data_synchro">Synchronisation des données (%1$d/%2$d)</string>
     <string name="help_connection">Si vous n\'avez pas de compte, sachez que seul un membre du Classico peut vous en créer un.\nEt si c\'est le hasard qui vous a conduit ici, alors continuez à vous exercer en tapant un pseudo &amp; mot de passe au hasard!</string>
     <string name="offline_identification">Identification hors ligne</string>
     <string name="identification">Identification</string>

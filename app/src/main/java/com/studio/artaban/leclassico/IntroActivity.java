@@ -229,12 +229,17 @@ public class IntroActivity extends AppCompatActivity {
                     Logs.add(Logs.Type.I, "Data synchronization");
 
                     // Data synchronization
-                    mProgressDialog.setMessage(getString(R.string.data_synchro));
-                    mDataService.get().synchronize();
+                    mProgressDialog.setMessage(getString(R.string.data_synchro, 1, Constants.DATA_LAST_TABLE_ID));
+                    if (!mDataService.get().synchronize()) {
+
+                        Logs.add(Logs.Type.E, "Internet connection lost");
+                        mProgressDialog.cancel(); // Should not happen during this short elapsed time!
+                    }
 
                 } else {
 
                     mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
+                    mProgressDialog.setProgressDrawable(getDrawable(R.drawable.error_red));
                     mProgressDialog.setTitle(getString(R.string.error));
                     mProgressDialog.setMessage(getString(
                             (connectState == DataService.CONNECTION_STATE_LOGIN_FAILED)?
@@ -243,6 +248,10 @@ public class IntroActivity extends AppCompatActivity {
 
             } else if (intent.getAction().equals(DataService.STATUS_SYNCHRONIZATION)) {
 
+                byte synchroState = intent.getByteExtra(DataService.SYNCHRONIZATION_STATE, DataService.STATE_ERROR);
+                switch (synchroState) {
+
+                    case DataService.SYNCHRONIZATION_STATE_DONE: {
 
 
 
@@ -250,8 +259,18 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
-                //mProgressDialog.cancel();
-                //startActivity
+                        //mProgressDialog.cancel();
+                        //startActivity
+
+
+
+
+
+
+
+                        break;
+                    }
+                    case DataService.STATE_ERROR: {
 
 
 
@@ -260,10 +279,19 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
+                        break;
+                    }
+                    default: {
+                        mProgressDialog.setMessage(getString(R.string.data_synchro, synchroState,
+                                Constants.DATA_LAST_TABLE_ID));
+                        break;
+                    }
+                }
             }
         }
     };
-    private DataReceiver mDataReceiver;
+    private final DataReceiver mDataReceiver = new DataReceiver();
 
     //
     public void onNextStep(View sender) { // Next step click event
@@ -293,16 +321,26 @@ public class IntroActivity extends AppCompatActivity {
             private void displayOfflineError() {
                 Logs.add(Logs.Type.V, null);
 
-                try { mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
-                } catch (Exception e) {
-                    Logs.add(Logs.Type.W, "Failed to display warning icon");
-                }
                 IntroActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
+                        mProgressDialog.setProgressDrawable(getDrawable(R.drawable.warning_red));
                         mProgressDialog.setTitle(getString(R.string.error));
                         mProgressDialog.setMessage(getString(R.string.no_internet));
+                    }
+                });
+            }
+            private void displayCriticalError(final int errorId) {
+                Logs.add(Logs.Type.V, "errorId: " + errorId);
+
+                IntroActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
+                        mProgressDialog.setProgressDrawable(getDrawable(R.drawable.error_red));
+                        mProgressDialog.setTitle(getString(R.string.error));
+                        mProgressDialog.setMessage(getString(errorId));
                     }
                 });
             }
@@ -330,18 +368,45 @@ public class IntroActivity extends AppCompatActivity {
                         result.close();
 
                         if (!mProgressDialog.isShowing()) return; // Cancelled
-                        if (membersCount > 0) { // Found existing DB (work offline)
+                        if (membersCount > 0) { // Found existing DB (try to work offline)
 
-                            // Offline identification
                             WaitUiThread.run(IntroActivity.this, new WaitUiThread.TaskToRun() {
                                 @Override
                                 public void proceed() {
                                     mProgressDialog.setMessage(getString(R.string.offline_identification));
                                 }
                             });
-                            mDataService.get().login(
-                                    pseudoText.getText().toString(),
-                                    passwordText.getText().toString());
+                            String pseudo = null;
+
+                            // Offline identification
+                            result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                                new String[]{ CamaradesTable.COLUMN_PSEUDO },
+                                "UPPER(" + CamaradesTable.COLUMN_PSEUDO  + ")=? AND " +
+                                        CamaradesTable.COLUMN_CODE_CONF + "=?",
+                                new String[]{
+                                        pseudoText.getText().toString().toUpperCase(),
+                                        passwordText.getText().toString() },
+                                null);
+                            if (result.getCount() > 0) {
+                                result.moveToFirst();
+                                pseudo = result.getString(0);
+                            }
+                            result.close();
+
+                            if (pseudo != null) { // Login succeeded
+
+                                mDataService.get().login(pseudo, passwordText.getText().toString());
+
+
+
+
+
+
+
+
+
+                                //mProgressDialog.cancel();
+                                //startActivity
 
 
 
@@ -353,6 +418,9 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
+                            } else // Login failed
+                                displayCriticalError(R.string.login_failed);
 
                         } else
                             displayOfflineError();
@@ -374,18 +442,7 @@ public class IntroActivity extends AppCompatActivity {
                 } catch (NullPointerException e) {
 
                     Logs.add(Logs.Type.E, "Unexpected service disconnection");
-                    try { mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
-                    } catch (Exception x) {
-                        Logs.add(Logs.Type.W, "Failed to display error icon");
-                    }
-                    IntroActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
-                            mProgressDialog.setTitle(getString(R.string.error));
-                            mProgressDialog.setMessage(getString(R.string.service_unavailable));
-                        }
-                    });
+                    displayCriticalError(R.string.service_unavailable);
                 }
             }
 

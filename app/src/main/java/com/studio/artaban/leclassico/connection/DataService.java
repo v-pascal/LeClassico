@@ -10,6 +10,13 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class DataService extends Service implements Internet.OnConnectivityListener {
 
     private static boolean isRunning; // Service running flag
@@ -46,12 +53,13 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final byte CONNECTION_STATE_LOGIN_FAILED = 2;
     public static final byte CONNECTION_STATE_EXPIRED = 3;
 
-    private static final String CONNECTION_DATA_PSEUDO = "pseudo";
-    private static final String CONNECTION_DATA_PASSWORD = "password";
+    private static final String CONNECTION_POSTDATA_PSEUDO = "pseudo";
+    private static final String CONNECTION_POSTDATA_PASSWORD = "password";
+    private static final String CONNECTION_POSTDATA_DATETIME = "dateTime";
 
     // action.STATUS_SYNCHRONIZATION
-    public static final String SYNCHRONIZATION_STATE = "synchronizationState";
-    public static final byte SYNCHRONIZATION_STATE_DONE = 1;
+    public static final String SYNCHRONIZATION_STATE = "synchronizationState"; // State == processing table Id
+    public static final byte SYNCHRONIZATION_STATE_DONE = Constants.DATA_LAST_TABLE_ID + 1;
 
     //////
     @Override
@@ -109,15 +117,22 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         if (!Internet.isConnected())
             return false;
 
+        Date now = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         ContentValues data = new ContentValues();
-        data.put(CONNECTION_DATA_PSEUDO, pseudo);
-        data.put(CONNECTION_DATA_PASSWORD, password);
+        data.put(CONNECTION_POSTDATA_PSEUDO, pseudo);
+        data.put(CONNECTION_POSTDATA_PASSWORD, password);
+        data.put(CONNECTION_POSTDATA_DATETIME, dateFormat.format(now));
 
         Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
                 Constants.WEBSERVICE_CONNECTION, data, new Internet.OnRequestListener() {
             @Override
             public void onReceiveReply(String response) {
 
+                byte result = STATE_ERROR;
+                try {
+                    JSONObject reply = new JSONObject(response);
 
 
 
@@ -125,7 +140,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
-                //mToken
+                    //mToken
 
 
 
@@ -134,6 +149,13 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
+                } catch (JSONException e) {
+                    Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                }
+                ////// STATUS_CONNECTION
+                Intent intent = new Intent(STATUS_CONNECTION);
+                intent.putExtra(CONNECTION_STATE, result);
+                sendBroadcast(intent);
             }
         });
         if (result != Internet.DownloadResult.SUCCEEDED) { // == CONNECTION_FAILED
