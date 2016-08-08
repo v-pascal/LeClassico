@@ -78,6 +78,7 @@ public class CamaradesTable implements IDataTable {
     public static final String COLUMN_LOCATED = "CAM_Located";
     public static final String COLUMN_LATITUDE = "CAM_Latitude";
     public static final String COLUMN_LONGITUDE = "CAM_Longitude";
+    public static final String COLUMN_STATUS_DATE = "CAM_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -99,8 +100,9 @@ public class CamaradesTable implements IDataTable {
     private static final short COLUMN_INDEX_LOCATED = 17;
     private static final short COLUMN_INDEX_LATITUDE = 18;
     private static final short COLUMN_INDEX_LONGITUDE = 19;
+    private static final short COLUMN_INDEX_STATUS_DATE = 20;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 20;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 21;
 
     //
     private CamaradesTable() { }
@@ -132,6 +134,7 @@ public class CamaradesTable implements IDataTable {
                 COLUMN_LOCATED + " INTEGER NOT NULL," +
                 COLUMN_LATITUDE + " REAL," +
                 COLUMN_LONGITUDE + " REAL," +
+                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 

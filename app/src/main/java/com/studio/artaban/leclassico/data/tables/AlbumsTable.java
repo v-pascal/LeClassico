@@ -65,6 +65,7 @@ public class AlbumsTable implements IDataTable {
     public static final String COLUMN_EVENT_ID = "ALB_EventID";
     public static final String COLUMN_REMARK = "ALB_Remark";
     public static final String COLUMN_DATE = "ALB_Date";
+    public static final String COLUMN_STATUS_DATE = "ALB_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_NOM = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -73,8 +74,9 @@ public class AlbumsTable implements IDataTable {
     private static final short COLUMN_INDEX_EVENT_ID = 4;
     private static final short COLUMN_INDEX_REMARK = 5;
     private static final short COLUMN_INDEX_DATE = 6;
+    private static final short COLUMN_INDEX_STATUS_DATE = 7;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 7;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
 
     //
     private AlbumsTable() { }
@@ -93,6 +95,7 @@ public class AlbumsTable implements IDataTable {
                 COLUMN_EVENT_ID + " INTEGER NOT NULL," +
                 COLUMN_REMARK + " TEXT," +
                 COLUMN_DATE + " TEXT," +
+                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 

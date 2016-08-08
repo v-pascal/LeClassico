@@ -61,12 +61,14 @@ public class AbonnementsTable implements IDataTable {
     // Columns
     public static final String COLUMN_PSEUDO = "ABO_Pseudo";
     public static final String COLUMN_CAMARADE = "ABO_Camarade";
+    public static final String COLUMN_STATUS_DATE = "ABO_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
     private static final short COLUMN_INDEX_CAMARADE = 2;
+    private static final short COLUMN_INDEX_STATUS_DATE = 3;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 3;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 4;
 
     //
     private AbonnementsTable() { }
@@ -81,6 +83,7 @@ public class AbonnementsTable implements IDataTable {
 
                 COLUMN_PSEUDO + " TEXT NOT NULL," +
                 COLUMN_CAMARADE + " TEXT NOT NULL," +
+                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 

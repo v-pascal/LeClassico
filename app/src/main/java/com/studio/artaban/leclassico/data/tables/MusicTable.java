@@ -65,6 +65,7 @@ public class MusicTable implements IDataTable {
     public static final String COLUMN_ALBUM = "MSC_Album";
     public static final String COLUMN_MORCEAU = "MSC_Morceau";
     public static final String COLUMN_SOURCE = "MSC_Source";
+    public static final String COLUMN_STATUS_DATE = "MSC_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_FICHIER = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -73,8 +74,9 @@ public class MusicTable implements IDataTable {
     private static final short COLUMN_INDEX_ALBUM = 4;
     private static final short COLUMN_INDEX_MORCEAU = 5;
     private static final short COLUMN_INDEX_SOURCE = 6;
+    private static final short COLUMN_INDEX_STATUS_DATE = 7;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 7;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
 
     //
     private MusicTable() { }
@@ -93,6 +95,7 @@ public class MusicTable implements IDataTable {
                 COLUMN_ALBUM + " TEXT NOT NULL," +
                 COLUMN_MORCEAU + " TEXT NOT NULL," +
                 COLUMN_SOURCE + " TEXT NOT NULL," +
+                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 

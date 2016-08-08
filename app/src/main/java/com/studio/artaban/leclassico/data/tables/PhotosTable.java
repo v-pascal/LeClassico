@@ -63,14 +63,16 @@ public class PhotosTable implements IDataTable {
     public static final String COLUMN_PSEUDO = "PHT_Pseudo";
     public static final String COLUMN_FICHIER = "PHT_Fichier";
     public static final String COLUMN_FICHIER_ID = "PHT_FichierID";
+    public static final String COLUMN_STATUS_DATE = "PHT_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_ALBUM = 1; // DataField.COLUMN_INDEX_ID + 1
     private static final short COLUMN_INDEX_PSEUDO = 2;
     private static final short COLUMN_INDEX_FICHIER = 3;
     private static final short COLUMN_INDEX_FICHIER_ID = 4;
+    private static final short COLUMN_INDEX_STATUS_DATE = 5;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 5;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 6;
 
     //
     private PhotosTable() { }
@@ -87,6 +89,7 @@ public class PhotosTable implements IDataTable {
                 COLUMN_PSEUDO + " TEXT NOT NULL," +
                 COLUMN_FICHIER + " TEXT NOT NULL," +
                 COLUMN_FICHIER_ID + " INTEGER NOT NULL," +
+                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
