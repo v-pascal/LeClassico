@@ -1,5 +1,7 @@
 <resources>
 
+    <string name="ok">OK</string>
+
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>
     <string name="app_about" translatable="false">APP: %1$s\nVERSION: 1.0\nAUTHOR: Pascal VIGUIE\nDATE: 2016&#8211;07&#8211;15</string>

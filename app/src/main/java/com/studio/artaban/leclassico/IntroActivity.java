@@ -3,31 +3,16 @@ package com.studio.artaban.leclassico;
 import android.animation.ObjectAnimator;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.UserHandle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AlertDialog;
@@ -39,7 +24,6 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,16 +47,6 @@ import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SizeUtils;
 import com.studio.artaban.leclassico.tools.WaitUiThread;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by pascal on 15/07/16.
@@ -240,19 +214,52 @@ public class IntroActivity extends AppCompatActivity {
 
     ////////////////////////////////////////////////////////////////////////////////////////// Login
 
+    private void startMainActivity() {
+    // Start main activity containing publications, events, locations, etc.
+
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+
+        //mProgressDialog.cancel();
+        //startActivity
+
+
+
+
+
+
+    }
+
+    //
     private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
+    private void displayError(final boolean critical, final int errorId) {
+
+        Logs.add(Logs.Type.V, "errorId: " + errorId);
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                try { mProgressDialog.cancel();
+                } catch (Exception e) {
+                    Logs.add(Logs.Type.W, "Unable to cancel progress dialog");
+                }
+                new AlertDialog.Builder(IntroActivity.this)
+                        .setTitle(R.string.error)
+                        .setIcon(getDrawable((critical) ? R.drawable.error_red : R.drawable.warning_red))
+                        .setMessage(errorId)
+                        .setPositiveButton(R.string.ok, null)
+                        .setCancelable(false)
+                        .show();
+            }
+        });
+    }
 
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
     private class DataReceiver extends BroadcastReceiver { // Data receiver
-
-        private void displayError(int errorId) {
-
-            Logs.add(Logs.Type.V, "errorId: " + errorId);
-            mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
-            mProgressDialog.setProgressDrawable(getDrawable(R.drawable.error_red));
-            mProgressDialog.setTitle(getString(R.string.error));
-            mProgressDialog.setMessage(getString(errorId));
-        }
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -266,15 +273,25 @@ public class IntroActivity extends AppCompatActivity {
 
                     // Data synchronization
                     mProgressDialog.setMessage(getString(R.string.data_synchro, 1, Constants.DATA_LAST_TABLE_ID));
-                    if (!mDataService.get().synchronize()) {
+                    try {
+                        if (!mDataService.get().synchronize())
+                            throw new NullPointerException("Internet connection lost");
+                            // Should not happen between the connection and this call! Elapsed time too short.
 
-                        Logs.add(Logs.Type.E, "Internet connection lost");
-                        mProgressDialog.cancel(); // Should not happen during this short elapsed time!
+                    } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
+
+                        Logs.add(Logs.Type.E, e.getMessage());
+                        mProgressDialog.cancel();
                     }
 
-                } else
-                    displayError((connectState == DataService.CONNECTION_STATE_LOGIN_FAILED)?
-                                    R.string.login_failed : R.string.webservice_error);
+                } else {
+
+                    // Display error message
+                    if (connectState == DataService.CONNECTION_STATE_LOGIN_FAILED)
+                        displayError(false, R.string.login_failed);
+                    else
+                        displayError(true, R.string.webservice_error);
+                }
 
             } else if (intent.getAction().equals(DataService.STATUS_SYNCHRONIZATION)) {
 
@@ -282,30 +299,11 @@ public class IntroActivity extends AppCompatActivity {
                 switch (synchroState) {
 
                     case DataService.SYNCHRONIZATION_STATE_DONE: {
-
-
-
-
-
-
-
-
-
-                        //mProgressDialog.cancel();
-                        //startActivity
-
-
-
-
-
-
-
-
-
+                        startMainActivity(); ////// Start main activity
                         break;
                     }
                     case DataService.STATE_ERROR: {
-                        displayError(R.string.synchro_error);
+                        displayError(true, R.string.synchro_error);
                         break;
                     }
                     default: {
@@ -337,39 +335,12 @@ public class IntroActivity extends AppCompatActivity {
 
         Logs.add(Logs.Type.V, "sender: " + sender);
         mProgressDialog = ProgressDialog.show(this, getString(R.string.wait),
-                getString(R.string.check_internet), true, true);
+                getString(R.string.check_internet), true, false);
 
         final EditText pseudoText = (EditText)findViewById(R.id.edit_pseudo);
         final EditText passwordText = (EditText)findViewById(R.id.edit_password);
 
         new Thread(new Runnable() {
-
-            private void displayOfflineError() {
-                Logs.add(Logs.Type.V, null);
-
-                IntroActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.warning_red));
-                        mProgressDialog.setProgressDrawable(getDrawable(R.drawable.warning_red));
-                        mProgressDialog.setTitle(getString(R.string.error));
-                        mProgressDialog.setMessage(getString(R.string.no_internet));
-                    }
-                });
-            }
-            private void displayCriticalError(final int errorId) {
-                Logs.add(Logs.Type.V, "errorId: " + errorId);
-
-                IntroActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
-                        mProgressDialog.setProgressDrawable(getDrawable(R.drawable.error_red));
-                        mProgressDialog.setTitle(getString(R.string.error));
-                        mProgressDialog.setMessage(getString(errorId));
-                    }
-                });
-            }
 
             @Override
             public void run() {
@@ -377,7 +348,6 @@ public class IntroActivity extends AppCompatActivity {
 
                 // Check Internet connection
                 boolean connected = Internet.isOnline(IntroActivity.this);
-                if (!mProgressDialog.isShowing()) return; // Cancelled
                 try {
 
                     if (!connected) {
@@ -393,7 +363,6 @@ public class IntroActivity extends AppCompatActivity {
                         }
                         result.close();
 
-                        if (!mProgressDialog.isShowing()) return; // Cancelled
                         if (membersCount > 0) { // Found existing DB (try to work offline)
 
                             WaitUiThread.run(IntroActivity.this, new WaitUiThread.TaskToRun() {
@@ -402,6 +371,11 @@ public class IntroActivity extends AppCompatActivity {
                                     mProgressDialog.setMessage(getString(R.string.offline_identification));
                                 }
                             });
+
+                            try { Thread.sleep(1000, 0); // Sleep to inform user offline identification
+                            } catch (InterruptedException e) {
+                                Logs.add(Logs.Type.E, "Sleep interrupted");
+                            }
                             String pseudo = null;
 
                             // Offline identification
@@ -421,34 +395,13 @@ public class IntroActivity extends AppCompatActivity {
                             if (pseudo != null) { // Login succeeded
 
                                 mDataService.get().login(pseudo, passwordText.getText().toString());
-
-
-
-
-
-
-
-
-
-                                //mProgressDialog.cancel();
-                                //startActivity
-
-
-
-
-
-
-
-
-
-
-
+                                startMainActivity(); ////// Start main activity
 
                             } else // Login failed
-                                displayCriticalError(R.string.login_failed);
+                                displayError(false, R.string.login_failed);
 
                         } else
-                            displayOfflineError();
+                            displayError(false, R.string.no_internet);
 
                     } else {
 
@@ -461,13 +414,13 @@ public class IntroActivity extends AppCompatActivity {
                         });
                         if (!mDataService.get().login(pseudoText.getText().toString(),
                                 passwordText.getText().toString()))
-                            displayOfflineError();
+                            displayError(false, R.string.no_internet);
                     }
 
                 } catch (NullPointerException e) {
 
                     Logs.add(Logs.Type.E, "Unexpected service disconnection");
-                    displayCriticalError(R.string.service_unavailable);
+                    displayError(true, R.string.service_unavailable);
                 }
             }
 
@@ -513,7 +466,7 @@ public class IntroActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Check to start data service
+        // Start data service (if not already started)
         if (!DataService.isRunning())
             startService(new Intent(IntroActivity.this, DataService.class));
 
@@ -902,13 +855,17 @@ public class IntroActivity extends AppCompatActivity {
         super.onResume();
 
         Logs.add(Logs.Type.V, null);
-        mDataService.bind(this); // Bind data service
+        mDataService.bind(this, new ServiceBinder.OnBoundListener() {
+            @Override
+            public void onServiceConnected() {
 
-        // Register broadcast receiver
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(DataService.STATUS_CONNECTION);
-        filter.addAction(DataService.STATUS_SYNCHRONIZATION);
-        registerReceiver(mDataReceiver, filter);
+                // Register broadcast receiver HERE coz data service connection needed...
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(DataService.STATUS_CONNECTION); // ...for THIS action (see receiver)
+                filter.addAction(DataService.STATUS_SYNCHRONIZATION);
+                IntroActivity.this.registerReceiver(mDataReceiver, filter);
+            }
+        }); // Bind data service
     }
 
     @Override
@@ -982,7 +939,11 @@ public class IntroActivity extends AppCompatActivity {
 
         Logs.add(Logs.Type.V, null);
         mDataService.unbind(this); // Unbind data service
-        unregisterReceiver(mDataReceiver); // Unregister broadcast receiver
+
+        try { unregisterReceiver(mDataReceiver); // Unregister broadcast receiver
+        } catch (Exception e) {
+            Logs.add(Logs.Type.W, "Receiver not registered");
+        }
     }
 
     @Override

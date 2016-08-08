@@ -19,35 +19,41 @@ public class ServiceBinder {
     private DataService mDataService; // Data service reference
     private boolean mBound; // Service bound flag
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-
-            Logs.add(Logs.Type.V, "name: " + name + ";binder: " + binder);
-            mDataService = ((DataService.DataBinder)binder).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-            Logs.add(Logs.Type.W, "name: " + name);
-            if (mDataService != null) {
-                mDataService.stop();
-                mDataService = null;
-            }
-        }
-    };
+    private ServiceConnection mConnection;
 
     //////
-    public void bind(Activity activity) {
+    public interface OnBoundListener {
+        void onServiceConnected();
+    };
+    public void bind(Activity activity, final OnBoundListener listener) {
 
-        Logs.add(Logs.Type.V, "activity: " + activity);
+        Logs.add(Logs.Type.V, "activity: " + activity + ";listener: " + listener);
         if (mBound) {
             Logs.add(Logs.Type.E, "Data service already bound");
             return;
         }
         mBound = true;
 
+        mConnection = new ServiceConnection() { // Implement service connection
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+
+                Logs.add(Logs.Type.V, "name: " + name + ";binder: " + binder);
+                mDataService = ((DataService.DataBinder)binder).getService();
+                if (listener != null)
+                    listener.onServiceConnected();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+                Logs.add(Logs.Type.W, "name: " + name);
+                if (mDataService != null) {
+                    mDataService.stop();
+                    mDataService = null;
+                }
+            }
+        };
         Intent bindIntent = new Intent(activity, DataService.class);
         activity.bindService(bindIntent, mConnection, Context.BIND_ADJUST_WITH_ACTIVITY);
     }
