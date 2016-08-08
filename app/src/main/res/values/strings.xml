@@ -18,6 +18,7 @@
     <string name="service_unavailable">Service unavailable!\nQuit application if error persists.</string>
     <string name="login_failed">Login failed!\nWrong pseudo and/or password.</string>
     <string name="webservice_error">Web service unavailable!\nPlease try later.</string>
+    <string name="synchro_error">An error occurred during the synchronization!\nPlease try to login later.</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome&#8230;</string>

@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.data.tables;
 
+import android.content.ContentResolver;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -32,6 +33,17 @@ public class NotificationsTable implements IDataTable {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public boolean synchronize(ContentResolver contentResolver) { // Synchronize data with remote DB
+
+
+
+
+
+
+
+        return true;
+    }
 
     //
     @Override

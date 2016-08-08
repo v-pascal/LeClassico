@@ -4,9 +4,12 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -108,7 +111,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private String mPassword;
     // Login
 
-    public boolean login(String pseudo, String password) {
+    public boolean login(final String pseudo, final String password) {
 
         Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";password: " + password);
         mPseudo = pseudo;
@@ -117,22 +120,26 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         if (!Internet.isConnected())
             return false;
 
-        Date now = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        ContentValues data = new ContentValues();
-        data.put(CONNECTION_POSTDATA_PSEUDO, pseudo);
-        data.put(CONNECTION_POSTDATA_PASSWORD, password);
-        data.put(CONNECTION_POSTDATA_DATETIME, dateFormat.format(now));
-
-        Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
-                Constants.WEBSERVICE_CONNECTION, data, new Internet.OnRequestListener() {
+        new Handler().post(new Runnable() {
             @Override
-            public void onReceiveReply(String response) {
+            public void run() {
 
-                byte result = STATE_ERROR;
-                try {
-                    JSONObject reply = new JSONObject(response);
+                Date now = new Date();
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                ContentValues data = new ContentValues();
+                data.put(CONNECTION_POSTDATA_PSEUDO, pseudo);
+                data.put(CONNECTION_POSTDATA_PASSWORD, password);
+                data.put(CONNECTION_POSTDATA_DATETIME, dateFormat.format(now));
+
+                Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
+                        Constants.WEBSERVICE_CONNECTION, data, new Internet.OnRequestListener() {
+                    @Override
+                    public void onReceiveReply(String response) {
+
+                        byte result = STATE_ERROR;
+                        try {
+                            JSONObject reply = new JSONObject(response);
 
 
 
@@ -140,7 +147,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
-                    //mToken
+                            //mToken
+                            //Timer
 
 
 
@@ -148,24 +156,23 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
+                        } catch (JSONException e) {
+                            Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                        }
+                        Intent intent = new Intent(STATUS_CONNECTION);
+                        intent.putExtra(CONNECTION_STATE, result);
+                        sendBroadcast(intent); ////// STATUS_CONNECTION
+                    }
+                });
+                if (result != Internet.DownloadResult.SUCCEEDED) { // == CONNECTION_FAILED
+                    Logs.add(Logs.Type.E, "Connection request error");
 
-                } catch (JSONException e) {
-                    Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                    Intent intent = new Intent(STATUS_CONNECTION);
+                    intent.putExtra(CONNECTION_STATE, STATE_ERROR);
+                    sendBroadcast(intent); ////// STATUS_CONNECTION
                 }
-                ////// STATUS_CONNECTION
-                Intent intent = new Intent(STATUS_CONNECTION);
-                intent.putExtra(CONNECTION_STATE, result);
-                sendBroadcast(intent);
             }
         });
-        if (result != Internet.DownloadResult.SUCCEEDED) { // == CONNECTION_FAILED
-            Logs.add(Logs.Type.E, "Connection request error");
-
-            ////// STATUS_CONNECTION
-            Intent intent = new Intent(STATUS_CONNECTION);
-            intent.putExtra(CONNECTION_STATE, STATE_ERROR);
-            sendBroadcast(intent);
-        }
         return true;
     }
     public boolean synchronize() {
@@ -174,15 +181,31 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         if ((!Internet.isConnected()) || (mToken == null))
             return false;
 
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
 
+                for (byte tableId = 1; tableId < Constants.DATA_LAST_TABLE_ID; ++tableId) {
 
+                    Intent intent = new Intent(STATUS_SYNCHRONIZATION);
+                    if (!Database.synchronize(tableId, getContentResolver())) {
 
+                        Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
+                        intent.putExtra(SYNCHRONIZATION_STATE, STATE_ERROR);
+                        sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
 
+                        return; // Exit on error
+                    }
+                    intent.putExtra(SYNCHRONIZATION_STATE, tableId);
+                    sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
+                }
 
-
-
-
-
+                // Synchronization finished successfully
+                Intent intent = new Intent(STATUS_SYNCHRONIZATION);
+                intent.putExtra(SYNCHRONIZATION_STATE, SYNCHRONIZATION_STATE_DONE);
+                sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
+            }
+        });
         return true;
     }
     public void logout() {
@@ -190,6 +213,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         Logs.add(Logs.Type.V, null);
         mPseudo = null;
         mPassword = null;
+
+
 
 
 

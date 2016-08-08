@@ -3,16 +3,32 @@ package com.studio.artaban.leclassico;
 import android.animation.ObjectAnimator;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.UserHandle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +39,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +63,16 @@ import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SizeUtils;
 import com.studio.artaban.leclassico.tools.WaitUiThread;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by pascal on 15/07/16.
@@ -218,6 +245,15 @@ public class IntroActivity extends AppCompatActivity {
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
     private class DataReceiver extends BroadcastReceiver { // Data receiver
 
+        private void displayError(int errorId) {
+
+            Logs.add(Logs.Type.V, "errorId: " + errorId);
+            mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
+            mProgressDialog.setProgressDrawable(getDrawable(R.drawable.error_red));
+            mProgressDialog.setTitle(getString(R.string.error));
+            mProgressDialog.setMessage(getString(errorId));
+        }
+
         @Override
         public void onReceive(Context context, Intent intent) {
 
@@ -236,15 +272,9 @@ public class IntroActivity extends AppCompatActivity {
                         mProgressDialog.cancel(); // Should not happen during this short elapsed time!
                     }
 
-                } else {
-
-                    mProgressDialog.setIndeterminateDrawable(getDrawable(R.drawable.error_red));
-                    mProgressDialog.setProgressDrawable(getDrawable(R.drawable.error_red));
-                    mProgressDialog.setTitle(getString(R.string.error));
-                    mProgressDialog.setMessage(getString(
-                            (connectState == DataService.CONNECTION_STATE_LOGIN_FAILED)?
-                                    R.string.login_failed : R.string.webservice_error));
-                }
+                } else
+                    displayError((connectState == DataService.CONNECTION_STATE_LOGIN_FAILED)?
+                                    R.string.login_failed : R.string.webservice_error);
 
             } else if (intent.getAction().equals(DataService.STATUS_SYNCHRONIZATION)) {
 
@@ -252,6 +282,8 @@ public class IntroActivity extends AppCompatActivity {
                 switch (synchroState) {
 
                     case DataService.SYNCHRONIZATION_STATE_DONE: {
+
+
 
 
 
@@ -268,18 +300,12 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
+
                         break;
                     }
                     case DataService.STATE_ERROR: {
-
-
-
-
-
-
-
-
-
+                        displayError(R.string.synchro_error);
                         break;
                     }
                     default: {
@@ -381,12 +407,11 @@ public class IntroActivity extends AppCompatActivity {
                             // Offline identification
                             result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                                 new String[]{ CamaradesTable.COLUMN_PSEUDO },
-                                "UPPER(" + CamaradesTable.COLUMN_PSEUDO  + ")=? AND " +
-                                        CamaradesTable.COLUMN_CODE_CONF + "=?",
-                                new String[]{
-                                        pseudoText.getText().toString().toUpperCase(),
-                                        passwordText.getText().toString() },
-                                null);
+                                "UPPER(" + CamaradesTable.COLUMN_PSEUDO  + ")='" +
+                                        pseudoText.getText().toString().toUpperCase() + "' AND " +
+                                        CamaradesTable.COLUMN_CODE_CONF + "='" +
+                                        passwordText.getText().toString() + "'",
+                                null, null);
                             if (result.getCount() > 0) {
                                 result.moveToFirst();
                                 pseudo = result.getString(0);

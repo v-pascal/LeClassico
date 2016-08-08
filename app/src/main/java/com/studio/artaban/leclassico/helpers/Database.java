@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.helpers;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -50,6 +51,42 @@ public class Database extends SQLiteOpenHelper {
         mTableMap.put(NotificationsTable.TABLE_NAME, NotificationsTable.newInstance());
     }
 
+    //
+    public static boolean synchronize(byte tableId, ContentResolver contentResolver) {
+    // Synchronize database table with remote DB according its ID
+
+        Logs.add(Logs.Type.V, "tableId: " + tableId);
+        switch (tableId) {
+
+            case Constants.DATA_TABLE_ID_CAMARADES:
+                return ((CamaradesTable)Database.getTable(CamaradesTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_ABONNEMENTS:
+                return ((AbonnementsTable)Database.getTable(AbonnementsTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_ACTUALITES:
+                return ((ActualitesTable)Database.getTable(ActualitesTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_ALBUMS:
+                return ((AlbumsTable)Database.getTable(AlbumsTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_COMMENTAIRES:
+                return ((CommentairesTable)Database.getTable(CommentairesTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_EVENEMENTS:
+                return ((EvenementsTable)Database.getTable(EvenementsTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_MESSAGERIE:
+                return ((MessagerieTable)Database.getTable(MessagerieTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_MUSIC:
+                return ((MusicTable)Database.getTable(MusicTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_PHOTOS:
+                return ((PhotosTable)Database.getTable(PhotosTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_PRESENTS:
+                return ((PresentsTable)Database.getTable(PresentsTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_VOTES:
+                return ((VotesTable)Database.getTable(VotesTable.TABLE_NAME)).synchronize(contentResolver);
+            case Constants.DATA_TABLE_ID_NOTIFICATIONS:
+                return ((NotificationsTable)Database.getTable(NotificationsTable.TABLE_NAME)).synchronize(contentResolver);
+            default:
+                throw new IllegalArgumentException("Unexpected table ID: " + tableId);
+        }
+    }
+
     //////
     protected boolean isReady() {
 
@@ -83,7 +120,7 @@ public class Database extends SQLiteOpenHelper {
     }
 
     //
-    public IDataTable getTable(String name) { return mTableMap.get(name); }
+    public static IDataTable getTable(String name) { return mTableMap.get(name); }
     public int insert(String table, Object[] data) {
 
         Logs.add(Logs.Type.V, "table: " + table + ", data: " + ((data != null)? data.length:"null"));
