@@ -14,6 +14,7 @@ import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.EvenementsTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.MusicTable;
+import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.data.tables.VotesTable;
@@ -46,6 +47,7 @@ public class Database extends SQLiteOpenHelper {
         mTableMap.put(PhotosTable.TABLE_NAME, PhotosTable.newInstance());
         mTableMap.put(PresentsTable.TABLE_NAME, PresentsTable.newInstance());
         mTableMap.put(VotesTable.TABLE_NAME, VotesTable.newInstance());
+        mTableMap.put(NotificationsTable.TABLE_NAME, NotificationsTable.newInstance());
     }
 
     //////

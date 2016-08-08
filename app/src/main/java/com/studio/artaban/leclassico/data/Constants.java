@@ -75,7 +75,8 @@ public final class Constants {
     public static final byte DATA_TABLE_ID_PHOTOS = 9;
     public static final byte DATA_TABLE_ID_PRESENTS = 10;
     public static final byte DATA_TABLE_ID_VOTES = 11;
+    public static final byte DATA_TABLE_ID_NOTIFICATIONS = 12;
 
-    public static final byte DATA_LAST_TABLE_ID = DATA_TABLE_ID_VOTES;
+    public static final byte DATA_LAST_TABLE_ID = DATA_TABLE_ID_NOTIFICATIONS;
 
 }

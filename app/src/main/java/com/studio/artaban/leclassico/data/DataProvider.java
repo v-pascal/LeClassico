@@ -20,6 +20,7 @@ import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.EvenementsTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.MusicTable;
+import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.data.tables.VotesTable;
@@ -79,6 +80,8 @@ public class DataProvider extends ContentProvider {
                 Constants.DATA_TABLE_ID_PRESENTS);
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME + SINGLE_ROW,
                 Constants.DATA_TABLE_ID_VOTES);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME + SINGLE_ROW,
+                Constants.DATA_TABLE_ID_NOTIFICATIONS);
 
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME, Constants.DATA_TABLE_ID_CAMARADES);
@@ -92,6 +95,7 @@ public class DataProvider extends ContentProvider {
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PhotosTable.TABLE_NAME, Constants.DATA_TABLE_ID_PHOTOS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME, Constants.DATA_TABLE_ID_PRESENTS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME, Constants.DATA_TABLE_ID_VOTES);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME, Constants.DATA_TABLE_ID_NOTIFICATIONS);
     }
 
     //
@@ -120,6 +124,7 @@ public class DataProvider extends ContentProvider {
             case Constants.DATA_TABLE_ID_PHOTOS: return PhotosTable.TABLE_NAME;
             case Constants.DATA_TABLE_ID_PRESENTS: return PresentsTable.TABLE_NAME;
             case Constants.DATA_TABLE_ID_VOTES: return VotesTable.TABLE_NAME;
+            case Constants.DATA_TABLE_ID_NOTIFICATIONS: return NotificationsTable.TABLE_NAME;
         }
         return null;
     }
@@ -174,6 +179,7 @@ public class DataProvider extends ContentProvider {
             case Constants.DATA_TABLE_ID_PHOTOS: return MIME_TYPE_SINGLE + PhotosTable.TABLE_NAME;
             case Constants.DATA_TABLE_ID_PRESENTS: return MIME_TYPE_SINGLE + PresentsTable.TABLE_NAME;
             case Constants.DATA_TABLE_ID_VOTES: return MIME_TYPE_SINGLE + VotesTable.TABLE_NAME;
+            case Constants.DATA_TABLE_ID_NOTIFICATIONS: return MIME_TYPE_SINGLE + NotificationsTable.TABLE_NAME;
         }
         switch (URI_MATCHER.match(uri)) {
             case Constants.DATA_TABLE_ID_CAMARADES: return MIME_TYPE + CamaradesTable.TABLE_NAME;
@@ -187,6 +193,7 @@ public class DataProvider extends ContentProvider {
             case Constants.DATA_TABLE_ID_PHOTOS: return MIME_TYPE + PhotosTable.TABLE_NAME;
             case Constants.DATA_TABLE_ID_PRESENTS: return MIME_TYPE + PresentsTable.TABLE_NAME;
             case Constants.DATA_TABLE_ID_VOTES: return MIME_TYPE + VotesTable.TABLE_NAME;
+            case Constants.DATA_TABLE_ID_NOTIFICATIONS: return MIME_TYPE + NotificationsTable.TABLE_NAME;
             default:
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
         }
