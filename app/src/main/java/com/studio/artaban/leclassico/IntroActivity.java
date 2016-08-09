@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -59,6 +60,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
     private static final String DATA_KEY_LOGIN_PASSWORD = "loginPassword";
 
     private static final String DATA_KEY_PROGRESS_MESSAGE = "progressMessage";
+
+    private static final String DATA_KEY_ERROR_DISPLAY = "errorDisplay";
+    private static final String DATA_KEY_ERROR_ICON = "errorIcon";
+    private static final String DATA_KEY_ERROR_MESSAGE = "errorMessage";
     // Data keys
 
     private static final int ANIMATION_DURATION_SHOW_CONNECT = 200; // Display connection layout partially duration
@@ -215,7 +220,8 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
     private void startMainActivity(boolean online) {
     // Start main activity containing publications, events, locations, etc.
 
-        Logs.add(Logs.Type.V, null);
+        Logs.add(Logs.Type.V, "online: " + online);
+        mProgressDialog.cancel();
 
 
 
@@ -225,10 +231,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
 
 
-        //mProgressDialog.cancel();
-        //startActivity
 
-
+        //Intent intent = new Intent(this, MainActivity.class);
+        //intent.putExtra(MainActivity.DATA_KEY_ONLINE, online);
+        //startActivity(intent);
 
 
 
@@ -306,19 +312,29 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
     //
     private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
     private ConnectionFragment mConnectionFragment; // Retain fragment containing the progress dialog
+    private AlertDialog mErrorDialog; // Alert dialog that displays error messages
 
     private String mProgressMessage; // Progress dialog message
 
-    private void displayError(final boolean critical, final int errorId) {
+    private boolean mErrorDisplay;
+    private int mErrorMessage;
+    private int mErrorIcon;
+    // Error dialog data
+
+    private void displayError(boolean critical, int errorId) {
 
         Logs.add(Logs.Type.V, "errorId: " + errorId);
+        mConnectionFragment.cancel();
         mProgressDialog.cancel();
 
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.error)
-                .setIcon(getDrawable((critical) ? R.drawable.error_red : R.drawable.warning_red))
-                .setMessage(errorId)
-                .show();
+        // Display message
+        mErrorIcon = (critical) ? R.drawable.error_red : R.drawable.warning_red;
+        mErrorMessage = errorId;
+        mErrorDialog.setIcon(getDrawable(mErrorIcon));
+        mErrorDialog.setMessage(getString(mErrorMessage));
+
+        mErrorDisplay = true;
+        mErrorDialog.show();
     }
 
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
@@ -450,6 +466,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
             pseudo = savedInstanceState.getString(DATA_KEY_LOGIN_PSEUDO, null);
             password = savedInstanceState.getString(DATA_KEY_LOGIN_PASSWORD, null);
 
+            mErrorDisplay = savedInstanceState.getBoolean(DATA_KEY_ERROR_DISPLAY);
+            mErrorIcon = savedInstanceState.getInt(DATA_KEY_ERROR_ICON);
+            mErrorMessage = savedInstanceState.getInt(DATA_KEY_ERROR_MESSAGE);
+
         } else if (mIntroDone)
             setTheme(R.style.ConnectAppTheme); // To display white background
 
@@ -466,6 +486,17 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
             ((EditText)findViewById(R.id.edit_pseudo)).setText(pseudo);
         if (password != null)
             ((EditText)findViewById(R.id.edit_password)).setText(password);
+
+        mErrorDialog = new AlertDialog.Builder(this).create();
+        mErrorDialog.setTitle(R.string.error);
+        mErrorDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+
+                Logs.add(Logs.Type.V, "dialog: " + dialog);
+                mErrorDisplay = false;
+            }
+        });
 
         // Avoid to display keyboard automatically
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -491,7 +522,14 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
             manager.executePendingTransactions();
 
         } else if (mConnectionFragment.isDisplayed())
-            mProgressDialog.show();
+            mProgressDialog.show(); // Display progress dialog
+        else if (mErrorDisplay) {
+
+            // Display alert dialog
+            mErrorDialog.setIcon(getDrawable(mErrorIcon));
+            mErrorDialog.setMessage(getString(mErrorMessage));
+            mErrorDialog.show();
+        }
 
         // Check to display intro
         if (mIntroDone)
@@ -960,6 +998,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
             outState.putString(DATA_KEY_LOGIN_PSEUDO, pseudoEdit.getText().toString());
         if (passwordEdit.getText().length() > 0)
             outState.putString(DATA_KEY_LOGIN_PASSWORD, passwordEdit.getText().toString());
+
+        outState.putBoolean(DATA_KEY_ERROR_DISPLAY, mErrorDisplay);
+        outState.putInt(DATA_KEY_ERROR_ICON, mErrorIcon);
+        outState.putInt(DATA_KEY_ERROR_MESSAGE, mErrorMessage);
 
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
