@@ -217,7 +217,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
     ////////////////////////////////////////////////////////////////////////////////////////// Login
 
-    private void startMainActivity(boolean online) {
+    private void startMainActivity(boolean online, String pseudo) {
     // Start main activity containing publications, events, locations, etc.
 
         Logs.add(Logs.Type.V, "online: " + online);
@@ -226,6 +226,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
+        intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
         startActivity(intent);
     }
 
@@ -278,13 +279,13 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         return true;
     }
     @Override
-    public void onPostExecute(boolean result, String pseudo, String password) {
+    public void onPostExecute(boolean result, String pseudo) {
 
-        Logs.add(Logs.Type.V, "result: " + result + ";pseudo: " + pseudo + ";password: " + password);
+        Logs.add(Logs.Type.V, "result: " + result + ";pseudo: " + pseudo);
         if (result) { // Login succeeded
             try {
-                mDataService.get().login(pseudo, password);
-                startMainActivity(false); ////// Start main activity (Offline)
+                mDataService.get().login(pseudo, null);
+                startMainActivity(false, pseudo); ////// Start main activity (Offline)
 
             } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
 
@@ -364,7 +365,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
                 switch (synchroState) {
 
                     case DataService.SYNCHRONIZATION_STATE_DONE: {
-                        startMainActivity(true); ////// Start main activity (Online)
+                        startMainActivity(true, mConnectionFragment.getPseudo()); ////// Start main activity (Online)
                         break;
                     }
                     case DataService.STATE_ERROR: {

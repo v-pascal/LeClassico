@@ -36,7 +36,7 @@ public class ConnectionFragment extends Fragment {
 
         void onPreExecute();
         boolean onProgressUpdate(int step, String pseudo, String password);
-        void onPostExecute(boolean result, String pseudo, String password);
+        void onPostExecute(boolean result, String pseudo);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,9 +54,6 @@ public class ConnectionFragment extends Fragment {
         mProgressTask = new ConnectionProgressTask();
         mProgressTask.execute(activity);
     }
-    public boolean isDisplayed() {
-        return ((mProgressTask != null) && (mProgressTask.getStatus() != AsyncTask.Status.FINISHED));
-    }
     public void cancel() {
 
         Logs.add(Logs.Type.V, null);
@@ -64,6 +61,12 @@ public class ConnectionFragment extends Fragment {
             mProgressTask.cancel(true);
             mProgressTask = null;
         }
+    }
+    public boolean isDisplayed() {
+        return ((mProgressTask != null) && (mProgressTask.getStatus() != AsyncTask.Status.FINISHED));
+    }
+    public String getPseudo() {
+        return mPseudo;
     }
 
     //
@@ -165,7 +168,7 @@ public class ConnectionFragment extends Fragment {
         @Override
         protected void onPostExecute(Boolean result) {
             Logs.add(Logs.Type.V, "result: " + result);
-            mListener.onPostExecute(result.booleanValue(), mPseudo, mPassword);
+            mListener.onPostExecute(result.booleanValue(), mPseudo);
         }
 
         @Override

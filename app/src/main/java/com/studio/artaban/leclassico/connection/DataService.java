@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.IBinder;
 
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -56,9 +55,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final byte CONNECTION_STATE_LOGIN_FAILED = 2;
     public static final byte CONNECTION_STATE_EXPIRED = 3;
 
-    private static final String CONNECTION_DATA_POST_PSEUDO = "pseudo";
-    private static final String CONNECTION_DATA_POST_PASSWORD = "password";
-    private static final String CONNECTION_DATA_POST_DATETIME = "dateTime";
+    private static final String CONNECTION_DATA_POST_PSEUDO = "psd";
+    private static final String CONNECTION_DATA_POST_PASSWORD = "ccf";
+    private static final String CONNECTION_DATA_POST_DATETIME = "odt";
 
     private static final String CONNECTION_DATA_GET_TOKEN = "Clf";
 
@@ -69,6 +68,15 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     //////
     @Override
     public void onConnection() {
+
+
+
+
+
+
+
+        //if (mToken == null) // Working offline
+        //  use mPseudo to get CAM_CodeConf then connect
 
 
 
@@ -99,7 +107,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     private String mToken; // Token used to identify the user when requesting remote DB
     private long mTimeLag; // Time lag between remote DB & current OS (in milliseconds)
-
+                           // NB: Will be updated at every remote requests coz OS date & time can changed
     //
     public void stop() {
 
@@ -110,21 +118,26 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     }
 
     private String mPseudo;
-    private String mPassword;
-    // Login
+    // Login pseudo (used to get a token if working offline and an Internet connection is established)
 
     public boolean login(final String pseudo, final String password) {
 
         Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";password: " + password);
         mPseudo = pseudo;
-        mPassword = password;
 
-        if (!Internet.isConnected())
-            return false;
+        if ((password == null) || (!Internet.isConnected()))
+            return false; // Working offline, or online but connection lost
 
         new Handler().post(new Runnable() {
             @Override
             public void run() {
+
+
+
+
+
+
+
 
                 Date now = new Date();
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -142,21 +155,15 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         byte result = STATE_ERROR;
                         try {
                             JSONObject reply = new JSONObject(response);
+                            if (!reply.has(Constants.WEBSERVICE_JSON_ERROR)) { // Check no web service error
 
+                                JSONObject logged = reply.getJSONObject(Constants.WEBSERVICE_JSON_LOGGED);
+                                mPseudo = logged.getString(Constants.WEBSERVICE_JSON_PSEUDO);
+                                mToken = logged.getString(Constants.WEBSERVICE_JSON_TOKEN);
+                                mTimeLag = logged.getLong(Constants.WEBSERVICE_JSON_TIME_LAG);
 
-
-
-
-
-
-                            //mToken
-                            //Timer
-
-
-
-
-
-
+                                result = CONNECTION_STATE_CONNECTED;
+                            }
 
                         } catch (JSONException e) {
                             Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
@@ -173,6 +180,14 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     intent.putExtra(CONNECTION_STATE, STATE_ERROR);
                     sendBroadcast(intent); ////// STATUS_CONNECTION
                 }
+
+
+
+
+
+
+
+
             }
         });
         return true;
@@ -214,7 +229,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
         Logs.add(Logs.Type.V, null);
         mPseudo = null;
-        mPassword = null;
 
 
 

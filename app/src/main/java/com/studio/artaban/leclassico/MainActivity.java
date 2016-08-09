@@ -22,6 +22,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_DATA_KEY_ONLINE = "online";
+    public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
     // Extra data keys
 
     /**

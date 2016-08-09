@@ -28,6 +28,15 @@ public final class Constants {
     public static final String WEBSERVICE_PUBLICATIONS = "/actualites.php"; // Publications web service
     public static final String WEBSERVICE_COMMENTS = "/commentaires.php"; // Comments web service
 
+    public static final String WEBSERVICE_JSON_ERROR = "error";
+    // JSON object error field
+
+    public static final String WEBSERVICE_JSON_LOGGED = "logged";
+    public static final String WEBSERVICE_JSON_PSEUDO = "pseudo";
+    public static final String WEBSERVICE_JSON_TOKEN = "token";
+    public static final String WEBSERVICE_JSON_TIME_LAG = "timeLag";
+    // JSON connection object fields
+
 
     ////// Introduction
     public static final int INTRO_PAGE_COUNT = 5; // Introduction page count

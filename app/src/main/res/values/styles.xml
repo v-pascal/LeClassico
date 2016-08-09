@@ -21,7 +21,7 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
 
-        <item name="android:windowBackground">@color/colorPrimaryMain</item>
+        <item name="android:windowBackground">@drawable/window_background</item>
         <item name="android:colorControlHighlight">@color/colorButtonBackgroundPressed</item>
 
         <item name="android:windowActivityTransitions">true</item>
