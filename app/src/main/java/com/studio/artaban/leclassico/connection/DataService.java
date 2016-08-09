@@ -56,9 +56,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final byte CONNECTION_STATE_LOGIN_FAILED = 2;
     public static final byte CONNECTION_STATE_EXPIRED = 3;
 
-    private static final String CONNECTION_POSTDATA_PSEUDO = "pseudo";
-    private static final String CONNECTION_POSTDATA_PASSWORD = "password";
-    private static final String CONNECTION_POSTDATA_DATETIME = "dateTime";
+    private static final String CONNECTION_DATA_POST_PSEUDO = "pseudo";
+    private static final String CONNECTION_DATA_POST_PASSWORD = "password";
+    private static final String CONNECTION_DATA_POST_DATETIME = "dateTime";
+
+    private static final String CONNECTION_DATA_GET_TOKEN = "Clf";
 
     // action.STATUS_SYNCHRONIZATION
     public static final String SYNCHRONIZATION_STATE = "synchronizationState"; // State == processing table Id
@@ -128,9 +130,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 ContentValues data = new ContentValues();
-                data.put(CONNECTION_POSTDATA_PSEUDO, pseudo);
-                data.put(CONNECTION_POSTDATA_PASSWORD, password);
-                data.put(CONNECTION_POSTDATA_DATETIME, dateFormat.format(now));
+                data.put(CONNECTION_DATA_POST_PSEUDO, pseudo);
+                data.put(CONNECTION_DATA_POST_PASSWORD, password);
+                data.put(CONNECTION_DATA_POST_DATETIME, dateFormat.format(now));
 
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
                         Constants.WEBSERVICE_CONNECTION, data, new Internet.OnRequestListener() {

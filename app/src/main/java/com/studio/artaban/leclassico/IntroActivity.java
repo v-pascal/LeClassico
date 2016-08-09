@@ -221,27 +221,12 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
     // Start main activity containing publications, events, locations, etc.
 
         Logs.add(Logs.Type.V, "online: " + online);
+        mConnectionFragment.cancel();
         mProgressDialog.cancel();
 
-
-
-
-
-
-
-
-
-
-        //Intent intent = new Intent(this, MainActivity.class);
-        //intent.putExtra(MainActivity.DATA_KEY_ONLINE, online);
-        //startActivity(intent);
-
-
-
-
-
-
-
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
+        startActivity(intent);
     }
 
     ////// OnProgressListener

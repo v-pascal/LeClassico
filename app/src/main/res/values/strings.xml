@@ -47,4 +47,22 @@
     <string name="mnu_quit">Quit</string>
     <string name="mnu_about">About</string>
 
+
+
+
+
+
+
+
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="section_format" translatable="false">Hello World from section: %1$d</string>
+
+
+
+
+
+
+
+
+
 </resources>
