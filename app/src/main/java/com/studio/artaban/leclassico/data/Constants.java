@@ -28,8 +28,22 @@ public final class Constants {
     public static final String WEBSERVICE_PUBLICATIONS = "/actualites.php"; // Publications web service
     public static final String WEBSERVICE_COMMENTS = "/commentaires.php"; // Comments web service
 
+    public static final byte WEBSERVICE_ERROR_SERVER_UNAVAILABLE = 1;
+    public static final byte WEBSERVICE_ERROR_LOGIN_FAILED = 2;
+    public static final byte WEBSERVICE_ERROR_TOKEN_EXPIRED = 3;
+    public static final byte WEBSERVICE_ERROR_INVALID_LOGIN = 4;
+    public static final byte WEBSERVICE_ERROR_SYSTEM_DATE = 5;
+    public static final byte WEBSERVICE_ERROR_INVALID_TOKEN = 6;
+    public static final byte WEBSERVICE_ERROR_INVALID_USER = 7;
+    public static final byte WEBSERVICE_ERROR_INVALID_PUBLICATION_ID = 8;
+    public static final byte WEBSERVICE_ERROR_REQUEST_PUBLICATION_DELETE = 9;
+    public static final byte WEBSERVICE_ERROR_REQUEST_PUBLICATION_INSERT = 10;
+    public static final byte WEBSERVICE_ERROR_REQUEST_COMMENT_DELETE = 11;
+    public static final byte WEBSERVICE_ERROR_REQUEST_COMMENT_INSERT = 12;
+    // Error codes
+
     public static final String WEBSERVICE_JSON_ERROR = "error";
-    // JSON object error field
+    // JSON object error field (containing the web service error codes above)
 
     public static final String WEBSERVICE_JSON_LOGGED = "logged";
     public static final String WEBSERVICE_JSON_PSEUDO = "pseudo";

@@ -52,8 +52,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     // action.STATUS_CONNECTION
     public static final String CONNECTION_STATE = "connectionState";
     public static final byte CONNECTION_STATE_CONNECTED = 1;
-    public static final byte CONNECTION_STATE_LOGIN_FAILED = 2;
-    public static final byte CONNECTION_STATE_EXPIRED = 3;
+    public static final byte CONNECTION_STATE_LOGIN_FAILED = 2; // Constants.WEBSERVICE_ERROR_LOGIN_FAILED
+    public static final byte CONNECTION_STATE_EXPIRED = 3; // Constants.WEBSERVICE_ERROR_TOKEN_EXPIRED
 
     private static final String CONNECTION_DATA_POST_PSEUDO = "psd";
     private static final String CONNECTION_DATA_POST_PASSWORD = "ccf";
