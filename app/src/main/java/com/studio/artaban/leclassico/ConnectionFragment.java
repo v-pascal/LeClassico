@@ -13,13 +13,20 @@ import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.tools.WaitUiThread;
 
 /**
  * Created by pascal on 08/08/16.
  * Fragment to display a progress dialog during connection & synchronization
  */
 public class ConnectionFragment extends Fragment {
+
+    public static final int STEP_CHECK_INTERNET = 0;
+    public static final int STEP_OFFLINE_IDENTIFICATION = 1;
+    public static final int STEP_ONLINE_IDENTIFICATION = 2;
+    public static final int STEP_LOGIN = 3;
+    public static final int STEP_LOGIN_FAILED = 4;
+    public static final int STEP_NO_INTERNET = 5;
+    // Connection steps
 
     public static final String TAG = "connectionProgress";
 
@@ -28,8 +35,8 @@ public class ConnectionFragment extends Fragment {
     public interface OnProgressListener { //////////////////////////////////////////////////////////
 
         void onPreExecute();
-        void onProgressUpdate();
-        void onPostExecute();
+        boolean onProgressUpdate(int step, String pseudo, String password);
+        void onPostExecute(boolean result, String pseudo, String password);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,138 +54,138 @@ public class ConnectionFragment extends Fragment {
         mProgressTask = new ConnectionProgressTask();
         mProgressTask.execute(activity);
     }
+    public boolean isDisplayed() {
+        return ((mProgressTask != null) && (mProgressTask.getStatus() != AsyncTask.Status.FINISHED));
+    }
     public void cancel() {
 
         Logs.add(Logs.Type.V, null);
-        if (mProgressTask != null)
+        if (mProgressTask != null) {
             mProgressTask.cancel(true);
+            mProgressTask = null;
+        }
     }
 
     //
     private ConnectionProgressTask mProgressTask;
-    private class ConnectionProgressTask extends AsyncTask<Activity, Integer, Integer> {
+    private class ConnectionProgressTask extends AsyncTask<Activity, Integer, Boolean> {
 
+        private static final long INFORM_USER_DELAY = 1000; // Delay of displaying step
+
+        private void publishWaitProgress(int step) {
+        // Publish progression and wait its displayed B4 marking a delay to let's the user to be informed
+
+            Logs.add(Logs.Type.V, "step: " + step);
+
+            Integer stepToPublish = step;
+            synchronized (stepToPublish) {
+
+                publishProgress(stepToPublish);
+
+                // Wait progress published
+                try { stepToPublish.wait();
+                } catch (InterruptedException e) {
+                    Logs.add(Logs.Type.E, "Wait display interrupted");
+                }
+            }
+
+            try { Thread.sleep(INFORM_USER_DELAY, 0); // Sleep to inform user of the step
+            } catch (InterruptedException e) {
+                Logs.add(Logs.Type.E, "User delay interrupted");
+            }
+        }
+
+        //////
         @Override
         protected void onPreExecute() {
             Logs.add(Logs.Type.V, null);
-
-
-
-
+            mListener.onPreExecute();
         }
 
         @Override
-        protected Integer doInBackground(Activity... params) {
+        protected Boolean doInBackground(Activity... params) {
             Logs.add(Logs.Type.V, null);
 
-
-
-
-            /*
             // Check Internet connection
-            boolean connected = Internet.isOnline(params[0]);
-            try {
+            if (!Internet.isOnline(params[0])) {
 
-                if (!connected) {
+                // No Internet connection so check existing DB to work offline
+                ContentResolver cr = params[0].getContentResolver();
+                Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                        new String[]{ "count(*)" }, null, null, null);
+                int membersCount = 0;
+                if (result.getCount() > 0) {
+                    result.moveToFirst();
+                    membersCount = result.getInt(0);
+                }
+                result.close();
 
-                    // No Internet connection so check existing DB to work offline
-                    ContentResolver cr = params[0].getContentResolver();
-                    Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                            new String[]{ "count(*)" }, null, null, null);
-                    int membersCount = 0;
+                if (membersCount > 0) { // Found existing DB (try to work offline)
+
+                    publishWaitProgress(STEP_OFFLINE_IDENTIFICATION);
+                    String pseudo = null;
+
+                    // Offline identification
+                    result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                        new String[]{ CamaradesTable.COLUMN_PSEUDO },
+                        "UPPER(" + CamaradesTable.COLUMN_PSEUDO  + ")='" +
+                                mPseudo.toUpperCase() +
+                                "' AND " +
+                                CamaradesTable.COLUMN_CODE_CONF + "='" +
+                                mPassword + "'",
+                        null, null);
                     if (result.getCount() > 0) {
                         result.moveToFirst();
-                        membersCount = result.getInt(0);
+                        pseudo = result.getString(0);
                     }
                     result.close();
 
-                    if (membersCount > 0) { // Found existing DB (try to work offline)
+                    if (pseudo != null) { // Login succeeded
 
-                        WaitUiThread.run(params[0], new WaitUiThread.TaskToRun() {
-                            @Override
-                            public void proceed() {
-                                mProgressDialog.setMessage(getString(R.string.offline_identification));
-                            }
-                        });
+                        mPseudo = pseudo; // Pseudo as defined in the DB
+                        return Boolean.TRUE;
 
-                        try { Thread.sleep(1000, 0); // Sleep to inform user offline identification
-                        } catch (InterruptedException e) {
-                            Logs.add(Logs.Type.E, "Sleep interrupted");
-                        }
-                        String pseudo = null;
-
-                        // Offline identification
-                        result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                            new String[]{ CamaradesTable.COLUMN_PSEUDO },
-                            "UPPER(" + CamaradesTable.COLUMN_PSEUDO  + ")='" +
-                                    mPseudo.toUpperCase() +
-                                    "' AND " +
-                                    CamaradesTable.COLUMN_CODE_CONF + "='" +
-                                    mPassword + "'",
-                            null, null);
-                        if (result.getCount() > 0) {
-                            result.moveToFirst();
-                            pseudo = result.getString(0);
-                        }
-                        result.close();
-
-                        if (pseudo != null) { // Login succeeded
-
-                            mDataService.get().login(pseudo, mPassword);
-                            startMainActivity(); ////// Start main activity
-
-                        } else // Login failed
-                            displayError(false, R.string.login_failed);
-
-                    } else
-                        displayError(false, R.string.no_internet);
+                    } else // Login failed
+                        publishProgress(STEP_LOGIN_FAILED);
 
                 } else {
-
-                    // Identification
-                    WaitUiThread.run(params[0], new WaitUiThread.TaskToRun() {
-                        @Override
-                        public void proceed() {
-                            mProgressDialog.setMessage(getString(R.string.identification));
-                        }
-                    });
-                    if (!mDataService.get().login(mPseudo, mPassword))
-                        displayError(false, R.string.no_internet);
+                    publishWaitProgress(STEP_CHECK_INTERNET);
+                    publishProgress(STEP_NO_INTERNET);
                 }
 
-            } catch (NullPointerException e) {
+            } else {
 
-                Logs.add(Logs.Type.E, "Unexpected service disconnection");
-                displayError(true, R.string.service_unavailable);
+                // Identification
+                publishWaitProgress(STEP_ONLINE_IDENTIFICATION);
+                publishProgress(STEP_LOGIN);
             }
-            */
-
-
-
-
-
-
-
-
-
-            return null;
+            return Boolean.FALSE;
         }
 
         @Override
-        protected void onPostExecute(Integer integer) {
-            Logs.add(Logs.Type.V, "integer: " + integer);
-
-
-
+        protected void onPostExecute(Boolean result) {
+            Logs.add(Logs.Type.V, "result: " + result);
+            mListener.onPostExecute(result.booleanValue(), mPseudo, mPassword);
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
+
             Logs.add(Logs.Type.V, null);
+            if (!mListener.onProgressUpdate(values[0].intValue(), mPseudo, mPassword))
+                cancel(true);
 
+            switch (values[0].intValue()) {
+                case STEP_CHECK_INTERNET:
+                case STEP_OFFLINE_IDENTIFICATION:
+                case STEP_ONLINE_IDENTIFICATION: {
 
-
-
+                    synchronized (values[0]) { // Notify progress publication done
+                        values[0].notify();
+                    }
+                    break;
+                }
+            }
         }
     };
 

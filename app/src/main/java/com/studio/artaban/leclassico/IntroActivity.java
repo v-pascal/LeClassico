@@ -45,7 +45,7 @@ import com.studio.artaban.leclassico.tools.SizeUtils;
  * Created by pascal on 15/07/16.
  * Introduction & connection activity class
  */
-public class IntroActivity extends AppCompatActivity {
+public class IntroActivity extends AppCompatActivity implements ConnectionFragment.OnProgressListener {
 
     private static final String DATA_KEY_INTRO_DISPLAYED = "introDisplayed";
 
@@ -114,7 +114,7 @@ public class IntroActivity extends AppCompatActivity {
         mIntroDone = false;
 
         if (DataService.isRunning())
-            stopService(new Intent(IntroActivity.this, DataService.class));
+            stopService(new Intent(this, DataService.class));
             // NB: Will call "DataService.stop" method when the service connection will disconnect
             //     (see "onServiceDisconnected" in "ServiceBinder" class), and this B4 the service
             //     is stopped. No need to call "DataService.stop" method here.
@@ -212,10 +212,13 @@ public class IntroActivity extends AppCompatActivity {
 
     ////////////////////////////////////////////////////////////////////////////////////////// Login
 
-    private void startMainActivity() {
+    private void startMainActivity(boolean online) {
     // Start main activity containing publications, events, locations, etc.
 
         Logs.add(Logs.Type.V, null);
+
+
+
 
 
 
@@ -230,25 +233,91 @@ public class IntroActivity extends AppCompatActivity {
 
 
 
+
+
+
+    }
+
+    ////// OnProgressListener
+    @Override
+    public void onPreExecute() {
+
+        Logs.add(Logs.Type.V, null);
+        mProgressMessage = getString(R.string.check_internet);
+        mProgressDialog.setMessage(mProgressMessage);
+    }
+    @Override
+    public boolean onProgressUpdate(int step, String pseudo, String password) {
+
+        Logs.add(Logs.Type.V, "step: " + step);
+        switch (step) {
+            //case ConnectionFragment.STEP_CHECK_INTERNET:
+                // Nothing to do
+            case ConnectionFragment.STEP_OFFLINE_IDENTIFICATION: {
+                mProgressMessage = getString(R.string.offline_identification);
+                mProgressDialog.setMessage(mProgressMessage);
+                break;
+            }
+            case ConnectionFragment.STEP_ONLINE_IDENTIFICATION: {
+                mProgressMessage = getString(R.string.identification);
+                mProgressDialog.setMessage(mProgressMessage);
+                break;
+            }
+            case ConnectionFragment.STEP_LOGIN: {
+                try {
+                    if (!mDataService.get().login(pseudo, password))
+                        displayError(false, R.string.no_internet);
+                } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
+
+                    Logs.add(Logs.Type.F, e.getMessage());
+                    displayError(true, R.string.service_unavailable);
+                    return false;
+                }
+                break;
+            }
+            case ConnectionFragment.STEP_LOGIN_FAILED: {
+                displayError(false, R.string.login_failed);
+                break;
+            }
+            case ConnectionFragment.STEP_NO_INTERNET: {
+                displayError(false, R.string.no_internet);
+                break;
+            }
+        }
+        return true;
+    }
+    @Override
+    public void onPostExecute(boolean result, String pseudo, String password) {
+
+        Logs.add(Logs.Type.V, "result: " + result + ";pseudo: " + pseudo + ";password: " + password);
+        if (result) { // Login succeeded
+            try {
+                mDataService.get().login(pseudo, password);
+                startMainActivity(false); ////// Start main activity (Offline)
+
+            } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
+
+                Logs.add(Logs.Type.F, e.getMessage());
+                mProgressDialog.cancel();
+            }
+        }
     }
 
     //
     private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
     private ConnectionFragment mConnectionFragment; // Retain fragment containing the progress dialog
+
     private String mProgressMessage; // Progress dialog message
 
     private void displayError(final boolean critical, final int errorId) {
 
         Logs.add(Logs.Type.V, "errorId: " + errorId);
-        if (mProgressDialog.isShowing())
-            mProgressDialog.cancel();
+        mProgressDialog.cancel();
 
-        new AlertDialog.Builder(IntroActivity.this)
+        new AlertDialog.Builder(this)
                 .setTitle(R.string.error)
                 .setIcon(getDrawable((critical) ? R.drawable.error_red : R.drawable.warning_red))
                 .setMessage(errorId)
-                .setPositiveButton(R.string.ok, null)
-                .setCancelable(false)
                 .show();
     }
 
@@ -275,8 +344,8 @@ public class IntroActivity extends AppCompatActivity {
 
                     } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
 
-                        Logs.add(Logs.Type.E, e.getMessage());
-                        mProgressDialog.cancel();
+                        Logs.add(Logs.Type.F, e.getMessage());
+                        displayError(true, R.string.service_unavailable);
                     }
 
                 } else {
@@ -294,7 +363,7 @@ public class IntroActivity extends AppCompatActivity {
                 switch (synchroState) {
 
                     case DataService.SYNCHRONIZATION_STATE_DONE: {
-                        startMainActivity(); ////// Start main activity
+                        startMainActivity(true); ////// Start main activity (Online)
                         break;
                     }
                     case DataService.STATE_ERROR: {
@@ -333,7 +402,18 @@ public class IntroActivity extends AppCompatActivity {
         EditText pseudoEdit = (EditText)findViewById(R.id.edit_pseudo);
         EditText passwordEdit = (EditText)findViewById(R.id.edit_password);
 
+        // Check valid login (defined)
+        if ((pseudoEdit.getText().length() == 0) || (passwordEdit.getText().length() == 0)) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.warning)
+                    .setIcon(getDrawable(R.drawable.warning_red))
+                    .setMessage(R.string.login_missing)
+                    .show();
+            return;
+        }
         mProgressDialog.show();
+        mConnectionFragment.cancel(); // Needed to reset previous state
         mConnectionFragment.display(this, pseudoEdit.getText().toString(), passwordEdit.getText().toString());
     }
 
@@ -342,7 +422,7 @@ public class IntroActivity extends AppCompatActivity {
     private LimitlessViewPager mViewPager; // Introduction view pager component
     private boolean mIntroDone; // Introduction flag
 
-    //////
+    ////// AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -399,7 +479,7 @@ public class IntroActivity extends AppCompatActivity {
 
         // Start data service (if not already started)
         if (!DataService.isRunning())
-            startService(new Intent(IntroActivity.this, DataService.class));
+            startService(new Intent(this, DataService.class));
 
         // Check connection in progress
         FragmentManager manager = getSupportFragmentManager();
@@ -410,7 +490,7 @@ public class IntroActivity extends AppCompatActivity {
             manager.beginTransaction().add(mConnectionFragment, ConnectionFragment.TAG).commit();
             manager.executePendingTransactions();
 
-        } else
+        } else if (mConnectionFragment.isDisplayed())
             mProgressDialog.show();
 
         // Check to display intro
@@ -883,6 +963,18 @@ public class IntroActivity extends AppCompatActivity {
 
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        Logs.add(Logs.Type.V, null);
+        if (mProgressDialog.isShowing()) {
+
+            moveTaskToBack(true); // Put application in pause
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override
