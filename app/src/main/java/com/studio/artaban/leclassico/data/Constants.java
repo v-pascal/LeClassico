@@ -103,4 +103,8 @@ public final class Constants {
 
     public static final byte DATA_LAST_TABLE_ID = DATA_TABLE_ID_NOTIFICATIONS;
 
+
+    ////// Main
+    public static final int MAIN_PAGE_COUNT = 5; // Main page count
+
 }

@@ -42,6 +42,27 @@
     <!-- Menus -->
     <string name="mnu_help">Aide</string>
     <string name="mnu_quit">Quitter</string>
-    <string name="mnu_about">A propos</string>
+    <string name="mnu_about">A propos</string><!-- Connection -->
+
+    <string name="mnu_profile">Profil</string>
+    <string name="mnu_location">Géolocation</string>
+    <string name="mnu_settings">Paramètres</string>
+    <string name="mnu_logout">Déconnexion</string>
+    <string name="mnu_exit">Quitter</string><!-- Main navigation -->
+
+    <!-- Pages -->
+    <string-array name="main_pages">
+        <item>Accueil</item>
+        <item>Fil d\'actualité</item>
+        <item>Evènements</item>
+        <item>Camarades</item>
+        <item>Notifications</item>
+    </string-array>
+    <string-array name="profile_pages">
+        <item>Publications</item>
+        <item>A Propos</item>
+        <item>Albums</item>
+        <item>Messagerie</item>
+    </string-array>
 
 </resources>

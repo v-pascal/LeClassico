@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico;
 
 import android.animation.ObjectAnimator;
+import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -224,10 +225,14 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         mConnectionFragment.cancel();
         mProgressDialog.cancel();
 
+        // Reset login data (needed at back)
+        ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
+        ((EditText)findViewById(R.id.edit_password)).getText().clear();
+
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
-        startActivity(intent);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     ////// OnProgressListener
@@ -895,6 +900,33 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
             }
         });
+
+
+
+
+
+
+
+
+
+
+
+
+        ((EditText)findViewById(R.id.edit_pseudo)).setText("pascal");
+        ((EditText)findViewById(R.id.edit_password)).setText("ras34");
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     @Override

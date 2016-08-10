@@ -64,7 +64,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final String SYNCHRONIZATION_STATE = "synchronizationState"; // State == processing table Id
     public static final byte SYNCHRONIZATION_STATE_DONE = Constants.DATA_LAST_TABLE_ID + 1;
 
-    //////
+    ////// OnConnectivityListener
     @Override
     public void onConnection() {
 
@@ -208,6 +208,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
             }
+
         }).start();
         return true;
     }
@@ -241,6 +242,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 intent.putExtra(SYNCHRONIZATION_STATE, SYNCHRONIZATION_STATE_DONE);
                 sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
             }
+
         }).start();
         return true;
     }
