@@ -9,10 +9,12 @@ import android.net.NetworkInfo;
 
 import com.studio.artaban.leclassico.data.Constants;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -80,7 +82,7 @@ public final class Internet {
             // Wait Internet connection check
             try { checkInternet.wait(); }
             catch (InterruptedException e) {
-                Logs.add(Logs.Type.E, e.getMessage());
+                Logs.add(Logs.Type.E, "Wait Internet interrupted: " + e.getMessage());
             }
         }
         return isConnected;
@@ -170,7 +172,7 @@ public final class Internet {
 
     private static String getPostContent(ContentValues data) {
 
-        Logs.add(Logs.Type.V, "data: " + data);
+        //Logs.add(Logs.Type.V, "data: " + data);
         StringBuilder postContent = new StringBuilder();
         boolean firstData = true;
 
@@ -204,7 +206,6 @@ public final class Internet {
 
             URL urlRequest = new URL(url);
             httpConnection = (HttpURLConnection)urlRequest.openConnection();
-            httpConnection.setDoInput(true);
             if (postData != null) {
 
                 httpConnection.setRequestMethod("POST");
@@ -212,6 +213,7 @@ public final class Internet {
                 os = httpConnection.getOutputStream();
                 bw = new BufferedWriter(new OutputStreamWriter(os, POST_CONTENT_ENCODING));
                 bw.write(getPostContent(postData));
+                bw.flush();
             }
             httpConnection.connect();
 
@@ -222,9 +224,14 @@ public final class Internet {
             if (listener != null) {
 
                 is = httpConnection.getInputStream();
-                byte[] buffer = new byte[is.available()];
-                is.read(buffer);
-                listener.onReceiveReply(new String(buffer));
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null)
+                    response.append(line).append('\n');
+
+                br.close();
+                listener.onReceiveReply(response.toString());
 
             } else
                 Logs.add(Logs.Type.W, "No request listener");
@@ -247,12 +254,12 @@ public final class Internet {
                 httpConnection.disconnect();
 
             try {
-                if (is != null) is.close();
-                if (os != null) os.close();
                 if (bw != null) {
                     bw.flush();
                     bw.close();
                 }
+                if (os != null) os.close();
+                if (is != null) is.close();
 
             } catch (IOException e) {
                 Logs.add(Logs.Type.E, "Failed to close input stream");

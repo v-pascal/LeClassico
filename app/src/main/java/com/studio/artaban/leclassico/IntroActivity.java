@@ -241,7 +241,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
     @Override
     public boolean onProgressUpdate(int step, String pseudo, String password) {
 
-        Logs.add(Logs.Type.V, "step: " + step);
+        Logs.add(Logs.Type.V, "step: " + step + ";pseudo: " + pseudo);// + ";password: " + password);
         switch (step) {
             //case ConnectionFragment.STEP_CHECK_INTERNET:
                 // Nothing to do
@@ -428,7 +428,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
+        Logs.add(Logs.Type.V, "savedInstanceState: " + (savedInstanceState != null? "exists":"null"));
 
         // Restore data
         SharedPreferences settings = getSharedPreferences(Constants.APP_PREFERENCE, 0);
@@ -989,7 +989,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         outState.putInt(DATA_KEY_ERROR_ICON, mErrorIcon);
         outState.putInt(DATA_KEY_ERROR_MESSAGE, mErrorMessage);
 
-        Logs.add(Logs.Type.V, "outState: " + outState);
+        //Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
     }
 

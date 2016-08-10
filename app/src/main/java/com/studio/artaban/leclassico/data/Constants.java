@@ -12,7 +12,7 @@ public final class Constants {
 
     ////// Application
     public static final String APP_NAME = "LeClassico"; // Application name
-    public static final String APP_WEBSITE = "http://leclassico.fr"; // Social network application web site
+    public static final String APP_WEBSITE = "http://www.leclassico.fr"; // Social network application web site
     public static final String APP_URI_COMPANY = "studio.artaban"; // Application company URI
     public static final String APP_URI = "leclassico"; // Application URI
 
@@ -24,7 +24,7 @@ public final class Constants {
 
 
     ////// Web services
-    public static final String WEBSERVICE_CONNECTION = "/connection.php"; // Connection web service
+    public static final String WEBSERVICE_CONNECTION = "/connexion.php"; // Connection web service
     public static final String WEBSERVICE_PUBLICATIONS = "/actualites.php"; // Publications web service
     public static final String WEBSERVICE_COMMENTS = "/commentaires.php"; // Comments web service
 

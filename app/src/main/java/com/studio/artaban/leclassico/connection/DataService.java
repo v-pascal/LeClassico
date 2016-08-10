@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 
 import com.studio.artaban.leclassico.data.Constants;
@@ -57,7 +56,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     private static final String CONNECTION_DATA_POST_PSEUDO = "psd";
     private static final String CONNECTION_DATA_POST_PASSWORD = "ccf";
-    private static final String CONNECTION_DATA_POST_DATETIME = "odt";
+    private static final String CONNECTION_DATA_DATETIME = "odt";
 
     private static final String CONNECTION_DATA_GET_TOKEN = "Clf";
 
@@ -122,15 +121,16 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     public boolean login(final String pseudo, final String password) {
 
-        Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";password: " + password);
+        Logs.add(Logs.Type.V, "pseudo: " + pseudo);// + ";password: " + password);
         mPseudo = pseudo;
 
         if ((password == null) || (!Internet.isConnected()))
             return false; // Working offline, or online but connection lost
 
-        new Handler().post(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
+
 
 
 
@@ -145,7 +145,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 ContentValues data = new ContentValues();
                 data.put(CONNECTION_DATA_POST_PSEUDO, pseudo);
                 data.put(CONNECTION_DATA_POST_PASSWORD, password);
-                data.put(CONNECTION_DATA_POST_DATETIME, dateFormat.format(now));
+                data.put(CONNECTION_DATA_DATETIME, dateFormat.format(now));
 
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
                         Constants.WEBSERVICE_CONNECTION, data, new Internet.OnRequestListener() {
@@ -162,7 +162,23 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                                 mToken = logged.getString(Constants.WEBSERVICE_JSON_TOKEN);
                                 mTimeLag = logged.getLong(Constants.WEBSERVICE_JSON_TIME_LAG);
 
+                                Logs.add(Logs.Type.I, "Logged with time lag: " + mTimeLag);
                                 result = CONNECTION_STATE_CONNECTED;
+
+                            } else switch ((byte)reply.getInt(Constants.WEBSERVICE_JSON_ERROR)) {
+
+                                // Error
+                                case Constants.WEBSERVICE_ERROR_LOGIN_FAILED:
+                                    Logs.add(Logs.Type.W, "Login failed");
+                                    result = CONNECTION_STATE_LOGIN_FAILED;
+                                    break;
+
+                                case Constants.WEBSERVICE_ERROR_SERVER_UNAVAILABLE:
+                                case Constants.WEBSERVICE_ERROR_INVALID_LOGIN:
+                                case Constants.WEBSERVICE_ERROR_SYSTEM_DATE:
+                                    Logs.add(Logs.Type.E, "Connection error: #" +
+                                            reply.getInt(Constants.WEBSERVICE_JSON_ERROR));
+                                    break;
                             }
 
                         } catch (JSONException e) {
@@ -173,7 +189,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         sendBroadcast(intent); ////// STATUS_CONNECTION
                     }
                 });
-                if (result != Internet.DownloadResult.SUCCEEDED) { // == CONNECTION_FAILED
+                if (result != Internet.DownloadResult.SUCCEEDED) {
                     Logs.add(Logs.Type.E, "Connection request error");
 
                     Intent intent = new Intent(STATUS_CONNECTION);
@@ -188,8 +204,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
+
+
+
             }
-        });
+        }).start();
         return true;
     }
     public boolean synchronize() {
@@ -198,7 +217,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         if ((!Internet.isConnected()) || (mToken == null))
             return false;
 
-        new Handler().post(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
 
@@ -222,7 +241,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 intent.putExtra(SYNCHRONIZATION_STATE, SYNCHRONIZATION_STATE_DONE);
                 sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
             }
-        });
+        }).start();
         return true;
     }
     public void logout() {

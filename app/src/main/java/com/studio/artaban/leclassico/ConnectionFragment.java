@@ -47,7 +47,7 @@ public class ConnectionFragment extends Fragment {
 
     public void display(Activity activity, String pseudo, String password) {
 
-        Logs.add(Logs.Type.V, null);
+        Logs.add(Logs.Type.V, "activity: " + activity + ";pseudo: " + pseudo);// + ";password: " + password);
         mPseudo = pseudo;
         mPassword = password;
 
