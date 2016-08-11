@@ -231,7 +231,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
-        startActivityForResult(intent, Requests.MAIN_2_INTRO.CODE,
+        startActivityForResult(intent, Requests.MAIN_TO_INTRO.CODE,
                 ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
@@ -1005,10 +1005,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         Logs.add(Logs.Type.V, "requestCode: " + requestCode + ", resultCode: " + resultCode);
         switch (requestCode) {
 
-            case Requests.MAIN_2_INTRO.CODE: { // Main activity result
+            case Requests.MAIN_TO_INTRO.CODE: { // Main activity result
                 switch (resultCode) {
 
-                    case Requests.MAIN_2_INTRO.RESULT_LOGOUT: {
+                    case Requests.MAIN_TO_INTRO.RESULT_LOGOUT: {
 
                         // Reset login data
                         ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
@@ -1018,6 +1018,17 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
 
                         //mDataService.get() != null ????
+                        /*
+                        try {
+                            mDataService.get().login(pseudo, null);
+                            startMainActivity(false, pseudo); ////// Start main activity (Offline)
+
+                        } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
+
+                            Logs.add(Logs.Type.F, e.getMessage());
+                            mProgressDialog.cancel();
+                        }
+                         */
 
 
 
@@ -1025,7 +1036,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
                         break;
                     }
-                    case Requests.MAIN_2_INTRO.RESULT_QUIT: {
+                    case Requests.MAIN_TO_INTRO.RESULT_QUIT: {
 
 
 
@@ -1034,7 +1045,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
 
                         //mDataService.get() != null ????
-                        quit(true);
+                        //quit(true);
 
 
 

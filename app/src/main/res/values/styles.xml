@@ -13,12 +13,22 @@
         <item name="colorAccent">@color/colorAccentMain</item>
 
     </style>
+    <style name="ProfileAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimaryProfile</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkProfile</item>
+        <item name="colorAccent">@color/colorAccentProfile</item>
+    </style>
     <style name="SettingAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimarySetting</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkSetting</item>
         <item name="colorAccent">@color/colorAccentSetting</item>
 
         <item name="android:textColorSecondary">@color/colorSecondaryText</item>
+    </style>
+    <style name="LocationAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimaryLocation</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkLocation</item>
+        <item name="colorAccent">@color/colorAccentLocation</item>
     </style>
 
     <!-- Custom theme -->
@@ -43,6 +53,10 @@
     <style name="IntroSelectableItemBackground">
         <item name="android:theme">@style/IntroAppTheme</item>
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
+    <style name="NavDrawerTextStyle" parent="Base.TextAppearance.AppCompat">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
     <!-- Main ActionBar theme -->

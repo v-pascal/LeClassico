@@ -6,9 +6,17 @@
     <color name="colorPrimaryDarkMain">#7b1fa2</color>
     <color name="colorAccentMain">#7c4dff</color>
 
+    <color name="colorPrimaryProfile">#009688</color>
+    <color name="colorPrimaryDarkProfile">#00796b</color>
+    <color name="colorAccentProfile">#4caf50</color>
+
     <color name="colorPrimarySetting">#ff5722</color>
     <color name="colorPrimaryDarkSetting">#e64a19</color>
     <color name="colorAccentSetting">#ffeb3b</color>
+
+    <color name="colorPrimaryLocation">#00bcd4</color>
+    <color name="colorPrimaryDarkLocation">#0097a7</color>
+    <color name="colorAccentLocation">#03a9f4</color>
 
     <!-- Colors -->
     <color name="green">#ff00ff00</color>

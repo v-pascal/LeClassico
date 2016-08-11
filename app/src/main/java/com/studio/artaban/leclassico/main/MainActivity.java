@@ -1,5 +1,8 @@
 package com.studio.artaban.leclassico.main;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -131,7 +134,9 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+
                 supportFinishAfterTransition();
+
 
 
 
@@ -177,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements
         // Set Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         // Set drawer toggle
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
@@ -191,12 +197,21 @@ public class MainActivity extends AppCompatActivity implements
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        // Add navigation listener
-        ((NavigationView) findViewById(R.id.nav_view)).setNavigationItemSelectedListener(this);
-
-
-
-
+        // Set navigation drawer
+        NavigationView navigation = (NavigationView) findViewById(R.id.nav_view);
+        navigation.setNavigationItemSelectedListener(this);
+        navigation.setItemTextAppearance(R.style.NavDrawerTextStyle);
+        navigation.setItemIconTintList(null);
+        navigation.getMenu().findItem(R.id.navig_profile).getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorAccentProfile), PorterDuff.Mode.SRC_ATOP);
+        navigation.getMenu().findItem(R.id.navig_location).getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorAccentLocation), PorterDuff.Mode.SRC_ATOP);
+        navigation.getMenu().findItem(R.id.navig_settings).getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorPrimarySetting), PorterDuff.Mode.SRC_ATOP);
+        navigation.getMenu().findItem(R.id.navig_logout).getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorPrimaryMain), PorterDuff.Mode.SRC_ATOP);
+        navigation.getMenu().findItem(R.id.navig_quit).getIcon()
+                .setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 
 
 
@@ -213,11 +228,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
          */
-
-
-
-
-
 
 
 

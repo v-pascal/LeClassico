@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/navig_profile"
-        android:icon="@drawable/ic_person_black_36dp"
-        android:title="@string/nav_profile" />
-    <item
-        android:id="@+id/navig_location"
-        android:icon="@drawable/ic_location_on_black_36dp"
-        android:title="@string/nav_location" />
-    <item
-        android:id="@+id/navig_settings"
-        android:icon="@drawable/ic_settings_black_36dp"
-        android:title="@string/nav_settings" />
-    <item
-        android:id="@+id/navig_logout"
-        android:icon="@drawable/ic_arrow_back_black_36dp"
-        android:title="@string/nav_logout" />
-    <item
-        android:id="@+id/navig_quit"
-        android:icon="@drawable/ic_cancel_black_36dp"
-        android:title="@string/nav_exit" />
+    <group android:id="@+id/groupA" android:checkableBehavior="single" >
+        <item
+            android:id="@+id/navig_profile"
+            android:icon="@drawable/ic_person_white_36dp"
+            android:title="@string/nav_profile" />
+        <item
+            android:id="@+id/navig_location"
+            android:icon="@drawable/ic_location_on_white_36dp"
+            android:title="@string/nav_location" />
+
+    </group>
+    <group android:id="@+id/groupB" android:checkableBehavior="single" >
+        <item
+            android:id="@+id/navig_settings"
+            android:icon="@drawable/ic_settings_white_36dp"
+            android:title="@string/nav_settings" />
+    </group>
+    <group android:id="@+id/groupC" android:checkableBehavior="single" >
+        <item
+            android:id="@+id/navig_logout"
+            android:icon="@drawable/ic_arrow_back_white_36dp"
+            android:title="@string/nav_logout" />
+        <item
+            android:id="@+id/navig_quit"
+            android:icon="@drawable/ic_cancel_white_36dp"
+            android:title="@string/nav_exit" />
+    </group>
 </menu>
