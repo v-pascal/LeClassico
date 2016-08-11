@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+
+
+                android:background="@color/red"
+
+
+                android:layout_height="192dp"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <!-- Banner -->
+    <ImageView
+        android:id="@+id/image_banner"
+        android:layout_width="match_parent"
+        android:layout_height="144dp"
+        android:scaleType="centerCrop"
+
+
+
+        android:src="@drawable/banner"
+
+
+
+
+        android:layout_alignParentTop="true"/>
+
+    <!-- Profile -->
+    <ImageView
+        android:id="@+id/image_profile"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+
+
+
+        android:src="@drawable/man"
+        android:background="@drawable/profile_border"
+
+
+
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Pseudo -->
+    <TextView
+
+
+        android:text="Pascal"
+
+        android:layout_marginTop="48dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

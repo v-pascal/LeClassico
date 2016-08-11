@@ -7,6 +7,8 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.codes.Errors;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -62,7 +64,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     // action.STATUS_SYNCHRONIZATION
     public static final String SYNCHRONIZATION_STATE = "synchronizationState"; // State == processing table Id
-    public static final byte SYNCHRONIZATION_STATE_DONE = Constants.DATA_LAST_TABLE_ID + 1;
+    public static final byte SYNCHRONIZATION_STATE_DONE = Tables.ID_LAST + 1;
 
     ////// OnConnectivityListener
     @Override
@@ -168,14 +170,14 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                             } else switch ((byte)reply.getInt(Constants.WEBSERVICE_JSON_ERROR)) {
 
                                 // Error
-                                case Constants.WEBSERVICE_ERROR_LOGIN_FAILED:
+                                case Errors.WEBSERVICE_LOGIN_FAILED:
                                     Logs.add(Logs.Type.W, "Login failed");
                                     result = CONNECTION_STATE_LOGIN_FAILED;
                                     break;
 
-                                case Constants.WEBSERVICE_ERROR_SERVER_UNAVAILABLE:
-                                case Constants.WEBSERVICE_ERROR_INVALID_LOGIN:
-                                case Constants.WEBSERVICE_ERROR_SYSTEM_DATE:
+                                case Errors.WEBSERVICE_SERVER_UNAVAILABLE:
+                                case Errors.WEBSERVICE_INVALID_LOGIN:
+                                case Errors.WEBSERVICE_SYSTEM_DATE:
                                     Logs.add(Logs.Type.E, "Connection error: #" +
                                             reply.getInt(Constants.WEBSERVICE_JSON_ERROR));
                                     break;
@@ -222,7 +224,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             @Override
             public void run() {
 
-                for (byte tableId = 1; tableId < Constants.DATA_LAST_TABLE_ID; ++tableId) {
+                for (byte tableId = 1; tableId < Tables.ID_LAST; ++tableId) {
 
                     Intent intent = new Intent(STATUS_SYNCHRONIZATION);
                     if (!Database.synchronize(tableId, getContentResolver())) {

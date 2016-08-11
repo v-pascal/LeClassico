@@ -44,11 +44,11 @@
     <string name="mnu_quit">Quitter</string>
     <string name="mnu_about">A propos</string><!-- Connection -->
 
-    <string name="mnu_profile">Profil</string>
-    <string name="mnu_location">Géolocation</string>
-    <string name="mnu_settings">Paramètres</string>
-    <string name="mnu_logout">Déconnexion</string>
-    <string name="mnu_exit">Quitter</string><!-- Main navigation -->
+    <string name="nav_profile">Profil</string>
+    <string name="nav_location">Géolocation</string>
+    <string name="nav_settings">Paramètres</string>
+    <string name="nav_logout">Déconnexion</string>
+    <string name="nav_exit">Quitter</string><!-- Main navigation -->
 
     <!-- Pages -->
     <string-array name="main_pages">

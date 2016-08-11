@@ -15,32 +15,17 @@ public final class Constants {
     public static final String APP_WEBSITE = "http://www.leclassico.fr"; // Social network application web site
     public static final String APP_URI_COMPANY = "studio.artaban"; // Application company URI
     public static final String APP_URI = "leclassico"; // Application URI
+    public static final String APP_WEBSERVICES = APP_WEBSITE + "/WebServices"; // LeClassico web services URL
 
     // Preferences
     public static final String APP_PREFERENCE = APP_NAME + "Preferences";
     public static final String APP_PREFERENCE_INTRO_DONE = "introDone";
-
-    public static final String APP_WEBSERVICES = APP_WEBSITE + "/WebServices"; // LeClassico web services URL
 
 
     ////// Web services
     public static final String WEBSERVICE_CONNECTION = "/connexion.php"; // Connection web service
     public static final String WEBSERVICE_PUBLICATIONS = "/actualites.php"; // Publications web service
     public static final String WEBSERVICE_COMMENTS = "/commentaires.php"; // Comments web service
-
-    public static final byte WEBSERVICE_ERROR_SERVER_UNAVAILABLE = 1;
-    public static final byte WEBSERVICE_ERROR_LOGIN_FAILED = 2;
-    public static final byte WEBSERVICE_ERROR_TOKEN_EXPIRED = 3;
-    public static final byte WEBSERVICE_ERROR_INVALID_LOGIN = 4;
-    public static final byte WEBSERVICE_ERROR_SYSTEM_DATE = 5;
-    public static final byte WEBSERVICE_ERROR_INVALID_TOKEN = 6;
-    public static final byte WEBSERVICE_ERROR_INVALID_USER = 7;
-    public static final byte WEBSERVICE_ERROR_INVALID_PUBLICATION_ID = 8;
-    public static final byte WEBSERVICE_ERROR_REQUEST_PUBLICATION_DELETE = 9;
-    public static final byte WEBSERVICE_ERROR_REQUEST_PUBLICATION_INSERT = 10;
-    public static final byte WEBSERVICE_ERROR_REQUEST_COMMENT_DELETE = 11;
-    public static final byte WEBSERVICE_ERROR_REQUEST_COMMENT_INSERT = 12;
-    // Error codes
 
     public static final String WEBSERVICE_JSON_ERROR = "error";
     // JSON object error field (containing the web service error codes above)
@@ -86,22 +71,6 @@ public final class Constants {
 
     public static final String DATA_DELETE_SELECTION = DATA_COLUMN_SYNCHRONIZED + "=" + DataProvider.Synchronized.TO_DELETE;
     // Selection criteria to delete records from DB definitively
-
-    // Database table IDs
-    public static final byte DATA_TABLE_ID_CAMARADES = 1; // Always start with 1 (0 is reserved)
-    public static final byte DATA_TABLE_ID_ABONNEMENTS = 2;
-    public static final byte DATA_TABLE_ID_ACTUALITES = 3;
-    public static final byte DATA_TABLE_ID_ALBUMS = 4;
-    public static final byte DATA_TABLE_ID_COMMENTAIRES = 5;
-    public static final byte DATA_TABLE_ID_EVENEMENTS = 6;
-    public static final byte DATA_TABLE_ID_MESSAGERIE = 7;
-    public static final byte DATA_TABLE_ID_MUSIC = 8;
-    public static final byte DATA_TABLE_ID_PHOTOS = 9;
-    public static final byte DATA_TABLE_ID_PRESENTS = 10;
-    public static final byte DATA_TABLE_ID_VOTES = 11;
-    public static final byte DATA_TABLE_ID_NOTIFICATIONS = 12;
-
-    public static final byte DATA_LAST_TABLE_ID = DATA_TABLE_ID_NOTIFICATIONS;
 
 
     ////// Main

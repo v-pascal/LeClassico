@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
@@ -58,44 +59,32 @@ public class DataProvider extends ContentProvider {
 
         // Table requests
         URI_MATCHER_SINGLE = new UriMatcher(UriMatcher.NO_MATCH);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_CAMARADES);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, AbonnementsTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_ABONNEMENTS);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, ActualitesTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_ACTUALITES);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, AlbumsTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_ALBUMS);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, CommentairesTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_COMMENTAIRES);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, EvenementsTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_EVENEMENTS);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, MessagerieTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_MESSAGERIE);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, MusicTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_MUSIC);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, PhotosTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_PHOTOS);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_PRESENTS);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_VOTES);
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME + SINGLE_ROW,
-                Constants.DATA_TABLE_ID_NOTIFICATIONS);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME + SINGLE_ROW, Tables.ID_CAMARADES);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, AbonnementsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_ABONNEMENTS);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, ActualitesTable.TABLE_NAME + SINGLE_ROW, Tables.ID_ACTUALITES);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, AlbumsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_ALBUMS);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, CommentairesTable.TABLE_NAME + SINGLE_ROW, Tables.ID_COMMENTAIRES);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, EvenementsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_EVENEMENTS);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, MessagerieTable.TABLE_NAME + SINGLE_ROW, Tables.ID_MESSAGERIE);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, MusicTable.TABLE_NAME + SINGLE_ROW, Tables.ID_MUSIC);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, PhotosTable.TABLE_NAME + SINGLE_ROW, Tables.ID_PHOTOS);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_PRESENTS);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME + SINGLE_ROW, Tables.ID_VOTES);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_NOTIFICATIONS);
 
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME, Constants.DATA_TABLE_ID_CAMARADES);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, AbonnementsTable.TABLE_NAME, Constants.DATA_TABLE_ID_ABONNEMENTS);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, ActualitesTable.TABLE_NAME, Constants.DATA_TABLE_ID_ACTUALITES);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, AlbumsTable.TABLE_NAME, Constants.DATA_TABLE_ID_ALBUMS);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, CommentairesTable.TABLE_NAME, Constants.DATA_TABLE_ID_COMMENTAIRES);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, EvenementsTable.TABLE_NAME, Constants.DATA_TABLE_ID_EVENEMENTS);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, MessagerieTable.TABLE_NAME, Constants.DATA_TABLE_ID_MESSAGERIE);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, MusicTable.TABLE_NAME, Constants.DATA_TABLE_ID_MUSIC);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PhotosTable.TABLE_NAME, Constants.DATA_TABLE_ID_PHOTOS);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME, Constants.DATA_TABLE_ID_PRESENTS);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME, Constants.DATA_TABLE_ID_VOTES);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME, Constants.DATA_TABLE_ID_NOTIFICATIONS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME, Tables.ID_CAMARADES);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, AbonnementsTable.TABLE_NAME, Tables.ID_ABONNEMENTS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, ActualitesTable.TABLE_NAME, Tables.ID_ACTUALITES);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, AlbumsTable.TABLE_NAME, Tables.ID_ALBUMS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, CommentairesTable.TABLE_NAME, Tables.ID_COMMENTAIRES);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, EvenementsTable.TABLE_NAME, Tables.ID_EVENEMENTS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, MessagerieTable.TABLE_NAME, Tables.ID_MESSAGERIE);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, MusicTable.TABLE_NAME, Tables.ID_MUSIC);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PhotosTable.TABLE_NAME, Tables.ID_PHOTOS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME, Tables.ID_PRESENTS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME, Tables.ID_VOTES);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME, Tables.ID_NOTIFICATIONS);
     }
 
     //
@@ -113,18 +102,18 @@ public class DataProvider extends ContentProvider {
         Logs.add(Logs.Type.V, "matcher: " + matcher + " uri: " + uri);
         switch (matcher.match(uri)) {
 
-            case Constants.DATA_TABLE_ID_CAMARADES: return CamaradesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ABONNEMENTS: return AbonnementsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ACTUALITES: return ActualitesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ALBUMS: return AlbumsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_COMMENTAIRES: return CommentairesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_EVENEMENTS: return EvenementsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_MESSAGERIE: return MessagerieTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_MUSIC: return MusicTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_PHOTOS: return PhotosTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_PRESENTS: return PresentsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_VOTES: return VotesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_NOTIFICATIONS: return NotificationsTable.TABLE_NAME;
+            case Tables.ID_CAMARADES: return CamaradesTable.TABLE_NAME;
+            case Tables.ID_ABONNEMENTS: return AbonnementsTable.TABLE_NAME;
+            case Tables.ID_ACTUALITES: return ActualitesTable.TABLE_NAME;
+            case Tables.ID_ALBUMS: return AlbumsTable.TABLE_NAME;
+            case Tables.ID_COMMENTAIRES: return CommentairesTable.TABLE_NAME;
+            case Tables.ID_EVENEMENTS: return EvenementsTable.TABLE_NAME;
+            case Tables.ID_MESSAGERIE: return MessagerieTable.TABLE_NAME;
+            case Tables.ID_MUSIC: return MusicTable.TABLE_NAME;
+            case Tables.ID_PHOTOS: return PhotosTable.TABLE_NAME;
+            case Tables.ID_PRESENTS: return PresentsTable.TABLE_NAME;
+            case Tables.ID_VOTES: return VotesTable.TABLE_NAME;
+            case Tables.ID_NOTIFICATIONS: return NotificationsTable.TABLE_NAME;
         }
         return null;
     }
@@ -168,32 +157,32 @@ public class DataProvider extends ContentProvider {
 
         Logs.add(Logs.Type.V, null);
         switch (URI_MATCHER_SINGLE.match(uri)) {
-            case Constants.DATA_TABLE_ID_CAMARADES: return MIME_TYPE_SINGLE + CamaradesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ABONNEMENTS: return MIME_TYPE_SINGLE + AbonnementsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ACTUALITES: return MIME_TYPE_SINGLE + ActualitesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ALBUMS: return MIME_TYPE_SINGLE + AlbumsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_COMMENTAIRES: return MIME_TYPE_SINGLE + CommentairesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_EVENEMENTS: return MIME_TYPE_SINGLE + EvenementsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_MESSAGERIE: return MIME_TYPE_SINGLE + MessagerieTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_MUSIC: return MIME_TYPE_SINGLE + MusicTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_PHOTOS: return MIME_TYPE_SINGLE + PhotosTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_PRESENTS: return MIME_TYPE_SINGLE + PresentsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_VOTES: return MIME_TYPE_SINGLE + VotesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_NOTIFICATIONS: return MIME_TYPE_SINGLE + NotificationsTable.TABLE_NAME;
+            case Tables.ID_CAMARADES: return MIME_TYPE_SINGLE + CamaradesTable.TABLE_NAME;
+            case Tables.ID_ABONNEMENTS: return MIME_TYPE_SINGLE + AbonnementsTable.TABLE_NAME;
+            case Tables.ID_ACTUALITES: return MIME_TYPE_SINGLE + ActualitesTable.TABLE_NAME;
+            case Tables.ID_ALBUMS: return MIME_TYPE_SINGLE + AlbumsTable.TABLE_NAME;
+            case Tables.ID_COMMENTAIRES: return MIME_TYPE_SINGLE + CommentairesTable.TABLE_NAME;
+            case Tables.ID_EVENEMENTS: return MIME_TYPE_SINGLE + EvenementsTable.TABLE_NAME;
+            case Tables.ID_MESSAGERIE: return MIME_TYPE_SINGLE + MessagerieTable.TABLE_NAME;
+            case Tables.ID_MUSIC: return MIME_TYPE_SINGLE + MusicTable.TABLE_NAME;
+            case Tables.ID_PHOTOS: return MIME_TYPE_SINGLE + PhotosTable.TABLE_NAME;
+            case Tables.ID_PRESENTS: return MIME_TYPE_SINGLE + PresentsTable.TABLE_NAME;
+            case Tables.ID_VOTES: return MIME_TYPE_SINGLE + VotesTable.TABLE_NAME;
+            case Tables.ID_NOTIFICATIONS: return MIME_TYPE_SINGLE + NotificationsTable.TABLE_NAME;
         }
         switch (URI_MATCHER.match(uri)) {
-            case Constants.DATA_TABLE_ID_CAMARADES: return MIME_TYPE + CamaradesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ABONNEMENTS: return MIME_TYPE + AbonnementsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ACTUALITES: return MIME_TYPE + ActualitesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_ALBUMS: return MIME_TYPE + AlbumsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_COMMENTAIRES: return MIME_TYPE + CommentairesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_EVENEMENTS: return MIME_TYPE + EvenementsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_MESSAGERIE: return MIME_TYPE + MessagerieTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_MUSIC: return MIME_TYPE + MusicTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_PHOTOS: return MIME_TYPE + PhotosTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_PRESENTS: return MIME_TYPE + PresentsTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_VOTES: return MIME_TYPE + VotesTable.TABLE_NAME;
-            case Constants.DATA_TABLE_ID_NOTIFICATIONS: return MIME_TYPE + NotificationsTable.TABLE_NAME;
+            case Tables.ID_CAMARADES: return MIME_TYPE + CamaradesTable.TABLE_NAME;
+            case Tables.ID_ABONNEMENTS: return MIME_TYPE + AbonnementsTable.TABLE_NAME;
+            case Tables.ID_ACTUALITES: return MIME_TYPE + ActualitesTable.TABLE_NAME;
+            case Tables.ID_ALBUMS: return MIME_TYPE + AlbumsTable.TABLE_NAME;
+            case Tables.ID_COMMENTAIRES: return MIME_TYPE + CommentairesTable.TABLE_NAME;
+            case Tables.ID_EVENEMENTS: return MIME_TYPE + EvenementsTable.TABLE_NAME;
+            case Tables.ID_MESSAGERIE: return MIME_TYPE + MessagerieTable.TABLE_NAME;
+            case Tables.ID_MUSIC: return MIME_TYPE + MusicTable.TABLE_NAME;
+            case Tables.ID_PHOTOS: return MIME_TYPE + PhotosTable.TABLE_NAME;
+            case Tables.ID_PRESENTS: return MIME_TYPE + PresentsTable.TABLE_NAME;
+            case Tables.ID_VOTES: return MIME_TYPE + VotesTable.TABLE_NAME;
+            case Tables.ID_NOTIFICATIONS: return MIME_TYPE + NotificationsTable.TABLE_NAME;
             default:
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
         }

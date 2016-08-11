@@ -1,8 +1,12 @@
 package com.studio.artaban.leclassico.main;
 
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -26,7 +30,8 @@ import com.studio.artaban.leclassico.helpers.Logs;
  * Created by pascal on 08/08/16.
  * Main activity class
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+                                                NavigationView.OnNavigationItemSelectedListener {
 
     public static final String EXTRA_DATA_KEY_ONLINE = "online";
     public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
@@ -102,7 +107,67 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //////
+
+
+
+
+
+
+    private int mNavItemSelected = Constants.NO_DATA; // Id of the selected navigation item (or -1 if none)
+    private void onSelectNavItem() {
+
+        Logs.add(Logs.Type.V, "mNavItemSelected: " + mNavItemSelected);
+        switch (mNavItemSelected) {
+            case R.id.navig_profile: {
+                break;
+            }
+            case R.id.navig_location: {
+                break;
+            }
+            case R.id.navig_settings: {
+                break;
+            }
+            case R.id.navig_logout: {
+
+
+
+                supportFinishAfterTransition();
+
+
+
+
+                break;
+            }
+            case R.id.navig_quit: {
+
+
+
+
+
+
+
+                break;
+            }
+        }
+        mNavItemSelected = Constants.NO_DATA;
+    }
+
+    ////// OnNavigationItemSelectedListener
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+
+        Logs.add(Logs.Type.V, "item: " + item);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer != null)
+            drawer.closeDrawer(GravityCompat.START);
+
+        mNavItemSelected = item.getItemId();
+        // Let's drawer close event do the job (more efficient)
+
+        return true;
+    }
+
+    ////// AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +177,44 @@ public class MainActivity extends AppCompatActivity {
         // Set Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        // Set drawer toggle
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+            @Override
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                onSelectNavItem();
+            }
+        };
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        // Add navigation listener
+        ((NavigationView) findViewById(R.id.nav_view)).setNavigationItemSelectedListener(this);
+
+
+
+
+
+
+
+
+
+        /*
+        Glide.with(context).load(url).asBitmap().centerCrop().into(new BitmapImageViewTarget(imageView) {
+            @Override
+            protected void setResource(Bitmap resource) {
+                RoundedBitmapDrawable circularBitmapDrawable =
+                        RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                circularBitmapDrawable.setCornerRadius(0.25f);
+                imageView.setImageDrawable(circularBitmapDrawable);
+            }
+        });
+         */
+
+
 
 
 
@@ -141,11 +244,21 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
+
+
+
     }
 
     @Override
     public void onBackPressed() {
         Logs.add(Logs.Type.V, null);
-        moveTaskToBack(true); // Put application in pause
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if ((drawer != null) && (drawer.isDrawerOpen(GravityCompat.START)))
+            drawer.closeDrawer(GravityCompat.START); // Close drawer
+        else
+            moveTaskToBack(true); // Put application in pause
     }
 }

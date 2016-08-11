@@ -11,6 +11,7 @@
         <item name="colorPrimary">@color/colorPrimaryMain</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkMain</item>
         <item name="colorAccent">@color/colorAccentMain</item>
+
     </style>
     <style name="SettingAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimarySetting</item>

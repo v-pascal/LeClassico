@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
@@ -58,29 +59,29 @@ public class Database extends SQLiteOpenHelper {
         Logs.add(Logs.Type.V, "tableId: " + tableId);
         switch (tableId) {
 
-            case Constants.DATA_TABLE_ID_CAMARADES:
+            case Tables.ID_CAMARADES:
                 return ((CamaradesTable)Database.getTable(CamaradesTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_ABONNEMENTS:
+            case Tables.ID_ABONNEMENTS:
                 return ((AbonnementsTable)Database.getTable(AbonnementsTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_ACTUALITES:
+            case Tables.ID_ACTUALITES:
                 return ((ActualitesTable)Database.getTable(ActualitesTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_ALBUMS:
+            case Tables.ID_ALBUMS:
                 return ((AlbumsTable)Database.getTable(AlbumsTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_COMMENTAIRES:
+            case Tables.ID_COMMENTAIRES:
                 return ((CommentairesTable)Database.getTable(CommentairesTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_EVENEMENTS:
+            case Tables.ID_EVENEMENTS:
                 return ((EvenementsTable)Database.getTable(EvenementsTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_MESSAGERIE:
+            case Tables.ID_MESSAGERIE:
                 return ((MessagerieTable)Database.getTable(MessagerieTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_MUSIC:
+            case Tables.ID_MUSIC:
                 return ((MusicTable)Database.getTable(MusicTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_PHOTOS:
+            case Tables.ID_PHOTOS:
                 return ((PhotosTable)Database.getTable(PhotosTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_PRESENTS:
+            case Tables.ID_PRESENTS:
                 return ((PresentsTable)Database.getTable(PresentsTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_VOTES:
+            case Tables.ID_VOTES:
                 return ((VotesTable)Database.getTable(VotesTable.TABLE_NAME)).synchronize(contentResolver);
-            case Constants.DATA_TABLE_ID_NOTIFICATIONS:
+            case Tables.ID_NOTIFICATIONS:
                 return ((NotificationsTable)Database.getTable(NotificationsTable.TABLE_NAME)).synchronize(contentResolver);
             default:
                 throw new IllegalArgumentException("Unexpected table ID: " + tableId);

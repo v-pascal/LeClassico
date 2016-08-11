@@ -40,6 +40,8 @@ import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.codes.Requests;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.main.MainActivity;
 import com.studio.artaban.leclassico.tools.SizeUtils;
@@ -115,10 +117,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
                     .translationX(0f);
         }
     }
-    private void quit() { // Quit application (stop service)
+    private void quit(boolean displayIntro) { // Quit application (stop service)
 
         Logs.add(Logs.Type.V, null);
-        mIntroDone = false;
+        mIntroDone = displayIntro;
 
         if (DataService.isRunning())
             stopService(new Intent(this, DataService.class));
@@ -226,17 +228,14 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         mConnectionFragment.cancel();
         mProgressDialog.cancel();
 
-        // Reset login data (needed at back)
-        ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
-        ((EditText)findViewById(R.id.edit_password)).getText().clear();
-
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
-        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        startActivityForResult(intent, Requests.MAIN_2_INTRO.CODE,
+                ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
-    ////// OnProgressListener
+    ////// OnProgressListener //////////////////////////////////////////////////////////////////////
     @Override
     public void onPreExecute() {
 
@@ -343,7 +342,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
                     Logs.add(Logs.Type.I, "Data synchronization");
 
                     // Data synchronization
-                    mProgressMessage = getString(R.string.data_synchro, 1, Constants.DATA_LAST_TABLE_ID);
+                    mProgressMessage = getString(R.string.data_synchro, 1, Tables.ID_LAST);
                     mProgressDialog.setMessage(mProgressMessage);
                     try {
                         if (!mDataService.get().synchronize())
@@ -379,8 +378,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
                         break;
                     }
                     default: {
-                        mProgressMessage = getString(R.string.data_synchro, synchroState,
-                                Constants.DATA_LAST_TABLE_ID);
+                        mProgressMessage = getString(R.string.data_synchro, synchroState,Tables.ID_LAST);
                         mProgressDialog.setMessage(mProgressMessage);
                         break;
                     }
@@ -430,7 +428,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
     private LimitlessViewPager mViewPager; // Introduction view pager component
     private boolean mIntroDone; // Introduction flag
 
-    ////// AppCompatActivity
+    ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -590,7 +588,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
             // Translation ratio of the location representation elements (markers): follow map.
 
             private void anim(boolean toTheLeft, View page, float position) {
-            // Apply animation to the representation images
+                // Apply animation to the representation images
 
                 //Logs.add(Logs.Type.V, "toTheLeft: " + toTheLeft + ";page: " + page +
                 //        ";position: " + position);
@@ -619,7 +617,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
                     TypedValue translateRatio = new TypedValue();
                     getResources().getValue(R.dimen.translation_ratio, translateRatio, true);
-                    position *=  translateRatio.getFloat();
+                    position *= translateRatio.getFloat();
 
                     ////// Welcome: scroll elements!
                     ImageView light1 = (ImageView) page.findViewById(R.id.image_light1);
@@ -849,7 +847,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            // Display or hide panel controls according current scroll position
+                // Display or hide panel controls according current scroll position
 
                 //Logs.add(Logs.Type.V, "position: " + position);
                 switch (position) {
@@ -901,33 +899,6 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
             }
         });
-
-
-
-
-
-
-
-
-
-
-
-
-        ((EditText)findViewById(R.id.edit_pseudo)).setText("pascal");
-        ((EditText)findViewById(R.id.edit_password)).setText("ras34");
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     @Override
@@ -945,6 +916,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
                 filter.addAction(DataService.STATUS_SYNCHRONIZATION);
                 IntroActivity.this.registerReceiver(mDataReceiver, filter);
             }
+
         }); // Bind data service
     }
 
@@ -980,7 +952,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
             }
             case R.id.menu_quit: {
 
-                quit();
+                quit(false);
                 return true;
             }
             case R.id.menu_help: {
@@ -1024,6 +996,58 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
         //Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        Logs.add(Logs.Type.V, "requestCode: " + requestCode + ", resultCode: " + resultCode);
+        switch (requestCode) {
+
+            case Requests.MAIN_2_INTRO.CODE: { // Main activity result
+                switch (resultCode) {
+
+                    case Requests.MAIN_2_INTRO.RESULT_LOGOUT: {
+
+                        // Reset login data
+                        ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
+                        ((EditText)findViewById(R.id.edit_password)).getText().clear();
+
+
+
+
+                        //mDataService.get() != null ????
+
+
+
+
+
+                        break;
+                    }
+                    case Requests.MAIN_2_INTRO.RESULT_QUIT: {
+
+
+
+
+
+
+
+                        //mDataService.get() != null ????
+                        quit(true);
+
+
+
+
+
+
+
+
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     @Override
