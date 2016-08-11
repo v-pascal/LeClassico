@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico;
+package com.studio.artaban.leclassico.main;
 
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 

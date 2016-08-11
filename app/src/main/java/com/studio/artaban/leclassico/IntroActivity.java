@@ -41,6 +41,7 @@ import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.main.MainActivity;
 import com.studio.artaban.leclassico.tools.SizeUtils;
 
 /**
