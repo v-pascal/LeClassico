@@ -35,6 +35,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.connection.DataService;
@@ -50,7 +51,8 @@ import com.studio.artaban.leclassico.tools.SizeUtils;
  * Created by pascal on 15/07/16.
  * Introduction & connection activity class
  */
-public class IntroActivity extends AppCompatActivity implements ConnectionFragment.OnProgressListener {
+public class IntroActivity extends AppCompatActivity implements
+        ConnectionFragment.OnProgressListener, ServiceBinder.OnServiceListener {
 
     private static final String DATA_KEY_INTRO_DISPLAYED = "introDisplayed";
 
@@ -124,7 +126,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
         if (DataService.isRunning())
             stopService(new Intent(this, DataService.class));
-            // NB: Will call "DataService.stop" method when the service connection will disconnect
+            // NB: This will call "DataService.stop" method when the service connection will disconnect
             //     (see "onServiceDisconnected" in "ServiceBinder" class), and this B4 the service
             //     is stopped. No need to call "DataService.stop" method here.
 
@@ -261,15 +263,8 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
                 break;
             }
             case ConnectionFragment.STEP_LOGIN: {
-                try {
-                    if (!mDataService.get().login(pseudo, password))
-                        displayError(false, R.string.no_internet);
-                } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
-
-                    Logs.add(Logs.Type.F, e.getMessage());
-                    displayError(true, R.string.service_unavailable);
-                    return false;
-                }
+                if (!mDataService.get().login(pseudo, password))
+                    displayError(false, R.string.no_internet);
                 break;
             }
             case ConnectionFragment.STEP_LOGIN_FAILED: {
@@ -288,15 +283,9 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
         Logs.add(Logs.Type.V, "result: " + result + ";pseudo: " + pseudo);
         if (result) { // Login succeeded
-            try {
-                mDataService.get().login(pseudo, null);
-                startMainActivity(false, pseudo); ////// Start main activity (Offline)
 
-            } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
-
-                Logs.add(Logs.Type.F, e.getMessage());
-                mProgressDialog.cancel();
-            }
+            mDataService.get().login(pseudo, null);
+            startMainActivity(false, pseudo); ////// Start main activity (Offline)
         }
     }
 
@@ -328,7 +317,24 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         mErrorDialog.show();
     }
 
+    ////// OnServiceListener ///////////////////////////////////////////////////////////////////////
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
+
+    @Override
+    public void onServiceDisconnected() {
+
+        Logs.add(Logs.Type.V, null);
+        mConnectionFragment.cancel();
+        mProgressDialog.cancel();
+        mErrorDialog.cancel();
+
+        // Inform user of this critical error then quit application (this will restart data service)
+        Toast.makeText(this, R.string.service_unavailable, Toast.LENGTH_LONG).show();
+        quit(mIntroDone);
+    }
+
+    //////
+    private final DataReceiver mDataReceiver = new DataReceiver();
     private class DataReceiver extends BroadcastReceiver { // Data receiver
 
         @Override
@@ -344,15 +350,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
                     // Data synchronization
                     mProgressMessage = getString(R.string.data_synchro, 1, Tables.ID_LAST);
                     mProgressDialog.setMessage(mProgressMessage);
-                    try {
-                        if (!mDataService.get().synchronize())
-                            throw new NullPointerException("Internet connection lost");
-                            // Should not happen between the connection and this call! Elapsed time too short.
-
-                    } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
-
-                        Logs.add(Logs.Type.F, e.getMessage());
-                        displayError(true, R.string.service_unavailable);
+                    if (!mDataService.get().synchronize()) {
+                        // Should not happen between the connection and this call! Elapsed time too short.
+                        Logs.add(Logs.Type.W, "Internet connection lost");
+                        displayError(true, R.string.webservice_error);
                     }
 
                 } else {
@@ -386,7 +387,6 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
             }
         }
     };
-    private final DataReceiver mDataReceiver = new DataReceiver();
 
     //
     public void onNextStep(View sender) { // Next step click event
@@ -899,6 +899,37 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
 
             }
         });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ((EditText)findViewById(R.id.edit_pseudo)).setText("pascal");
+        ((EditText)findViewById(R.id.edit_password)).setText("ras34");
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     @Override
@@ -906,18 +937,16 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         super.onResume();
 
         Logs.add(Logs.Type.V, null);
-        mDataService.bind(this, new ServiceBinder.OnBoundListener() {
-            @Override
-            public void onServiceConnected() {
+        if (mDataService.bind(this, this)) { // Bind data service
 
-                // Register broadcast receiver HERE coz data service connection needed...
-                IntentFilter filter = new IntentFilter();
-                filter.addAction(DataService.STATUS_CONNECTION); // ...for THIS action (see receiver)
-                filter.addAction(DataService.STATUS_SYNCHRONIZATION);
-                IntroActivity.this.registerReceiver(mDataReceiver, filter);
-            }
-
-        }); // Bind data service
+            // Register broadcast receiver HERE coz data service connection needed...
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(DataService.STATUS_CONNECTION); // ...for THIS action (see receiver)
+            filter.addAction(DataService.STATUS_SYNCHRONIZATION);
+            registerReceiver(mDataReceiver, filter);
+        }
+        else
+            onServiceDisconnected();
     }
 
     @Override
@@ -1005,7 +1034,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
         Logs.add(Logs.Type.V, "requestCode: " + requestCode + ", resultCode: " + resultCode);
         switch (requestCode) {
 
-            case Requests.MAIN_TO_INTRO.CODE: { // Main activity result
+            case Requests.MAIN_TO_INTRO.CODE: { ////// Main activity result ////////////////////////
                 switch (resultCode) {
 
                     case Requests.MAIN_TO_INTRO.RESULT_LOGOUT: {
@@ -1014,46 +1043,24 @@ public class IntroActivity extends AppCompatActivity implements ConnectionFragme
                         ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
                         ((EditText)findViewById(R.id.edit_password)).getText().clear();
 
-
-
-
-                        //mDataService.get() != null ????
-                        /*
-                        try {
-                            mDataService.get().login(pseudo, null);
-                            startMainActivity(false, pseudo); ////// Start main activity (Offline)
-
-                        } catch (NullPointerException e) { // Can occurred if service stopped unexpectedly
-
-                            Logs.add(Logs.Type.F, e.getMessage());
-                            mProgressDialog.cancel();
-                        }
-                         */
-
-
-
-
-
+                        // Logout from service
+                        if (mDataService.bind(this, this))
+                            mDataService.get().logout();
+                        else
+                            onServiceDisconnected();
                         break;
                     }
                     case Requests.MAIN_TO_INTRO.RESULT_QUIT: {
 
-
-
-
-
-
-
-                        //mDataService.get() != null ????
-                        //quit(true);
-
-
-
-
-
-
-
-
+                        // Bind data service B4 quit application (see comment in "quit" method)
+                        if (mDataService.bind(this, this))
+                            quit(true);
+                        else
+                            onServiceDisconnected();
+                        break;
+                    }
+                    default: {
+                        Logs.add(Logs.Type.F, "Unexpected result: " + requestCode);
                         break;
                     }
                 }

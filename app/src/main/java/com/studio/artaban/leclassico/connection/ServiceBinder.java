@@ -22,15 +22,16 @@ public class ServiceBinder {
     private ServiceConnection mConnection;
 
     //////
-    public interface OnBoundListener {
-        void onServiceConnected();
+    public interface OnServiceListener {
+        void onServiceDisconnected();
     };
-    public void bind(Activity activity, final OnBoundListener listener) {
+    public boolean bind(Activity activity, final OnServiceListener listener) {
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";listener: " + listener);
         if (mBound) {
-            Logs.add(Logs.Type.E, "Data service already bound");
-            return;
+
+            Logs.add(Logs.Type.W, "Data service already bound");
+            return true; // Already bound
         }
         mBound = true;
 
@@ -40,22 +41,22 @@ public class ServiceBinder {
 
                 Logs.add(Logs.Type.V, "name: " + name + ";binder: " + binder);
                 mDataService = ((DataService.DataBinder)binder).getService();
-                if (listener != null)
-                    listener.onServiceConnected();
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
 
                 Logs.add(Logs.Type.W, "name: " + name);
-                if (mDataService != null) {
+                if (DataService.isRunning()) {
+                    if (listener != null)
+                        listener.onServiceDisconnected();
+
                     mDataService.stop();
-                    mDataService = null;
                 }
             }
         };
         Intent bindIntent = new Intent(activity, DataService.class);
-        activity.bindService(bindIntent, mConnection, Context.BIND_ADJUST_WITH_ACTIVITY);
+        return activity.bindService(bindIntent, mConnection, Context.BIND_ADJUST_WITH_ACTIVITY);
     }
     public void unbind(Activity activity) {
 
@@ -63,7 +64,9 @@ public class ServiceBinder {
         if (mBound) {
             activity.unbindService(mConnection);
             mBound = false;
-        }
+
+        } else
+            Logs.add(Logs.Type.W, "Service not bound");
     }
 
     //

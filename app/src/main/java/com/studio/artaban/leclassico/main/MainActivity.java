@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -121,43 +122,42 @@ public class MainActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, "mNavItemSelected: " + mNavItemSelected);
         switch (mNavItemSelected) {
-            case R.id.navig_profile: {
+            case R.id.navig_profile: { // Display user profile
+
+
+
+
                 break;
             }
-            case R.id.navig_location: {
+            case R.id.navig_location: { // Display location activity
+
+
+
                 break;
             }
-            case R.id.navig_settings: {
+            case R.id.navig_settings: { // Display settings
+
+
+
                 break;
             }
-            case R.id.navig_logout: {
+            case R.id.navig_logout: { // Logout
 
-
-
-
+                setResult(Requests.MAIN_TO_INTRO.RESULT_LOGOUT);
                 supportFinishAfterTransition();
-
-
-
-
-
                 break;
             }
-            case R.id.navig_quit: {
+            case R.id.navig_quit: { // Quit application
 
-
-
-
-
-
-
+                setResult(Requests.MAIN_TO_INTRO.RESULT_QUIT);
+                supportFinishAfterTransition();
                 break;
             }
         }
         mNavItemSelected = Constants.NO_DATA;
     }
 
-    ////// OnNavigationItemSelectedListener
+    ////// OnNavigationItemSelectedListener ////////////////////////////////////////////////////////
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    ////// AppCompatActivity
+    ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

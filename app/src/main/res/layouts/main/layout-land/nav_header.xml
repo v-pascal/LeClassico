@@ -45,6 +45,13 @@
 
         android:text="Pascal"
 
+
+
+        android:background="@color/blue"
+        android:paddingBottom="6dp"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
         android:layout_toEndOf="@id/image_profile"
         android:layout_alignParentBottom="true"
         android:gravity="bottom"

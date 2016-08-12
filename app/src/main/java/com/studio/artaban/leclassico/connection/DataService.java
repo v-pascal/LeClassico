@@ -113,9 +113,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public void stop() {
 
         Logs.add(Logs.Type.V, null);
-        isRunning = false;
-
         logout();
+
+        isRunning = false;
     }
 
     private String mPseudo;
@@ -124,8 +124,12 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public boolean login(final String pseudo, final String password) {
 
         Logs.add(Logs.Type.V, "pseudo: " + pseudo);// + ";password: " + password);
-        mPseudo = pseudo;
+        if (!isRunning) {
+            Logs.add(Logs.Type.E, "Login failed: service stopped");
+            return false;
+        }
 
+        mPseudo = pseudo;
         if ((password == null) || (!Internet.isConnected()))
             return false; // Working offline, or online but connection lost
 
@@ -217,6 +221,10 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public boolean synchronize() {
 
         Logs.add(Logs.Type.V, null);
+        if (!isRunning) {
+            Logs.add(Logs.Type.E, "Synchronization failed: service stopped");
+            return false;
+        }
         if ((!Internet.isConnected()) || (mToken == null))
             return false;
 
@@ -251,17 +259,18 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public void logout() {
 
         Logs.add(Logs.Type.V, null);
+        if (!isRunning) {
+            Logs.add(Logs.Type.E, "Logout failed: service stopped");
+            return;
+        }
+
+
+
+
+
+
+
         mPseudo = null;
-
-
-
-
-
-
-
-
-
-
         mToken = null;
 
 
