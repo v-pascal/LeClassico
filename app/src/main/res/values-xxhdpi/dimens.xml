@@ -8,4 +8,8 @@
     <item name="limitless_rotation_ratio" format="float" type="dimen">0.007</item>
     <item name="translation_ratio" format="float" type="dimen">1.9</item>
 
+    <!-- Main -->
+    <item name="pseudo_shadow" format="float" type="dimen">2.5</item>
+    <item name="pseudo_radius" format="float" type="dimen">2.0</item>
+
 </resources>

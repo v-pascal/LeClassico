@@ -9,6 +9,7 @@ import android.os.IBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Errors;
 import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -56,15 +57,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final byte CONNECTION_STATE_LOGIN_FAILED = 2; // Constants.WEBSERVICE_ERROR_LOGIN_FAILED
     public static final byte CONNECTION_STATE_EXPIRED = 3; // Constants.WEBSERVICE_ERROR_TOKEN_EXPIRED
 
-    private static final String CONNECTION_DATA_POST_PSEUDO = "psd";
-    private static final String CONNECTION_DATA_POST_PASSWORD = "ccf";
-    private static final String CONNECTION_DATA_DATETIME = "odt";
-
-    private static final String CONNECTION_DATA_GET_TOKEN = "Clf";
-
     // action.STATUS_SYNCHRONIZATION
     public static final String SYNCHRONIZATION_STATE = "synchronizationState"; // State == processing table Id
     public static final byte SYNCHRONIZATION_STATE_DONE = Tables.ID_LAST + 1;
+
+    public static final String SYNCHRONIZATION_PSEUDO = "synchronizationPseudo"; // User pseudo data (from DB)
 
     ////// OnConnectivityListener
     @Override
@@ -149,9 +146,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 ContentValues data = new ContentValues();
-                data.put(CONNECTION_DATA_POST_PSEUDO, pseudo);
-                data.put(CONNECTION_DATA_POST_PASSWORD, password);
-                data.put(CONNECTION_DATA_DATETIME, dateFormat.format(now));
+                data.put(WebServices.CONNECTION_DATA_PSEUDO, pseudo);
+                data.put(WebServices.CONNECTION_DATA_PASSWORD, password);
+                data.put(WebServices.CONNECTION_DATA_DATETIME, dateFormat.format(now));
 
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
                         Constants.WEBSERVICE_CONNECTION, data, new Internet.OnRequestListener() {
@@ -161,17 +158,17 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         byte result = STATE_ERROR;
                         try {
                             JSONObject reply = new JSONObject(response);
-                            if (!reply.has(Constants.WEBSERVICE_JSON_ERROR)) { // Check no web service error
+                            if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
-                                JSONObject logged = reply.getJSONObject(Constants.WEBSERVICE_JSON_LOGGED);
-                                mPseudo = logged.getString(Constants.WEBSERVICE_JSON_PSEUDO);
-                                mToken = logged.getString(Constants.WEBSERVICE_JSON_TOKEN);
-                                mTimeLag = logged.getLong(Constants.WEBSERVICE_JSON_TIME_LAG);
+                                JSONObject logged = reply.getJSONObject(WebServices.JSON_KEY_LOGGED);
+                                mPseudo = logged.getString(WebServices.JSON_KEY_PSEUDO);
+                                mToken = logged.getString(WebServices.JSON_KEY_TOKEN);
+                                mTimeLag = logged.getLong(WebServices.JSON_KEY_TIME_LAG);
 
                                 Logs.add(Logs.Type.I, "Logged with time lag: " + mTimeLag);
                                 result = CONNECTION_STATE_CONNECTED;
 
-                            } else switch ((byte)reply.getInt(Constants.WEBSERVICE_JSON_ERROR)) {
+                            } else switch ((byte)reply.getInt(WebServices.JSON_KEY_ERROR)) {
 
                                 // Error
                                 case Errors.WEBSERVICE_LOGIN_FAILED:
@@ -183,7 +180,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                                 case Errors.WEBSERVICE_INVALID_LOGIN:
                                 case Errors.WEBSERVICE_SYSTEM_DATE:
                                     Logs.add(Logs.Type.E, "Connection error: #" +
-                                            reply.getInt(Constants.WEBSERVICE_JSON_ERROR));
+                                            reply.getInt(WebServices.JSON_KEY_ERROR));
                                     break;
                             }
 
@@ -250,6 +247,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 // Synchronization finished successfully
                 Intent intent = new Intent(STATUS_SYNCHRONIZATION);
                 intent.putExtra(SYNCHRONIZATION_STATE, SYNCHRONIZATION_STATE_DONE);
+                intent.putExtra(SYNCHRONIZATION_PSEUDO, mPseudo); // From remote DB
                 sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
             }
 

@@ -44,8 +44,11 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.main.MainActivity;
 import com.studio.artaban.leclassico.tools.SizeUtils;
+
+import java.io.File;
 
 /**
  * Created by pascal on 15/07/16.
@@ -66,6 +69,8 @@ public class IntroActivity extends AppCompatActivity implements
     private static final String DATA_KEY_LOGIN_PASSWORD = "loginPassword";
 
     private static final String DATA_KEY_PROGRESS_MESSAGE = "progressMessage";
+    private static final String DATA_KEY_PROGRESS_INDETERMINATE = "progressIndeterminate";
+    private static final String DATA_KEY_PROGRESS_VALUE = "progressValue";
 
     private static final String DATA_KEY_ERROR_DISPLAY = "errorDisplay";
     private static final String DATA_KEY_ERROR_ICON = "errorIcon";
@@ -329,7 +334,7 @@ public class IntroActivity extends AppCompatActivity implements
         mErrorDialog.cancel();
 
         // Inform user of this critical error then quit application (this will restart data service)
-        Toast.makeText(this, R.string.service_unavailable, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
         quit(mIntroDone);
     }
 
@@ -348,8 +353,11 @@ public class IntroActivity extends AppCompatActivity implements
                     Logs.add(Logs.Type.I, "Data synchronization");
 
                     // Data synchronization
-                    mProgressMessage = getString(R.string.data_synchro, 1, Tables.ID_LAST);
+                    mProgressMessage = getString(R.string.data_synchro);
                     mProgressDialog.setMessage(mProgressMessage);
+                    mProgressDialog.setProgress(1);
+                    mProgressDialog.setIndeterminate(false);
+
                     if (!mDataService.get().synchronize()) {
                         // Should not happen between the connection and this call! Elapsed time too short.
                         Logs.add(Logs.Type.W, "Internet connection lost");
@@ -371,7 +379,10 @@ public class IntroActivity extends AppCompatActivity implements
                 switch (synchroState) {
 
                     case DataService.SYNCHRONIZATION_STATE_DONE: {
-                        startMainActivity(true, mConnectionFragment.getPseudo()); ////// Start main activity (Online)
+
+                        ////// Start main activity (Online)
+                        String pseudo = intent.getStringExtra(DataService.SYNCHRONIZATION_PSEUDO);
+                        startMainActivity(true, pseudo);
                         break;
                     }
                     case DataService.STATE_ERROR: {
@@ -379,8 +390,9 @@ public class IntroActivity extends AppCompatActivity implements
                         break;
                     }
                     default: {
-                        mProgressMessage = getString(R.string.data_synchro, synchroState,Tables.ID_LAST);
+                        mProgressMessage = getString(R.string.data_synchro);
                         mProgressDialog.setMessage(mProgressMessage);
+                        mProgressDialog.setProgress(synchroState);
                         break;
                     }
                 }
@@ -441,8 +453,10 @@ public class IntroActivity extends AppCompatActivity implements
 
         String pseudo = null;
         String password = null;
-        if (savedInstanceState != null) {
+        int progress = 0;
+        boolean indeterminate = true;
 
+        if (savedInstanceState != null) {
             mIntroDone = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
 
             mAlphaSkip = savedInstanceState.getFloat(DATA_KEY_ALPHA_SKIP);
@@ -452,6 +466,8 @@ public class IntroActivity extends AppCompatActivity implements
             mAlphaStep4 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP4);
 
             mProgressMessage = savedInstanceState.getString(DATA_KEY_PROGRESS_MESSAGE);
+            indeterminate = savedInstanceState.getBoolean(DATA_KEY_PROGRESS_INDETERMINATE);
+            progress = savedInstanceState.getInt(DATA_KEY_PROGRESS_VALUE);
 
             pseudo = savedInstanceState.getString(DATA_KEY_LOGIN_PSEUDO, null);
             password = savedInstanceState.getString(DATA_KEY_LOGIN_PASSWORD, null);
@@ -467,7 +483,9 @@ public class IntroActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_intro);
 
         mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setIndeterminate(indeterminate);
+        mProgressDialog.setMax(Tables.ID_LAST);
+        mProgressDialog.setProgress(progress);
         mProgressDialog.setCancelable(false);
         mProgressDialog.setTitle(R.string.wait);
         mProgressDialog.setMessage(mProgressMessage);
@@ -497,6 +515,15 @@ public class IntroActivity extends AppCompatActivity implements
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Create working sub folders
+        if (!Storage.createWorkingFolders(this)) {
+
+            // Quit application if shared storage is not currently available
+            Toast.makeText(this, R.string.error_no_storage, Toast.LENGTH_LONG);
+            finish();
+            return;
+        }
 
         // Start data service (if not already started)
         if (!DataService.isRunning())
@@ -1011,6 +1038,8 @@ public class IntroActivity extends AppCompatActivity implements
         outState.putFloat(DATA_KEY_ALPHA_STEP4, mAlphaStep4);
 
         outState.putString(DATA_KEY_PROGRESS_MESSAGE, mProgressMessage);
+        outState.putBoolean(DATA_KEY_PROGRESS_INDETERMINATE, mProgressDialog.isIndeterminate());
+        outState.putInt(DATA_KEY_PROGRESS_VALUE, mProgressDialog.getProgress());
 
         EditText pseudoEdit = (EditText)findViewById(R.id.edit_pseudo);
         EditText passwordEdit = (EditText)findViewById(R.id.edit_password);

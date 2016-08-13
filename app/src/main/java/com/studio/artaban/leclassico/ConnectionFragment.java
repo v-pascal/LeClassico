@@ -65,9 +65,6 @@ public class ConnectionFragment extends Fragment {
     public boolean isDisplayed() {
         return ((mProgressTask != null) && (mProgressTask.getStatus() != AsyncTask.Status.FINISHED));
     }
-    public String getPseudo() {
-        return mPseudo;
-    }
 
     //
     private ConnectionProgressTask mProgressTask;

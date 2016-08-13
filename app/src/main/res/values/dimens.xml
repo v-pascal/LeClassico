@@ -20,5 +20,7 @@
 
     <!-- Main -->
     <dimen name="profile_border_width">6dp</dimen>
+    <item name="pseudo_shadow" format="float" type="dimen">2.0</item>
+    <item name="pseudo_radius" format="float" type="dimen">1.5</item>
 
 </resources>
