@@ -1,15 +1,12 @@
 package com.studio.artaban.leclassico.main;
 
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,22 +23,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Requests;
+import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import com.bumptech.glide.Glide;
+import com.studio.artaban.leclassico.helpers.QueryLoader;
 
 /**
  * Created by pascal on 08/08/16.
  * Main activity class
  */
 public class MainActivity extends AppCompatActivity implements
-                                                NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener {
 
     public static final String EXTRA_DATA_KEY_ONLINE = "online";
     public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
@@ -122,45 +122,71 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+    ////// OnResultListener ////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onLoadFinished(int id, Cursor cursor) {
 
-    //////
-    private final LoaderManager.LoaderCallbacks mLoaderCallbacks = new LoaderManager.LoaderCallbacks() {
-        @Override
-        public Loader onCreateLoader(int id, Bundle args) {
+        Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+        switch (id) {
+            case Tables.ID_CAMARADES: { ////// User info
 
-            Logs.add(Logs.Type.V, "id: " + id + ";args: " + args);
-            Uri contentUri;
-            switch (id) {
 
+
+
+
+
+                /*
+                ((ImageView)navigation.getHeaderView(0).findViewById(R.id.image_banner))
+                        .setImageDrawable(getDrawable(R.drawable.banner));
+                ((ImageView)navigation.getHeaderView(0).findViewById(R.id.image_profile))
+                        .setImageDrawable(getDrawable(R.drawable.man));
+
+
+
+                Glide.with(context)
+                    .load(url)
+                    .asBitmap()
+                    .centerCrop()
+                    .placeholder(R.drawable.banner)
+                    .into(new BitmapImageViewTarget(navigation.getHeaderView(0).findViewById(R.id.image_banner)) {
+
+                    @Override
+                    protected void setResource(Bitmap resource) {
+
+
+
+                        RoundedBitmapDrawable radiusBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                        radiusBitmapDrawable.setCornerRadius(0.25f);
+                        imageView.setImageDrawable(radiusBitmapDrawable);
+                    }
+                });
+                */
+
+
+
+
+
+
+                break;
             }
+            case Tables.ID_NOTIFICATIONS: { ////// Notifications
 
 
-            //return new CursorLoader(MainActivity.this, contentUri, fields, where, whereArgs, sort);
 
-
-            return null;
+                break;
+            }
         }
+    }
 
-        @Override
-        public void onLoadFinished(Loader loader, Object data) {
+    @Override
+    public void onLoaderReset() {
 
-        }
+    }
 
-        @Override
-        public void onLoaderReset(Loader loader) {
-
-        }
-    };
-
-
-
-
-
-
-
-
-
-
+    //
+    private final QueryLoader mUserLoader = new QueryLoader(this, this); // User data query loader
+    private final QueryLoader mNotificationLoader = new QueryLoader(this, this); // Notification data query loader
 
     ////// OnNavigationItemSelectedListener ////////////////////////////////////////////////////////
     @Override
@@ -267,41 +293,30 @@ public class MainActivity extends AppCompatActivity implements
                 .setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 
         // Display user pseudo, profile icon & banner
-        ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo))
-                .setText(getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO));
+        String pseudo = getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO);
+        ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
 
+        // Load user & notification data (using query loaders)
+        Bundle userData = new Bundle();
+        userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
+        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
 
-
-
-
-
-        /*
-        ((ImageView)navigation.getHeaderView(0).findViewById(R.id.image_banner))
-                .setImageDrawable(getDrawable(R.drawable.banner));
-        ((ImageView)navigation.getHeaderView(0).findViewById(R.id.image_profile))
-                .setImageDrawable(getDrawable(R.drawable.man));
-
-
-
-        Glide.with(context)
-            .load(url)
-            .asBitmap()
-            .centerCrop()
-            .placeholder(R.drawable.banner)
-            .into(new BitmapImageViewTarget(navigation.getHeaderView(0).findViewById(R.id.image_banner)) {
-
-            @Override
-            protected void setResource(Bitmap resource) {
-
-
-
-                RoundedBitmapDrawable radiusBitmapDrawable =
-                        RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                radiusBitmapDrawable.setCornerRadius(0.25f);
-                imageView.setImageDrawable(radiusBitmapDrawable);
-            }
+                CamaradesTable.COLUMN_SEXE,
+                CamaradesTable.COLUMN_PROFILE,
+                CamaradesTable.COLUMN_BANNER
         });
-        */
+        userData.putString(QueryLoader.DATA_KEY_SELECTION, "CAM_Pseudo = '" + pseudo + "'");
+        mUserLoader.init(this, Tables.ID_CAMARADES, userData);
+
+        Bundle notificationData = new Bundle();
+        notificationData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
+        notificationData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{ "count(*)" });
+        notificationData.putString(QueryLoader.DATA_KEY_SELECTION, NotificationsTable.COLUMN_LU_FLAG + "=0");
+        mNotificationLoader.init(this, Tables.ID_NOTIFICATIONS, notificationData);
+
+
+
+
 
 
 

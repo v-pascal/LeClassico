@@ -51,7 +51,7 @@ public class DataProvider extends ContentProvider {
             "." + Constants.APP_URI + ".";
     private static final String MIME_TYPE = "vnd.android.cursor.dir/vnd." + Constants.APP_URI_COMPANY +
             "." + Constants.APP_URI + ".";
-    private static final String SINGLE_ROW = "/#";
+    public static final String SINGLE_ROW = "/#";
 
     private static final UriMatcher URI_MATCHER_SINGLE;
     private static final UriMatcher URI_MATCHER;

@@ -63,7 +63,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     public static final String SYNCHRONIZATION_PSEUDO = "synchronizationPseudo"; // User pseudo data (from DB)
 
-    ////// OnConnectivityListener
+    ////// OnConnectivityListener //////////////////////////////////////////////////////////////////
     @Override
     public void onConnection() {
 
@@ -279,7 +279,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     }
 
-    //////
+    ////// Service /////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreate() {
         super.onCreate();
