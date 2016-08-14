@@ -1,12 +1,15 @@
 package com.studio.artaban.leclassico.main;
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
@@ -31,10 +35,13 @@ import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
+import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 
-import com.bumptech.glide.Glide;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
+import com.studio.artaban.leclassico.helpers.Storage;
+
+import java.io.File;
 
 /**
  * Created by pascal on 08/08/16.
@@ -125,52 +132,68 @@ public class MainActivity extends AppCompatActivity implements
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
-
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+
+        cursor.moveToFirst();
         switch (id) {
             case Tables.ID_CAMARADES: { ////// User info
 
+                // Get DB data
+                final boolean female = (cursor.getInt(COLUMN_INDEX_SEXE) == CamaradesTable.FEMALE);
+                final String profile = cursor.getString(COLUMN_INDEX_PROFILE);
+                final String banner = cursor.getString(COLUMN_INDEX_BANNER);
 
-
-
-
-
-                /*
-                ((ImageView)navigation.getHeaderView(0).findViewById(R.id.image_banner))
-                        .setImageDrawable(getDrawable(R.drawable.banner));
-                ((ImageView)navigation.getHeaderView(0).findViewById(R.id.image_profile))
-                        .setImageDrawable(getDrawable(R.drawable.man));
-
-
-
-                Glide.with(context)
-                    .load(url)
-                    .asBitmap()
-                    .centerCrop()
-                    .placeholder(R.drawable.banner)
-                    .into(new BitmapImageViewTarget(navigation.getHeaderView(0).findViewById(R.id.image_banner)) {
-
+                runOnUiThread(new Runnable() {
                     @Override
-                    protected void setResource(Bitmap resource) {
+                    public void run() {
 
+                        Logs.add(Logs.Type.V, null);
+                        View navHeader = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
 
+                        // Profile
+                        if (profile != null)
+                            Glider.with(MainActivity.this)
+                                    .load(Storage.FOLDER_PROFILE +
+                                            File.separator + getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO) +
+                                            File.separator + profile,
+                                            Constants.APP_PROFILES_URL + "/" + profile)
+                                    .placeholder((female)? R.drawable.woman : R.drawable.man)
+                                    .into((ImageView) navHeader.findViewById(R.id.image_profile),
+                                            new Glider.OnLoadListener() {
 
-                        RoundedBitmapDrawable radiusBitmapDrawable =
-                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                        radiusBitmapDrawable.setCornerRadius(0.25f);
-                        imageView.setImageDrawable(radiusBitmapDrawable);
+                                        @Override
+                                        public boolean setResource(Bitmap resource, ImageView imageView) {
+                                            //Logs.add(Logs.Type.V, "resource: " + resource +
+                                            //        ";imageView: " + imageView);
+
+                                            RoundedBitmapDrawable radiusBmp =
+                                                    RoundedBitmapDrawableFactory.create(getResources(),
+                                                            resource);
+                                            radiusBmp.setCornerRadius(0.25f);
+                                            imageView.setImageDrawable(radiusBmp);
+                                            return true;
+                                        }
+                                    });
+
+                        // Banner
+                        if (banner != null)
+                            Glider.with(MainActivity.this)
+                                    .load(Storage.FOLDER_PROFILE +
+                                            File.separator + getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO) +
+                                            File.separator + banner,
+                                            Constants.APP_PROFILES_URL + "/" + banner)
+                                    .placeholder(R.drawable.banner)
+                                    .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
                     }
+
                 });
-                */
-
-
-
-
-
-
                 break;
             }
             case Tables.ID_NOTIFICATIONS: { ////// Notifications
+
+
+
+
 
 
 
@@ -184,7 +207,11 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    //
+    private static final byte COLUMN_INDEX_SEXE = 0;
+    private static final byte COLUMN_INDEX_PROFILE = 1;
+    private static final byte COLUMN_INDEX_BANNER = 2;
+    // Query column index
+
     private final QueryLoader mUserLoader = new QueryLoader(this, this); // User data query loader
     private final QueryLoader mNotificationLoader = new QueryLoader(this, this); // Notification data query loader
 
@@ -216,6 +243,8 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+
+
                 break;
             }
             case R.id.navig_location: { // Display location activity
@@ -225,9 +254,13 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+
+
                 break;
             }
             case R.id.navig_settings: { // Display settings
+
+
 
 
 
@@ -301,9 +334,9 @@ public class MainActivity extends AppCompatActivity implements
         userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
         userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
 
-                CamaradesTable.COLUMN_SEXE,
-                CamaradesTable.COLUMN_PROFILE,
-                CamaradesTable.COLUMN_BANNER
+                CamaradesTable.COLUMN_SEXE, // COLUMN_INDEX_SEXE
+                CamaradesTable.COLUMN_PROFILE, // COLUMN_INDEX_PROFILE
+                CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
         });
         userData.putString(QueryLoader.DATA_KEY_SELECTION, "CAM_Pseudo = '" + pseudo + "'");
         mUserLoader.init(this, Tables.ID_CAMARADES, userData);

@@ -15,11 +15,22 @@ public final class Constants {
     public static final String APP_WEBSITE = "http://www.leclassico.fr"; // Social network application web site
     public static final String APP_URI_COMPANY = "studio.artaban"; // Application company URI
     public static final String APP_URI = "leclassico"; // Application URI
-    public static final String APP_WEBSERVICES = APP_WEBSITE + "/WebServices"; // LeClassico web services URL
 
-    // Preferences
-    public static final String APP_PREFERENCE = APP_NAME + "Preferences";
-    public static final String APP_PREFERENCE_INTRO_DONE = "introDone";
+    public static final String APP_WEBSERVICES = APP_WEBSITE + "/WebServices"; // LeClassico web services URL
+    public static final String APP_PROFILES_URL = APP_WEBSITE + "/Profiles"; // LeClassico profile URL
+
+    // Preference keys
+    public static final String APP_PREFERENCE = APP_NAME + "Preferences"; // Application preference
+    public static final String APP_PREFERENCE_INTRO_DONE = "introDone"; // Introduction done flag
+
+
+    ////// Images
+    public static final int IMAGE_JPEG_QUALITY = 90; // Default stored JPEG file quality
+    public static final int IMAGE_PNG_QUALITY = 90; // Default stored PNG file quality
+
+    // File extensions
+    public static final String IMAGE_JPEG_EXTENSION = ".JPG";
+    public static final String IMAGE_PNG_EXTENSION = ".PNG";
 
 
     ////// Web services

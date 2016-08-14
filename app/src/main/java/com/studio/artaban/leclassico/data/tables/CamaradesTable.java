@@ -17,6 +17,9 @@ import java.util.List;
  */
 public class CamaradesTable implements IDataTable {
 
+    public static final int MALE = 2;
+    public static final int FEMALE = 1;
+
     public static class Friend extends DataField { ///////////////////////////////// Camarades entry
 
         public Friend(short count, long id) { super(count, id); }

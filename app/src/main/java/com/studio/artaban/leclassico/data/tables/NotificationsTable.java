@@ -71,6 +71,7 @@ public class NotificationsTable implements IDataTable {
     public static final String TABLE_NAME = "Notifications";
 
     // Columns
+    public static final String COLUMN_PSEUDO = "NOT_Pseudo";
     public static final String COLUMN_DATE = "NOT_Date";
     public static final String COLUMN_OBJECT_TYPE = "NOT_ObjType";
     public static final String COLUMN_OBJECT_ID = "NOT_ObjID";
@@ -79,14 +80,15 @@ public class NotificationsTable implements IDataTable {
     public static final String COLUMN_LU_FLAG = "NOT_LuFlag";
 
     // Columns index
-    private static final short COLUMN_INDEX_DATE = 1; // DataField.COLUMN_INDEX_ID + 1
-    private static final short COLUMN_INDEX_OBJECT_TYPE = 2;
-    private static final short COLUMN_INDEX_OBJECT_ID = 3;
-    private static final short COLUMN_INDEX_OBJECT_DATE = 4;
-    private static final short COLUMN_INDEX_OBJECT_FROM = 5;
-    private static final short COLUMN_INDEX_LU_FLAG = 6;
+    private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
+    private static final short COLUMN_INDEX_DATE = 2;
+    private static final short COLUMN_INDEX_OBJECT_TYPE = 3;
+    private static final short COLUMN_INDEX_OBJECT_ID = 4;
+    private static final short COLUMN_INDEX_OBJECT_DATE = 5;
+    private static final short COLUMN_INDEX_OBJECT_FROM = 6;
+    private static final short COLUMN_INDEX_LU_FLAG = 7;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 21;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
 
     //
     private NotificationsTable() { }
@@ -99,6 +101,7 @@ public class NotificationsTable implements IDataTable {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
                 DataField.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
+                COLUMN_PSEUDO + " TEXT NOT NULL," +
                 COLUMN_DATE + " TEXT NOT NULL," +
                 COLUMN_OBJECT_TYPE + " TEXT," +
                 COLUMN_OBJECT_ID + " INTEGER," +

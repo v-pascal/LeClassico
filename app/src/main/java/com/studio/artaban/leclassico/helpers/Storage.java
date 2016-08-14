@@ -17,6 +17,9 @@ import java.nio.channels.FileChannel;
  */
 public final class Storage {
 
+    public static final String FOLDER_PROFILE = File.separator + "Profile";
+
+    //
     private static String FOLDER; // Application working folder path
     public static String get() {
         return FOLDER;
@@ -126,10 +129,8 @@ public final class Storage {
         Storage.FOLDER = workingFolder.getAbsolutePath();
 
         // Create sub folders
-
-
-
-
+        if (!createFolder(FOLDER + Storage.FOLDER_PROFILE))
+            Logs.add(Logs.Type.E, "Failed to create 'Profile' folder");
 
 
 
