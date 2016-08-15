@@ -155,6 +155,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     @Override
                     public boolean onReceiveReply(String response) {
 
+                        Logs.add(Logs.Type.V, "response: " + response);
                         byte result = STATE_ERROR;
                         try {
                             JSONObject reply = new JSONObject(response);

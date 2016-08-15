@@ -14,6 +14,5 @@ public final class Requests {
 
         // Results
         public static final int RESULT_LOGOUT = 1;
-        public static final int RESULT_QUIT = 2;
     };
 }

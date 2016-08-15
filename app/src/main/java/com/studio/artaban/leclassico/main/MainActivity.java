@@ -1,5 +1,7 @@
 package com.studio.artaban.leclassico.main;
 
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -30,6 +32,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -53,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements
     public static final String EXTRA_DATA_KEY_ONLINE = "online";
     public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
     // Extra data keys
+
+
 
 
 
@@ -129,13 +135,16 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+
+
+
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
 
         cursor.moveToFirst();
-        switch (id) {
+        switch ((byte)id) {
             case Tables.ID_CAMARADES: { ////// User info
 
                 // Get DB data
@@ -279,8 +288,25 @@ public class MainActivity extends AppCompatActivity implements
             }
             case R.id.navig_quit: { // Quit application
 
-                setResult(Requests.MAIN_TO_INTRO.RESULT_QUIT);
-                supportFinishAfterTransition();
+                // Stop service properly B4 quit application
+                final ServiceBinder dataService = new ServiceBinder();
+                boolean bound = dataService.bind(this, new ServiceBinder.OnServiceListener() {
+                    @Override
+                    public void onServiceConnected() {
+
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ServiceConnection connection) {
+
+                        Logs.add(Logs.Type.V, null);
+                        unbindService(connection);
+                        finishAffinity(); // Quit application
+                    }
+                });
+                if (bound)
+                    stopService(new Intent(MainActivity.this, DataService.class));
+                    // NB: This will call "onServiceDisconnected" method defined above
                 break;
             }
         }
@@ -344,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements
                 CamaradesTable.COLUMN_PROFILE, // COLUMN_INDEX_PROFILE
                 CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
         });
-        userData.putString(QueryLoader.DATA_KEY_SELECTION, "CAM_Pseudo = '" + pseudo + "'");
+        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + "'");
         mUserLoader.init(this, Tables.ID_CAMARADES, userData);
 
         Bundle notificationData = new Bundle();

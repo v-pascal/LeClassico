@@ -113,11 +113,8 @@ public class ConnectionFragment extends Fragment {
                 ContentResolver cr = params[0].getContentResolver();
                 Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                         new String[]{ "count(*)" }, null, null, null);
-                int membersCount = 0;
-                if (result.getCount() > 0) {
-                    result.moveToFirst();
-                    membersCount = result.getInt(0);
-                }
+                result.moveToFirst();
+                int membersCount = result.getInt(0);
                 result.close();
 
                 if (membersCount > 0) { // Found existing DB (try to work offline)
@@ -128,11 +125,8 @@ public class ConnectionFragment extends Fragment {
                     // Offline identification
                     result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                         new String[]{ CamaradesTable.COLUMN_PSEUDO },
-                        "UPPER(" + CamaradesTable.COLUMN_PSEUDO  + ")='" +
-                                mPseudo.toUpperCase() +
-                                "' AND " +
-                                CamaradesTable.COLUMN_CODE_CONF + "='" +
-                                mPassword + "'",
+                        "UPPER(" + CamaradesTable.COLUMN_PSEUDO  + ")='" + mPseudo.toUpperCase() +
+                                "' AND " + CamaradesTable.COLUMN_CODE_CONF + "='" + mPassword + "'",
                         null, null);
                     if (result.getCount() > 0) {
                         result.moveToFirst();

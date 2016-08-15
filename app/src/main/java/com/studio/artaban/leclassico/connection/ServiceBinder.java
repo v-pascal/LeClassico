@@ -23,7 +23,8 @@ public class ServiceBinder {
 
     //////
     public interface OnServiceListener {
-        void onServiceDisconnected();
+        void onServiceConnected();
+        void onServiceDisconnected(ServiceConnection connection);
     };
     public boolean bind(Activity activity, final OnServiceListener listener) {
 
@@ -41,17 +42,21 @@ public class ServiceBinder {
 
                 Logs.add(Logs.Type.V, "name: " + name + ";binder: " + binder);
                 mDataService = ((DataService.DataBinder)binder).getService();
+
+                if (listener != null)
+                    listener.onServiceConnected();
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
 
                 Logs.add(Logs.Type.W, "name: " + name);
-                if (DataService.isRunning()) {
+                if (mDataService != null) {
                     if (listener != null)
-                        listener.onServiceDisconnected();
+                        listener.onServiceDisconnected(this);
 
                     mDataService.stop();
+                    mDataService = null;
                 }
             }
         };

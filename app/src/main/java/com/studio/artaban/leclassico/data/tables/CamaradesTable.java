@@ -76,6 +76,9 @@ public class CamaradesTable implements IDataTable {
                     JSONObject reply = new JSONObject(response);
                     if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
+                        if (reply.isNull(JSON_KEY_MEMBERS))
+                            return true; // Already synchronized
+
                         JSONArray members = reply.getJSONArray(JSON_KEY_MEMBERS);
                         for (int i = 0; i < members.length(); ++i) {
 

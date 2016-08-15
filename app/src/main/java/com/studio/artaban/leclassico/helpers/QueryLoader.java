@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
@@ -31,11 +32,13 @@ import com.studio.artaban.leclassico.data.tables.VotesTable;
 public class QueryLoader {
 
     // Data keys
-    public static final String DATA_KEY_URI_SINGLE = "single";
     public static final String DATA_KEY_PROJECTION = "projection";
     public static final String DATA_KEY_SELECTION = "selection";
     public static final String DATA_KEY_SELECTION_ARGS = "selectionArgs";
     public static final String DATA_KEY_SORT_ORDER = "sortOrder";
+
+    public static final String DATA_KEY_URI_SINGLE = "single";
+    public static final String DATA_KEY_ROW_ID = "rowId";
 
     //////
     public interface OnResultListener {
@@ -86,7 +89,7 @@ public class QueryLoader {
 
             // Check single row query
             if (args.getBoolean(DATA_KEY_URI_SINGLE, false))
-                contentUri += DataProvider.SINGLE_ROW;
+                contentUri += '/' + args.getLong(DATA_KEY_ROW_ID, Constants.NO_DATA);
 
             return new CursorLoader(mContext, Uri.parse(contentUri),
                     args.getStringArray(DATA_KEY_PROJECTION),

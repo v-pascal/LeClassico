@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -48,14 +49,12 @@ import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.main.MainActivity;
 import com.studio.artaban.leclassico.tools.SizeUtils;
 
-import java.io.File;
-
 /**
  * Created by pascal on 15/07/16.
  * Introduction & connection activity class
  */
 public class IntroActivity extends AppCompatActivity implements
-        ConnectionFragment.OnProgressListener, ServiceBinder.OnServiceListener {
+                            ConnectionFragment.OnProgressListener, ServiceBinder.OnServiceListener {
 
     private static final String DATA_KEY_INTRO_DISPLAYED = "introDisplayed";
 
@@ -231,7 +230,7 @@ public class IntroActivity extends AppCompatActivity implements
     private void startMainActivity(boolean online, String pseudo) {
     // Start main activity containing publications, events, locations, etc.
 
-        Logs.add(Logs.Type.V, "online: " + online);
+        Logs.add(Logs.Type.V, "online: " + online + ";pseudo: " + pseudo);
         mConnectionFragment.cancel();
         mProgressDialog.cancel();
 
@@ -268,7 +267,7 @@ public class IntroActivity extends AppCompatActivity implements
                 break;
             }
             case ConnectionFragment.STEP_LOGIN: {
-                if (!mDataService.get().login(pseudo, password))
+                if ((mDataService.get() != null) && (!mDataService.get().login(pseudo, password)))
                     displayError(false, R.string.no_internet);
                 break;
             }
@@ -289,7 +288,8 @@ public class IntroActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, "result: " + result + ";pseudo: " + pseudo);
         if (result) { // Login succeeded
 
-            mDataService.get().login(pseudo, null);
+            if (mDataService.get() != null)
+                mDataService.get().login(pseudo, null);
             startMainActivity(false, pseudo); ////// Start main activity (Offline)
         }
     }
@@ -324,11 +324,30 @@ public class IntroActivity extends AppCompatActivity implements
 
     ////// OnServiceListener ///////////////////////////////////////////////////////////////////////
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
+    private boolean mLogoutRequest; // Logout request flag
 
     @Override
-    public void onServiceDisconnected() {
+    public void onServiceConnected() {
+        Logs.add(Logs.Type.V, null);
+        if (mLogoutRequest) {
+            mLogoutRequest = false;
+            mDataService.get().logout();
+        }
+
+        // Register broadcast receiver HERE coz data service connection needed...
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DataService.STATUS_CONNECTION); // ...for THIS action (see receiver)
+        filter.addAction(DataService.STATUS_SYNCHRONIZATION);
+        registerReceiver(mDataReceiver, filter);
+    }
+    @Override
+    public void onServiceDisconnected(ServiceConnection connection) {
 
         Logs.add(Logs.Type.V, null);
+        try { unregisterReceiver(mDataReceiver); // Unregister broadcast receiver
+        } catch (Exception e) {
+            Logs.add(Logs.Type.W, "Receiver not registered");
+        }
         mConnectionFragment.cancel();
         mProgressDialog.cancel();
         mErrorDialog.cancel();
@@ -358,7 +377,7 @@ public class IntroActivity extends AppCompatActivity implements
                     mProgressDialog.setProgress(1);
                     mProgressDialog.setIndeterminate(false);
 
-                    if (!mDataService.get().synchronize()) {
+                    if ((mDataService.get() != null) && (!mDataService.get().synchronize())) {
                         // Should not happen between the connection and this call! Elapsed time too short.
                         Logs.add(Logs.Type.W, "Internet connection lost");
                         displayError(true, R.string.webservice_error);
@@ -962,16 +981,8 @@ public class IntroActivity extends AppCompatActivity implements
         super.onResume();
 
         Logs.add(Logs.Type.V, null);
-        if (mDataService.bind(this, this)) { // Bind data service
-
-            // Register broadcast receiver HERE coz data service connection needed...
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(DataService.STATUS_CONNECTION); // ...for THIS action (see receiver)
-            filter.addAction(DataService.STATUS_SYNCHRONIZATION);
-            registerReceiver(mDataReceiver, filter);
-        }
-        else
-            onServiceDisconnected();
+        if (!mDataService.bind(this, this)) // Bind data service
+            onServiceDisconnected(null);
     }
 
     @Override
@@ -1070,20 +1081,7 @@ public class IntroActivity extends AppCompatActivity implements
                         ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
                         ((EditText)findViewById(R.id.edit_password)).getText().clear();
 
-                        // Logout from service
-                        if (mDataService.bind(this, this))
-                            mDataService.get().logout();
-                        else
-                            onServiceDisconnected();
-                        break;
-                    }
-                    case Requests.MAIN_TO_INTRO.RESULT_QUIT: {
-
-                        // Bind data service B4 quit application (see comment in "quit" method)
-                        if (mDataService.bind(this, this))
-                            quit(true);
-                        else
-                            onServiceDisconnected();
+                        mLogoutRequest = true; // Logout requested
                         break;
                     }
                     default: {
