@@ -139,9 +139,12 @@ public class MainActivity extends AppCompatActivity implements
             case Tables.ID_CAMARADES: { ////// User info
 
                 // Get DB data
-                final boolean female = (cursor.getInt(COLUMN_INDEX_SEXE) == CamaradesTable.FEMALE);
-                final String profile = cursor.getString(COLUMN_INDEX_PROFILE);
-                final String banner = cursor.getString(COLUMN_INDEX_BANNER);
+                final boolean female = (!cursor.isNull(COLUMN_INDEX_SEXE)) &&
+                        (cursor.getInt(COLUMN_INDEX_SEXE) == CamaradesTable.FEMALE);
+                final String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
+                        cursor.getString(COLUMN_INDEX_PROFILE) : null;
+                final String banner = (!cursor.isNull(COLUMN_INDEX_BANNER))?
+                        cursor.getString(COLUMN_INDEX_BANNER) : null;
 
                 runOnUiThread(new Runnable() {
                     @Override

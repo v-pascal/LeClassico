@@ -6,12 +6,21 @@ package com.studio.artaban.leclassico.data.codes;
  */
 public final class WebServices {
 
-    ////// Connection
+    ////// URL
+    public static final String URL_CONNECTION = "/connexion.php"; // Connection web service
+    public static final String URL_MEMBERS = "/camarades.php"; // Members web service
+    public static final String URL_PUBLICATIONS = "/actualites.php"; // Publications web service
+    public static final String URL_COMMENTS = "/commentaires.php"; // Comments web service
+
+
+    ////// GET & POST data keys
+    public static final String DATA_TOKEN = "Clf";
+    public static final String DATA_DATE = "Date";
+
+    // Connection
     public static final String CONNECTION_DATA_PSEUDO = "psd";
     public static final String CONNECTION_DATA_PASSWORD = "ccf";
     public static final String CONNECTION_DATA_DATETIME = "odt";
-
-    public static final String CONNECTION_DATA_TOKEN = "Clf";
 
 
     ////// JSON keys

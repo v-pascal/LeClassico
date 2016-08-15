@@ -97,6 +97,7 @@ public final class Internet {
         CANCELLED, // The download has been cancelled by the user
         WRONG_URL, // Wrong URL format
         CONNECTION_FAILED, // Failed to connect to URL
+        REPLY_ERROR, // Reply error
         SUCCEEDED // Download succeeded
     }
     public interface OnDownloadListener { // Download listener
@@ -105,7 +106,7 @@ public final class Internet {
         void onPublishProgress(int read);
     }
     public interface OnRequestListener {
-        void onReceiveReply(String response);
+        boolean onReceiveReply(String response);
     }
 
     //
@@ -231,7 +232,8 @@ public final class Internet {
                     response.append(line).append('\n');
 
                 br.close();
-                listener.onReceiveReply(response.toString());
+                if (!listener.onReceiveReply(response.toString()))
+                    return DownloadResult.REPLY_ERROR;
 
             } else
                 Logs.add(Logs.Type.W, "No request listener");

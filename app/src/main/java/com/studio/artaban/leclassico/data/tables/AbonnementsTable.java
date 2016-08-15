@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.List;
@@ -34,8 +35,10 @@ public class AbonnementsTable implements IDataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(ContentResolver contentResolver, long timeLag) {
+    public boolean synchronize(ContentResolver resolver, String token) {
     // Synchronize data with remote DB
+
+
 
 
 

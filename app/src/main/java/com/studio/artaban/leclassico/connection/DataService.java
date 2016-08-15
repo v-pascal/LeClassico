@@ -151,9 +151,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 data.put(WebServices.CONNECTION_DATA_DATETIME, dateFormat.format(now));
 
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
-                        Constants.WEBSERVICE_CONNECTION, data, new Internet.OnRequestListener() {
+                        WebServices.URL_CONNECTION, data, new Internet.OnRequestListener() {
                     @Override
-                    public void onReceiveReply(String response) {
+                    public boolean onReceiveReply(String response) {
 
                         byte result = STATE_ERROR;
                         try {
@@ -190,6 +190,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         Intent intent = new Intent(STATUS_CONNECTION);
                         intent.putExtra(CONNECTION_STATE, result);
                         sendBroadcast(intent); ////// STATUS_CONNECTION
+
+                        // Always return true coz status connection already sent (just above)
+                        return true;
                     }
                 });
                 if (result != Internet.DownloadResult.SUCCEEDED) {
@@ -231,8 +234,26 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
                 for (byte tableId = 1; tableId < Tables.ID_LAST; ++tableId) {
 
+
+
+
+
+
+
+                    try {
+                        Thread.sleep(1000, 0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+
+
+
+
                     Intent intent = new Intent(STATUS_SYNCHRONIZATION);
-                    if (!Database.synchronize(tableId, getContentResolver(), mTimeLag)) {
+                    if (!Database.synchronize(tableId, getContentResolver(), mToken)) {
 
                         Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
                         intent.putExtra(SYNCHRONIZATION_STATE, STATE_ERROR);

@@ -390,9 +390,7 @@ public class IntroActivity extends AppCompatActivity implements
                         break;
                     }
                     default: {
-                        mProgressMessage = getString(R.string.data_synchro);
-                        mProgressDialog.setMessage(mProgressMessage);
-                        mProgressDialog.setProgress(synchroState);
+                        mProgressDialog.setProgress((int)synchroState);
                         break;
                     }
                 }

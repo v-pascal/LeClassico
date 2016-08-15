@@ -53,36 +53,37 @@ public class Database extends SQLiteOpenHelper {
     }
 
     //
-    public static boolean synchronize(byte tableId, ContentResolver contentResolver, long timeLag) {
-    // Synchronize database table with remote DB according its ID
+    public static boolean synchronize(byte tableId, ContentResolver resolver, String token) {
 
+        // Synchronize database table with remote DB according its ID
         Logs.add(Logs.Type.V, "tableId: " + tableId);
+
         switch (tableId) {
 
             case Tables.ID_CAMARADES:
-                return ((CamaradesTable)Database.getTable(CamaradesTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((CamaradesTable)Database.getTable(CamaradesTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_ABONNEMENTS:
-                return ((AbonnementsTable)Database.getTable(AbonnementsTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((AbonnementsTable)Database.getTable(AbonnementsTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_ACTUALITES:
-                return ((ActualitesTable)Database.getTable(ActualitesTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((ActualitesTable)Database.getTable(ActualitesTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_ALBUMS:
-                return ((AlbumsTable)Database.getTable(AlbumsTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((AlbumsTable)Database.getTable(AlbumsTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_COMMENTAIRES:
-                return ((CommentairesTable)Database.getTable(CommentairesTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((CommentairesTable)Database.getTable(CommentairesTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_EVENEMENTS:
-                return ((EvenementsTable)Database.getTable(EvenementsTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((EvenementsTable)Database.getTable(EvenementsTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_MESSAGERIE:
-                return ((MessagerieTable)Database.getTable(MessagerieTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((MessagerieTable)Database.getTable(MessagerieTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_MUSIC:
-                return ((MusicTable)Database.getTable(MusicTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((MusicTable)Database.getTable(MusicTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_PHOTOS:
-                return ((PhotosTable)Database.getTable(PhotosTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((PhotosTable)Database.getTable(PhotosTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_PRESENTS:
-                return ((PresentsTable)Database.getTable(PresentsTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((PresentsTable)Database.getTable(PresentsTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_VOTES:
-                return ((VotesTable)Database.getTable(VotesTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((VotesTable)Database.getTable(VotesTable.TABLE_NAME)).synchronize(resolver, token);
             case Tables.ID_NOTIFICATIONS:
-                return ((NotificationsTable)Database.getTable(NotificationsTable.TABLE_NAME)).synchronize(contentResolver, timeLag);
+                return ((NotificationsTable)Database.getTable(NotificationsTable.TABLE_NAME)).synchronize(resolver, token);
             default:
                 throw new IllegalArgumentException("Unexpected table ID: " + tableId);
         }

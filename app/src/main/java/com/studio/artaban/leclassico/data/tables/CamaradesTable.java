@@ -1,13 +1,23 @@
 package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -37,15 +47,115 @@ public class CamaradesTable implements IDataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(ContentResolver contentResolver, long timeLag) {
+    public boolean synchronize(final ContentResolver resolver, String token) {
     // Synchronize data with remote DB
 
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token);
+        String url = Constants.APP_WEBSERVICES + WebServices.URL_MEMBERS + "?" +
+                WebServices.DATA_TOKEN + "=" + token; // Add token to URL
 
+        // Get last synchronization date
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME),
+                new String[]{ "max(" + COLUMN_STATUS_DATE + ")" }, null, null, null);
+        cursor.moveToFirst();
+        if (cursor.getString(0) != null) {
+            Logs.add(Logs.Type.I, "Previous status date: " + cursor.getString(0));
+            url += "&" + WebServices.DATA_DATE + "=" + cursor.getString(0).replace(' ', 'n');
+        }
+        cursor.close();
 
+        // Send remote DB request
+        Internet.DownloadResult result = Internet.downloadHttpRequest(url, null,
+                new Internet.OnRequestListener() {
 
+            @Override
+            public boolean onReceiveReply(String response) {
+                //Logs.add(Logs.Type.V, "response: " + response);
+                try {
 
+                    JSONObject reply = new JSONObject(response);
+                    if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
+                        JSONArray members = reply.getJSONArray(JSON_KEY_MEMBERS);
+                        for (int i = 0; i < members.length(); ++i) {
 
+                            JSONObject member = (JSONObject) members.get(i);
+                            Uri memberUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
+                            String pseudo = member.getString(JSON_KEY_PSEUDO);
+
+                            // Member data
+                            ContentValues values = new ContentValues();
+                            values.put(COLUMN_CODE_CONF, member.getString(JSON_KEY_CODE_CONF));
+                            if (!member.isNull(JSON_KEY_NOM))
+                                values.put(COLUMN_NOM, member.getString(JSON_KEY_NOM));
+                            if (!member.isNull(JSON_KEY_PRENOM))
+                                values.put(COLUMN_PRENOM, member.getString(JSON_KEY_PRENOM));
+                            if (!member.isNull(JSON_KEY_SEXE))
+                                values.put(COLUMN_SEXE, member.getInt(JSON_KEY_SEXE));
+                            if (!member.isNull(JSON_KEY_BORN_DATE))
+                                values.put(COLUMN_BORN_DATE, member.getString(JSON_KEY_BORN_DATE));
+                            if (!member.isNull(JSON_KEY_ADRESSE))
+                                values.put(COLUMN_ADRESSE, member.getString(JSON_KEY_ADRESSE));
+                            if (!member.isNull(JSON_KEY_VILLE))
+                                values.put(COLUMN_VILLE, member.getString(JSON_KEY_VILLE));
+                            if (!member.isNull(JSON_KEY_POSTAL))
+                                values.put(COLUMN_POSTAL, member.getString(JSON_KEY_POSTAL));
+                            if (!member.isNull(JSON_KEY_EMAIL))
+                                values.put(COLUMN_EMAIL, member.getString(JSON_KEY_EMAIL));
+                            if (!member.isNull(JSON_KEY_HOBBIES))
+                                values.put(COLUMN_HOBBIES, member.getString(JSON_KEY_HOBBIES));
+                            if (!member.isNull(JSON_KEY_A_PROPOS))
+                                values.put(COLUMN_A_PROPOS, member.getString(JSON_KEY_A_PROPOS));
+                            if (!member.isNull(JSON_KEY_LOG_DATE))
+                                values.put(COLUMN_LOG_DATE, member.getString(JSON_KEY_LOG_DATE));
+                            values.put(COLUMN_ADMIN, member.getInt(JSON_KEY_ADMIN));
+                            if (!member.isNull(JSON_KEY_PROFILE))
+                                values.put(COLUMN_PROFILE, member.getString(JSON_KEY_PROFILE));
+                            if (!member.isNull(JSON_KEY_BANNER))
+                                values.put(COLUMN_BANNER, member.getString(JSON_KEY_BANNER));
+                            values.put(COLUMN_LOCATED, member.getInt(JSON_KEY_LOCATED));
+                            if (!member.isNull(JSON_KEY_LATITUDE))
+                                values.put(COLUMN_LATITUDE, member.getDouble(JSON_KEY_LATITUDE));
+                            if (!member.isNull(JSON_KEY_LONGITUDE))
+                                values.put(COLUMN_LONGITUDE, member.getDouble(JSON_KEY_LONGITUDE));
+                            values.put(COLUMN_STATUS_DATE, member.getString(JSON_KEY_STATUS_DATE));
+                            values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                    DataProvider.Synchronized.DONE.getValue());
+
+                            // Check if member already exists
+                            String selection = COLUMN_PSEUDO + "='" + pseudo + "'";
+                            Cursor cursor = resolver.query(memberUri, new String[]{ "count(*)" },
+                                    COLUMN_PSEUDO + "='" + pseudo + "'",
+                                    null, null);
+                            cursor.moveToFirst();
+                            if (cursor.getInt(0) > 0) // Update DB entry
+                                resolver.update(memberUri, values, selection, null);
+                            else { // Insert entry into DB
+
+                                values.put(COLUMN_PSEUDO, pseudo);
+                                resolver.insert(memberUri, values);
+                            }
+                            cursor.close();
+                        }
+
+                    } else {
+                        Logs.add(Logs.Type.E, "Synchronization error: #" +
+                                reply.getInt(WebServices.JSON_KEY_ERROR));
+                        return false;
+                    }
+
+                } catch (JSONException e) {
+                    Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                    return false;
+                }
+                return true;
+            }
+        });
+        if (result != Internet.DownloadResult.SUCCEEDED) {
+
+            Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
+            return false;
+        }
         return true;
     }
 
@@ -119,6 +229,30 @@ public class CamaradesTable implements IDataTable {
     private static final short COLUMN_INDEX_STATUS_DATE = 20;
 
     private static final short COLUMN_INDEX_SYNCHRONIZED = 21;
+
+    // JSON keys
+    private static final String JSON_KEY_MEMBERS = "camarades";
+
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_CODE_CONF = COLUMN_CODE_CONF.substring(4);
+    private static final String JSON_KEY_NOM = COLUMN_NOM.substring(4);
+    private static final String JSON_KEY_PRENOM = COLUMN_PRENOM.substring(4);
+    private static final String JSON_KEY_SEXE = COLUMN_SEXE.substring(4);
+    private static final String JSON_KEY_BORN_DATE = COLUMN_BORN_DATE.substring(4);
+    private static final String JSON_KEY_ADRESSE = COLUMN_ADRESSE.substring(4);
+    private static final String JSON_KEY_VILLE = COLUMN_VILLE.substring(4);
+    private static final String JSON_KEY_POSTAL = COLUMN_POSTAL.substring(4);
+    private static final String JSON_KEY_EMAIL = COLUMN_EMAIL.substring(4);
+    private static final String JSON_KEY_HOBBIES = COLUMN_HOBBIES.substring(4);
+    private static final String JSON_KEY_A_PROPOS = COLUMN_A_PROPOS.substring(4);
+    private static final String JSON_KEY_LOG_DATE = COLUMN_LOG_DATE.substring(4);
+    private static final String JSON_KEY_ADMIN = COLUMN_ADMIN.substring(4);
+    private static final String JSON_KEY_PROFILE = COLUMN_PROFILE.substring(4);
+    private static final String JSON_KEY_BANNER = COLUMN_BANNER.substring(4);
+    private static final String JSON_KEY_LOCATED = COLUMN_LOCATED.substring(4);
+    private static final String JSON_KEY_LATITUDE = COLUMN_LATITUDE.substring(4);
+    private static final String JSON_KEY_LONGITUDE = COLUMN_LONGITUDE.substring(4);
+    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     //
     private CamaradesTable() { }

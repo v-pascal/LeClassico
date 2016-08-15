@@ -25,18 +25,12 @@ public final class Constants {
 
 
     ////// Images
-    public static final int IMAGE_JPEG_QUALITY = 90; // Default stored JPEG file quality
-    public static final int IMAGE_PNG_QUALITY = 90; // Default stored PNG file quality
+    public static final int IMAGE_JPEG_QUALITY = 80; // Default stored JPEG file quality
+    public static final int IMAGE_PNG_QUALITY = 80; // Default stored PNG file quality
 
     // File extensions
     public static final String IMAGE_JPEG_EXTENSION = ".JPG";
     public static final String IMAGE_PNG_EXTENSION = ".PNG";
-
-
-    ////// Web services
-    public static final String WEBSERVICE_CONNECTION = "/connexion.php"; // Connection web service
-    public static final String WEBSERVICE_PUBLICATIONS = "/actualites.php"; // Publications web service
-    public static final String WEBSERVICE_COMMENTS = "/commentaires.php"; // Comments web service
 
 
     ////// Introduction
