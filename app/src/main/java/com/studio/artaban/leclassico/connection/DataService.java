@@ -232,7 +232,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 for (byte tableId = 1; tableId < Tables.ID_LAST; ++tableId) {
 
                     Intent intent = new Intent(STATUS_SYNCHRONIZATION);
-                    if (!Database.synchronize(tableId, getContentResolver())) {
+                    if (!Database.synchronize(tableId, getContentResolver(), mTimeLag)) {
 
                         Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
                         intent.putExtra(SYNCHRONIZATION_STATE, STATE_ERROR);

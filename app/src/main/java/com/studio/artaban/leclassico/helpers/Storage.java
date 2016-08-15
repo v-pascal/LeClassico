@@ -17,7 +17,8 @@ import java.nio.channels.FileChannel;
  */
 public final class Storage {
 
-    public static final String FOLDER_PROFILE = File.separator + "Profile";
+    public static final String FOLDER_PROFILES = File.separator + "Profiles";
+    public static final String FOLDER_PHOTOS = File.separator + "Photos";
 
     //
     private static String FOLDER; // Application working folder path
@@ -129,17 +130,8 @@ public final class Storage {
         Storage.FOLDER = workingFolder.getAbsolutePath();
 
         // Create sub folders
-        if (!createFolder(FOLDER + Storage.FOLDER_PROFILE))
-            Logs.add(Logs.Type.E, "Failed to create 'Profile' folder");
-
-
-
-
-
-
-
-
-
+        createFolder(FOLDER + Storage.FOLDER_PROFILES);
+        createFolder(FOLDER + Storage.FOLDER_PHOTOS);
         return true;
     }
 }

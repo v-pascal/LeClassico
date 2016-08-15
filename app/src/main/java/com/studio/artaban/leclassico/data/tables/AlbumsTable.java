@@ -34,7 +34,8 @@ public class AlbumsTable implements IDataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(ContentResolver contentResolver) { // Synchronize data with remote DB
+    public boolean synchronize(ContentResolver contentResolver, long timeLag) {
+    // Synchronize data with remote DB
 
 
 

@@ -94,7 +94,8 @@ public class Glider {
                             fos.close();
 
                         } catch (IOException e) {
-                            Logs.add(Logs.Type.E, "Failed to save image: " + e.getMessage());
+                            Logs.add(Logs.Type.E, "Failed to save image '" + mImageFile +
+                                    "' (" + e.getMessage() + ")");
                         }
                     }
 
