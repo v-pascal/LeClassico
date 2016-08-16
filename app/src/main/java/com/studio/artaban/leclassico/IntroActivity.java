@@ -267,8 +267,13 @@ public class IntroActivity extends AppCompatActivity implements
                 break;
             }
             case ConnectionFragment.STEP_LOGIN: {
-                if ((mDataService.get() != null) && (!mDataService.get().login(pseudo, password)))
-                    displayError(false, R.string.no_internet);
+                try {
+                    if (!mDataService.get().login(pseudo, password))
+                        displayError(false, R.string.no_internet);
+
+                } catch (NullPointerException e) {
+                    Logs.add(Logs.Type.E, "Unbound service use");
+                }
                 break;
             }
             case ConnectionFragment.STEP_LOGIN_FAILED: {
@@ -287,10 +292,13 @@ public class IntroActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, "result: " + result + ";pseudo: " + pseudo);
         if (result) { // Login succeeded
-
-            if (mDataService.get() != null)
+            try {
                 mDataService.get().login(pseudo, null);
-            startMainActivity(false, pseudo); ////// Start main activity (Offline)
+                startMainActivity(false, pseudo); ////// Start main activity (Offline)
+
+            } catch (NullPointerException e) {
+                Logs.add(Logs.Type.E, "Unbound service use");
+            }
         }
     }
 
@@ -300,6 +308,24 @@ public class IntroActivity extends AppCompatActivity implements
     private AlertDialog mErrorDialog; // Alert dialog that displays error messages
 
     private String mProgressMessage; // Progress dialog message
+    private void createProgressDialog(boolean indeterminate, int progress) {
+
+        Logs.add(Logs.Type.V, "indeterminate: " + indeterminate + ";progress: " + progress);
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setCancelable(false);
+        if (!indeterminate)
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+
+        mProgressDialog.setTitle(R.string.wait);
+        mProgressDialog.setMessage(mProgressMessage);
+        mProgressDialog.setMax(Tables.ID_LAST - 1);
+        mProgressDialog.setProgress(progress);
+        mProgressDialog.setIndeterminate(indeterminate);
+
+        // Hide percentage info
+        mProgressDialog.setProgressNumberFormat(null);
+        mProgressDialog.setProgressPercentFormat(null);
+    }
 
     private boolean mErrorDisplay;
     private int mErrorMessage;
@@ -372,15 +398,19 @@ public class IntroActivity extends AppCompatActivity implements
                     Logs.add(Logs.Type.I, "Data synchronization");
 
                     // Data synchronization
+                    mProgressDialog.cancel();
                     mProgressMessage = getString(R.string.data_synchro);
-                    mProgressDialog.setMessage(mProgressMessage);
-                    mProgressDialog.setProgress(1);
-                    mProgressDialog.setIndeterminate(false);
+                    createProgressDialog(false, 0);
+                    mProgressDialog.show();
+                    try {
+                        if (!mDataService.get().synchronize()) {
+                            // Should not happen between the connection and this call! Elapsed time too short.
+                            Logs.add(Logs.Type.W, "Internet connection lost");
+                            displayError(true, R.string.webservice_error);
+                        }
 
-                    if ((mDataService.get() != null) && (!mDataService.get().synchronize())) {
-                        // Should not happen between the connection and this call! Elapsed time too short.
-                        Logs.add(Logs.Type.W, "Internet connection lost");
-                        displayError(true, R.string.webservice_error);
+                    } catch (NullPointerException e) {
+                        Logs.add(Logs.Type.E, "Unbound service use");
                     }
 
                 } else {
@@ -499,14 +529,8 @@ public class IntroActivity extends AppCompatActivity implements
         //
         setContentView(R.layout.activity_intro);
 
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setIndeterminate(indeterminate);
-        mProgressDialog.setMax(Tables.ID_LAST);
-        mProgressDialog.setProgress(progress);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setTitle(R.string.wait);
-        mProgressDialog.setMessage(mProgressMessage);
-
+        // Create dialogs
+        createProgressDialog(indeterminate, progress);
         if (pseudo != null)
             ((EditText)findViewById(R.id.edit_pseudo)).setText(pseudo);
         if (password != null)
