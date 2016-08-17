@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.tools;
 
 import android.app.Activity;
+import android.os.Bundle;
 
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -11,19 +12,21 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class WaitUiThread {
 
     public static abstract class TaskToRun {
-        public abstract void proceed();
+        public abstract void proceed(Bundle result);
     };
 
     //////
-    public static void run(final Activity activity, final TaskToRun task) {
+    public static Bundle run(final Activity activity, final TaskToRun task) {
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";task: " + task);
+        final Bundle result = new Bundle();
+
         Runnable taskRunnable = new Runnable() {
             @Override
             public void run() {
 
                 Logs.add(Logs.Type.I, "Proceed task");
-                task.proceed();
+                task.proceed(result);
 
                 // Notify initialization finished
                 synchronized (this) { notify(); }
@@ -39,5 +42,6 @@ public class WaitUiThread {
                 Logs.add(Logs.Type.E, e.getMessage());
             }
         }
+        return result;
     }
 }

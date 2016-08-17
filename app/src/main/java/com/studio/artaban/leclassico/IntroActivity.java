@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -245,7 +246,7 @@ public class IntroActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, "step: " + step);
         switch (step) {
             //case DataService.LOGIN_STEP_CHECK_INTERNET:
-                // Nothing to do
+            // Nothing to do
             case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION: {
                 mProgressMessage = getString(R.string.offline_identification);
                 mProgressDialog.setMessage(mProgressMessage);
@@ -275,13 +276,13 @@ public class IntroActivity extends AppCompatActivity implements
                 displayError(true, R.string.webservice_error);
                 break;
             }
-            case (byte)Constants.NO_DATA: {
+            case (byte) Constants.NO_DATA: {
                 Logs.add(Logs.Type.F, "Service not bound");
                 onServiceDisconnected(null);
                 break;
             }
             default: { // Tables DB synchronization
-                mProgressDialog.setProgress((int)step);
+                mProgressDialog.setProgress((int) step);
                 break;
             }
         }
@@ -299,10 +300,11 @@ public class IntroActivity extends AppCompatActivity implements
     @Override
     public boolean onLoginRequested(ConnectionFragment.ServiceHandler handler,
                                     String pseudo, String password) {
-        Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);
 
+        Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);
         try { mDataService.get().login(handler, pseudo, password);
         } catch (NullPointerException e) {
+
             Logs.add(Logs.Type.E, "Unbound service use");
             return false;
         }

@@ -5,10 +5,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
-import com.studio.artaban.leclassico.ConnectionFragment;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Errors;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -110,7 +110,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final byte LOGIN_STEP_SUCCEEDED = 20;
     // Login step codes
 
-    public void login(final ConnectionFragment.ServiceHandler handler, String pseudo, final String password) {
+    public void login(final Handler handler, String pseudo, final String password) {
 
         Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);// + ";password: " + password);
         mPseudo = pseudo;
