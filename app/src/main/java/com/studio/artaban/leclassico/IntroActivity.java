@@ -3,11 +3,8 @@ package com.studio.artaban.leclassico;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -54,7 +51,7 @@ import com.studio.artaban.leclassico.tools.SizeUtils;
  * Introduction & connection activity class
  */
 public class IntroActivity extends AppCompatActivity implements
-                            ConnectionFragment.OnProgressListener, ServiceBinder.OnServiceListener {
+        ServiceBinder.OnServiceListener, ConnectionFragment.OnProgressListener {
 
     private static final String DATA_KEY_INTRO_DISPLAYED = "introDisplayed";
 
@@ -124,16 +121,10 @@ public class IntroActivity extends AppCompatActivity implements
         }
     }
     private void quit(boolean displayIntro) { // Quit application (stop service)
-
         Logs.add(Logs.Type.V, null);
+
         mIntroDone = displayIntro;
-
-        if (DataService.isRunning())
-            stopService(new Intent(this, DataService.class));
-            // NB: This will call "DataService.stop" method when the service connection will disconnect
-            //     (see "onServiceDisconnected" in "ServiceBinder" class), and this B4 the service
-            //     is stopped. No need to call "DataService.stop" method here.
-
+        DataService.stop(this);
         finish();
     }
 
@@ -149,7 +140,6 @@ public class IntroActivity extends AppCompatActivity implements
 
         //Logs.add(Logs.Type.V, "skip: " + skip + "step1: " + step1 + "step2: " + step2 +
         //        "step3: " + step3 + "step4: " + step4);
-
         skip.setAlpha(mAlphaSkip);
         step1.setAlpha(mAlphaStep1);
         step2.setAlpha(mAlphaStep2);
@@ -250,61 +240,79 @@ public class IntroActivity extends AppCompatActivity implements
         mProgressDialog.setMessage(mProgressMessage);
     }
     @Override
-    public boolean onProgressUpdate(int step, String pseudo, String password) {
+    public void onProgressUpdate(byte step) {
 
-        Logs.add(Logs.Type.V, "step: " + step + ";pseudo: " + pseudo);// + ";password: " + password);
+        Logs.add(Logs.Type.V, "step: " + step);
         switch (step) {
-            //case ConnectionFragment.STEP_CHECK_INTERNET:
+            //case DataService.LOGIN_STEP_CHECK_INTERNET:
                 // Nothing to do
-            case ConnectionFragment.STEP_OFFLINE_IDENTIFICATION: {
+            case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION: {
                 mProgressMessage = getString(R.string.offline_identification);
                 mProgressDialog.setMessage(mProgressMessage);
                 break;
             }
-            case ConnectionFragment.STEP_ONLINE_IDENTIFICATION: {
+            case DataService.LOGIN_STEP_FAILED: {
+                displayError(false, R.string.login_failed);
+                break;
+            }
+            case DataService.LOGIN_STEP_INTERNET_NEEDED: {
+                displayError(false, R.string.no_internet);
+                break;
+            }
+            case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION: {
                 mProgressMessage = getString(R.string.identification);
                 mProgressDialog.setMessage(mProgressMessage);
                 break;
             }
-            case ConnectionFragment.STEP_LOGIN: {
-                try {
-                    if (!mDataService.get().login(pseudo, password))
-                        displayError(false, R.string.no_internet);
+            case DataService.LOGIN_STEP_SYNCHRONIZATION: {
+                mProgressDialog.cancel();
+                mProgressMessage = getString(R.string.data_synchro);
+                createProgressDialog(false, 0);
+                mProgressDialog.show();
+                break;
+            }
+            case DataService.LOGIN_STEP_ERROR: {
+                displayError(true, R.string.webservice_error);
+                break;
+            }
+            case (byte)Constants.NO_DATA: {
+                Logs.add(Logs.Type.F, "Service not bound");
+                onServiceDisconnected(null);
+                break;
+            }
+            default: { // Tables DB synchronization
+                mProgressDialog.setProgress((int)step);
+                break;
+            }
+        }
+    }
+    @Override
+    public void onPostExecute(boolean result, boolean online, String pseudo) {
 
-                } catch (NullPointerException e) {
-                    Logs.add(Logs.Type.E, "Unbound service use");
-                }
-                break;
-            }
-            case ConnectionFragment.STEP_LOGIN_FAILED: {
-                displayError(false, R.string.login_failed);
-                break;
-            }
-            case ConnectionFragment.STEP_NO_INTERNET: {
-                displayError(false, R.string.no_internet);
-                break;
-            }
+        Logs.add(Logs.Type.V, "result: " + result + ";online: " + online + ";pseudo: " + pseudo);
+        if (result) // Login succeeded
+            startMainActivity(online, pseudo); ////// Start main activity
+
+        //else // Nothing to do (user already informed using "onProgressUpdate" method)
+    }
+
+    @Override
+    public boolean onLoginRequested(ConnectionFragment.ServiceHandler handler,
+                                    String pseudo, String password) {
+        Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);
+
+        try { mDataService.get().login(handler, pseudo, password);
+        } catch (NullPointerException e) {
+            Logs.add(Logs.Type.E, "Unbound service use");
+            return false;
         }
         return true;
     }
-    @Override
-    public void onPostExecute(boolean result, String pseudo) {
-
-        Logs.add(Logs.Type.V, "result: " + result + ";pseudo: " + pseudo);
-        if (result) { // Login succeeded
-            try {
-                mDataService.get().login(pseudo, null);
-                startMainActivity(false, pseudo); ////// Start main activity (Offline)
-
-            } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "Unbound service use");
-            }
-        }
-    }
 
     //
-    private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
     private ConnectionFragment mConnectionFragment; // Retain fragment containing the progress dialog
+
+    private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
     private AlertDialog mErrorDialog; // Alert dialog that displays error messages
 
     private String mProgressMessage; // Progress dialog message
@@ -312,19 +320,16 @@ public class IntroActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, "indeterminate: " + indeterminate + ";progress: " + progress);
         mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setProgressNumberFormat(null);
         mProgressDialog.setCancelable(false);
         if (!indeterminate)
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
         mProgressDialog.setTitle(R.string.wait);
         mProgressDialog.setMessage(mProgressMessage);
-        mProgressDialog.setMax(Tables.ID_LAST - 1);
+        mProgressDialog.setMax(Tables.ID_LAST);
         mProgressDialog.setProgress(progress);
         mProgressDialog.setIndeterminate(indeterminate);
-
-        // Hide percentage info
-        mProgressDialog.setProgressNumberFormat(null);
-        mProgressDialog.setProgressPercentFormat(null);
     }
 
     private boolean mErrorDisplay;
@@ -349,6 +354,7 @@ public class IntroActivity extends AppCompatActivity implements
     }
 
     ////// OnServiceListener ///////////////////////////////////////////////////////////////////////
+
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
     private boolean mLogoutRequest; // Logout request flag
 
@@ -359,21 +365,11 @@ public class IntroActivity extends AppCompatActivity implements
             mLogoutRequest = false;
             mDataService.get().logout();
         }
-
-        // Register broadcast receiver HERE coz data service connection needed...
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(DataService.STATUS_CONNECTION); // ...for THIS action (see receiver)
-        filter.addAction(DataService.STATUS_SYNCHRONIZATION);
-        registerReceiver(mDataReceiver, filter);
     }
     @Override
     public void onServiceDisconnected(ServiceConnection connection) {
 
         Logs.add(Logs.Type.V, null);
-        try { unregisterReceiver(mDataReceiver); // Unregister broadcast receiver
-        } catch (Exception e) {
-            Logs.add(Logs.Type.W, "Receiver not registered");
-        }
         mConnectionFragment.cancel();
         mProgressDialog.cancel();
         mErrorDialog.cancel();
@@ -382,70 +378,6 @@ public class IntroActivity extends AppCompatActivity implements
         Toast.makeText(this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
         quit(mIntroDone);
     }
-
-    //////
-    private final DataReceiver mDataReceiver = new DataReceiver();
-    private class DataReceiver extends BroadcastReceiver { // Data receiver
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
-            if (intent.getAction().equals(DataService.STATUS_CONNECTION)) {
-
-                byte connectState = intent.getByteExtra(DataService.CONNECTION_STATE, DataService.STATE_ERROR);
-                if (connectState == DataService.CONNECTION_STATE_CONNECTED) {
-                    Logs.add(Logs.Type.I, "Data synchronization");
-
-                    // Data synchronization
-                    mProgressDialog.cancel();
-                    mProgressMessage = getString(R.string.data_synchro);
-                    createProgressDialog(false, 0);
-                    mProgressDialog.show();
-                    try {
-                        if (!mDataService.get().synchronize()) {
-                            // Should not happen between the connection and this call! Elapsed time too short.
-                            Logs.add(Logs.Type.W, "Internet connection lost");
-                            displayError(true, R.string.webservice_error);
-                        }
-
-                    } catch (NullPointerException e) {
-                        Logs.add(Logs.Type.E, "Unbound service use");
-                    }
-
-                } else {
-
-                    // Display error message
-                    if (connectState == DataService.CONNECTION_STATE_LOGIN_FAILED)
-                        displayError(false, R.string.login_failed);
-                    else
-                        displayError(true, R.string.webservice_error);
-                }
-
-            } else if (intent.getAction().equals(DataService.STATUS_SYNCHRONIZATION)) {
-
-                byte synchroState = intent.getByteExtra(DataService.SYNCHRONIZATION_STATE, DataService.STATE_ERROR);
-                switch (synchroState) {
-
-                    case DataService.SYNCHRONIZATION_STATE_DONE: {
-
-                        ////// Start main activity (Online)
-                        String pseudo = intent.getStringExtra(DataService.SYNCHRONIZATION_PSEUDO);
-                        startMainActivity(true, pseudo);
-                        break;
-                    }
-                    case DataService.STATE_ERROR: {
-                        displayError(true, R.string.synchro_error);
-                        break;
-                    }
-                    default: {
-                        mProgressDialog.setProgress((int)synchroState);
-                        break;
-                    }
-                }
-            }
-        }
-    };
 
     //
     public void onNextStep(View sender) { // Next step click event
@@ -502,8 +434,8 @@ public class IntroActivity extends AppCompatActivity implements
         String password = null;
         int progress = 0;
         boolean indeterminate = true;
-
         if (savedInstanceState != null) {
+
             mIntroDone = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
 
             mAlphaSkip = savedInstanceState.getFloat(DATA_KEY_ALPHA_SKIP);
@@ -512,12 +444,12 @@ public class IntroActivity extends AppCompatActivity implements
             mAlphaStep3 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP3);
             mAlphaStep4 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP4);
 
+            pseudo = savedInstanceState.getString(DATA_KEY_LOGIN_PSEUDO, null);
+            password = savedInstanceState.getString(DATA_KEY_LOGIN_PASSWORD, null);
+
             mProgressMessage = savedInstanceState.getString(DATA_KEY_PROGRESS_MESSAGE);
             indeterminate = savedInstanceState.getBoolean(DATA_KEY_PROGRESS_INDETERMINATE);
             progress = savedInstanceState.getInt(DATA_KEY_PROGRESS_VALUE);
-
-            pseudo = savedInstanceState.getString(DATA_KEY_LOGIN_PSEUDO, null);
-            password = savedInstanceState.getString(DATA_KEY_LOGIN_PASSWORD, null);
 
             mErrorDisplay = savedInstanceState.getBoolean(DATA_KEY_ERROR_DISPLAY);
             mErrorIcon = savedInstanceState.getInt(DATA_KEY_ERROR_ICON);
@@ -529,13 +461,13 @@ public class IntroActivity extends AppCompatActivity implements
         //
         setContentView(R.layout.activity_intro);
 
-        // Create dialogs
-        createProgressDialog(indeterminate, progress);
         if (pseudo != null)
             ((EditText)findViewById(R.id.edit_pseudo)).setText(pseudo);
         if (password != null)
             ((EditText)findViewById(R.id.edit_password)).setText(password);
 
+        // Create dialogs
+        createProgressDialog(indeterminate, progress);
         mErrorDialog = new AlertDialog.Builder(this).create();
         mErrorDialog.setTitle(R.string.error);
         mErrorDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -1005,8 +937,10 @@ public class IntroActivity extends AppCompatActivity implements
         super.onResume();
 
         Logs.add(Logs.Type.V, null);
-        if (!mDataService.bind(this, this)) // Bind data service
+        if (!mDataService.bind(this, this)) { // Bind data service
+            Logs.add(Logs.Type.F, "Service not bound");
             onServiceDisconnected(null);
+        }
     }
 
     @Override
@@ -1070,10 +1004,6 @@ public class IntroActivity extends AppCompatActivity implements
         outState.putFloat(DATA_KEY_ALPHA_STEP3, mAlphaStep3);
         outState.putFloat(DATA_KEY_ALPHA_STEP4, mAlphaStep4);
 
-        outState.putString(DATA_KEY_PROGRESS_MESSAGE, mProgressMessage);
-        outState.putBoolean(DATA_KEY_PROGRESS_INDETERMINATE, mProgressDialog.isIndeterminate());
-        outState.putInt(DATA_KEY_PROGRESS_VALUE, mProgressDialog.getProgress());
-
         EditText pseudoEdit = (EditText)findViewById(R.id.edit_pseudo);
         EditText passwordEdit = (EditText)findViewById(R.id.edit_password);
         if (pseudoEdit.getText().length() > 0)
@@ -1081,11 +1011,15 @@ public class IntroActivity extends AppCompatActivity implements
         if (passwordEdit.getText().length() > 0)
             outState.putString(DATA_KEY_LOGIN_PASSWORD, passwordEdit.getText().toString());
 
+        outState.putString(DATA_KEY_PROGRESS_MESSAGE, mProgressMessage);
+        outState.putBoolean(DATA_KEY_PROGRESS_INDETERMINATE, mProgressDialog.isIndeterminate());
+        outState.putInt(DATA_KEY_PROGRESS_VALUE, mProgressDialog.getProgress());
+
         outState.putBoolean(DATA_KEY_ERROR_DISPLAY, mErrorDisplay);
         outState.putInt(DATA_KEY_ERROR_ICON, mErrorIcon);
         outState.putInt(DATA_KEY_ERROR_MESSAGE, mErrorMessage);
 
-        //Logs.add(Logs.Type.V, "outState: " + outState);
+        Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -1101,9 +1035,11 @@ public class IntroActivity extends AppCompatActivity implements
 
                     case Requests.MAIN_TO_INTRO.RESULT_LOGOUT: {
 
-                        // Reset login data
+                        // Reset login data & progress dialog
                         ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
                         ((EditText)findViewById(R.id.edit_password)).getText().clear();
+                        mProgressMessage = getString(R.string.check_internet);
+                        createProgressDialog(true, 0);
 
                         mLogoutRequest = true; // Logout requested
                         break;
@@ -1135,11 +1071,6 @@ public class IntroActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, null);
         mDataService.unbind(this); // Unbind data service
-
-        try { unregisterReceiver(mDataReceiver); // Unregister broadcast receiver
-        } catch (Exception e) {
-            Logs.add(Logs.Type.W, "Receiver not registered");
-        }
     }
 
     @Override
@@ -1150,7 +1081,7 @@ public class IntroActivity extends AppCompatActivity implements
         SharedPreferences prefs = getSharedPreferences(Constants.APP_PREFERENCE, 0);
         if (prefs != null) {
 
-            Logs.add(Logs.Type.I, "mIntroDone: " + mIntroDone);
+            Logs.add(Logs.Type.I, "Introduction displayed: " + mIntroDone);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean(Constants.APP_PREFERENCE_INTRO_DONE, mIntroDone);
             editor.apply();

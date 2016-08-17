@@ -3,6 +3,7 @@
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>
@@ -42,6 +43,7 @@
     <string name="error">Error</string>
     <string name="warning">Warning</string>
     <string name="help">Help</string>
+    <string name="confirm">Confirm</string>
 
     <!-- Menus -->
     <string name="mnu_help">Help</string>
@@ -73,6 +75,9 @@
     <string name="error_no_storage">CRITICAL ERROR: Storage unavailable! Please to restart application later.</string>
     <string name="error_service_unavailable">CRITICAL ERROR: Service unavailable! Please to restart application.</string>
 
+    <!-- Confirmation -->
+    <string name="confirm_logout">Do you really want to logout?</string>
+    <string name="confirm_quit">Do you really want to quit application and therefore logout?</string>
 
 
 

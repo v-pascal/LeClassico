@@ -2,6 +2,7 @@
 <resources>
 
     <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
 
     <!-- Connection -->
     <string name="connection">Connexion</string>
@@ -37,6 +38,7 @@
     <string name="error">Erreur</string>
     <string name="warning">Attention</string>
     <string name="help">Aide</string>
+    <string name="confirm">Confirmation</string>
 
     <!-- Menus -->
     <string name="mnu_help">Aide</string>
@@ -67,5 +69,9 @@
     <!-- Errors -->
     <string name="error_no_storage">ERREUR CRITIQUE: Espace de stockage indisponible! Veuillez redémarrer l\'application plus tard.</string>
     <string name="error_service_unavailable">ERREUR CRITIQUE: Service indisponible! Veuillez redémarrer l\'application.</string>
+
+    <!-- Confirmation -->
+    <string name="confirm_logout">Souhaitez-vous vraiment vous déconnecter?</string>
+    <string name="confirm_quit">Souhaitez-vous vraiment quitter l\'application, et donc vous déconnecter?</string>
 
 </resources>

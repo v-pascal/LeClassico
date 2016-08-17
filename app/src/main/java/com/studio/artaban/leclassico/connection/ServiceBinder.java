@@ -55,7 +55,6 @@ public class ServiceBinder {
                     if (listener != null)
                         listener.onServiceDisconnected(this);
 
-                    mDataService.stop();
                     mDataService = null;
                 }
             }

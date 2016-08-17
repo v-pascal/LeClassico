@@ -1,7 +1,7 @@
 package com.studio.artaban.leclassico.main;
 
-import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -15,6 +15,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -33,7 +34,6 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.connection.DataService;
-import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -282,31 +282,50 @@ public class MainActivity extends AppCompatActivity implements
             }
             case R.id.navig_logout: { // Logout
 
-                setResult(Requests.MAIN_TO_INTRO.RESULT_LOGOUT);
-                supportFinishAfterTransition();
+                // Confirm logout
+                new AlertDialog.Builder(this)
+                        .setIcon(R.drawable.question_purple)
+                        .setTitle(R.string.confirm)
+                        .setMessage(R.string.confirm_logout)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
+                                if (which == DialogInterface.BUTTON_POSITIVE) {
+
+                                    MainActivity.this.setResult(Requests.MAIN_TO_INTRO.RESULT_LOGOUT);
+                                    MainActivity.this.supportFinishAfterTransition();
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .create()
+                        .show();
                 break;
             }
             case R.id.navig_quit: { // Quit application
 
-                // Stop service properly B4 quit application
-                final ServiceBinder dataService = new ServiceBinder();
-                boolean bound = dataService.bind(this, new ServiceBinder.OnServiceListener() {
-                    @Override
-                    public void onServiceConnected() {
+                // Confirm quit
+                new AlertDialog.Builder(this)
+                        .setIcon(R.drawable.question_red)
+                        .setTitle(R.string.confirm)
+                        .setMessage(R.string.confirm_quit)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
-                    }
+                                Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
+                                if (which == DialogInterface.BUTTON_POSITIVE) {
 
-                    @Override
-                    public void onServiceDisconnected(ServiceConnection connection) {
-
-                        Logs.add(Logs.Type.V, null);
-                        unbindService(connection);
-                        finishAffinity(); // Quit application
-                    }
-                });
-                if (bound)
-                    stopService(new Intent(MainActivity.this, DataService.class));
-                    // NB: This will call "onServiceDisconnected" method defined above
+                                    DataService.stop(MainActivity.this);
+                                    MainActivity.this.finishAffinity();
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .create()
+                        .show();
                 break;
             }
         }
@@ -342,6 +361,14 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView navigation = (NavigationView) findViewById(R.id.nav_view);
         navigation.setNavigationItemSelectedListener(this);
         navigation.setItemTextAppearance(R.style.NavDrawerTextStyle);
+        navigation.setItemTextColor(new ColorStateList(
+                new int[][]{
+                        new int[]{-android.R.attr.state_enabled},
+                        new int[]{android.R.attr.state_enabled},
+                        new int[]{-android.R.attr.state_checked},
+                        new int[]{android.R.attr.state_pressed}
+                },
+                new int[]{Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK}));
         navigation.setItemIconTintList(null);
         navigation.getMenu().findItem(R.id.navig_profile).getIcon()
                 .setColorFilter(getResources().getColor(R.color.colorAccentProfile), PorterDuff.Mode.SRC_ATOP);
@@ -375,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Bundle notificationData = new Bundle();
         notificationData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        notificationData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{ "count(*)" });
+        notificationData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
         notificationData.putString(QueryLoader.DATA_KEY_SELECTION, NotificationsTable.COLUMN_LU_FLAG + "=0");
         mNotificationLoader.init(this, Tables.ID_NOTIFICATIONS, notificationData);
 

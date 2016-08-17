@@ -7,8 +7,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 
+import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
@@ -20,14 +25,6 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class ConnectionFragment extends Fragment {
 
-    public static final int STEP_CHECK_INTERNET = 0;
-    public static final int STEP_OFFLINE_IDENTIFICATION = 1;
-    public static final int STEP_ONLINE_IDENTIFICATION = 2;
-    public static final int STEP_LOGIN = 3;
-    public static final int STEP_LOGIN_FAILED = 4;
-    public static final int STEP_NO_INTERNET = 5;
-    // Connection steps
-
     public static final String TAG = "connectionProgress";
 
     //
@@ -35,8 +32,10 @@ public class ConnectionFragment extends Fragment {
     public interface OnProgressListener { //////////////////////////////////////////////////////////
 
         void onPreExecute();
-        boolean onProgressUpdate(int step, String pseudo, String password);
-        void onPostExecute(boolean result, String pseudo);
+        void onProgressUpdate(byte step);
+        void onPostExecute(boolean result, boolean online, String pseudo);
+
+        boolean onLoginRequested(ServiceHandler handler, String pseudo, String password);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,18 +65,72 @@ public class ConnectionFragment extends Fragment {
         return ((mProgressTask != null) && (mProgressTask.getStatus() != AsyncTask.Status.FINISHED));
     }
 
+    //////
+    public static class ServiceHandler extends Handler {
+    // Handler used to manage exchange between the data service & the asynchronous connection task
+
+        private byte mLoginResult; // Login & synchronization result
+        public byte getResult() {
+            return mLoginResult;
+        }
+
+        //
+        private ConnectionProgressTask mAsyncTask;
+        public ServiceHandler(Looper looper, ConnectionProgressTask task) {
+            super(looper);
+            mAsyncTask = task; // Needed to publish progression
+        }
+
+        //////
+        @Override
+        public void handleMessage(Message msg) {
+
+            Logs.add(Logs.Type.V, "msg: " + msg);
+            switch (msg.what) {
+                case Constants.NO_DATA: { // Unexpected error (service not bound)
+
+                    Logs.add(Logs.Type.E, "Service not bound");
+                    mLoginResult = (byte)Constants.NO_DATA;
+                    getLooper().quit();
+                    break;
+                }
+                case DataService.LOGIN_STEP_SYNCHRONIZATION: {
+
+                    mAsyncTask.publishProgress(DataService.LOGIN_STEP_SYNCHRONIZATION, (String)msg.obj);
+                    break;
+                }
+                case DataService.LOGIN_STEP_ERROR:
+                case DataService.LOGIN_STEP_FAILED:
+                case DataService.LOGIN_STEP_SUCCEEDED: {
+
+                    mLoginResult = (byte)msg.what;
+                    getLooper().quit();
+                    break;
+                }
+                default: { // Tables DB synchronization
+
+                    mAsyncTask.publishProgress((byte)msg.what, null);
+                    break;
+                }
+            }
+        }
+    };
+
     //
     private ConnectionProgressTask mProgressTask;
-    private class ConnectionProgressTask extends AsyncTask<Activity, Integer, Boolean> {
+    private class ConnectionProgressTask extends AsyncTask<Activity, Byte, Boolean> {
 
-        private static final long INFORM_USER_DELAY = 1000; // Delay of displaying step
+        private static final long INFORM_USER_DELAY = 700; // Delay of displaying step
 
-        private void publishWaitProgress(int step) {
-        // Publish progression and wait its displayed B4 marking a delay to let's the user to be informed
+        //
+        private boolean mOnline; // Online connection flag
+        private ServiceHandler mHandler; // Data service exchange handler
+
+        private void publishWaitProgress(byte step) {
+        // Publish progression and wait its display B4 marking a delay to let's the user to be informed
 
             Logs.add(Logs.Type.V, "step: " + step);
-
-            Integer stepToPublish = step;
+            Byte stepToPublish = step;
             synchronized (stepToPublish) {
 
                 publishProgress(stepToPublish);
@@ -88,11 +141,20 @@ public class ConnectionFragment extends Fragment {
                     Logs.add(Logs.Type.E, "Wait display interrupted");
                 }
             }
-
             try { Thread.sleep(INFORM_USER_DELAY, 0); // Sleep to inform user of the step
             } catch (InterruptedException e) {
-                Logs.add(Logs.Type.E, "User delay interrupted");
+                Logs.add(Logs.Type.W, "User delay interrupted");
             }
+        }
+
+        public void publishProgress(byte step, String pseudo) {
+        // Allow to publish progression from the service handler
+
+            Logs.add(Logs.Type.V, "step: " + step + ";pseudo: " + pseudo);
+            if (step == DataService.LOGIN_STEP_SYNCHRONIZATION)
+                mPseudo = pseudo; // Pseudo as defined in the remote DB
+
+            publishProgress(step);
         }
 
         //////
@@ -107,7 +169,8 @@ public class ConnectionFragment extends Fragment {
             Logs.add(Logs.Type.V, null);
 
             // Check Internet connection
-            if (!Internet.isOnline(params[0])) {
+            mOnline = Internet.isOnline(params[0]);
+            if (!mOnline) {
 
                 // No Internet connection so check existing DB to work offline
                 ContentResolver cr = params[0].getContentResolver();
@@ -119,7 +182,7 @@ public class ConnectionFragment extends Fragment {
 
                 if (membersCount > 0) { // Found existing DB (try to work offline)
 
-                    publishWaitProgress(STEP_OFFLINE_IDENTIFICATION);
+                    publishWaitProgress(DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION);
                     String pseudo = null;
 
                     // Offline identification
@@ -137,42 +200,60 @@ public class ConnectionFragment extends Fragment {
                     if (pseudo != null) { // Login succeeded
 
                         mPseudo = pseudo; // Pseudo as defined in the DB
-                        return Boolean.TRUE;
+                        return Boolean.TRUE; // Succeeded (offline)
 
                     } else // Login failed
-                        publishProgress(STEP_LOGIN_FAILED);
+                        publishProgress(DataService.LOGIN_STEP_FAILED);
 
                 } else {
-                    publishWaitProgress(STEP_CHECK_INTERNET);
-                    publishProgress(STEP_NO_INTERNET);
+                    publishWaitProgress(DataService.LOGIN_STEP_CHECK_INTERNET);
+                    publishProgress(DataService.LOGIN_STEP_INTERNET_NEEDED);
                 }
-
-            } else {
-
-                // Identification
-                publishWaitProgress(STEP_ONLINE_IDENTIFICATION);
-                publishProgress(STEP_LOGIN);
+                return Boolean.FALSE;
             }
-            return Boolean.FALSE;
+
+            // Online identification
+            publishWaitProgress(DataService.LOGIN_STEP_ONLINE_IDENTIFICATION);
+
+            Looper.prepare();
+            mHandler = new ServiceHandler(Looper.myLooper(), this);
+            publishProgress(DataService.LOGIN_STEP_IN_PROGRESS);
+            Looper.loop();
+
+            //////
+            if (mHandler.getResult() != DataService.LOGIN_STEP_SUCCEEDED) {
+
+                byte result = mHandler.getResult();
+                publishProgress(result);
+                return Boolean.FALSE;
+            }
+            return Boolean.TRUE; // Succeeded (online)
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
+
             Logs.add(Logs.Type.V, "result: " + result);
-            mListener.onPostExecute(result.booleanValue(), mPseudo);
+            mListener.onPostExecute(result, mOnline, mPseudo);
         }
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
+        protected void onProgressUpdate(Byte... values) {
+            Logs.add(Logs.Type.V, "values[0]: " + values[0]);
 
-            Logs.add(Logs.Type.V, null);
-            if (!mListener.onProgressUpdate(values[0].intValue(), mPseudo, mPassword))
-                cancel(true);
+            // Check online login service requested
+            if (values[0] == DataService.LOGIN_STEP_IN_PROGRESS) {
+
+                if (!mListener.onLoginRequested(mHandler, mPseudo, mPassword))
+                    mHandler.sendEmptyMessage(Constants.NO_DATA);
+                return;
+            }
+            mListener.onProgressUpdate(values[0]);
 
             switch (values[0].intValue()) {
-                case STEP_CHECK_INTERNET:
-                case STEP_OFFLINE_IDENTIFICATION:
-                case STEP_ONLINE_IDENTIFICATION: {
+                case DataService.LOGIN_STEP_CHECK_INTERNET:
+                case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION:
+                case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION: {
 
                     synchronized (values[0]) { // Notify progress publication done
                         values[0].notify();

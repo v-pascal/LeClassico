@@ -2,10 +2,13 @@ package com.studio.artaban.leclassico.connection;
 
 import android.app.Service;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Message;
 
+import com.studio.artaban.leclassico.ConnectionFragment;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Errors;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -27,13 +30,14 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static boolean isRunning() {
         return isRunning;
     }
+    public static void stop(Context context) { // Stop service
+        Logs.add(Logs.Type.V, "context: " + context);
+
+        isRunning = false;
+        context.stopService(new Intent(context, DataService.class));
+    }
 
     ////// Broadcast actions
-    public static final String STATUS_CONNECTION = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.STATUS_CONNECTION";
-    public static final String STATUS_SYNCHRONIZATION = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.STATUS_SYNCHRONIZATION";
-
     public static final String NEW_NOTIFICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
             Constants.APP_URI + ".action.NEW_NOTIFICATIONS";
 
@@ -47,21 +51,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             Constants.APP_URI + ".action.NEW_LOCATIONS";
     public static final String NEW_EVENTS = "com." + Constants.APP_URI_COMPANY + "." +
             Constants.APP_URI + ".action.NEW_EVENTS";
-
-    ////// Broadcast keys & data
-    public static final byte STATE_ERROR = 0;
-
-    // action.STATUS_CONNECTION
-    public static final String CONNECTION_STATE = "connectionState";
-    public static final byte CONNECTION_STATE_CONNECTED = 1;
-    public static final byte CONNECTION_STATE_LOGIN_FAILED = 2; // Constants.WEBSERVICE_ERROR_LOGIN_FAILED
-    public static final byte CONNECTION_STATE_EXPIRED = 3; // Constants.WEBSERVICE_ERROR_TOKEN_EXPIRED
-
-    // action.STATUS_SYNCHRONIZATION
-    public static final String SYNCHRONIZATION_STATE = "synchronizationState"; // State == processing table Id
-    public static final byte SYNCHRONIZATION_STATE_DONE = Tables.ID_LAST + 1;
-
-    public static final String SYNCHRONIZATION_PSEUDO = "synchronizationPseudo"; // User pseudo data (from DB)
 
     ////// OnConnectivityListener //////////////////////////////////////////////////////////////////
     @Override
@@ -106,47 +95,39 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private String mToken; // Token used to identify the user when requesting remote DB
     private long mTimeLag; // Time lag between remote DB & current OS (in milliseconds)
                            // NB: Will be updated at every remote requests coz OS date & time can changed
-    //
-    public void stop() {
-
-        Logs.add(Logs.Type.V, null);
-        logout();
-
-        isRunning = false;
-    }
 
     private String mPseudo;
     // Login pseudo (used to get a token if working offline and an Internet connection is established)
 
-    public boolean login(final String pseudo, final String password) {
+    public static final byte LOGIN_STEP_ERROR = 0;
+    public static final byte LOGIN_STEP_CHECK_INTERNET = 13; // NB: [1;12]: reserved (tables ID)
+    public static final byte LOGIN_STEP_OFFLINE_IDENTIFICATION = 14;
+    public static final byte LOGIN_STEP_ONLINE_IDENTIFICATION = 15;
+    public static final byte LOGIN_STEP_IN_PROGRESS = 16;
+    public static final byte LOGIN_STEP_FAILED = 17;
+    public static final byte LOGIN_STEP_INTERNET_NEEDED = 18;
+    public static final byte LOGIN_STEP_SYNCHRONIZATION = 19;
+    public static final byte LOGIN_STEP_SUCCEEDED = 20;
+    // Login step codes
 
-        Logs.add(Logs.Type.V, "pseudo: " + pseudo);// + ";password: " + password);
-        if (!isRunning) {
-            Logs.add(Logs.Type.E, "Login failed: service stopped");
-            return false;
-        }
+    public void login(final ConnectionFragment.ServiceHandler handler, String pseudo, final String password) {
 
+        Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);// + ";password: " + password);
         mPseudo = pseudo;
-        if ((password == null) || (!Internet.isConnected()))
-            return false; // Working offline, or online but connection lost
+
+        if (!isRunning)
+            throw new IllegalArgumentException("Service stopped");
 
         new Thread(new Runnable() {
             @Override
             public void run() {
 
-
-
-
-
-
-
-
-
+                ////// Login
                 Date now = new Date();
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 ContentValues data = new ContentValues();
-                data.put(WebServices.CONNECTION_DATA_PSEUDO, pseudo);
+                data.put(WebServices.CONNECTION_DATA_PSEUDO, mPseudo);
                 data.put(WebServices.CONNECTION_DATA_PASSWORD, password);
                 data.put(WebServices.CONNECTION_DATA_DATETIME, dateFormat.format(now));
 
@@ -156,7 +137,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     public boolean onReceiveReply(String response) {
 
                         Logs.add(Logs.Type.V, "response: " + response);
-                        byte result = STATE_ERROR;
+                        boolean result = false;
                         try {
                             JSONObject reply = new JSONObject(response);
                             if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
@@ -167,14 +148,14 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                                 mTimeLag = logged.getLong(WebServices.JSON_KEY_TIME_LAG);
 
                                 Logs.add(Logs.Type.I, "Logged with time lag: " + mTimeLag);
-                                result = CONNECTION_STATE_CONNECTED;
+                                result = true; // Continue
 
                             } else switch ((byte)reply.getInt(WebServices.JSON_KEY_ERROR)) {
 
                                 // Error
                                 case Errors.WEBSERVICE_LOGIN_FAILED:
                                     Logs.add(Logs.Type.W, "Login failed");
-                                    result = CONNECTION_STATE_LOGIN_FAILED;
+                                    handler.sendEmptyMessage(LOGIN_STEP_FAILED);
                                     break;
 
                                 case Errors.WEBSERVICE_SERVER_UNAVAILABLE:
@@ -182,58 +163,36 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                                 case Errors.WEBSERVICE_SYSTEM_DATE:
                                     Logs.add(Logs.Type.E, "Connection error: #" +
                                             reply.getInt(WebServices.JSON_KEY_ERROR));
+                                    handler.sendEmptyMessage(LOGIN_STEP_ERROR);
                                     break;
                             }
 
                         } catch (JSONException e) {
                             Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                            handler.sendEmptyMessage(LOGIN_STEP_ERROR);
                         }
-                        Intent intent = new Intent(STATUS_CONNECTION);
-                        intent.putExtra(CONNECTION_STATE, result);
-                        sendBroadcast(intent); ////// STATUS_CONNECTION
-
-                        // Always return true coz status connection already sent (just above)
-                        return true;
+                        return result; // Manage method reply (below)
                     }
                 });
                 if (result != Internet.DownloadResult.SUCCEEDED) {
-                    Logs.add(Logs.Type.E, "Connection request error");
-
-                    Intent intent = new Intent(STATUS_CONNECTION);
-                    intent.putExtra(CONNECTION_STATE, STATE_ERROR);
-                    sendBroadcast(intent); ////// STATUS_CONNECTION
+                    Logs.add(Logs.Type.W, "Connection request failed");
+                    return;
                 }
 
+                ////// Synchronization
+                Message msg = handler.obtainMessage();
+                msg.obj = mPseudo;
+                msg.what = LOGIN_STEP_SYNCHRONIZATION;
+                handler.sendMessage(msg);
 
+                for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
+                    if (!Database.synchronize(tableId, getContentResolver(), mToken)) {
 
-
-
-
-
-
-
-
-
-            }
-
-        }).start();
-        return true;
-    }
-    public boolean synchronize() {
-
-        Logs.add(Logs.Type.V, null);
-        if (!isRunning) {
-            Logs.add(Logs.Type.E, "Synchronization failed: service stopped");
-            return false;
-        }
-        if ((!Internet.isConnected()) || (mToken == null))
-            return false;
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                for (byte tableId = 1; tableId < Tables.ID_LAST; ++tableId) {
+                        Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
+                        handler.sendEmptyMessage(LOGIN_STEP_ERROR);
+                        return; // Exit on error
+                    }
+                    handler.sendEmptyMessage(tableId);
 
 
 
@@ -253,36 +212,18 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
-                    Intent intent = new Intent(STATUS_SYNCHRONIZATION);
-                    if (!Database.synchronize(tableId, getContentResolver(), mToken)) {
 
-                        Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
-                        intent.putExtra(SYNCHRONIZATION_STATE, STATE_ERROR);
-                        sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
-
-                        return; // Exit on error
-                    }
-                    intent.putExtra(SYNCHRONIZATION_STATE, tableId);
-                    sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
                 }
 
-                // Synchronization finished successfully
-                Intent intent = new Intent(STATUS_SYNCHRONIZATION);
-                intent.putExtra(SYNCHRONIZATION_STATE, SYNCHRONIZATION_STATE_DONE);
-                intent.putExtra(SYNCHRONIZATION_PSEUDO, mPseudo); // From remote DB
-                sendBroadcast(intent); ////// STATUS_SYNCHRONIZATION
+                // Login & Synchronization finished successfully
+                handler.sendEmptyMessage(LOGIN_STEP_SUCCEEDED);
             }
 
         }).start();
-        return true;
     }
     public void logout() {
 
         Logs.add(Logs.Type.V, null);
-        if (!isRunning) {
-            Logs.add(Logs.Type.E, "Logout failed: service stopped");
-            return;
-        }
 
 
 
