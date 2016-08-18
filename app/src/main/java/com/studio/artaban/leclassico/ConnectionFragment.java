@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceHandler;
@@ -76,25 +77,29 @@ public class ConnectionFragment extends Fragment {
     private final ConnectionRunnable mConnectionRunnable = new ConnectionRunnable();
     private class ConnectionRunnable implements Runnable, ServiceHandler.OnPublishListener {
 
-        private static final long DELAY_INFORM_USER = 700; // Delay of displaying step
-        private static final long DELAY_WAIT_SERVICE = 300; // Max delay to wait service bound
+        private static final int DELAY_INFORM_USER = 700; // Delay of displaying step (in ms)
+        private static final int DELAY_WAIT_PROGRESS = 150; // Max delay to wait progress published (in ms)
+        private static final int DELAY_WAIT_SERVICE = 300; // Max delay to wait service bound (in ms)
+        // Delays
 
-        //
         private ServiceHandler mHandler; // Data service exchange handler
         public ServiceHandler getServiceHandler() {
             return mHandler;
         }
+
         private void cancel() {
         // Cancel thread from current runnable implementation (in case where activity is detached)
-        // NB: Should not happen! Fragment is a retain instance
 
             Logs.add(Logs.Type.V, null);
             if (mHandler != null)
                 mHandler.cancel();
+
             Thread.currentThread().interrupt();
         }
 
+        //
         private static final String DATA_KEY_REQUEST_RESULT = "serviceResult";
+
         private static final byte REQUEST_RESULT_CANCELLED = 0;
         private static final byte REQUEST_RESULT_NOT_BOUND = 1;
         private static final byte REQUEST_RESULT_SUCCEEDED = 2;
@@ -102,7 +107,7 @@ public class ConnectionFragment extends Fragment {
         private Bundle requestStepService(final byte requestStep) {
 
             Logs.add(Logs.Type.V, "requestStep: " + requestStep);
-            return WaitUiThread.run(getActivity(), new WaitUiThread.TaskToRun() {
+            return WaitUiThread.run(getWaitActivity(), new WaitUiThread.TaskToRun() {
                 @Override
                 public void proceed(Bundle result) {
 
@@ -128,10 +133,14 @@ public class ConnectionFragment extends Fragment {
         private void publishProgress(final Byte step) {
 
             Logs.add(Logs.Type.V, "step: " + step);
-            try {
-                // Check if service operation is requested
-                if ((step == DataService.LOGIN_STEP_IN_PROGRESS) || (step == DataService.LOGIN_STEP_SUCCEEDED)) {
+            boolean requestStep = false;
 
+            // Check if service operation is requested
+            if ((step == DataService.LOGIN_STEP_IN_PROGRESS) || (step == DataService.LOGIN_STEP_SUCCEEDED))
+                requestStep = true;
+
+            try {
+                if (requestStep) {
                     Bundle requestRes = requestStepService(step);
                     if (requestRes.getByte(DATA_KEY_REQUEST_RESULT) == REQUEST_RESULT_NOT_BOUND) {
 
@@ -148,7 +157,7 @@ public class ConnectionFragment extends Fragment {
                     }
 
                 } else { // Not a service request step
-                    getActivity().runOnUiThread(new Runnable() {
+                    getWaitActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
 
@@ -171,8 +180,11 @@ public class ConnectionFragment extends Fragment {
                 }
 
             } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "No more attached activity (pub)");
-                cancel();
+                Logs.add(Logs.Type.E, "Attached activity missing (pub)");
+
+                // Check if needed to cancel the process due to this issue
+                if (requestStep)
+                    cancel();
             }
         }
         private void publishWaitProgress(byte step) {
@@ -185,7 +197,7 @@ public class ConnectionFragment extends Fragment {
                 publishProgress(stepToPublish);
 
                 // Wait progress published
-                try { stepToPublish.wait();
+                try { stepToPublish.wait(DELAY_WAIT_PROGRESS);
                 } catch (InterruptedException e) {
                     Logs.add(Logs.Type.E, "Wait display interrupted");
                 }
@@ -205,12 +217,12 @@ public class ConnectionFragment extends Fragment {
             try {
 
                 // Check Internet connection
-                boolean online = Internet.isOnline(getActivity());
+                boolean online = Internet.isOnline(getWaitActivity());
                 if (Thread.currentThread().isInterrupted()) return;
                 if (!online) {
 
                     // No Internet connection so check existing DB to work offline
-                    ContentResolver cr = getActivity().getContentResolver();
+                    ContentResolver cr = getWaitActivity().getContentResolver();
                     Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                             new String[]{"count(*)"}, null, null, null);
                     result.moveToFirst();
@@ -274,7 +286,7 @@ public class ConnectionFragment extends Fragment {
                 onPostExecute(true, true, mPseudo); // Succeeded (online)
 
             } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "No more attached activity (run)");
+                Logs.add(Logs.Type.E, "Attached activity missing (run)");
                 cancel();
             }
         }
@@ -282,7 +294,7 @@ public class ConnectionFragment extends Fragment {
         //////
         private void onPreExecute() {
             try {
-                WaitUiThread.run(getActivity(), new WaitUiThread.TaskToRun() {
+                WaitUiThread.run(getWaitActivity(), new WaitUiThread.TaskToRun() {
                     @Override
                     public void proceed(Bundle res) {
                         mListener.onPreExecute();
@@ -290,13 +302,13 @@ public class ConnectionFragment extends Fragment {
                 });
 
             } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "No more attached activity (pre)");
-                cancel();
+                Logs.add(Logs.Type.E, "Attached activity missing (pre)");
+                //cancel(); // Not needed coz will always check this in the IntroActivity class
             }
         }
         private void onPostExecute(final boolean result, final boolean online, final String pseudo) {
             try {
-                getActivity().runOnUiThread(new Runnable() {
+                getWaitActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mListener.onPostExecute(result, online, pseudo);
@@ -304,7 +316,7 @@ public class ConnectionFragment extends Fragment {
                 });
 
             } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "No more attached activity (post)");
+                Logs.add(Logs.Type.E, "Attached activity missing (post)");
                 cancel();
             }
         }
@@ -322,12 +334,39 @@ public class ConnectionFragment extends Fragment {
         }
     };
 
+    //
+    private static final int DELAY_WAIT_ACTIVITY = 300; // Max delay to wait activity attached (in ms)
+    private final Boolean mWaitActivity = Boolean.FALSE; // Used to wait activity attached
+
+    private FragmentActivity getWaitActivity() { // Wait activity attached
+    // NB: When activity is recreated during an orientation change the fragment is detached and
+    //     reattached. During this laps of time the activity is not available and it is the reason
+    //     why this method exists.
+
+        Logs.add(Logs.Type.V, null);
+        if (getActivity() == null) {
+
+            Logs.add(Logs.Type.W, "Activity not attached yet");
+            synchronized (mWaitActivity) {
+                try {
+                    mWaitActivity.wait(DELAY_WAIT_ACTIVITY);
+                } catch (InterruptedException e) {
+                    Logs.add(Logs.Type.W, "Wait activity attached interrupted");
+                }
+            }
+        }
+        return getActivity();
+    }
+
     ////// Fragment ////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Logs.add(Logs.Type.V, null);
 
+        Logs.add(Logs.Type.V, null);
+        synchronized (mWaitActivity) { // Manage waiting activity attached
+            mWaitActivity.notify();
+        }
         if (context instanceof OnProgressListener)
             mListener = (OnProgressListener)context;
         else
