@@ -398,13 +398,13 @@ public class MainActivity extends AppCompatActivity implements
                 CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
         });
         userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + "'");
-        mUserLoader.init(this, Tables.ID_CAMARADES, userData);
+        mUserLoader.restart(this, Tables.ID_CAMARADES, userData);
 
         Bundle notificationData = new Bundle();
         notificationData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
         notificationData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
         notificationData.putString(QueryLoader.DATA_KEY_SELECTION, NotificationsTable.COLUMN_LU_FLAG + "=0");
-        mNotificationLoader.init(this, Tables.ID_NOTIFICATIONS, notificationData);
+        mNotificationLoader.restart(this, Tables.ID_NOTIFICATIONS, notificationData);
 
 
 

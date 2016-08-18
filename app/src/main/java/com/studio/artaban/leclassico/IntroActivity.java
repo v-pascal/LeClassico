@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -244,6 +243,9 @@ public class IntroActivity extends AppCompatActivity implements
     public void onProgressUpdate(byte step) {
 
         Logs.add(Logs.Type.V, "step: " + step);
+        if (!mProgressDialog.isShowing())
+            return; // Nothing to update coz nothing is displayed
+
         switch (step) {
             //case DataService.LOGIN_STEP_CHECK_INTERNET:
             // Nothing to do
@@ -278,7 +280,8 @@ public class IntroActivity extends AppCompatActivity implements
             }
             case (byte) Constants.NO_DATA: {
                 Logs.add(Logs.Type.F, "Service not bound");
-                onServiceDisconnected(null);
+                //onServiceDisconnected(null);
+                cancel();
                 break;
             }
             default: { // Tables DB synchronization
@@ -313,6 +316,13 @@ public class IntroActivity extends AppCompatActivity implements
 
     //
     private ConnectionFragment mConnectionFragment; // Retain fragment containing the progress dialog
+    private void cancel() { // Cancel any background process & dialog display
+
+        Logs.add(Logs.Type.V, null);
+        mConnectionFragment.cancel();
+        mProgressDialog.cancel();
+        mErrorDialog.cancel();
+    }
 
     private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
     private AlertDialog mErrorDialog; // Alert dialog that displays error messages
@@ -332,6 +342,26 @@ public class IntroActivity extends AppCompatActivity implements
         mProgressDialog.setMax(Tables.ID_LAST);
         mProgressDialog.setProgress(progress);
         mProgressDialog.setIndeterminate(indeterminate);
+
+        // Allow user to cancel
+        mProgressDialog.setButton(ProgressDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
+                if (which == ProgressDialog.BUTTON_NEGATIVE) {
+                    mConnectionFragment.cancel();
+                    resetProgressDialog();
+                }
+            }
+        });
+    }
+    private void resetProgressDialog() { // Recreate progress dialog with default settings
+
+        Logs.add(Logs.Type.V, null);
+        mProgressMessage = getString(R.string.check_internet);
+        createProgressDialog(true, 0);
     }
 
     private boolean mErrorDisplay;
@@ -369,12 +399,10 @@ public class IntroActivity extends AppCompatActivity implements
         }
     }
     @Override
-    public void onServiceDisconnected(ServiceConnection connection) {
+    public void onServiceDisconnected(ServiceConnection connection) { // SHOULD NOT HAPPEN!
 
         Logs.add(Logs.Type.V, null);
-        mConnectionFragment.cancel();
-        mProgressDialog.cancel();
-        mErrorDialog.cancel();
+        cancel();
 
         // Inform user of this critical error then quit application (this will restart data service)
         Toast.makeText(this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
@@ -940,6 +968,7 @@ public class IntroActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, null);
         if (!mDataService.bind(this, this)) { // Bind data service
+
             Logs.add(Logs.Type.F, "Service not bound");
             onServiceDisconnected(null);
         }
@@ -1040,8 +1069,7 @@ public class IntroActivity extends AppCompatActivity implements
                         // Reset login data & progress dialog
                         ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
                         ((EditText)findViewById(R.id.edit_password)).getText().clear();
-                        mProgressMessage = getString(R.string.check_internet);
-                        createProgressDialog(true, 0);
+                        resetProgressDialog();
 
                         mLogoutRequest = true; // Logout requested
                         break;

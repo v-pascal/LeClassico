@@ -5,10 +5,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
+import com.studio.artaban.leclassico.ConnectionFragment;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Errors;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -110,7 +110,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final byte LOGIN_STEP_SUCCEEDED = 20;
     // Login step codes
 
-    public void login(final Handler handler, String pseudo, final String password) {
+    public void login(final ConnectionFragment.ServiceHandler handler, String pseudo, final String password) {
 
         Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);// + ";password: " + password);
         mPseudo = pseudo;
@@ -137,8 +137,10 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     public boolean onReceiveReply(String response) {
 
                         Logs.add(Logs.Type.V, "response: " + response);
+                        if (handler.isCancelled()) return false;
                         boolean result = false;
                         try {
+
                             JSONObject reply = new JSONObject(response);
                             if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
@@ -174,9 +176,19 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         return result; // Manage method reply (below)
                     }
                 });
-                if (result != Internet.DownloadResult.SUCCEEDED) {
-                    Logs.add(Logs.Type.W, "Connection request failed");
-                    return;
+                if (handler.isCancelled()) return;
+                switch (result) {
+                    case WRONG_URL:
+                    case CONNECTION_FAILED:
+                    case REPLY_ERROR: {
+
+                        Logs.add(Logs.Type.W, "Connection request failed");
+                        if (result != Internet.DownloadResult.REPLY_ERROR)
+                            handler.sendEmptyMessage(LOGIN_STEP_ERROR);
+                        return;
+                    }
+                    default: // SUCCEEDED
+                        break;
                 }
 
                 ////// Synchronization
@@ -192,6 +204,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         handler.sendEmptyMessage(LOGIN_STEP_ERROR);
                         return; // Exit on error
                     }
+                    if (handler.isCancelled()) return;
                     handler.sendEmptyMessage(tableId);
 
 
