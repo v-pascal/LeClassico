@@ -16,7 +16,7 @@ public class WaitUiThread {
     };
 
     //////
-    public static Bundle run(final Activity activity, final TaskToRun task) {
+    public static Bundle run(final Activity activity, final TaskToRun task) throws NullPointerException {
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";task: " + task);
         final Bundle result = new Bundle();

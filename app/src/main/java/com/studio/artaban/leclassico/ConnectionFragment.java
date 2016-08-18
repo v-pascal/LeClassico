@@ -6,12 +6,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.connection.ServiceHandler;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -21,7 +20,10 @@ import com.studio.artaban.leclassico.tools.WaitUiThread;
 
 /**
  * Created by pascal on 08/08/16.
- * Fragment to display a progress dialog during connection & synchronization
+ * Fragment to display a progression on UI during connection & synchronization
+ * NB: The difficulty is to request the data service from this thread in order to log & synchronize
+ *     data, using the activity service bound (which is not always bound due to the orientation
+ *     change)
  */
 public class ConnectionFragment extends Fragment {
 
@@ -36,6 +38,7 @@ public class ConnectionFragment extends Fragment {
         void onPostExecute(boolean result, boolean online, String pseudo);
 
         boolean onLoginRequested(ServiceHandler handler, String pseudo, String password);
+        boolean onSynchronizationRequested(ServiceHandler handler);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,9 +74,10 @@ public class ConnectionFragment extends Fragment {
     private Thread mThread; // Connection thread
 
     private final ConnectionRunnable mConnectionRunnable = new ConnectionRunnable();
-    private class ConnectionRunnable implements Runnable {
+    private class ConnectionRunnable implements Runnable, ServiceHandler.OnPublishListener {
 
-        private static final long INFORM_USER_DELAY = 700; // Delay of displaying step
+        private static final long DELAY_INFORM_USER = 700; // Delay of displaying step
+        private static final long DELAY_WAIT_SERVICE = 300; // Max delay to wait service bound
 
         //
         private ServiceHandler mHandler; // Data service exchange handler
@@ -90,51 +94,86 @@ public class ConnectionFragment extends Fragment {
             Thread.currentThread().interrupt();
         }
 
+        private static final String DATA_KEY_REQUEST_RESULT = "serviceResult";
+        private static final byte REQUEST_RESULT_CANCELLED = 0;
+        private static final byte REQUEST_RESULT_NOT_BOUND = 1;
+        private static final byte REQUEST_RESULT_SUCCEEDED = 2;
+
+        private Bundle requestStepService(final byte requestStep) {
+
+            Logs.add(Logs.Type.V, "requestStep: " + requestStep);
+            return WaitUiThread.run(getActivity(), new WaitUiThread.TaskToRun() {
+                @Override
+                public void proceed(Bundle result) {
+
+                    Logs.add(Logs.Type.V, "result: " + result);
+                    result.putByte(DATA_KEY_REQUEST_RESULT, REQUEST_RESULT_CANCELLED);
+
+                    if (mHandler.isCancelled()) return;
+
+                    boolean requestDone;
+                    if (requestStep == DataService.LOGIN_STEP_IN_PROGRESS) // Login
+                        requestDone = mListener.onLoginRequested(mHandler, mPseudo, mPassword);
+                    else // Synchronization
+                        requestDone = mListener.onSynchronizationRequested(mHandler);
+
+                    //////
+                    result.putByte(DATA_KEY_REQUEST_RESULT,
+                            (!requestDone)? REQUEST_RESULT_NOT_BOUND : REQUEST_RESULT_SUCCEEDED);
+                }
+
+            });
+        }
+
         private void publishProgress(final Byte step) {
 
             Logs.add(Logs.Type.V, "step: " + step);
             try {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                // Check if service operation is requested
+                if ((step == DataService.LOGIN_STEP_IN_PROGRESS) || (step == DataService.LOGIN_STEP_SUCCEEDED)) {
 
-                        // Check online login service requested
-                        if (step == DataService.LOGIN_STEP_IN_PROGRESS) {
+                    Bundle requestRes = requestStepService(step);
+                    if (requestRes.getByte(DATA_KEY_REQUEST_RESULT) == REQUEST_RESULT_NOT_BOUND) {
 
-                            if (mHandler.isCancelled()) return;
-                            if (!mListener.onLoginRequested(mHandler, mPseudo, mPassword))
-                                mHandler.sendEmptyMessage(Constants.NO_DATA);
-                            return;
+                        Logs.add(Logs.Type.W, "Service not bound yet");
+                        try { // Wait service bound
+                            Thread.sleep(DELAY_WAIT_SERVICE, 0);
+                        } catch (InterruptedException e) {
+                            Logs.add(Logs.Type.W, "Wait service delay interrupted");
                         }
-                        mListener.onProgressUpdate(step);
 
-                        switch (step) {
-                            case DataService.LOGIN_STEP_CHECK_INTERNET:
-                            case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION:
-                            case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION: {
+                        requestRes = requestStepService(step);
+                        if (requestRes.getByte(DATA_KEY_REQUEST_RESULT) == REQUEST_RESULT_NOT_BOUND)
+                            mHandler.sendEmptyMessage(Constants.NO_DATA);
+                    }
 
-                                synchronized (step) { // Notify progress publication done
-                                    step.notify();
+                } else { // Not a service request step
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            Logs.add(Logs.Type.V, null);
+                            mListener.onProgressUpdate(step);
+
+                            switch (step) {
+                                case DataService.LOGIN_STEP_CHECK_INTERNET:
+                                case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION:
+                                case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION: {
+
+                                    synchronized (step) { // Notify progress publication done
+                                        step.notify();
+                                    }
+                                    break;
                                 }
-                                break;
                             }
                         }
-                    }
-                });
+                    });
+                }
 
             } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "No more attached activity");
+                Logs.add(Logs.Type.E, "No more attached activity (pub)");
                 cancel();
             }
-        }
-        public void publishProgress(byte step, String pseudo) {
-        // Allow to publish progression from the service handler
-
-            Logs.add(Logs.Type.V, "step: " + step + ";pseudo: " + pseudo);
-            if (step == DataService.LOGIN_STEP_SYNCHRONIZATION)
-                mPseudo = pseudo; // Pseudo as defined in the remote DB
-
-            publishProgress(step);
         }
         private void publishWaitProgress(byte step) {
         // Publish progression and wait its display B4 marking a delay to let's the user to be informed
@@ -151,7 +190,7 @@ public class ConnectionFragment extends Fragment {
                     Logs.add(Logs.Type.E, "Wait display interrupted");
                 }
             }
-            try { Thread.sleep(INFORM_USER_DELAY, 0); // Sleep to inform user of the step
+            try { Thread.sleep(DELAY_INFORM_USER, 0); // Sleep to inform user of the step
             } catch (InterruptedException e) {
                 Logs.add(Logs.Type.W, "User delay interrupted");
             }
@@ -226,7 +265,7 @@ public class ConnectionFragment extends Fragment {
 
                 //
                 if (Thread.currentThread().isInterrupted()) return;
-                if (mHandler.getResult() != DataService.LOGIN_STEP_SUCCEEDED) {
+                if (mHandler.getResult() != DataService.SYNCHRONIZATION_STEP_SUCCEEDED) {
 
                     publishProgress(mHandler.getResult());
                     onPostExecute(false, true, null);
@@ -235,7 +274,7 @@ public class ConnectionFragment extends Fragment {
                 onPostExecute(true, true, mPseudo); // Succeeded (online)
 
             } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "No more attached activity");
+                Logs.add(Logs.Type.E, "No more attached activity (run)");
                 cancel();
             }
         }
@@ -251,7 +290,7 @@ public class ConnectionFragment extends Fragment {
                 });
 
             } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "No more attached activity");
+                Logs.add(Logs.Type.E, "No more attached activity (pre)");
                 cancel();
             }
         }
@@ -265,74 +304,21 @@ public class ConnectionFragment extends Fragment {
                 });
 
             } catch (NullPointerException e) {
-                Logs.add(Logs.Type.E, "No more attached activity");
+                Logs.add(Logs.Type.E, "No more attached activity (post)");
                 cancel();
             }
         }
-    };
 
-    public static class ServiceHandler extends Handler {
-    // Handler used to manage exchange between the data service & the asynchronous connection task
-
-        private byte mLoginResult; // Login & synchronization result
-        public byte getResult() {
-            return mLoginResult;
-        }
-        private boolean mCancelled; // Cancel request flag
-        public boolean isCancelled() { // Used by the data service to known if needed to cancel
-            return mCancelled;
-        }
-
-        public void cancel() { // Cancel thread requested
-            Logs.add(Logs.Type.V, null);
-            mCancelled = true;
-        }
-
-        //
-        private ConnectionRunnable mRunnable;
-        public ServiceHandler(ConnectionRunnable runnable) {
-            super();
-            mRunnable = runnable;
-        }
-
-        //////
+        ////// OnPublishListener ///////////////////////////////////////////////////////////////////
         @Override
-        public void handleMessage(Message msg) {
+        public void publishProgress(byte step, Object pseudo) {
+        // Allow to publish progression from the service handler
 
-            Logs.add(Logs.Type.V, "msg: " + msg);
-            if (mCancelled) {
+            Logs.add(Logs.Type.V, "step: " + step + ";pseudo: " + pseudo);
+            if (step == DataService.LOGIN_STEP_SUCCEEDED)
+                mPseudo = (String)pseudo; // Pseudo as defined in the remote DB
 
-                mLoginResult = DataService.LOGIN_STEP_ERROR;
-                getLooper().quit();
-                return; // Prevents any message process if cancelled
-            }
-            switch (msg.what) {
-                case Constants.NO_DATA: { // Unexpected error (service not bound)
-
-                    Logs.add(Logs.Type.E, "Service not bound");
-                    mLoginResult = (byte)Constants.NO_DATA;
-                    getLooper().quit();
-                    break;
-                }
-                case DataService.LOGIN_STEP_SYNCHRONIZATION: {
-
-                    mRunnable.publishProgress(DataService.LOGIN_STEP_SYNCHRONIZATION, (String)msg.obj);
-                    break;
-                }
-                case DataService.LOGIN_STEP_ERROR:
-                case DataService.LOGIN_STEP_FAILED:
-                case DataService.LOGIN_STEP_SUCCEEDED: {
-
-                    mLoginResult = (byte)msg.what;
-                    getLooper().quit();
-                    break;
-                }
-                default: { // Tables DB synchronization
-
-                    mRunnable.publishProgress((byte)msg.what, null);
-                    break;
-                }
-            }
+            publishProgress(step);
         }
     };
 

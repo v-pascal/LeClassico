@@ -8,7 +8,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.Message;
 
-import com.studio.artaban.leclassico.ConnectionFragment;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Errors;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -30,6 +29,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static boolean isRunning() {
         return isRunning;
     }
+
     public static void stop(Context context) { // Stop service
         Logs.add(Logs.Type.V, "context: " + context);
 
@@ -100,17 +100,16 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     // Login pseudo (used to get a token if working offline and an Internet connection is established)
 
     public static final byte LOGIN_STEP_ERROR = 0;
-    public static final byte LOGIN_STEP_CHECK_INTERNET = 13; // NB: [1;12]: reserved (tables ID)
+    public static final byte LOGIN_STEP_CHECK_INTERNET = 13;  // NB: [1;12]: reserved (tables ID)
     public static final byte LOGIN_STEP_OFFLINE_IDENTIFICATION = 14;
     public static final byte LOGIN_STEP_ONLINE_IDENTIFICATION = 15;
     public static final byte LOGIN_STEP_IN_PROGRESS = 16;
     public static final byte LOGIN_STEP_FAILED = 17;
     public static final byte LOGIN_STEP_INTERNET_NEEDED = 18;
-    public static final byte LOGIN_STEP_SYNCHRONIZATION = 19;
-    public static final byte LOGIN_STEP_SUCCEEDED = 20;
+    public static final byte LOGIN_STEP_SUCCEEDED = 19;
     // Login step codes
 
-    public void login(final ConnectionFragment.ServiceHandler handler, String pseudo, final String password) {
+    public void login(final ServiceHandler handler, String pseudo, final String password) {
 
         Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);// + ";password: " + password);
         mPseudo = pseudo;
@@ -121,6 +120,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Logs.add(Logs.Type.V, null);
 
                 ////// Login
                 Date now = new Date();
@@ -191,45 +191,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         break;
                 }
 
-                ////// Synchronization
+                // Login finished successfully
                 Message msg = handler.obtainMessage();
                 msg.obj = mPseudo;
-                msg.what = LOGIN_STEP_SYNCHRONIZATION;
+                msg.what = LOGIN_STEP_SUCCEEDED;
                 handler.sendMessage(msg);
-
-                for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
-                    if (!Database.synchronize(tableId, getContentResolver(), mToken)) {
-
-                        Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
-                        handler.sendEmptyMessage(LOGIN_STEP_ERROR);
-                        return; // Exit on error
-                    }
-                    if (handler.isCancelled()) return;
-                    handler.sendEmptyMessage(tableId);
-
-
-
-
-
-
-
-                    try {
-                        Thread.sleep(1000, 0);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-
-
-
-
-
-
-
-                }
-
-                // Login & Synchronization finished successfully
-                handler.sendEmptyMessage(LOGIN_STEP_SUCCEEDED);
             }
 
         }).start();
@@ -253,6 +219,67 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
+    }
+
+    public static final byte SYNCHRONIZATION_STEP_ERROR = 20; // LOGIN_STEP_SUCCEEDED + 1
+    public static final byte SYNCHRONIZATION_STEP_SUCCEEDED = 21;
+    // Synchronization step codes
+
+    public boolean synchronize(final ServiceHandler handler) {
+
+        Logs.add(Logs.Type.V, "handler: " + handler);
+        if (!isRunning)
+            throw new IllegalArgumentException("Service stopped");
+
+        // Check if ready to synchronize
+        if ((!Internet.isConnected()) || (mToken == null)) {
+            Logs.add(Logs.Type.E, "Unable to synchronize");
+            return false;
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Logs.add(Logs.Type.V, null);
+
+                ////// Synchronization
+                for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
+                    if (handler.isCancelled()) return;
+                    handler.sendEmptyMessage(tableId);
+
+                    if (!Database.synchronize(tableId, getContentResolver(), mToken)) {
+
+                        Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
+                        handler.sendEmptyMessage(SYNCHRONIZATION_STEP_ERROR);
+                        return; // Exit on error
+                    }
+
+
+
+
+
+
+
+                    try {
+                        Thread.sleep(1000, 0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+
+
+
+
+
+                }
+
+                // Synchronization finished successfully
+                handler.sendEmptyMessage(SYNCHRONIZATION_STEP_SUCCEEDED);
+            }
+        }).start();
+        return true;
     }
 
     ////// Service /////////////////////////////////////////////////////////////////////////////////

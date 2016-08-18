@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
+import com.studio.artaban.leclassico.connection.ServiceHandler;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -267,11 +268,11 @@ public class IntroActivity extends AppCompatActivity implements
                 mProgressDialog.setMessage(mProgressMessage);
                 break;
             }
-            case DataService.LOGIN_STEP_SYNCHRONIZATION: {
-                mProgressDialog.cancel();
+            case DataService.LOGIN_STEP_SUCCEEDED: {
                 mProgressMessage = getString(R.string.data_synchro);
-                createProgressDialog(false, 0);
-                mProgressDialog.show();
+                mProgressDialog.setMessage(mProgressMessage);
+                mProgressDialog.setProgress(0);
+                mProgressDialog.setIndeterminate(false);
                 break;
             }
             case DataService.LOGIN_STEP_ERROR: {
@@ -301,14 +302,25 @@ public class IntroActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onLoginRequested(ConnectionFragment.ServiceHandler handler,
-                                    String pseudo, String password) {
+    public boolean onLoginRequested(ServiceHandler handler, String pseudo, String password) {
 
         Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);
         try { mDataService.get().login(handler, pseudo, password);
         } catch (NullPointerException e) {
 
-            Logs.add(Logs.Type.E, "Unbound service use");
+            Logs.add(Logs.Type.E, "Unbound service use (login)");
+            return false;
+        }
+        return true;
+    }
+    @Override
+    public boolean onSynchronizationRequested(ServiceHandler handler) {
+
+        Logs.add(Logs.Type.V, "handler: " + handler);
+        try { mDataService.get().synchronize(handler);
+        } catch (NullPointerException e) {
+
+            Logs.add(Logs.Type.E, "Unbound service use (synchronize)");
             return false;
         }
         return true;
@@ -328,41 +340,6 @@ public class IntroActivity extends AppCompatActivity implements
     private AlertDialog mErrorDialog; // Alert dialog that displays error messages
 
     private String mProgressMessage; // Progress dialog message
-    private void createProgressDialog(boolean indeterminate, int progress) {
-
-        Logs.add(Logs.Type.V, "indeterminate: " + indeterminate + ";progress: " + progress);
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setProgressNumberFormat(null);
-        mProgressDialog.setCancelable(false);
-        if (!indeterminate)
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-
-        mProgressDialog.setTitle(R.string.wait);
-        mProgressDialog.setMessage(mProgressMessage);
-        mProgressDialog.setMax(Tables.ID_LAST);
-        mProgressDialog.setProgress(progress);
-        mProgressDialog.setIndeterminate(indeterminate);
-
-        // Allow user to cancel
-        mProgressDialog.setButton(ProgressDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
-                if (which == ProgressDialog.BUTTON_NEGATIVE) {
-                    mConnectionFragment.cancel();
-                    resetProgressDialog();
-                }
-            }
-        });
-    }
-    private void resetProgressDialog() { // Recreate progress dialog with default settings
-
-        Logs.add(Logs.Type.V, null);
-        mProgressMessage = getString(R.string.check_internet);
-        createProgressDialog(true, 0);
-    }
 
     private boolean mErrorDisplay;
     private int mErrorMessage;
@@ -392,6 +369,7 @@ public class IntroActivity extends AppCompatActivity implements
 
     @Override
     public void onServiceConnected() {
+
         Logs.add(Logs.Type.V, null);
         if (mLogoutRequest) {
             mLogoutRequest = false;
@@ -497,7 +475,35 @@ public class IntroActivity extends AppCompatActivity implements
             ((EditText)findViewById(R.id.edit_password)).setText(password);
 
         // Create dialogs
-        createProgressDialog(indeterminate, progress);
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setProgressNumberFormat(null);
+        mProgressDialog.setProgressPercentFormat(null);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setTitle(R.string.wait);
+        mProgressDialog.setMax(Tables.ID_LAST);
+
+        mProgressDialog.setMessage(mProgressMessage);
+        mProgressDialog.setProgress(progress);
+        mProgressDialog.setIndeterminate(indeterminate);
+
+        // Allow user to cancel
+        mProgressDialog.setButton(ProgressDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
+                if (which == ProgressDialog.BUTTON_NEGATIVE) {
+
+                    mConnectionFragment.cancel();
+                    mProgressDialog.setProgress(0);
+                    mProgressDialog.setIndeterminate(true);
+                }
+            }
+        });
+
+
         mErrorDialog = new AlertDialog.Builder(this).create();
         mErrorDialog.setTitle(R.string.error);
         mErrorDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -963,13 +969,13 @@ public class IntroActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
         Logs.add(Logs.Type.V, null);
         if (!mDataService.bind(this, this)) { // Bind data service
 
-            Logs.add(Logs.Type.F, "Service not bound");
+            Logs.add(Logs.Type.F, "Failed to bind service");
             onServiceDisconnected(null);
         }
     }
@@ -1068,8 +1074,9 @@ public class IntroActivity extends AppCompatActivity implements
 
                         // Reset login data & progress dialog
                         ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
-                        ((EditText)findViewById(R.id.edit_password)).getText().clear();
-                        resetProgressDialog();
+                        ((EditText) findViewById(R.id.edit_password)).getText().clear();
+                        mProgressDialog.setProgress(0);
+                        mProgressDialog.setIndeterminate(true);
 
                         mLogoutRequest = true; // Logout requested
                         break;
@@ -1084,30 +1091,12 @@ public class IntroActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onBackPressed() {
-
-        Logs.add(Logs.Type.V, null);
-        if (mProgressDialog.isShowing()) {
-
-            moveTaskToBack(true); // Put application in pause
-            return;
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        Logs.add(Logs.Type.V, null);
-        mDataService.unbind(this); // Unbind data service
-    }
-
-    @Override
     protected void onStop(){
         super.onStop();
 
         Logs.add(Logs.Type.V, null);
+        mDataService.unbind(this); // Unbind data service
+
         SharedPreferences prefs = getSharedPreferences(Constants.APP_PREFERENCE, 0);
         if (prefs != null) {
 
