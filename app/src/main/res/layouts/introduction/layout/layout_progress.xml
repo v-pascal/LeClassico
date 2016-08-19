@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:theme="@style/LoginAppTheme"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    <!-- Internet connection -->
+    <ImageView
+        android:src="@drawable/checked_green"
+        android:layout_gravity="center_vertical"/>
+    <TextView
+        android:text="@string/check_internet"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_column="1"
+        android:layout_width="@dimen/login_width"
+        android:minWidth="@dimen/login_min_width"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:layout_height="36dp"/>
+
+    <!-- Identification -->
+    <ImageView
+        android:id="@+id/checked_identification"
+        android:src="@drawable/checked_green"
+        android:visibility="gone"
+        android:layout_row="1"
+        android:layout_gravity="center_vertical"/>
+    <TextView
+        android:text="@string/identification"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_row="1"
+        android:layout_column="1"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:layout_height="36dp"/>
+
+    <!-- Data synchronization -->
+    <ImageView
+        android:id="@+id/checked_synchro"
+        android:src="@drawable/checked_green"
+        android:visibility="gone"
+        android:layout_row="2"
+        android:layout_gravity="center_vertical"/>
+    <TextView
+        android:text="@string/data_synchro"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_row="2"
+        android:layout_column="1"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:layout_height="36dp"/>
+
+    <!-- Notification service -->
+    <ImageView
+        android:id="@+id/checked_notification"
+        android:src="@drawable/checked_green"
+        android:visibility="gone"
+        android:layout_row="3"
+        android:layout_gravity="center_vertical"/>
+    <TextView
+        android:text="@string/notification_service"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_row="3"
+        android:layout_column="1"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:layout_height="36dp"/>
+
+    <FrameLayout
+        android:layout_row="4"
+        android:layout_height="36dp"/>
+
+    <!-- Status -->
+    <TextView
+        android:text="@string/status"
+        android:textSize="18sp"
+        android:layout_row="5"
+        android:layout_column="0"
+        android:layout_gravity="center_vertical"/>
+    <TextView
+        android:textSize="18sp"
+        android:layout_row="5"
+        android:layout_column="1"
+        android:layout_gravity="clip_horizontal|end"/>
+
+    <!-- Progress bar -->
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_row="6"
+        android:layout_column="0"
+        android:layout_columnSpan="2"
+        android:layout_rowWeight="1"
+        android:layout_gravity="fill_horizontal|top"/>
+
+</GridLayout>

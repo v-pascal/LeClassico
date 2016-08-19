@@ -45,11 +45,11 @@ public class ServiceHandler extends Handler {
     public void handleMessage(Message msg) {
 
         Logs.add(Logs.Type.V, "msg: " + msg);
-        if (mCancelled) {
+        if (mCancelled) { // Prevents any message process if cancelled
 
             mLoginResult = (byte)Constants.NO_DATA;
             getLooper().quit();
-            return; // Prevents any message process if cancelled
+            return;
         }
         switch (msg.what) {
             case (byte)Constants.NO_DATA: { // Unexpected error (service not bound)

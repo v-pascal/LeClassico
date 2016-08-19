@@ -3,22 +3,23 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
+    <string name="status">Statut</string>
 
     <!-- Connection -->
     <string name="connection">Connexion</string>
     <string name="pseudo">Pseudo</string>
     <string name="password">Mot de passe</string>
     <string name="wait">Veuillez patienter&#8230;</string>
-    <string name="check_internet">Vérification connexion Internet</string>
+    <string name="check_internet">Connexion Internet</string>
     <string name="no_internet">Pas de connexion Internet!\nNécessaire lors de la première identification.</string>
     <string name="data_synchro">Synchronisation des données</string>
     <string name="help_connection">Si vous n\'avez pas de compte, sachez que seul un membre du Classico peut vous en créer un.\nEt si c\'est le hasard qui vous a conduit ici, alors continuez à vous exercer en tapant un pseudo &amp; mot de passe au hasard!</string>
-    <string name="offline_identification">Identification hors ligne</string>
     <string name="identification">Identification</string>
+    <string name="notification_service">Service de notification</string>
     <string name="login_missing">Pseudo et/ou mote de passe manquant!</string>
     <string name="login_failed">Echec durant l\'identification!\nPseudo et/ou mot de passe incorrecte.</string>
-    <string name="webservice_error">Web service indisponible!\nVeuillez ré-essayer plus tard.</string>
-    <string name="synchro_error">Une erreur est intervenue durant la synchronisation!\nVeuillez vous reconnecter plus tard.</string>
+    <string name="error_webservice">Web service indisponible!\nVeuillez ré-essayer plus tard.</string>
+    <string name="error_synchro">Une erreur est intervenue durant la synchronisation!\nVeuillez vous reconnecter plus tard.</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Bienvenue&#8230;</string>

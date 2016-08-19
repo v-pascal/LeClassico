@@ -4,6 +4,7 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="status">Status</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>
@@ -14,16 +15,16 @@
     <string name="pseudo">Pseudo</string>
     <string name="password">Password</string>
     <string name="wait">Please wait&#8230;</string>
-    <string name="check_internet">Check Internet connection</string>
+    <string name="check_internet">Internet connection</string>
     <string name="no_internet">No Internet connection!\nNeeded during the first identification.</string>
     <string name="data_synchro">Data synchronization</string>
     <string name="help_connection">If you do not have an account, please note that only a Classico member can create you one.\nAnd if it was chance that brought you here, so keep on practicing it by entering a username &amp; password to chance!</string>
-    <string name="offline_identification">Offline identification</string>
     <string name="identification">Identification</string>
+    <string name="notification_service">Notification service</string>
     <string name="login_missing">Missing pseudo and/or password!</string>
     <string name="login_failed">Login failed!\nWrong pseudo and/or password.</string>
-    <string name="webservice_error">Web service unavailable!\nPlease try later.</string>
-    <string name="synchro_error">An error occurred during the synchronization!\nPlease try to login later.</string>
+    <string name="error_webservice">Web service unavailable!\nPlease try later.</string>
+    <string name="error_synchro">An error occurred during the synchronization!\nPlease try to login later.</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome&#8230;</string>

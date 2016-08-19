@@ -18,6 +18,9 @@
     <item name="limitless_rotation_ratio" format="float" type="dimen">0.05</item>
     <item name="translation_ratio" format="float" type="dimen">1.0</item>
 
+    <dimen name="login_width">256dp</dimen>
+    <dimen name="login_min_width">128dp</dimen>
+
     <!-- Main -->
     <dimen name="profile_border_width">6dp</dimen>
     <item name="pseudo_shadow" format="float" type="dimen">2.0</item>

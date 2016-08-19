@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.view.ViewStub;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
@@ -41,7 +42,6 @@ import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.connection.ServiceHandler;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Requests;
-import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.main.MainActivity;
@@ -64,10 +64,6 @@ public class IntroActivity extends AppCompatActivity implements
 
     private static final String DATA_KEY_LOGIN_PSEUDO = "loginPseudo";
     private static final String DATA_KEY_LOGIN_PASSWORD = "loginPassword";
-
-    private static final String DATA_KEY_PROGRESS_MESSAGE = "progressMessage";
-    private static final String DATA_KEY_PROGRESS_INDETERMINATE = "progressIndeterminate";
-    private static final String DATA_KEY_PROGRESS_VALUE = "progressValue";
 
     private static final String DATA_KEY_ERROR_DISPLAY = "errorDisplay";
     private static final String DATA_KEY_ERROR_ICON = "errorIcon";
@@ -218,6 +214,25 @@ public class IntroActivity extends AppCompatActivity implements
 
     ////////////////////////////////////////////////////////////////////////////////////////// Login
 
+
+
+
+
+
+
+
+
+    private ProgressDialog mProgressDialog;
+    private String mProgressMessage;
+
+
+
+
+
+
+
+
+
     private void startMainActivity(boolean online, String pseudo) {
     // Start main activity containing publications, events, locations, etc.
 
@@ -249,9 +264,9 @@ public class IntroActivity extends AppCompatActivity implements
 
         switch (step) {
             //case DataService.LOGIN_STEP_CHECK_INTERNET:
-            // Nothing to do
+                // Nothing to do
             case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION: {
-                mProgressMessage = getString(R.string.offline_identification);
+                //mProgressMessage = getString(R.string.offline_identification);
                 mProgressDialog.setMessage(mProgressMessage);
                 break;
             }
@@ -276,10 +291,10 @@ public class IntroActivity extends AppCompatActivity implements
                 break;
             }
             case DataService.LOGIN_STEP_ERROR: {
-                displayError(true, R.string.webservice_error);
+                displayError(true, R.string.error_webservice);
                 break;
             }
-            case (byte) Constants.NO_DATA: {
+            case (byte) Constants.NO_DATA: { // SHOULD NOT HAPPEN!
                 Logs.add(Logs.Type.F, "Service not bound");
                 //onServiceDisconnected(null);
                 cancel();
@@ -336,10 +351,7 @@ public class IntroActivity extends AppCompatActivity implements
         mErrorDialog.cancel();
     }
 
-    private ProgressDialog mProgressDialog; // Progress dialog for connection & synchronization
     private AlertDialog mErrorDialog; // Alert dialog that displays error messages
-
-    private String mProgressMessage; // Progress dialog message
 
     private boolean mErrorDisplay;
     private int mErrorMessage;
@@ -404,8 +416,8 @@ public class IntroActivity extends AppCompatActivity implements
     public void onConnection(View sender) { // Connection
 
         Logs.add(Logs.Type.V, "sender: " + sender);
-        EditText pseudoEdit = (EditText)findViewById(R.id.edit_pseudo);
-        EditText passwordEdit = (EditText)findViewById(R.id.edit_password);
+        EditText pseudoEdit = (EditText)mConnectLayout.findViewById(R.id.edit_pseudo);
+        EditText passwordEdit = (EditText)mConnectLayout.findViewById(R.id.edit_password);
 
         // Check valid login (defined)
         if ((pseudoEdit.getText().length() == 0) || (passwordEdit.getText().length() == 0)) {
@@ -425,7 +437,9 @@ public class IntroActivity extends AppCompatActivity implements
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private LimitlessViewPager mViewPager; // Introduction view pager component
-    private boolean mIntroDone; // Introduction flag
+    private View mConnectLayout; // Connection layout view (containing login & connection progress)
+
+    private boolean mIntroDone; // Introduction displayed flag
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
@@ -436,12 +450,9 @@ public class IntroActivity extends AppCompatActivity implements
         // Restore data
         SharedPreferences settings = getSharedPreferences(Constants.APP_PREFERENCE, 0);
         mIntroDone = settings.getBoolean(Constants.APP_PREFERENCE_INTRO_DONE, false);
-        mProgressMessage = getString(R.string.check_internet);
 
         String pseudo = null;
         String password = null;
-        int progress = 0;
-        boolean indeterminate = true;
         if (savedInstanceState != null) {
 
             mIntroDone = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
@@ -455,10 +466,6 @@ public class IntroActivity extends AppCompatActivity implements
             pseudo = savedInstanceState.getString(DATA_KEY_LOGIN_PSEUDO, null);
             password = savedInstanceState.getString(DATA_KEY_LOGIN_PASSWORD, null);
 
-            mProgressMessage = savedInstanceState.getString(DATA_KEY_PROGRESS_MESSAGE);
-            indeterminate = savedInstanceState.getBoolean(DATA_KEY_PROGRESS_INDETERMINATE);
-            progress = savedInstanceState.getInt(DATA_KEY_PROGRESS_VALUE);
-
             mErrorDisplay = savedInstanceState.getBoolean(DATA_KEY_ERROR_DISPLAY);
             mErrorIcon = savedInstanceState.getInt(DATA_KEY_ERROR_ICON);
             mErrorMessage = savedInstanceState.getInt(DATA_KEY_ERROR_MESSAGE);
@@ -469,41 +476,36 @@ public class IntroActivity extends AppCompatActivity implements
         //
         setContentView(R.layout.activity_intro);
 
+
+
+
+
+
+
+
+
+
+        /*
+        ViewStub connect = (ViewStub) findViewById(R.id.connect_container);
+        connect.setLayoutResource(R.layout.layout_login);
+        //connect.setLayoutResource(R.layout.layout_progress);
+        mConnectLayout = connect.inflate();
+        */
+
+
+
+
+
+
+
+
+
         if (pseudo != null)
-            ((EditText)findViewById(R.id.edit_pseudo)).setText(pseudo);
+            ((EditText)mConnectLayout.findViewById(R.id.edit_pseudo)).setText(pseudo);
         if (password != null)
-            ((EditText)findViewById(R.id.edit_password)).setText(password);
+            ((EditText)mConnectLayout.findViewById(R.id.edit_password)).setText(password);
 
         // Create dialogs
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setProgressNumberFormat(null);
-        mProgressDialog.setProgressPercentFormat(null);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setTitle(R.string.wait);
-        mProgressDialog.setMax(Tables.ID_LAST);
-
-        mProgressDialog.setMessage(mProgressMessage);
-        mProgressDialog.setProgress(progress);
-        mProgressDialog.setIndeterminate(indeterminate);
-
-        // Allow user to cancel
-        mProgressDialog.setButton(ProgressDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
-                if (which == ProgressDialog.BUTTON_NEGATIVE) {
-
-                    mConnectionFragment.cancel();
-                    mProgressDialog.setProgress(0);
-                    mProgressDialog.setIndeterminate(true);
-                }
-            }
-        });
-
-
         mErrorDialog = new AlertDialog.Builder(this).create();
         mErrorDialog.setTitle(R.string.error);
         mErrorDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -951,8 +953,8 @@ public class IntroActivity extends AppCompatActivity implements
 
 
 
-        ((EditText)findViewById(R.id.edit_pseudo)).setText("pascal");
-        ((EditText)findViewById(R.id.edit_password)).setText("ras34");
+        ((EditText)mConnectLayout.findViewById(R.id.edit_pseudo)).setText("pascal");
+        ((EditText)mConnectLayout.findViewById(R.id.edit_password)).setText("ras34");
 
 
 
@@ -1041,16 +1043,12 @@ public class IntroActivity extends AppCompatActivity implements
         outState.putFloat(DATA_KEY_ALPHA_STEP3, mAlphaStep3);
         outState.putFloat(DATA_KEY_ALPHA_STEP4, mAlphaStep4);
 
-        EditText pseudoEdit = (EditText)findViewById(R.id.edit_pseudo);
-        EditText passwordEdit = (EditText)findViewById(R.id.edit_password);
+        EditText pseudoEdit = (EditText)mConnectLayout.findViewById(R.id.edit_pseudo);
+        EditText passwordEdit = (EditText)mConnectLayout.findViewById(R.id.edit_password);
         if (pseudoEdit.getText().length() > 0)
             outState.putString(DATA_KEY_LOGIN_PSEUDO, pseudoEdit.getText().toString());
         if (passwordEdit.getText().length() > 0)
             outState.putString(DATA_KEY_LOGIN_PASSWORD, passwordEdit.getText().toString());
-
-        outState.putString(DATA_KEY_PROGRESS_MESSAGE, mProgressMessage);
-        outState.putBoolean(DATA_KEY_PROGRESS_INDETERMINATE, mProgressDialog.isIndeterminate());
-        outState.putInt(DATA_KEY_PROGRESS_VALUE, mProgressDialog.getProgress());
 
         outState.putBoolean(DATA_KEY_ERROR_DISPLAY, mErrorDisplay);
         outState.putInt(DATA_KEY_ERROR_ICON, mErrorIcon);
@@ -1073,8 +1071,8 @@ public class IntroActivity extends AppCompatActivity implements
                     case Requests.MAIN_TO_INTRO.RESULT_LOGOUT: {
 
                         // Reset login data & progress dialog
-                        ((EditText)findViewById(R.id.edit_pseudo)).getText().clear();
-                        ((EditText) findViewById(R.id.edit_password)).getText().clear();
+                        ((EditText)mConnectLayout.findViewById(R.id.edit_pseudo)).getText().clear();
+                        ((EditText)mConnectLayout.findViewById(R.id.edit_password)).getText().clear();
                         mProgressDialog.setProgress(0);
                         mProgressDialog.setIndeterminate(true);
 
