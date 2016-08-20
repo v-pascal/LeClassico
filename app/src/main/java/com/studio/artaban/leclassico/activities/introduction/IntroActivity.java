@@ -1,6 +1,5 @@
 package com.studio.artaban.leclassico.activities.introduction;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
@@ -8,12 +7,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
@@ -27,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import android.view.ViewAnimationUtils;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
@@ -118,6 +117,91 @@ public class IntroActivity extends AppCompatActivity implements
                     .translationX(0f);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void replaceFloatingButton(boolean login, boolean hide) {
+    // Hide FAB under navigation bar then change icon & color B4 showing it again (expected parameters)
+
+        Logs.add(Logs.Type.V, "login: " + login);
+        Point screenSize = new Point();
+        getWindowManager().getDefaultDisplay().getSize(screenSize);
+
+        if (login) { // From login fragment to progress fragment
+
+            final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+            if (hide) { // Hide start button
+
+                fab.clearAnimation();
+                TranslateAnimation anim = new TranslateAnimation(0, 0, 0, screenSize.y - fab.getY());
+                anim.setDuration(DELAY_REVEAL_FRAGMENT); // Same as reveal fragment
+                anim.setFillAfter(true);
+                fab.startAnimation(anim);
+
+            } else { // Show cancel button
+
+                fab.setImageDrawable(getDrawable(R.drawable.ic_close_white_36dp));
+                fab.setBackgroundTintList(new ColorStateList(
+                        new int[][]{
+                                new int[]{-android.R.attr.state_enabled},
+                                new int[]{android.R.attr.state_enabled},
+                                new int[]{-android.R.attr.state_checked},
+                                new int[]{android.R.attr.state_pressed}
+                        },
+                        new int[]{Color.RED, Color.RED, Color.RED, Color.RED}
+                ));
+                fab.setTranslationY(0);
+                TranslateAnimation anim = new TranslateAnimation(0, 0, screenSize.y - fab.getY(), 0);
+                anim.setDuration(DELAY_REVEAL_FRAGMENT);
+                fab.clearAnimation();
+                fab.startAnimation(anim);
+            }
+
+        } else { // Back to login fragment
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private void quit(boolean displayIntro) { // Quit application (stop service)
         Logs.add(Logs.Type.V, null);
 
@@ -453,6 +537,9 @@ public class IntroActivity extends AppCompatActivity implements
         //.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
         */
 
+
+
+        replaceFloatingButton(true, true);
         login.reveal(false, new RevealFragment.OnRevealListener() {
             @Override
             public void onRevealEnd() {
@@ -465,6 +552,9 @@ public class IntroActivity extends AppCompatActivity implements
                         .replace(R.id.connect_container, progress, ProgressFragment.TAG)
                         .addToBackStack(null)
                         .commit();
+
+                //
+                replaceFloatingButton(true, false);
                 getSupportFragmentManager().executePendingTransactions();
 
 
