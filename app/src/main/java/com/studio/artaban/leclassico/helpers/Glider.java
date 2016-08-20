@@ -56,10 +56,11 @@ public class Glider {
         return this;
     }
 
-    //
-    public interface OnLoadListener {
+    public interface OnLoadListener { //////////////////////////////////////////////////////////////
         boolean setResource(Bitmap resource, ImageView imageView);
     };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void into(final ImageView imageView, final OnLoadListener listener) {
         Logs.add(Logs.Type.V, "view: " + imageView + ";listener: " + listener);

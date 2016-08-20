@@ -48,6 +48,7 @@ import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.activities.main.MainActivity;
+import com.studio.artaban.leclassico.tools.InOutScreen;
 import com.studio.artaban.leclassico.tools.SizeUtils;
 
 /**
@@ -117,91 +118,60 @@ public class IntroActivity extends AppCompatActivity implements
                     .translationX(0f);
         }
     }
+    private void replaceButtonIcon(boolean cancel) {
 
+        Logs.add(Logs.Type.V, "cancel: " + cancel);
+        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        if (cancel) { // Display close icon
 
+            fab.setImageDrawable(getDrawable(R.drawable.ic_close_white_36dp));
+            fab.setBackgroundTintList(new ColorStateList(
+                    new int[][]{
+                            new int[]{-android.R.attr.state_enabled},
+                            new int[]{android.R.attr.state_enabled},
+                            new int[]{-android.R.attr.state_checked},
+                            new int[]{android.R.attr.state_pressed}
+                    },
+                    new int[]{Color.RED, Color.RED, Color.RED, Color.RED}
+            ));
 
+        } else { // Display start icon
 
-
-
-
-
-
-
-
-
-
-
-
-    private void replaceFloatingButton(boolean login, boolean hide) {
-    // Hide FAB under navigation bar then change icon & color B4 showing it again (expected parameters)
-
-        Logs.add(Logs.Type.V, "login: " + login);
-        Point screenSize = new Point();
-        getWindowManager().getDefaultDisplay().getSize(screenSize);
-
-        if (login) { // From login fragment to progress fragment
-
-            final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-            if (hide) { // Hide start button
-
-                fab.clearAnimation();
-                TranslateAnimation anim = new TranslateAnimation(0, 0, 0, screenSize.y - fab.getY());
-                anim.setDuration(DELAY_REVEAL_FRAGMENT); // Same as reveal fragment
-                anim.setFillAfter(true);
-                fab.startAnimation(anim);
-
-            } else { // Show cancel button
-
-                fab.setImageDrawable(getDrawable(R.drawable.ic_close_white_36dp));
-                fab.setBackgroundTintList(new ColorStateList(
-                        new int[][]{
-                                new int[]{-android.R.attr.state_enabled},
-                                new int[]{android.R.attr.state_enabled},
-                                new int[]{-android.R.attr.state_checked},
-                                new int[]{android.R.attr.state_pressed}
-                        },
-                        new int[]{Color.RED, Color.RED, Color.RED, Color.RED}
-                ));
-                fab.setTranslationY(0);
-                TranslateAnimation anim = new TranslateAnimation(0, 0, screenSize.y - fab.getY(), 0);
-                anim.setDuration(DELAY_REVEAL_FRAGMENT);
-                fab.clearAnimation();
-                fab.startAnimation(anim);
-            }
-
-        } else { // Back to login fragment
-
-
-
-
-
-
-
-
-
-
-
-
-
+            fab.setImageDrawable(getDrawable(android.R.drawable.ic_lock_power_off));
+            fab.setBackgroundTintList(new ColorStateList(
+                    new int[][]{
+                            new int[]{-android.R.attr.state_enabled},
+                            new int[]{android.R.attr.state_enabled},
+                            new int[]{-android.R.attr.state_checked},
+                            new int[]{android.R.attr.state_pressed}
+                    },
+                    new int[]{
+                            getResources().getColor(R.color.colorAccentMain),
+                            getResources().getColor(R.color.colorAccentMain),
+                            getResources().getColor(R.color.colorAccentMain),
+                            getResources().getColor(R.color.colorAccentMain)
+                    }
+            ));
         }
     }
+    private void replaceFloatingButton(boolean hide) {
+    // Hide FAB under navigation bar then change icon & color B4 showing it again (expected parameter)
+    // NB: From login fragment to progress fragment
 
+        Logs.add(Logs.Type.V, "hide: " + hide);
+        if (hide) // Hide start button
+            InOutScreen.with(this)
+                    .setDuration(DELAY_REVEAL_FRAGMENT)
+                    .out(findViewById(R.id.fab));
 
+        else { // Show cancel button
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            replaceButtonIcon(true);
+            InOutScreen.with(this)
+                    .setDuration(DELAY_REVEAL_FRAGMENT)
+                    .in(findViewById(R.id.fab));
+        }
+    }
     private void quit(boolean displayIntro) { // Quit application (stop service)
         Logs.add(Logs.Type.V, null);
 
@@ -539,7 +509,7 @@ public class IntroActivity extends AppCompatActivity implements
 
 
 
-        replaceFloatingButton(true, true);
+        replaceFloatingButton(true);
         login.reveal(false, new RevealFragment.OnRevealListener() {
             @Override
             public void onRevealEnd() {
@@ -554,7 +524,7 @@ public class IntroActivity extends AppCompatActivity implements
                         .commit();
 
                 //
-                replaceFloatingButton(true, false);
+                replaceFloatingButton(false);
                 getSupportFragmentManager().executePendingTransactions();
 
 
@@ -568,6 +538,7 @@ public class IntroActivity extends AppCompatActivity implements
 
 
             }
+
         }, DELAY_REVEAL_FRAGMENT);
     }
 
@@ -612,19 +583,16 @@ public class IntroActivity extends AppCompatActivity implements
 
 
 
+
         // Add login fragment (if not already done)
         if (getSupportFragmentManager().findFragmentByTag(LoginFragment.TAG) == null)
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.connect_container, new LoginFragment(), LoginFragment.TAG)
                     .commit();
+        if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null)
+            replaceButtonIcon(true);
 
-        /*
-        ViewStub connect = (ViewStub) findViewById(R.id.connect_container);
-        connect.setLayoutResource(R.layout.layout_login);
-        //connect.setLayoutResource(R.layout.layout_progress);
-        mConnectLayout = connect.inflate();
-        */
 
 
 
@@ -1188,11 +1156,18 @@ public class IntroActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, null);
         if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null) {
+            replaceButtonIcon(false);
 
 
 
 
-            // Cancel connection
+
+
+
+            //Cancel connection
+
+
+
 
 
 
