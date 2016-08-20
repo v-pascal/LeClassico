@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico.main;
+package com.studio.artaban.leclassico.activities.main;
 
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;

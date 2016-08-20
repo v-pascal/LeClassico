@@ -20,14 +20,14 @@ android {
     sourceSets {
         main {
             res.srcDirs =
-            [   'src/main/res/layouts/introduction',
-                'src/main/res/layouts/main',
-                'src/main/res/drawables/introduction',
-                'src/main/res/drawables/main',
-                'src/main/res/layouts',
-                'src/main/res/drawables',
-                'src/main/res'
-            ]
+                    ['src/main/res/layouts/introduction',
+                     'src/main/res/layouts/main',
+                     'src/main/res/drawables/introduction',
+                     'src/main/res/drawables/main',
+                     'src/main/res/layouts',
+                     'src/main/res/drawables',
+                     'src/main/res'
+                    ]
         }
     }
 }
@@ -38,4 +38,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:design:23.2.1'
     compile 'com.github.bumptech.glide:glide:3.5.2'
+    compile 'com.android.support:support-v4:23.2.1'
 }

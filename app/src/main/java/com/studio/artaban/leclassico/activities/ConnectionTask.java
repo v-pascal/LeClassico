@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico;
+package com.studio.artaban.leclassico.activities;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -24,11 +24,11 @@ import com.studio.artaban.leclassico.tools.WaitUiThread;
  * Fragment to display a progression on UI during connection & synchronization
  * NB: The difficulty is to request the data service from this thread in order to log & synchronize
  *     data, using the activity service bound (which is not always bound due to the orientation
- *     change)
+ *     change and pause operation)
  */
-public class ConnectionFragment extends Fragment {
+public class ConnectionTask extends Fragment {
 
-    public static final String TAG = "connectionProgress";
+    public static final String TAG = "connectionTask";
 
     //
     private OnProgressListener mListener;

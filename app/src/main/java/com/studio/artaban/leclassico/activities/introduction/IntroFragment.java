@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico;
+package com.studio.artaban.leclassico.activities.introduction;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;

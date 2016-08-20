@@ -23,6 +23,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Created by pascal on 14/08/16.
+ * Data service that manage synchronization with remote DB
+ */
 public class DataService extends Service implements Internet.OnConnectivityListener {
 
     private static boolean isRunning; // Service running flag

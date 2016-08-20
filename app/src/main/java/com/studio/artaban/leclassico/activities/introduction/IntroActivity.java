@@ -1,5 +1,6 @@
-package com.studio.artaban.leclassico;
+package com.studio.artaban.leclassico.activities.introduction;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
@@ -12,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
@@ -25,18 +27,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import android.view.ViewStub;
+import android.view.ViewAnimationUtils;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.activities.ConnectionTask;
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
+import com.studio.artaban.leclassico.components.RevealFragment;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.connection.ServiceHandler;
@@ -44,7 +48,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
-import com.studio.artaban.leclassico.main.MainActivity;
+import com.studio.artaban.leclassico.activities.main.MainActivity;
 import com.studio.artaban.leclassico.tools.SizeUtils;
 
 /**
@@ -52,7 +56,7 @@ import com.studio.artaban.leclassico.tools.SizeUtils;
  * Introduction & connection activity class
  */
 public class IntroActivity extends AppCompatActivity implements
-        ServiceBinder.OnServiceListener, ConnectionFragment.OnProgressListener {
+        ServiceBinder.OnServiceListener, ConnectionTask.OnProgressListener {
 
     private static final String DATA_KEY_INTRO_DISPLAYED = "introDisplayed";
 
@@ -61,9 +65,6 @@ public class IntroActivity extends AppCompatActivity implements
     private static final String DATA_KEY_ALPHA_STEP2 = "alphaStep2";
     private static final String DATA_KEY_ALPHA_STEP3 = "alphaStep3";
     private static final String DATA_KEY_ALPHA_STEP4 = "alphaStep4";
-
-    private static final String DATA_KEY_LOGIN_PSEUDO = "loginPseudo";
-    private static final String DATA_KEY_LOGIN_PASSWORD = "loginPassword";
 
     private static final String DATA_KEY_ERROR_DISPLAY = "errorDisplay";
     private static final String DATA_KEY_ERROR_ICON = "errorIcon";
@@ -237,7 +238,7 @@ public class IntroActivity extends AppCompatActivity implements
     // Start main activity containing publications, events, locations, etc.
 
         Logs.add(Logs.Type.V, "online: " + online + ";pseudo: " + pseudo);
-        mConnectionFragment.cancel();
+        mConnectionTask.cancel();
         mProgressDialog.cancel();
 
         Intent intent = new Intent(this, MainActivity.class);
@@ -342,11 +343,11 @@ public class IntroActivity extends AppCompatActivity implements
     }
 
     //
-    private ConnectionFragment mConnectionFragment; // Retain fragment containing the progress dialog
+    private ConnectionTask mConnectionTask; // Retain fragment containing the progress dialog
     private void cancel() { // Cancel any background process & dialog display
 
         Logs.add(Logs.Type.V, null);
-        mConnectionFragment.cancel();
+        mConnectionTask.cancel();
         mProgressDialog.cancel();
         mErrorDialog.cancel();
     }
@@ -361,7 +362,7 @@ public class IntroActivity extends AppCompatActivity implements
     private void displayError(boolean critical, int errorId) {
 
         Logs.add(Logs.Type.V, "errorId: " + errorId);
-        mConnectionFragment.cancel();
+        mConnectionTask.cancel();
         mProgressDialog.cancel();
 
         // Display message
@@ -399,7 +400,9 @@ public class IntroActivity extends AppCompatActivity implements
         quit(mIntroDone);
     }
 
-    //
+    private static final int DELAY_REVEAL_FRAGMENT = 300; // Delay of displaying or hiding fragment
+
+    //////
     public void onNextStep(View sender) { // Next step click event
 
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -416,11 +419,12 @@ public class IntroActivity extends AppCompatActivity implements
     public void onConnection(View sender) { // Connection
 
         Logs.add(Logs.Type.V, "sender: " + sender);
-        EditText pseudoEdit = (EditText)mConnectLayout.findViewById(R.id.edit_pseudo);
-        EditText passwordEdit = (EditText)mConnectLayout.findViewById(R.id.edit_password);
+        LoginFragment login = (LoginFragment)getSupportFragmentManager().findFragmentByTag(LoginFragment.TAG);
+        String pseudo = login.getPseudo();
+        String password = login.getPassword();
 
         // Check valid login (defined)
-        if ((pseudoEdit.getText().length() == 0) || (passwordEdit.getText().length() == 0)) {
+        if ((pseudo.length() == 0) || (password.length() == 0)) {
 
             new AlertDialog.Builder(this)
                     .setTitle(R.string.warning)
@@ -429,16 +433,57 @@ public class IntroActivity extends AppCompatActivity implements
                     .show();
             return;
         }
-        mProgressDialog.show();
-        mConnectionFragment.cancel(); // Needed to reset previous state
-        mConnectionFragment.display(this, pseudoEdit.getText().toString(), passwordEdit.getText().toString());
+
+
+
+
+
+
+
+        /*
+        int deltaX = login.getWidth() >> 1;
+        int deltaY = login.getHeight() >> 1;
+        Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, initialRadius, 0);
+
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        transaction.replace(R.id.connect_container, new ProgressFragment(), ProgressFragment.TAG);
+        transaction.addToBackStack(null).commit();
+        //.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+        */
+
+        login.reveal(false, new RevealFragment.OnRevealListener() {
+            @Override
+            public void onRevealEnd() {
+                Logs.add(Logs.Type.V, null);
+
+                ProgressFragment progress = new ProgressFragment();
+                progress.reveal(true, null, DELAY_REVEAL_FRAGMENT);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.connect_container, progress, ProgressFragment.TAG)
+                        .addToBackStack(null)
+                        .commit();
+                getSupportFragmentManager().executePendingTransactions();
+
+
+
+                /*
+                mProgressDialog.show();
+                mConnectionTask.cancel(); // Needed to reset previous state
+                mConnectionTask.display(this, pseudo, password);
+                */
+
+
+
+            }
+        }, DELAY_REVEAL_FRAGMENT);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private LimitlessViewPager mViewPager; // Introduction view pager component
-    private View mConnectLayout; // Connection layout view (containing login & connection progress)
-
     private boolean mIntroDone; // Introduction displayed flag
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
@@ -451,10 +496,7 @@ public class IntroActivity extends AppCompatActivity implements
         SharedPreferences settings = getSharedPreferences(Constants.APP_PREFERENCE, 0);
         mIntroDone = settings.getBoolean(Constants.APP_PREFERENCE_INTRO_DONE, false);
 
-        String pseudo = null;
-        String password = null;
         if (savedInstanceState != null) {
-
             mIntroDone = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
 
             mAlphaSkip = savedInstanceState.getFloat(DATA_KEY_ALPHA_SKIP);
@@ -462,9 +504,6 @@ public class IntroActivity extends AppCompatActivity implements
             mAlphaStep2 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP2);
             mAlphaStep3 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP3);
             mAlphaStep4 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP4);
-
-            pseudo = savedInstanceState.getString(DATA_KEY_LOGIN_PSEUDO, null);
-            password = savedInstanceState.getString(DATA_KEY_LOGIN_PASSWORD, null);
 
             mErrorDisplay = savedInstanceState.getBoolean(DATA_KEY_ERROR_DISPLAY);
             mErrorIcon = savedInstanceState.getInt(DATA_KEY_ERROR_ICON);
@@ -483,7 +522,12 @@ public class IntroActivity extends AppCompatActivity implements
 
 
 
-
+        // Add login fragment (if not already done)
+        if (getSupportFragmentManager().findFragmentByTag(LoginFragment.TAG) == null)
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.connect_container, new LoginFragment(), LoginFragment.TAG)
+                    .commit();
 
         /*
         ViewStub connect = (ViewStub) findViewById(R.id.connect_container);
@@ -499,11 +543,6 @@ public class IntroActivity extends AppCompatActivity implements
 
 
 
-
-        if (pseudo != null)
-            ((EditText)mConnectLayout.findViewById(R.id.edit_pseudo)).setText(pseudo);
-        if (password != null)
-            ((EditText)mConnectLayout.findViewById(R.id.edit_password)).setText(password);
 
         // Create dialogs
         mErrorDialog = new AlertDialog.Builder(this).create();
@@ -542,14 +581,14 @@ public class IntroActivity extends AppCompatActivity implements
 
         // Check connection in progress
         FragmentManager manager = getSupportFragmentManager();
-        mConnectionFragment = (ConnectionFragment)manager.findFragmentByTag(ConnectionFragment.TAG);
-        if (mConnectionFragment == null) {
+        mConnectionTask = (ConnectionTask)manager.findFragmentByTag(ConnectionTask.TAG);
+        if (mConnectionTask == null) {
 
-            mConnectionFragment = new ConnectionFragment();
-            manager.beginTransaction().add(mConnectionFragment, ConnectionFragment.TAG).commit();
+            mConnectionTask = new ConnectionTask();
+            manager.beginTransaction().add(mConnectionTask, ConnectionTask.TAG).commit();
             manager.executePendingTransactions();
 
-        } else if (mConnectionFragment.isDisplayed())
+        } else if (mConnectionTask.isDisplayed())
             mProgressDialog.show(); // Display progress dialog
         else if (mErrorDisplay) {
 
@@ -937,37 +976,6 @@ public class IntroActivity extends AppCompatActivity implements
 
             }
         });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        ((EditText)mConnectLayout.findViewById(R.id.edit_pseudo)).setText("pascal");
-        ((EditText)mConnectLayout.findViewById(R.id.edit_password)).setText("ras34");
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     @Override
@@ -1043,13 +1051,6 @@ public class IntroActivity extends AppCompatActivity implements
         outState.putFloat(DATA_KEY_ALPHA_STEP3, mAlphaStep3);
         outState.putFloat(DATA_KEY_ALPHA_STEP4, mAlphaStep4);
 
-        EditText pseudoEdit = (EditText)mConnectLayout.findViewById(R.id.edit_pseudo);
-        EditText passwordEdit = (EditText)mConnectLayout.findViewById(R.id.edit_password);
-        if (pseudoEdit.getText().length() > 0)
-            outState.putString(DATA_KEY_LOGIN_PSEUDO, pseudoEdit.getText().toString());
-        if (passwordEdit.getText().length() > 0)
-            outState.putString(DATA_KEY_LOGIN_PASSWORD, passwordEdit.getText().toString());
-
         outState.putBoolean(DATA_KEY_ERROR_DISPLAY, mErrorDisplay);
         outState.putInt(DATA_KEY_ERROR_ICON, mErrorIcon);
         outState.putInt(DATA_KEY_ERROR_MESSAGE, mErrorMessage);
@@ -1070,11 +1071,15 @@ public class IntroActivity extends AppCompatActivity implements
 
                     case Requests.MAIN_TO_INTRO.RESULT_LOGOUT: {
 
-                        // Reset login data & progress dialog
-                        ((EditText)mConnectLayout.findViewById(R.id.edit_pseudo)).getText().clear();
-                        ((EditText)mConnectLayout.findViewById(R.id.edit_password)).getText().clear();
-                        mProgressDialog.setProgress(0);
-                        mProgressDialog.setIndeterminate(true);
+
+
+
+
+
+
+
+
+
 
                         mLogoutRequest = true; // Logout requested
                         break;
@@ -1086,6 +1091,24 @@ public class IntroActivity extends AppCompatActivity implements
                 }
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        Logs.add(Logs.Type.V, null);
+        if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null) {
+
+
+
+
+            // Cancel connection
+
+
+
+
+        }
+        super.onBackPressed();
     }
 
     @Override
