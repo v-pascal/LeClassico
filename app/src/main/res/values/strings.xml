@@ -25,6 +25,7 @@
     <string name="login_failed">Login failed!\nWrong pseudo and/or password.</string>
     <string name="error_webservice">Web service unavailable!\nPlease try later.</string>
     <string name="error_synchro">An error occurred during the synchronization!\nPlease try to login later.</string>
+    <string name="working_offline">Working offline</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome&#8230;</string>

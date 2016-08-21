@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
@@ -48,7 +49,7 @@ public class ConnectionTask extends Fragment {
     private String mPassword;
     // Login data
 
-    public void display(final Activity activity, String pseudo, String password) {
+    public void start(final Activity activity, String pseudo, String password) {
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";pseudo: " + pseudo);// + ";password: " + password);
         mPseudo = pseudo;
@@ -57,7 +58,7 @@ public class ConnectionTask extends Fragment {
         mThread = new Thread(mConnectionRunnable);
         mThread.start();
     }
-    public void cancel() {
+    public void stop() {
 
         Logs.add(Logs.Type.V, null);
         if (mThread != null) {
@@ -67,7 +68,7 @@ public class ConnectionTask extends Fragment {
             mThread = null;
         }
     }
-    public boolean isDisplayed() {
+    public boolean isRunning() {
         return ((mThread != null) && (!mThread.isInterrupted()));
     }
 
@@ -217,7 +218,9 @@ public class ConnectionTask extends Fragment {
             try {
 
                 // Check Internet connection
+                publishWaitProgress(DataService.LOGIN_STEP_CHECK_INTERNET);
                 boolean online = Internet.isOnline(getWaitActivity());
+
                 if (Thread.currentThread().isInterrupted()) return;
                 if (!online) {
 
@@ -239,8 +242,10 @@ public class ConnectionTask extends Fragment {
                         // Offline identification
                         result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                                 new String[]{CamaradesTable.COLUMN_PSEUDO},
-                                "UPPER(" + CamaradesTable.COLUMN_PSEUDO + ")='" + mPseudo.toUpperCase() +
-                                        "' AND " + CamaradesTable.COLUMN_CODE_CONF + "='" + mPassword + "'",
+                                "UPPER(" + CamaradesTable.COLUMN_PSEUDO + ")=" +
+                                        DatabaseUtils.sqlEscapeString(mPseudo.toUpperCase()) +
+                                        " AND " + CamaradesTable.COLUMN_CODE_CONF + "=" +
+                                        DatabaseUtils.sqlEscapeString(mPassword),
                                 null, null);
                         if (result.getCount() > 0) {
                             result.moveToFirst();
@@ -250,6 +255,31 @@ public class ConnectionTask extends Fragment {
 
                         if (Thread.currentThread().isInterrupted()) return;
                         if (pseudo != null) { // Login succeeded
+
+
+
+
+
+
+
+
+
+
+
+
+                            //publishProgress(SYNCHRONIZATION_STEP_SUCCEEDED); ?!?!
+                            //Start service notification
+
+
+
+
+
+
+
+
+
+
+
 
                             mPseudo = pseudo; // Pseudo as defined in the DB
                             onPostExecute(true, false, mPseudo); // Succeeded (offline)
@@ -283,6 +313,29 @@ public class ConnectionTask extends Fragment {
                     onPostExecute(false, true, null);
                     return;
                 }
+
+
+
+
+
+
+
+
+
+
+                //publishProgress(mHandler.getResult());
+                //Start service notification
+
+
+
+
+
+
+
+
+
+
+
                 onPostExecute(true, true, mPseudo); // Succeeded (online)
 
             } catch (NullPointerException e) {

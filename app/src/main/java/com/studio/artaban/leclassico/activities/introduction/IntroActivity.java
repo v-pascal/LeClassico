@@ -2,7 +2,6 @@ package com.studio.artaban.leclassico.activities.introduction;
 
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -269,31 +268,14 @@ public class IntroActivity extends AppCompatActivity implements
 
     ////////////////////////////////////////////////////////////////////////////////////////// Login
 
-
-
-
-
-
-
-
-
-    private ProgressDialog mProgressDialog;
-    private String mProgressMessage;
-
-
-
-
-
-
-
-
-
     private void startMainActivity(boolean online, String pseudo) {
     // Start main activity containing publications, events, locations, etc.
 
         Logs.add(Logs.Type.V, "online: " + online + ";pseudo: " + pseudo);
-        mConnectionTask.cancel();
-        mProgressDialog.cancel();
+        mConnectionTask.stop();
+
+        if (!online) // Inform user if working offline
+            Toast.makeText(this, R.string.working_offline, Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
@@ -307,22 +289,27 @@ public class IntroActivity extends AppCompatActivity implements
     public void onPreExecute() {
 
         Logs.add(Logs.Type.V, null);
-        mProgressMessage = getString(R.string.check_internet);
-        mProgressDialog.setMessage(mProgressMessage);
+        ((ProgressFragment)getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG))
+                .update(DataService.LOGIN_STEP_CHECK_INTERNET, 0);
     }
     @Override
     public void onProgressUpdate(byte step) {
 
         Logs.add(Logs.Type.V, "step: " + step);
-        if (!mProgressDialog.isShowing())
-            return; // Nothing to update coz nothing is displayed
+        ProgressFragment progress = (ProgressFragment)getSupportFragmentManager()
+                .findFragmentByTag(ProgressFragment.TAG);
+
+        // Check if connection task has been cancelled (can occurs)
+        if ((progress == null) || (!mConnectionTask.isRunning()))
+            return;
 
         switch (step) {
-            //case DataService.LOGIN_STEP_CHECK_INTERNET:
-                // Nothing to do
-            case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION: {
-                //mProgressMessage = getString(R.string.offline_identification);
-                mProgressDialog.setMessage(mProgressMessage);
+            case DataService.LOGIN_STEP_CHECK_INTERNET:
+            case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION:
+            case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION:
+            case DataService.LOGIN_STEP_SUCCEEDED: {
+
+                progress.update(step, 0);
                 break;
             }
             case DataService.LOGIN_STEP_FAILED: {
@@ -333,30 +320,21 @@ public class IntroActivity extends AppCompatActivity implements
                 displayError(false, R.string.no_internet);
                 break;
             }
-            case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION: {
-                mProgressMessage = getString(R.string.identification);
-                mProgressDialog.setMessage(mProgressMessage);
-                break;
-            }
-            case DataService.LOGIN_STEP_SUCCEEDED: {
-                mProgressMessage = getString(R.string.data_synchro);
-                mProgressDialog.setMessage(mProgressMessage);
-                mProgressDialog.setProgress(0);
-                mProgressDialog.setIndeterminate(false);
-                break;
-            }
             case DataService.LOGIN_STEP_ERROR: {
                 displayError(true, R.string.error_webservice);
                 break;
             }
             case (byte) Constants.NO_DATA: { // SHOULD NOT HAPPEN!
+
                 Logs.add(Logs.Type.F, "Service not bound");
                 //onServiceDisconnected(null);
-                cancel();
+                getSupportFragmentManager().popBackStack();
+                replaceButtonIcon(false);
                 break;
             }
             default: { // Tables DB synchronization
-                mProgressDialog.setProgress((int) step);
+
+                progress.update(DataService.SYNCHRONIZATION_STEP_IN_PROGRESS, step);
                 break;
             }
         }
@@ -367,8 +345,6 @@ public class IntroActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, "result: " + result + ";online: " + online + ";pseudo: " + pseudo);
         if (result) // Login succeeded
             startMainActivity(online, pseudo); ////// Start main activity
-
-        //else // Nothing to do (user already informed using "onProgressUpdate" method)
     }
 
     @Override
@@ -398,14 +374,6 @@ public class IntroActivity extends AppCompatActivity implements
 
     //
     private ConnectionTask mConnectionTask; // Retain fragment containing the progress dialog
-    private void cancel() { // Cancel any background process & dialog display
-
-        Logs.add(Logs.Type.V, null);
-        mConnectionTask.cancel();
-        mProgressDialog.cancel();
-        mErrorDialog.cancel();
-    }
-
     private AlertDialog mErrorDialog; // Alert dialog that displays error messages
 
     private boolean mErrorDisplay;
@@ -416,8 +384,7 @@ public class IntroActivity extends AppCompatActivity implements
     private void displayError(boolean critical, int errorId) {
 
         Logs.add(Logs.Type.V, "errorId: " + errorId);
-        mConnectionTask.cancel();
-        mProgressDialog.cancel();
+        mConnectionTask.stop();
 
         // Display message
         mErrorIcon = (critical) ? R.drawable.error_red : R.drawable.warning_red;
@@ -447,7 +414,8 @@ public class IntroActivity extends AppCompatActivity implements
     public void onServiceDisconnected(ServiceConnection connection) { // SHOULD NOT HAPPEN!
 
         Logs.add(Logs.Type.V, null);
-        cancel();
+        mConnectionTask.stop();
+        mErrorDialog.cancel();
 
         // Inform user of this critical error then quit application (this will restart data service)
         Toast.makeText(this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
@@ -470,76 +438,55 @@ public class IntroActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, "sender: " + sender);
         skipIntro();
     }
-    public void onConnection(View sender) { // Connection
+    public void onAction(View sender) { // Login or Cancel connection
 
         Logs.add(Logs.Type.V, "sender: " + sender);
-        LoginFragment login = (LoginFragment)getSupportFragmentManager().findFragmentByTag(LoginFragment.TAG);
-        String pseudo = login.getPseudo();
-        String password = login.getPassword();
+        if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null) {
 
-        // Check valid login (defined)
-        if ((pseudo.length() == 0) || (password.length() == 0)) {
+            // Cancel connection task
+            mConnectionTask.stop();
+            getSupportFragmentManager().popBackStack();
+            replaceButtonIcon(false);
 
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.warning)
-                    .setIcon(getDrawable(R.drawable.warning_red))
-                    .setMessage(R.string.login_missing)
-                    .show();
-            return;
-        }
+        } else {
 
+            LoginFragment login = (LoginFragment)getSupportFragmentManager().findFragmentByTag(LoginFragment.TAG);
+            final String pseudo = login.getPseudo();
+            final String password = login.getPassword();
 
+            // Check valid login (defined)
+            if ((pseudo.length() == 0) || (password.length() == 0)) {
 
-
-
-
-
-        /*
-        int deltaX = login.getWidth() >> 1;
-        int deltaY = login.getHeight() >> 1;
-        Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, initialRadius, 0);
-
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-        transaction.replace(R.id.connect_container, new ProgressFragment(), ProgressFragment.TAG);
-        transaction.addToBackStack(null).commit();
-        //.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-        */
-
-
-
-        replaceFloatingButton(true);
-        login.reveal(false, new RevealFragment.OnRevealListener() {
-            @Override
-            public void onRevealEnd() {
-                Logs.add(Logs.Type.V, null);
-
-                ProgressFragment progress = new ProgressFragment();
-                progress.reveal(true, null, DELAY_REVEAL_FRAGMENT);
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.connect_container, progress, ProgressFragment.TAG)
-                        .addToBackStack(null)
-                        .commit();
-
-                //
-                replaceFloatingButton(false);
-                getSupportFragmentManager().executePendingTransactions();
-
-
-
-                /*
-                mProgressDialog.show();
-                mConnectionTask.cancel(); // Needed to reset previous state
-                mConnectionTask.display(this, pseudo, password);
-                */
-
-
-
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.warning)
+                        .setIcon(getDrawable(R.drawable.warning_red))
+                        .setMessage(R.string.login_missing)
+                        .show();
+                return;
             }
+            replaceFloatingButton(true);
+            login.reveal(false, new RevealFragment.OnRevealListener() {
+                @Override
+                public void onRevealEnd() {
+                    Logs.add(Logs.Type.V, null);
 
-        }, DELAY_REVEAL_FRAGMENT);
+                    ProgressFragment progress = new ProgressFragment();
+                    progress.reveal(true, null, DELAY_REVEAL_FRAGMENT);
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.connect_container, progress, ProgressFragment.TAG)
+                            .addToBackStack(null)
+                            .commit();
+
+                    //
+                    replaceFloatingButton(false);
+                    getSupportFragmentManager().executePendingTransactions();
+                    mConnectionTask.stop(); // Needed to reset previous state
+                    mConnectionTask.start(IntroActivity.this, pseudo, password);
+                }
+
+            }, DELAY_REVEAL_FRAGMENT);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -576,14 +523,6 @@ public class IntroActivity extends AppCompatActivity implements
         //
         setContentView(R.layout.activity_intro);
 
-
-
-
-
-
-
-
-
         // Add login fragment (if not already done)
         if (getSupportFragmentManager().findFragmentByTag(LoginFragment.TAG) == null)
             getSupportFragmentManager()
@@ -593,23 +532,16 @@ public class IntroActivity extends AppCompatActivity implements
         if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null)
             replaceButtonIcon(true);
 
-
-
-
-
-
-
-
-
-
         // Create dialogs
         mErrorDialog = new AlertDialog.Builder(this).create();
         mErrorDialog.setTitle(R.string.error);
         mErrorDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-
                 Logs.add(Logs.Type.V, "dialog: " + dialog);
+
+                getSupportFragmentManager().popBackStack();
+                replaceButtonIcon(false);
                 mErrorDisplay = false;
             }
         });
@@ -646,9 +578,7 @@ public class IntroActivity extends AppCompatActivity implements
             manager.beginTransaction().add(mConnectionTask, ConnectionTask.TAG).commit();
             manager.executePendingTransactions();
 
-        } else if (mConnectionTask.isDisplayed())
-            mProgressDialog.show(); // Display progress dialog
-        else if (mErrorDisplay) {
+        } else if (mErrorDisplay) {
 
             // Display alert dialog
             mErrorDialog.setIcon(getDrawable(mErrorIcon));
@@ -1139,6 +1069,11 @@ public class IntroActivity extends AppCompatActivity implements
 
 
 
+
+
+
+
+
                         mLogoutRequest = true; // Logout requested
                         break;
                     }
@@ -1156,22 +1091,10 @@ public class IntroActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, null);
         if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null) {
+
+            // Cancel connection task
+            mConnectionTask.stop();
             replaceButtonIcon(false);
-
-
-
-
-
-
-
-            //Cancel connection
-
-
-
-
-
-
-
         }
         super.onBackPressed();
     }

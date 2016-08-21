@@ -226,7 +226,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     }
 
     public static final byte SYNCHRONIZATION_STEP_ERROR = 20; // LOGIN_STEP_SUCCEEDED + 1
-    public static final byte SYNCHRONIZATION_STEP_SUCCEEDED = 21;
+    public static final byte SYNCHRONIZATION_STEP_IN_PROGRESS = 21;
+    public static final byte SYNCHRONIZATION_STEP_SUCCEEDED = 22;
     // Synchronization step codes
 
     public boolean synchronize(final ServiceHandler handler) {
