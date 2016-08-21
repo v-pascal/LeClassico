@@ -214,8 +214,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
+
+
         mPseudo = null;
         mToken = null;
+
 
 
 

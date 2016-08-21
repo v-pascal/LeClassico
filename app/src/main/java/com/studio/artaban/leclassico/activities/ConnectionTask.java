@@ -267,7 +267,7 @@ public class ConnectionTask extends Fragment {
 
 
 
-                            //publishProgress(SYNCHRONIZATION_STEP_SUCCEEDED); ?!?!
+                            //publishWaitProgress(SYNCHRONIZATION_STEP_SUCCEEDED); ?!?!
                             //Start service notification
 
 
@@ -309,7 +309,7 @@ public class ConnectionTask extends Fragment {
                 if (Thread.currentThread().isInterrupted()) return;
                 if (mHandler.getResult() != DataService.SYNCHRONIZATION_STEP_SUCCEEDED) {
 
-                    publishProgress(mHandler.getResult());
+                    publishProgress(mHandler.getResult()); // Error
                     onPostExecute(false, true, null);
                     return;
                 }

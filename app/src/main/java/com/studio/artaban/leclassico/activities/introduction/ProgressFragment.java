@@ -46,7 +46,9 @@ public class ProgressFragment extends RevealFragment {
         pin.setImageDrawable(getResources().getDrawable(R.drawable.forward_purple));
         pin.setVisibility(View.INVISIBLE);
 
-        ((ProgressBar)mRootView.findViewById(R.id.progress_view)).setIndeterminate(true);
+        ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
+        progressBar.setIndeterminate(true);
+        progressBar.invalidate();
         ((TextView)mRootView.findViewById(R.id.progress_percentage)).setText(null);
     }
 
@@ -80,21 +82,23 @@ public class ProgressFragment extends RevealFragment {
                 mRootView.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
                 break;
             }
-            case DataService.LOGIN_STEP_SUCCEEDED:
             case DataService.SYNCHRONIZATION_STEP_IN_PROGRESS: {
-                mProgress = progress;
                 reset();
 
+                ((ImageView)mRootView.findViewById(R.id.checked_internet))
+                        .setImageDrawable(getResources().getDrawable((mOnline) ?
+                                R.drawable.checked_orange : R.drawable.cancel_orange));
                 ImageView pin = (ImageView)mRootView.findViewById(R.id.checked_identification);
                 pin.setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
                 pin.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
                 mRootView.findViewById(R.id.checked_synchro).setVisibility(View.VISIBLE);
 
                 ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
-                progressBar.setProgress(progress);
                 progressBar.setIndeterminate(false);
+                progressBar.invalidate();
+                progressBar.setProgress(progress);
                 ((TextView)mRootView.findViewById(R.id.progress_percentage))
-                        .setText(String.format("%d%%", (byte) (progress * 100f / 13f)));
+                        .setText(String.format("%d%%", (byte) (progress * 100f / Tables.ID_LAST)));
                 break;
             }
         }
@@ -105,8 +109,11 @@ public class ProgressFragment extends RevealFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
                 ";savedInstanceState: " + savedInstanceState);
+
         mRootView = inflater.inflate(R.layout.layout_progress, container, false);
-        ((ProgressBar)mRootView.findViewById(R.id.progress_view)).setMax(Tables.ID_LAST);
+        ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
+        progressBar.setMax(Tables.ID_LAST);
+        progressBar.incrementProgressBy(0);
 
         // Restore data
         if (savedInstanceState != null) {

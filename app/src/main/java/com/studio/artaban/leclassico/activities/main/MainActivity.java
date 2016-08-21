@@ -166,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements
                         if (profile != null)
                             Glider.with(MainActivity.this)
                                     .load(Storage.FOLDER_PROFILES +
-                                            File.separator + getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO) +
                                             File.separator + profile,
                                             Constants.APP_URL_PROFILES + "/" + profile)
                                     .placeholder((female)? R.drawable.woman : R.drawable.man)
@@ -191,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements
                         if (banner != null)
                             Glider.with(MainActivity.this)
                                     .load(Storage.FOLDER_PROFILES +
-                                            File.separator + getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO) +
                                             File.separator + banner,
                                             Constants.APP_URL_PROFILES + "/" + banner)
                                     .placeholder(R.drawable.banner)
@@ -384,9 +382,6 @@ public class MainActivity extends AppCompatActivity implements
         // Display user pseudo, profile icon & banner
         String pseudo = getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO);
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
-
-        // Storage: create user sub folder
-        Storage.createFolder(Storage.get() + Storage.FOLDER_PROFILES + File.separator + pseudo);
 
         // Load user & notification data (using query loaders)
         Bundle userData = new Bundle();

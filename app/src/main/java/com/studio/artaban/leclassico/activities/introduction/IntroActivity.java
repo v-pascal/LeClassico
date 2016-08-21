@@ -10,6 +10,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -175,6 +176,7 @@ public class IntroActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, null);
 
         mIntroDone = displayIntro;
+        mDataService.unbind(this);
         DataService.stop(this);
         finish();
     }
@@ -273,9 +275,16 @@ public class IntroActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, "online: " + online + ";pseudo: " + pseudo);
         mConnectionTask.stop();
+        getSupportFragmentManager().popBackStack();
+        replaceButtonIcon(false);
 
         if (!online) // Inform user if working offline
-            Toast.makeText(this, R.string.working_offline, Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(IntroActivity.this, R.string.working_offline, Toast.LENGTH_LONG).show();
+                }
+            }, 1200);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
@@ -402,12 +411,12 @@ public class IntroActivity extends AppCompatActivity implements
     private boolean mLogoutRequest; // Logout request flag
 
     @Override
-    public void onServiceConnected() {
+    public void onServiceConnected(DataService service) {
 
         Logs.add(Logs.Type.V, null);
         if (mLogoutRequest) {
             mLogoutRequest = false;
-            mDataService.get().logout();
+            service.logout();
         }
     }
     @Override
@@ -1058,23 +1067,14 @@ public class IntroActivity extends AppCompatActivity implements
                 switch (resultCode) {
 
                     case Requests.MAIN_TO_INTRO.RESULT_LOGOUT: {
+                        ((LoginFragment)getSupportFragmentManager()
+                                .findFragmentByTag(LoginFragment.TAG)).reset();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        mLogoutRequest = true; // Logout requested
+                        try { mDataService.get().logout();
+                        } catch (NullPointerException e) {
+                            Logs.add(Logs.Type.W, "Service not bound yet");
+                            mLogoutRequest = true; // Logout requested
+                        }
                         break;
                     }
                     default: {
