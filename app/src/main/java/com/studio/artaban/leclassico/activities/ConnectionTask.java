@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
+import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceHandler;
 import com.studio.artaban.leclassico.data.Constants;
@@ -18,6 +19,7 @@ import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.helpers.Notify;
 import com.studio.artaban.leclassico.tools.WaitUiThread;
 
 /**
@@ -221,8 +223,12 @@ public class ConnectionTask extends Fragment {
                 publishWaitProgress(DataService.LOGIN_STEP_CHECK_INTERNET);
                 boolean online = Internet.isOnline(getWaitActivity());
 
+                Bundle notifyData = new Bundle();
+                notifyData.putInt(Notify.DATA_KEY_ICON, R.drawable.notification);
+                notifyData.putString(Notify.DATA_KEY_TITLE, Constants.APP_NAME);
+
                 if (Thread.currentThread().isInterrupted()) return;
-                if (!online) {
+                if (!online) { ////// Offline
 
                     // No Internet connection so check existing DB to work offline
                     ContentResolver cr = getWaitActivity().getContentResolver();
@@ -256,87 +262,57 @@ public class ConnectionTask extends Fragment {
                         if (Thread.currentThread().isInterrupted()) return;
                         if (pseudo != null) { // Login succeeded
 
-
-
-
-
-
-
-
-
-
-
-
-                            //publishWaitProgress(SYNCHRONIZATION_STEP_SUCCEEDED); ?!?!
-                            //Start service notification
-
-
-
-
-
-
-
-
-
-
-
+                            // Start service notification
+                            publishWaitProgress(DataService.SYNCHRONIZATION_STEP_SUCCEEDED);
+                            if (Thread.currentThread().isInterrupted()) return;
+                            notifyData.putString(Notify.DATA_KEY_TEXT,
+                                    getString(R.string.pseudo_connected, pseudo));
+                            Notify.update(getWaitActivity(), Notify.Type.EVENT, null, notifyData);
 
                             mPseudo = pseudo; // Pseudo as defined in the DB
                             onPostExecute(true, false, mPseudo); // Succeeded (offline)
-                            return;
 
-                        } else // Login failed
+                        } else { // Login failed
                             publishProgress(DataService.LOGIN_STEP_FAILED);
+                            onPostExecute(false, false, null);
+                        }
 
                     } else {
                         publishWaitProgress(DataService.LOGIN_STEP_CHECK_INTERNET);
                         publishProgress(DataService.LOGIN_STEP_INTERNET_NEEDED);
+                        onPostExecute(false, false, null);
                     }
-                    onPostExecute(false, false, null);
-                    return;
+
+                } else { ////// Online
+
+                    // Online identification
+                    publishWaitProgress(DataService.LOGIN_STEP_ONLINE_IDENTIFICATION);
+                    if (Thread.currentThread().isInterrupted()) return;
+
+                    Looper.prepare();
+                    mHandler = new ServiceHandler(this);
+                    publishProgress(DataService.LOGIN_STEP_IN_PROGRESS);
+                    Looper.loop();
+
+                    //
+                    if (Thread.currentThread().isInterrupted()) return;
+                    if (mHandler.getResult() != DataService.SYNCHRONIZATION_STEP_SUCCEEDED) {
+
+                        publishProgress(mHandler.getResult()); // Error
+                        onPostExecute(false, true, null);
+
+                    } else {
+
+                        // Start service notification
+                        publishWaitProgress(DataService.SYNCHRONIZATION_STEP_SUCCEEDED);
+                        if (Thread.currentThread().isInterrupted()) return;
+                        notifyData.putString(Notify.DATA_KEY_TEXT,
+                                getString(R.string.pseudo_connected, mPseudo));
+                        Notify.update(getWaitActivity(), Notify.Type.EVENT, null, notifyData);
+
+                        onPostExecute(true, true, mPseudo); // Succeeded (online)
+                    }
                 }
-
-                // Online identification
-                publishWaitProgress(DataService.LOGIN_STEP_ONLINE_IDENTIFICATION);
-                if (Thread.currentThread().isInterrupted()) return;
-
-                Looper.prepare();
-                mHandler = new ServiceHandler(this);
-                publishProgress(DataService.LOGIN_STEP_IN_PROGRESS);
-                Looper.loop();
-
-                //
-                if (Thread.currentThread().isInterrupted()) return;
-                if (mHandler.getResult() != DataService.SYNCHRONIZATION_STEP_SUCCEEDED) {
-
-                    publishProgress(mHandler.getResult()); // Error
-                    onPostExecute(false, true, null);
-                    return;
-                }
-
-
-
-
-
-
-
-
-
-
-                //publishProgress(mHandler.getResult());
-                //Start service notification
-
-
-
-
-
-
-
-
-
-
-
-                onPostExecute(true, true, mPseudo); // Succeeded (online)
 
             } catch (NullPointerException e) {
                 Logs.add(Logs.Type.E, "Attached activity missing (run)");

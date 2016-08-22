@@ -26,6 +26,7 @@
     <string name="error_webservice">Web service unavailable!\nPlease try later.</string>
     <string name="error_synchro">An error occurred during the synchronization!\nPlease try to login later.</string>
     <string name="working_offline">Working offline</string>
+    <string name="pseudo_connected">%1$s is connected</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Welcome&#8230;</string>

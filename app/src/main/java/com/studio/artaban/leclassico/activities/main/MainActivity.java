@@ -42,6 +42,7 @@ import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import com.studio.artaban.leclassico.helpers.Notify;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.helpers.Storage;
 
@@ -292,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements
                                 Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
                                 if (which == DialogInterface.BUTTON_POSITIVE) {
 
+                                    Notify.cancel(MainActivity.this);
                                     MainActivity.this.setResult(Requests.MAIN_TO_INTRO.RESULT_LOGOUT);
                                     MainActivity.this.supportFinishAfterTransition();
                                 }
@@ -316,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements
                                 Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
                                 if (which == DialogInterface.BUTTON_POSITIVE) {
 
+                                    Notify.cancel(MainActivity.this);
                                     DataService.stop(MainActivity.this);
                                     MainActivity.this.finishAffinity();
                                 }

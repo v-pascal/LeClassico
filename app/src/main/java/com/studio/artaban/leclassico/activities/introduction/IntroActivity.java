@@ -69,6 +69,10 @@ public class IntroActivity extends AppCompatActivity implements
     private static final String DATA_KEY_ERROR_DISPLAY = "errorDisplay";
     private static final String DATA_KEY_ERROR_ICON = "errorIcon";
     private static final String DATA_KEY_ERROR_MESSAGE = "errorMessage";
+
+    private static final String DATA_KEY_LOGIN_REQUEST = "loginRequest";
+    private static final String DATA_KEY_ONLINE = "online";
+    private static final String DATA_KEY_PSEUDO = "pseudo";
     // Data keys
 
     private static final int ANIMATION_DURATION_SHOW_CONNECT = 200; // Display connection layout partially duration
@@ -270,13 +274,17 @@ public class IntroActivity extends AppCompatActivity implements
 
     ////////////////////////////////////////////////////////////////////////////////////////// Login
 
+    private boolean mLoginRequest; // Login succeeded flag (useful when activity is in background)
+
+    private boolean mOnline;
+    private String mPseudo;
+    // Login request info (as defined to 'startMainActivity' method below)
+
     private void startMainActivity(boolean online, String pseudo) {
     // Start main activity containing publications, events, locations, etc.
 
         Logs.add(Logs.Type.V, "online: " + online + ";pseudo: " + pseudo);
         mConnectionTask.stop();
-        getSupportFragmentManager().popBackStack();
-        replaceButtonIcon(false);
 
         if (!online) // Inform user if working offline
             new Handler().postDelayed(new Runnable() {
@@ -285,6 +293,8 @@ public class IntroActivity extends AppCompatActivity implements
                     Toast.makeText(IntroActivity.this, R.string.working_offline, Toast.LENGTH_LONG).show();
                 }
             }, 1200);
+
+        mLogged = true;
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
@@ -316,7 +326,8 @@ public class IntroActivity extends AppCompatActivity implements
             case DataService.LOGIN_STEP_CHECK_INTERNET:
             case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION:
             case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION:
-            case DataService.LOGIN_STEP_SUCCEEDED: {
+            case DataService.LOGIN_STEP_SUCCEEDED:
+            case DataService.SYNCHRONIZATION_STEP_SUCCEEDED: {
 
                 progress.update(step, 0);
                 break;
@@ -338,6 +349,7 @@ public class IntroActivity extends AppCompatActivity implements
                 Logs.add(Logs.Type.F, "Service not bound");
                 //onServiceDisconnected(null);
                 getSupportFragmentManager().popBackStack();
+                getSupportFragmentManager().executePendingTransactions();
                 replaceButtonIcon(false);
                 break;
             }
@@ -352,8 +364,16 @@ public class IntroActivity extends AppCompatActivity implements
     public void onPostExecute(boolean result, boolean online, String pseudo) {
 
         Logs.add(Logs.Type.V, "result: " + result + ";online: " + online + ";pseudo: " + pseudo);
-        if (result) // Login succeeded
-            startMainActivity(online, pseudo); ////// Start main activity
+        if (result) { // Login succeeded
+            if (!mInPause)
+                startMainActivity(online, pseudo); ////// Start main activity
+            else {
+
+                mLoginRequest = true; // Will start main activity when resumed
+                mOnline = online;
+                mPseudo = pseudo;
+            }
+        }
     }
 
     @Override
@@ -455,6 +475,7 @@ public class IntroActivity extends AppCompatActivity implements
             // Cancel connection task
             mConnectionTask.stop();
             getSupportFragmentManager().popBackStack();
+            getSupportFragmentManager().executePendingTransactions();
             replaceButtonIcon(false);
 
         } else {
@@ -501,7 +522,10 @@ public class IntroActivity extends AppCompatActivity implements
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private LimitlessViewPager mViewPager; // Introduction view pager component
+
     private boolean mIntroDone; // Introduction displayed flag
+    private boolean mInPause; // Activity background flag
+    private boolean mLogged; // Main activity started flag
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
@@ -525,6 +549,10 @@ public class IntroActivity extends AppCompatActivity implements
             mErrorDisplay = savedInstanceState.getBoolean(DATA_KEY_ERROR_DISPLAY);
             mErrorIcon = savedInstanceState.getInt(DATA_KEY_ERROR_ICON);
             mErrorMessage = savedInstanceState.getInt(DATA_KEY_ERROR_MESSAGE);
+
+            mLoginRequest = savedInstanceState.getBoolean(DATA_KEY_LOGIN_REQUEST);
+            mOnline = savedInstanceState.getBoolean(DATA_KEY_ONLINE);
+            mPseudo = savedInstanceState.getString(DATA_KEY_PSEUDO);
 
         } else if (mIntroDone)
             setTheme(R.style.ConnectAppTheme); // To display white background
@@ -550,7 +578,9 @@ public class IntroActivity extends AppCompatActivity implements
                 Logs.add(Logs.Type.V, "dialog: " + dialog);
 
                 getSupportFragmentManager().popBackStack();
+                getSupportFragmentManager().executePendingTransactions();
                 replaceButtonIcon(false);
+
                 mErrorDisplay = false;
             }
         });
@@ -988,6 +1018,24 @@ public class IntroActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        Logs.add(Logs.Type.V, null);
+        mInPause = false;
+        if (mLoginRequest) {
+            mLogoutRequest = false;
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startMainActivity(mOnline, mPseudo); ////// Start main activity
+                }
+            }, 1200);
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         Logs.add(Logs.Type.V, "menu: " + menu);
@@ -1052,6 +1100,10 @@ public class IntroActivity extends AppCompatActivity implements
         outState.putInt(DATA_KEY_ERROR_ICON, mErrorIcon);
         outState.putInt(DATA_KEY_ERROR_MESSAGE, mErrorMessage);
 
+        outState.putBoolean(DATA_KEY_LOGIN_REQUEST, mLoginRequest);
+        outState.putBoolean(DATA_KEY_ONLINE, mOnline);
+        outState.putString(DATA_KEY_PSEUDO, mPseudo);
+
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
     }
@@ -1097,6 +1149,20 @@ public class IntroActivity extends AppCompatActivity implements
             replaceButtonIcon(false);
         }
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+
+        Logs.add(Logs.Type.V, null);
+        if (mLogged) {
+
+            getSupportFragmentManager().popBackStack();
+            getSupportFragmentManager().executePendingTransactions();
+            replaceButtonIcon(false);
+        }
+        super.onPause();
+        mInPause = true;
     }
 
     @Override

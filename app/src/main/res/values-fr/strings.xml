@@ -21,6 +21,7 @@
     <string name="error_webservice">Web service indisponible!\nVeuillez ré-essayer plus tard.</string>
     <string name="error_synchro">Une erreur est intervenue durant la synchronisation!\nVeuillez vous reconnecter plus tard.</string>
     <string name="working_offline">Connexion hors ligne</string>
+    <string name="pseudo_connected">%1$s est connecté</string>
 
     <!-- Introduction -->
     <string name="intro_welcome">Bienvenue&#8230;</string>

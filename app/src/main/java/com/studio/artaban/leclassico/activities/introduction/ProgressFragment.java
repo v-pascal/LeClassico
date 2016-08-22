@@ -30,9 +30,10 @@ public class ProgressFragment extends RevealFragment {
     private byte mStep = DataService.LOGIN_STEP_CHECK_INTERNET; // Progression step
     private int mProgress; // Progress status
     private boolean mOnline; // Internet connection check result
-    private void reset() {
+    private void reset(boolean indeterminate) {
+    // Reset progress UI components
 
-        Logs.add(Logs.Type.V, null);
+        Logs.add(Logs.Type.V, "indeterminate: " + indeterminate);
         ((ImageView)mRootView.findViewById(R.id.checked_internet))
                 .setImageDrawable(getResources().getDrawable(R.drawable.forward_purple));
 
@@ -45,10 +46,12 @@ public class ProgressFragment extends RevealFragment {
         pin = (ImageView)mRootView.findViewById(R.id.checked_notification);
         pin.setImageDrawable(getResources().getDrawable(R.drawable.forward_purple));
         pin.setVisibility(View.INVISIBLE);
+        if (indeterminate) {
 
-        ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
-        progressBar.setIndeterminate(true);
-        progressBar.invalidate();
+            ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
+            progressBar.setIndeterminate(true);
+            progressBar.invalidate();
+        }
         ((TextView)mRootView.findViewById(R.id.progress_percentage)).setText(null);
     }
 
@@ -61,12 +64,12 @@ public class ProgressFragment extends RevealFragment {
 
         switch (step) {
             case DataService.LOGIN_STEP_CHECK_INTERNET: {
-                reset();
+                reset(true);
                 break;
             }
             case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION: {
                 mOnline = true;
-                reset();
+                reset(true);
 
                 ((ImageView)mRootView.findViewById(R.id.checked_internet))
                         .setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
@@ -75,7 +78,7 @@ public class ProgressFragment extends RevealFragment {
             }
             case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION: {
                 mOnline = false;
-                reset();
+                reset(true);
 
                 ((ImageView)mRootView.findViewById(R.id.checked_internet))
                         .setImageDrawable(getResources().getDrawable(R.drawable.cancel_orange));
@@ -83,7 +86,7 @@ public class ProgressFragment extends RevealFragment {
                 break;
             }
             case DataService.SYNCHRONIZATION_STEP_IN_PROGRESS: {
-                reset();
+                reset(false);
 
                 ((ImageView)mRootView.findViewById(R.id.checked_internet))
                         .setImageDrawable(getResources().getDrawable((mOnline) ?
@@ -99,6 +102,22 @@ public class ProgressFragment extends RevealFragment {
                 progressBar.setProgress(progress);
                 ((TextView)mRootView.findViewById(R.id.progress_percentage))
                         .setText(String.format("%d%%", (byte) (progress * 100f / Tables.ID_LAST)));
+                break;
+            }
+            case DataService.SYNCHRONIZATION_STEP_SUCCEEDED: {
+                reset(true);
+
+                ((ImageView)mRootView.findViewById(R.id.checked_internet))
+                        .setImageDrawable(getResources().getDrawable((mOnline) ?
+                                R.drawable.checked_orange : R.drawable.cancel_orange));
+                ImageView pin = (ImageView)mRootView.findViewById(R.id.checked_identification);
+                pin.setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
+                pin.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
+                pin = (ImageView)mRootView.findViewById(R.id.checked_synchro);
+                pin.setImageDrawable(getResources().getDrawable((mOnline) ?
+                                R.drawable.checked_orange : R.drawable.cancel_orange));
+                pin.setVisibility(View.VISIBLE);
+                mRootView.findViewById(R.id.checked_notification).setVisibility(View.VISIBLE);
                 break;
             }
         }
