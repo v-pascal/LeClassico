@@ -24,21 +24,6 @@ public class LoginFragment extends RevealFragment {
         return ((EditText)mRootView.findViewById(R.id.edit_password)).getText().toString();
     }
 
-    //
-    private boolean mResetRequested; // Reset request flag
-    public void reset() { // Clear pseudo & password entered by user
-
-        Logs.add(Logs.Type.V, null);
-        try {
-            ((EditText) mRootView.findViewById(R.id.edit_pseudo)).setText(null);
-            ((EditText) mRootView.findViewById(R.id.edit_password)).setText(null);
-
-        } catch (NullPointerException e) {
-            Logs.add(Logs.Type.W, "Root view not defined yet");
-            mResetRequested = true;
-        }
-    }
-
     //////
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,19 +31,5 @@ public class LoginFragment extends RevealFragment {
                 ";savedInstanceState: " + savedInstanceState);
         mRootView = inflater.inflate(R.layout.layout_login, container, false);
         return mRootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Logs.add(Logs.Type.V, null);
-
-        if (mResetRequested) {
-            mResetRequested = false;
-
-            Logs.add(Logs.Type.I, "Clear login info");
-            ((EditText) mRootView.findViewById(R.id.edit_pseudo)).setText(null);
-            ((EditText) mRootView.findViewById(R.id.edit_password)).setText(null);
-        }
     }
 }

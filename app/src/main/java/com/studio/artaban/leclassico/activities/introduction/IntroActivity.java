@@ -272,9 +272,12 @@ public class IntroActivity extends AppCompatActivity implements
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////// Login
+    ///////////////////////////////////////////////////////////////////////////////////// Connection
 
-    private boolean mLoginRequest; // Login succeeded flag (useful when activity is in background)
+    private boolean mLoginRequest; // Login succeeded flag
+    // NB: Used to know if needed to start main activity if the current one is in pause when the login
+    //     has succeeded. In this way it preserves user to be embarrassed by the displaying of the
+    //     main activity while he previously placed it into pause mode.
 
     private boolean mOnline;
     private String mPseudo;
@@ -294,13 +297,19 @@ public class IntroActivity extends AppCompatActivity implements
                 }
             }, 1200);
 
-        mLogged = true;
+        mLogoutRequest = true; // Needed if back to activity (logout requested)
+        // NB: The only reason to be back from main activity to this activity is that the user has
+        //     requested a logout operation (see main activity)
 
+        ////// Start main activity
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
-        startActivityForResult(intent, Requests.MAIN_TO_INTRO.CODE,
-                ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+    }
+    private boolean isConnectionCancelled() {
+        return (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) == null) ||
+                (!mConnectionTask.isRunning());
     }
 
     ////// OnProgressListener //////////////////////////////////////////////////////////////////////
@@ -313,15 +322,14 @@ public class IntroActivity extends AppCompatActivity implements
     }
     @Override
     public void onProgressUpdate(byte step) {
-
         Logs.add(Logs.Type.V, "step: " + step);
-        ProgressFragment progress = (ProgressFragment)getSupportFragmentManager()
-                .findFragmentByTag(ProgressFragment.TAG);
 
         // Check if connection task has been cancelled (can occurs)
-        if ((progress == null) || (!mConnectionTask.isRunning()))
-            return;
+        if (isConnectionCancelled())
+            return; // Nothing to do
 
+        ProgressFragment progress = (ProgressFragment)getSupportFragmentManager()
+                .findFragmentByTag(ProgressFragment.TAG);
         switch (step) {
             case DataService.LOGIN_STEP_CHECK_INTERNET:
             case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION:
@@ -362,8 +370,12 @@ public class IntroActivity extends AppCompatActivity implements
     }
     @Override
     public void onPostExecute(boolean result, boolean online, String pseudo) {
-
         Logs.add(Logs.Type.V, "result: " + result + ";online: " + online + ";pseudo: " + pseudo);
+
+        // Check if connection task has been cancelled (can occurs)
+        if (isConnectionCancelled())
+            return; // Nothing to do
+
         if (result) { // Login succeeded
             if (!mInPause)
                 startMainActivity(online, pseudo); ////// Start main activity
@@ -525,7 +537,6 @@ public class IntroActivity extends AppCompatActivity implements
 
     private boolean mIntroDone; // Introduction displayed flag
     private boolean mInPause; // Activity background flag
-    private boolean mLogged; // Main activity started flag
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
@@ -608,7 +619,7 @@ public class IntroActivity extends AppCompatActivity implements
         if (!DataService.isRunning())
             startService(new Intent(this, DataService.class));
 
-        // Check connection in progress
+        // Create connection task (fragment)
         FragmentManager manager = getSupportFragmentManager();
         mConnectionTask = (ConnectionTask)manager.findFragmentByTag(ConnectionTask.TAG);
         if (mConnectionTask == null) {
@@ -1014,6 +1025,16 @@ public class IntroActivity extends AppCompatActivity implements
 
             Logs.add(Logs.Type.F, "Failed to bind service");
             onServiceDisconnected(null);
+
+        } else if (mLogoutRequest) { // Logout requested (back to connect activity)
+
+            getSupportFragmentManager().popBackStack(); // Remove progress fragment
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.connect_container, new LoginFragment(), LoginFragment.TAG)
+                    .commit(); // Reset login fragment
+            getSupportFragmentManager().executePendingTransactions();
+            replaceButtonIcon(false);
         }
     }
 
@@ -1024,8 +1045,9 @@ public class IntroActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, null);
         mInPause = false;
         if (mLoginRequest) {
-            mLogoutRequest = false;
+            mLoginRequest = false;
 
+            // NB: Will start main activity here to avoid to start it from background (when paused)
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -1109,36 +1131,6 @@ public class IntroActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        super.onActivityResult(requestCode, resultCode, data);
-        Logs.add(Logs.Type.V, "requestCode: " + requestCode + ", resultCode: " + resultCode);
-        switch (requestCode) {
-
-            case Requests.MAIN_TO_INTRO.CODE: { ////// Main activity result ////////////////////////
-                switch (resultCode) {
-
-                    case Requests.MAIN_TO_INTRO.RESULT_LOGOUT: {
-                        ((LoginFragment)getSupportFragmentManager()
-                                .findFragmentByTag(LoginFragment.TAG)).reset();
-
-                        try { mDataService.get().logout();
-                        } catch (NullPointerException e) {
-                            Logs.add(Logs.Type.W, "Service not bound yet");
-                            mLogoutRequest = true; // Logout requested
-                        }
-                        break;
-                    }
-                    default: {
-                        Logs.add(Logs.Type.F, "Unexpected result: " + requestCode);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
     public void onBackPressed() {
 
         Logs.add(Logs.Type.V, null);
@@ -1153,15 +1145,8 @@ public class IntroActivity extends AppCompatActivity implements
 
     @Override
     protected void onPause() {
-
-        Logs.add(Logs.Type.V, null);
-        if (mLogged) {
-
-            getSupportFragmentManager().popBackStack();
-            getSupportFragmentManager().executePendingTransactions();
-            replaceButtonIcon(false);
-        }
         super.onPause();
+        Logs.add(Logs.Type.V, null);
         mInPause = true;
     }
 

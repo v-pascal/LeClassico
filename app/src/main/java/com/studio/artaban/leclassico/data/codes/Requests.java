@@ -6,6 +6,7 @@ package com.studio.artaban.leclassico.data.codes;
  */
 public final class Requests {
 
+    /*
     private static final int REQUEST_MAIN_2_INTRO = 1; // Main to Introduction activity request
 
     //////
@@ -14,5 +15,7 @@ public final class Requests {
 
         // Results
         public static final int RESULT_LOGOUT = 1;
+        public static final int RESULT_QUIT = 2;
     };
+    */
 }

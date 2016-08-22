@@ -63,7 +63,8 @@ public class ConnectionTask extends Fragment {
     public void stop() {
 
         Logs.add(Logs.Type.V, null);
-        if (mThread != null) {
+        if (isRunning()) {
+
             if (mConnectionRunnable.getServiceHandler() != null)
                 mConnectionRunnable.getServiceHandler().cancel();
             mThread.interrupt();

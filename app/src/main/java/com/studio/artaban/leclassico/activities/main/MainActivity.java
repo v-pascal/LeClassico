@@ -294,8 +294,8 @@ public class MainActivity extends AppCompatActivity implements
                                 if (which == DialogInterface.BUTTON_POSITIVE) {
 
                                     Notify.cancel(MainActivity.this);
-                                    MainActivity.this.setResult(Requests.MAIN_TO_INTRO.RESULT_LOGOUT);
                                     MainActivity.this.supportFinishAfterTransition();
+                                    // NB: Back to introduction activity means logout requested
                                 }
                             }
                         })
