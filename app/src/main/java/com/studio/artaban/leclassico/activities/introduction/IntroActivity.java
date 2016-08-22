@@ -44,7 +44,6 @@ import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.connection.ServiceHandler;
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.activities.main.MainActivity;
@@ -70,6 +69,7 @@ public class IntroActivity extends AppCompatActivity implements
     private static final String DATA_KEY_ERROR_ICON = "errorIcon";
     private static final String DATA_KEY_ERROR_MESSAGE = "errorMessage";
 
+    private static final String DATA_KEY_LOGOUT_REQUEST = "logoutRequest";
     private static final String DATA_KEY_LOGIN_REQUEST = "loginRequest";
     private static final String DATA_KEY_ONLINE = "online";
     private static final String DATA_KEY_PSEUDO = "pseudo";
@@ -372,10 +372,11 @@ public class IntroActivity extends AppCompatActivity implements
     public void onPostExecute(boolean result, boolean online, String pseudo) {
         Logs.add(Logs.Type.V, "result: " + result + ";online: " + online + ";pseudo: " + pseudo);
 
-        // Check if connection task has been cancelled (can occurs)
-        if (isConnectionCancelled())
+        // Check if connection task has been cancelled
+        if (isConnectionCancelled()) {
+            Logs.add(Logs.Type.I, "Connection has been cancelled");
             return; // Nothing to do
-
+        }
         if (result) { // Login succeeded
             if (!mInPause)
                 startMainActivity(online, pseudo); ////// Start main activity
@@ -542,7 +543,7 @@ public class IntroActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logs.add(Logs.Type.V, "savedInstanceState: " + (savedInstanceState != null? "exists":"null"));
+        Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
 
         // Restore data
         SharedPreferences settings = getSharedPreferences(Constants.APP_PREFERENCE, 0);
@@ -561,6 +562,7 @@ public class IntroActivity extends AppCompatActivity implements
             mErrorIcon = savedInstanceState.getInt(DATA_KEY_ERROR_ICON);
             mErrorMessage = savedInstanceState.getInt(DATA_KEY_ERROR_MESSAGE);
 
+            mLogoutRequest = savedInstanceState.getBoolean(DATA_KEY_LOGOUT_REQUEST);
             mLoginRequest = savedInstanceState.getBoolean(DATA_KEY_LOGIN_REQUEST);
             mOnline = savedInstanceState.getBoolean(DATA_KEY_ONLINE);
             mPseudo = savedInstanceState.getString(DATA_KEY_PSEUDO);
@@ -1021,12 +1023,7 @@ public class IntroActivity extends AppCompatActivity implements
         super.onStart();
 
         Logs.add(Logs.Type.V, null);
-        if (!mDataService.bind(this, this)) { // Bind data service
-
-            Logs.add(Logs.Type.F, "Failed to bind service");
-            onServiceDisconnected(null);
-
-        } else if (mLogoutRequest) { // Logout requested (back to connect activity)
+        if (mLogoutRequest) { // Logout requested (back to connect activity)
 
             getSupportFragmentManager().popBackStack(); // Remove progress fragment
             getSupportFragmentManager()
@@ -1035,6 +1032,12 @@ public class IntroActivity extends AppCompatActivity implements
                     .commit(); // Reset login fragment
             getSupportFragmentManager().executePendingTransactions();
             replaceButtonIcon(false);
+        }
+        if (!mDataService.bind(this, this)) { // Bind data service
+
+            Logs.add(Logs.Type.F, "Failed to bind service");
+            onServiceDisconnected(null);
+
         }
     }
 
@@ -1122,6 +1125,7 @@ public class IntroActivity extends AppCompatActivity implements
         outState.putInt(DATA_KEY_ERROR_ICON, mErrorIcon);
         outState.putInt(DATA_KEY_ERROR_MESSAGE, mErrorMessage);
 
+        outState.putBoolean(DATA_KEY_LOGOUT_REQUEST, mLogoutRequest);
         outState.putBoolean(DATA_KEY_LOGIN_REQUEST, mLoginRequest);
         outState.putBoolean(DATA_KEY_ONLINE, mOnline);
         outState.putString(DATA_KEY_PSEUDO, mPseudo);
