@@ -293,9 +293,8 @@ public class MainActivity extends AppCompatActivity implements
                                 Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
                                 if (which == DialogInterface.BUTTON_POSITIVE) {
 
-                                    Notify.cancel(MainActivity.this);
+                                    DataService.stop(MainActivity.this);
                                     MainActivity.this.supportFinishAfterTransition();
-                                    // NB: Back to introduction activity means logout requested
                                 }
                             }
                         })
@@ -318,7 +317,6 @@ public class MainActivity extends AppCompatActivity implements
                                 Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
                                 if (which == DialogInterface.BUTTON_POSITIVE) {
 
-                                    Notify.cancel(MainActivity.this);
                                     DataService.stop(MainActivity.this);
                                     MainActivity.this.finishAffinity();
                                 }

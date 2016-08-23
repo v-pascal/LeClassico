@@ -13,7 +13,6 @@ import android.graphics.Point;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
@@ -37,16 +36,15 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.studio.artaban.leclassico.R;
-import com.studio.artaban.leclassico.activities.ConnectionTask;
+import com.studio.artaban.leclassico.activities.main.MainActivity;
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.components.RevealFragment;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
-import com.studio.artaban.leclassico.connection.ServiceHandler;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
-import com.studio.artaban.leclassico.activities.main.MainActivity;
 import com.studio.artaban.leclassico.tools.InOutScreen;
 import com.studio.artaban.leclassico.tools.SizeUtils;
 
@@ -54,25 +52,16 @@ import com.studio.artaban.leclassico.tools.SizeUtils;
  * Created by pascal on 15/07/16.
  * Introduction & connection activity class
  */
-public class IntroActivity extends AppCompatActivity implements
-        ServiceBinder.OnServiceListener, ConnectionTask.OnProgressListener {
+public class IntroActivity extends AppCompatActivity implements ConnectFragment.OnConnectListener {
 
     private static final String DATA_KEY_INTRO_DISPLAYED = "introDisplayed";
+    private static final String DATA_KEY_LOGOUT_REQUESTED = "logoutRequested";
 
     private static final String DATA_KEY_ALPHA_SKIP = "alphaSkip";
     private static final String DATA_KEY_ALPHA_STEP1 = "alphaStep1";
     private static final String DATA_KEY_ALPHA_STEP2 = "alphaStep2";
     private static final String DATA_KEY_ALPHA_STEP3 = "alphaStep3";
     private static final String DATA_KEY_ALPHA_STEP4 = "alphaStep4";
-
-    private static final String DATA_KEY_ERROR_DISPLAY = "errorDisplay";
-    private static final String DATA_KEY_ERROR_ICON = "errorIcon";
-    private static final String DATA_KEY_ERROR_MESSAGE = "errorMessage";
-
-    private static final String DATA_KEY_LOGOUT_REQUEST = "logoutRequest";
-    private static final String DATA_KEY_LOGIN_REQUEST = "loginRequest";
-    private static final String DATA_KEY_ONLINE = "online";
-    private static final String DATA_KEY_PSEUDO = "pseudo";
     // Data keys
 
     private static final int ANIMATION_DURATION_SHOW_CONNECT = 200; // Display connection layout partially duration
@@ -180,7 +169,6 @@ public class IntroActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, null);
 
         mIntroDone = displayIntro;
-        mDataService.unbind(this);
         DataService.stop(this);
         finish();
     }
@@ -272,199 +260,133 @@ public class IntroActivity extends AppCompatActivity implements
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////// Connection
+    //////
+    private AlertDialog mErrorDialog; // Alert dialog that displays connection error messages
+    private void displayError(byte error) { // Show alert dialog to display en error message
 
-    private boolean mLoginRequest; // Login succeeded flag
-    // NB: Used to know if needed to start main activity if the current one is in pause when the login
-    //     has succeeded. In this way it preserves user to be embarrassed by the displaying of the
-    //     main activity while he previously placed it into pause mode.
+        Logs.add(Logs.Type.V, "error: " + error);
+        int errorIcon, errorMsg;
 
-    private boolean mOnline;
-    private String mPseudo;
-    // Login request info (as defined to 'startMainActivity' method below)
+        switch (error) {
+            case ConnectFragment.STEP_LOGIN_FAILED: {
 
-    private void startMainActivity(boolean online, String pseudo) {
-    // Start main activity containing publications, events, locations, etc.
-
-        Logs.add(Logs.Type.V, "online: " + online + ";pseudo: " + pseudo);
-        mConnectionTask.stop();
-
-        if (!online) // Inform user if working offline
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(IntroActivity.this, R.string.working_offline, Toast.LENGTH_LONG).show();
-                }
-            }, 1200);
-
-        mLogoutRequest = true; // Needed if back to activity (logout requested)
-        // NB: The only reason to be back from main activity to this activity is that the user has
-        //     requested a logout operation (see main activity)
-
-        ////// Start main activity
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
-        intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
-        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-    }
-    private boolean isConnectionCancelled() {
-        return (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) == null) ||
-                (!mConnectionTask.isRunning());
-    }
-
-    ////// OnProgressListener //////////////////////////////////////////////////////////////////////
-    @Override
-    public void onPreExecute() {
-
-        Logs.add(Logs.Type.V, null);
-        ((ProgressFragment)getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG))
-                .update(DataService.LOGIN_STEP_CHECK_INTERNET, 0);
-    }
-    @Override
-    public void onProgressUpdate(byte step) {
-        Logs.add(Logs.Type.V, "step: " + step);
-
-        // Check if connection task has been cancelled (can occurs)
-        if (isConnectionCancelled())
-            return; // Nothing to do
-
-        ProgressFragment progress = (ProgressFragment)getSupportFragmentManager()
-                .findFragmentByTag(ProgressFragment.TAG);
-        switch (step) {
-            case DataService.LOGIN_STEP_CHECK_INTERNET:
-            case DataService.LOGIN_STEP_ONLINE_IDENTIFICATION:
-            case DataService.LOGIN_STEP_OFFLINE_IDENTIFICATION:
-            case DataService.LOGIN_STEP_SUCCEEDED:
-            case DataService.SYNCHRONIZATION_STEP_SUCCEEDED: {
-
-                progress.update(step, 0);
+                errorIcon = R.drawable.warning_red;
+                errorMsg = R.string.login_failed;
                 break;
             }
-            case DataService.LOGIN_STEP_FAILED: {
-                displayError(false, R.string.login_failed);
-                break;
-            }
-            case DataService.LOGIN_STEP_INTERNET_NEEDED: {
-                displayError(false, R.string.no_internet);
-                break;
-            }
-            case DataService.LOGIN_STEP_ERROR: {
-                displayError(true, R.string.error_webservice);
-                break;
-            }
-            case (byte) Constants.NO_DATA: { // SHOULD NOT HAPPEN!
+            case ConnectFragment.STEP_INTERNET_NEEDED: {
 
-                Logs.add(Logs.Type.F, "Service not bound");
-                //onServiceDisconnected(null);
-                getSupportFragmentManager().popBackStack();
-                getSupportFragmentManager().executePendingTransactions();
-                replaceButtonIcon(false);
+                errorIcon = R.drawable.warning_red;
+                errorMsg = R.string.no_internet;
                 break;
             }
-            default: { // Tables DB synchronization
+            //case ConnectFragment.STEP_ERROR:
+            default: {
 
-                progress.update(DataService.SYNCHRONIZATION_STEP_IN_PROGRESS, step);
+                errorIcon = R.drawable.error_red;
+                errorMsg = R.string.error_webservice;
                 break;
             }
         }
-    }
-    @Override
-    public void onPostExecute(boolean result, boolean online, String pseudo) {
-        Logs.add(Logs.Type.V, "result: " + result + ";online: " + online + ";pseudo: " + pseudo);
 
-        // Check if connection task has been cancelled
-        if (isConnectionCancelled()) {
-            Logs.add(Logs.Type.I, "Connection has been cancelled");
-            return; // Nothing to do
-        }
-        if (result) { // Login succeeded
-            if (!mInPause)
-                startMainActivity(online, pseudo); ////// Start main activity
-            else {
-
-                mLoginRequest = true; // Will start main activity when resumed
-                mOnline = online;
-                mPseudo = pseudo;
-            }
-        }
-    }
-
-    @Override
-    public boolean onLoginRequested(ServiceHandler handler, String pseudo, String password) {
-
-        Logs.add(Logs.Type.V, "handler: " + handler + ";pseudo: " + pseudo);
-        try { mDataService.get().login(handler, pseudo, password);
-        } catch (NullPointerException e) {
-
-            Logs.add(Logs.Type.E, "Unbound service use (login)");
-            return false;
-        }
-        return true;
-    }
-    @Override
-    public boolean onSynchronizationRequested(ServiceHandler handler) {
-
-        Logs.add(Logs.Type.V, "handler: " + handler);
-        try { mDataService.get().synchronize(handler);
-        } catch (NullPointerException e) {
-
-            Logs.add(Logs.Type.E, "Unbound service use (synchronize)");
-            return false;
-        }
-        return true;
-    }
-
-    //
-    private ConnectionTask mConnectionTask; // Retain fragment containing the progress dialog
-    private AlertDialog mErrorDialog; // Alert dialog that displays error messages
-
-    private boolean mErrorDisplay;
-    private int mErrorMessage;
-    private int mErrorIcon;
-    // Error dialog data
-
-    private void displayError(boolean critical, int errorId) {
-
-        Logs.add(Logs.Type.V, "errorId: " + errorId);
-        mConnectionTask.stop();
-
-        // Display message
-        mErrorIcon = (critical) ? R.drawable.error_red : R.drawable.warning_red;
-        mErrorMessage = errorId;
-        mErrorDialog.setIcon(getDrawable(mErrorIcon));
-        mErrorDialog.setMessage(getString(mErrorMessage));
-
-        mErrorDisplay = true;
+        // Display error message
+        mErrorDialog.setIcon(getDrawable(errorIcon));
+        mErrorDialog.setMessage(getString(errorMsg));
         mErrorDialog.show();
     }
 
-    ////// OnServiceListener ///////////////////////////////////////////////////////////////////////
+    ////// OnConnectListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onError(byte error) {
+        Logs.add(Logs.Type.V, "error: " + error);
 
-    private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
-    private boolean mLogoutRequest; // Logout request flag
+        // Save persistent data coz unable to use save instance state behavior (not working if in pause)
+        SharedPreferences prefs = getSharedPreferences(Constants.APP_PREFERENCE, 0);
+        prefs.edit().putBoolean(Preferences.INTRODUCTION_ERROR_DISPLAY, true).apply();
+
+        displayError(error);
+    }
 
     @Override
-    public void onServiceConnected(DataService service) {
+    public boolean onServiceRequested() {
 
         Logs.add(Logs.Type.V, null);
-        if (mLogoutRequest) {
-            mLogoutRequest = false;
-            service.logout();
+        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) == null)
+            return false; // Connection task stopped
+        if (!mResumed)
+            return false; // Activity in background
+
+        // Bind data service
+        if (!mDataService.isBound()) {
+
+            Logs.add(Logs.Type.I, "Bind data service");
+            mDataService.bind(this, new ServiceBinder.OnServiceListener() {
+                @Override
+                public void onServiceConnected(DataService service) {
+
+                }
+
+                @Override
+                public void onServiceDisconnected(ServiceConnection connection) { // SHOULD NOT HAPPEN!
+
+                    Logs.add(Logs.Type.V, "connection: " + connection);
+                    if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
+                        getSupportFragmentManager().popBackStack();
+                        getSupportFragmentManager().executePendingTransactions();
+                        // NB: This will stop background connection task
+                    }
+
+                    // Inform user of this critical error then quit application (this will restart data service)
+                    Toast.makeText(IntroActivity.this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
+                    quit(mIntroDone);
+                }
+            });
+            return false;
+        }
+        return (mDataService.get() != null);
+    }
+
+    @Override
+    public void onConnected(String pseudo, String token, long timeLag) {
+
+        Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";token: " + token + ";timeLag: " + timeLag);
+        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) == null)
+            return; // Connection task stopped
+
+        try {
+            mDataService.get().connected(pseudo, token, timeLag);
+
+            if (token == null) // Inform user if working offline
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(IntroActivity.this, R.string.working_offline, Toast.LENGTH_LONG).show();
+                    }
+                }, 1200);
+
+            mLogoutRequested = true; // Needed if back to activity (logout requested)
+            // NB: The only reason to be back from main activity to this activity is that the user has
+            //     requested a logout operation (see main activity)
+
+            ////// Start main activity
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, (token != null));
+            intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+
+        } catch (NullPointerException e) {
+
+            Logs.add(Logs.Type.E, "Unexpected service unbound");
+            getSupportFragmentManager().popBackStack();
+            getSupportFragmentManager().executePendingTransactions();
+            replaceButtonIcon(false);
         }
     }
-    @Override
-    public void onServiceDisconnected(ServiceConnection connection) { // SHOULD NOT HAPPEN!
 
-        Logs.add(Logs.Type.V, null);
-        mConnectionTask.stop();
-        mErrorDialog.cancel();
-
-        // Inform user of this critical error then quit application (this will restart data service)
-        Toast.makeText(this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
-        quit(mIntroDone);
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static final int DELAY_REVEAL_FRAGMENT = 300; // Delay of displaying or hiding fragment
+    private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
 
     //////
     public void onNextStep(View sender) { // Next step click event
@@ -483,10 +405,9 @@ public class IntroActivity extends AppCompatActivity implements
     public void onAction(View sender) { // Login or Cancel connection
 
         Logs.add(Logs.Type.V, "sender: " + sender);
-        if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null) {
+        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
 
             // Cancel connection task
-            mConnectionTask.stop();
             getSupportFragmentManager().popBackStack();
             getSupportFragmentManager().executePendingTransactions();
             replaceButtonIcon(false);
@@ -513,31 +434,32 @@ public class IntroActivity extends AppCompatActivity implements
                 public void onRevealEnd() {
                     Logs.add(Logs.Type.V, null);
 
-                    ProgressFragment progress = new ProgressFragment();
+                    Bundle data = new Bundle();
+                    data.putString(ConnectFragment.ARGS_KEY_PSEUDO, pseudo);
+                    data.putString(ConnectFragment.ARGS_KEY_PASSWORD, password);
+
+                    ConnectFragment progress = new ConnectFragment();
+                    progress.setArguments(data);
                     progress.reveal(true, null, DELAY_REVEAL_FRAGMENT);
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.connect_container, progress, ProgressFragment.TAG)
+                            .replace(R.id.connect_container, progress, ConnectFragment.TAG)
                             .addToBackStack(null)
                             .commit();
-
                     //
                     replaceFloatingButton(false);
                     getSupportFragmentManager().executePendingTransactions();
-                    mConnectionTask.stop(); // Needed to reset previous state
-                    mConnectionTask.start(IntroActivity.this, pseudo, password);
                 }
 
             }, DELAY_REVEAL_FRAGMENT);
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
     private LimitlessViewPager mViewPager; // Introduction view pager component
 
     private boolean mIntroDone; // Introduction displayed flag
-    private boolean mInPause; // Activity background flag
+    private boolean mResumed; // Activity active flag (false if in background)
+    private boolean mLogoutRequested; // Flag used to logout when back to this activity after logged
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
@@ -547,25 +469,19 @@ public class IntroActivity extends AppCompatActivity implements
 
         // Restore data
         SharedPreferences settings = getSharedPreferences(Constants.APP_PREFERENCE, 0);
-        mIntroDone = settings.getBoolean(Constants.APP_PREFERENCE_INTRO_DONE, false);
+        mIntroDone = settings.getBoolean(Preferences.INTRODUCTION_DONE, false);
+        byte error = (byte)settings.getInt(Preferences.CONNECTION_STEP, 0);
+        boolean errorDisplay = settings.getBoolean(Preferences.INTRODUCTION_ERROR_DISPLAY, false);
 
         if (savedInstanceState != null) {
             mIntroDone = savedInstanceState.getBoolean(DATA_KEY_INTRO_DISPLAYED);
+            mLogoutRequested = savedInstanceState.getBoolean(DATA_KEY_LOGOUT_REQUESTED);
 
             mAlphaSkip = savedInstanceState.getFloat(DATA_KEY_ALPHA_SKIP);
             mAlphaStep1 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP1);
             mAlphaStep2 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP2);
             mAlphaStep3 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP3);
             mAlphaStep4 = savedInstanceState.getFloat(DATA_KEY_ALPHA_STEP4);
-
-            mErrorDisplay = savedInstanceState.getBoolean(DATA_KEY_ERROR_DISPLAY);
-            mErrorIcon = savedInstanceState.getInt(DATA_KEY_ERROR_ICON);
-            mErrorMessage = savedInstanceState.getInt(DATA_KEY_ERROR_MESSAGE);
-
-            mLogoutRequest = savedInstanceState.getBoolean(DATA_KEY_LOGOUT_REQUEST);
-            mLoginRequest = savedInstanceState.getBoolean(DATA_KEY_LOGIN_REQUEST);
-            mOnline = savedInstanceState.getBoolean(DATA_KEY_ONLINE);
-            mPseudo = savedInstanceState.getString(DATA_KEY_PSEUDO);
 
         } else if (mIntroDone)
             setTheme(R.style.ConnectAppTheme); // To display white background
@@ -579,10 +495,10 @@ public class IntroActivity extends AppCompatActivity implements
                     .beginTransaction()
                     .add(R.id.connect_container, new LoginFragment(), LoginFragment.TAG)
                     .commit();
-        if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null)
+        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null)
             replaceButtonIcon(true);
 
-        // Create dialogs
+        // Create & restore error dialog (if needed)
         mErrorDialog = new AlertDialog.Builder(this).create();
         mErrorDialog.setTitle(R.string.error);
         mErrorDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -594,9 +510,13 @@ public class IntroActivity extends AppCompatActivity implements
                 getSupportFragmentManager().executePendingTransactions();
                 replaceButtonIcon(false);
 
-                mErrorDisplay = false;
+                // Save persistent data
+                SharedPreferences prefs = getSharedPreferences(Constants.APP_PREFERENCE, 0);
+                prefs.edit().putBoolean(Preferences.INTRODUCTION_ERROR_DISPLAY, false).apply();
             }
         });
+        if (errorDisplay)
+            displayError(error);
 
         // Avoid to display keyboard automatically
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -615,27 +535,6 @@ public class IntroActivity extends AppCompatActivity implements
             Toast.makeText(this, R.string.error_no_storage, Toast.LENGTH_LONG);
             finish();
             return;
-        }
-
-        // Start data service (if not already started)
-        if (!DataService.isRunning())
-            startService(new Intent(this, DataService.class));
-
-        // Create connection task (fragment)
-        FragmentManager manager = getSupportFragmentManager();
-        mConnectionTask = (ConnectionTask)manager.findFragmentByTag(ConnectionTask.TAG);
-        if (mConnectionTask == null) {
-
-            mConnectionTask = new ConnectionTask();
-            manager.beginTransaction().add(mConnectionTask, ConnectionTask.TAG).commit();
-            manager.executePendingTransactions();
-
-        } else if (mErrorDisplay) {
-
-            // Display alert dialog
-            mErrorDialog.setIcon(getDrawable(mErrorIcon));
-            mErrorDialog.setMessage(getString(mErrorMessage));
-            mErrorDialog.show();
         }
 
         // Check to display intro
@@ -1023,7 +922,8 @@ public class IntroActivity extends AppCompatActivity implements
         super.onStart();
 
         Logs.add(Logs.Type.V, null);
-        if (mLogoutRequest) { // Logout requested (back to connect activity)
+        if (mLogoutRequested) { // Logout requested (back to connect activity)
+            mLogoutRequested = false;
 
             getSupportFragmentManager().popBackStack(); // Remove progress fragment
             getSupportFragmentManager()
@@ -1033,31 +933,13 @@ public class IntroActivity extends AppCompatActivity implements
             getSupportFragmentManager().executePendingTransactions();
             replaceButtonIcon(false);
         }
-        if (!mDataService.bind(this, this)) { // Bind data service
-
-            Logs.add(Logs.Type.F, "Failed to bind service");
-            onServiceDisconnected(null);
-
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         Logs.add(Logs.Type.V, null);
-        mInPause = false;
-        if (mLoginRequest) {
-            mLoginRequest = false;
-
-            // NB: Will start main activity here to avoid to start it from background (when paused)
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startMainActivity(mOnline, mPseudo); ////// Start main activity
-                }
-            }, 1200);
-        }
+        mResumed = true;
     }
 
     @Override
@@ -1114,21 +996,13 @@ public class IntroActivity extends AppCompatActivity implements
     protected void onSaveInstanceState(Bundle outState) {
 
         outState.putBoolean(DATA_KEY_INTRO_DISPLAYED, mIntroDone);
+        outState.putBoolean(DATA_KEY_LOGOUT_REQUESTED, mLogoutRequested);
 
         outState.putFloat(DATA_KEY_ALPHA_SKIP, mAlphaSkip);
         outState.putFloat(DATA_KEY_ALPHA_STEP1, mAlphaStep1);
         outState.putFloat(DATA_KEY_ALPHA_STEP2, mAlphaStep2);
         outState.putFloat(DATA_KEY_ALPHA_STEP3, mAlphaStep3);
         outState.putFloat(DATA_KEY_ALPHA_STEP4, mAlphaStep4);
-
-        outState.putBoolean(DATA_KEY_ERROR_DISPLAY, mErrorDisplay);
-        outState.putInt(DATA_KEY_ERROR_ICON, mErrorIcon);
-        outState.putInt(DATA_KEY_ERROR_MESSAGE, mErrorMessage);
-
-        outState.putBoolean(DATA_KEY_LOGOUT_REQUEST, mLogoutRequest);
-        outState.putBoolean(DATA_KEY_LOGIN_REQUEST, mLoginRequest);
-        outState.putBoolean(DATA_KEY_ONLINE, mOnline);
-        outState.putString(DATA_KEY_PSEUDO, mPseudo);
 
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
@@ -1138,12 +1012,9 @@ public class IntroActivity extends AppCompatActivity implements
     public void onBackPressed() {
 
         Logs.add(Logs.Type.V, null);
-        if (getSupportFragmentManager().findFragmentByTag(ProgressFragment.TAG) != null) {
-
-            // Cancel connection task
-            mConnectionTask.stop();
+        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null)
             replaceButtonIcon(false);
-        }
+
         super.onBackPressed();
     }
 
@@ -1151,7 +1022,7 @@ public class IntroActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         Logs.add(Logs.Type.V, null);
-        mInPause = true;
+        mResumed = false;
     }
 
     @Override
@@ -1159,15 +1030,10 @@ public class IntroActivity extends AppCompatActivity implements
         super.onStop();
 
         Logs.add(Logs.Type.V, null);
-        mDataService.unbind(this); // Unbind data service
+        mDataService.unbind(this); // Unbind data service (if any)
 
+        // Store persistent data
         SharedPreferences prefs = getSharedPreferences(Constants.APP_PREFERENCE, 0);
-        if (prefs != null) {
-
-            Logs.add(Logs.Type.I, "Introduction displayed: " + mIntroDone);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(Constants.APP_PREFERENCE_INTRO_DONE, mIntroDone);
-            editor.apply();
-        }
+        prefs.edit().putBoolean(Preferences.INTRODUCTION_DONE, mIntroDone).apply();
     }
 }

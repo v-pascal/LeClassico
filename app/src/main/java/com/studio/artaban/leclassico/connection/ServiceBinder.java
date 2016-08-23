@@ -21,11 +21,14 @@ public class ServiceBinder {
 
     private ServiceConnection mConnection;
 
-    //////
-    public interface OnServiceListener {
+    public interface OnServiceListener { ///////////////////////////////////////////////////////////
+
         void onServiceConnected(DataService service);
         void onServiceDisconnected(ServiceConnection connection);
-    };
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     public boolean bind(Activity activity, final OnServiceListener listener) {
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";listener: " + listener);
@@ -62,6 +65,9 @@ public class ServiceBinder {
         };
         Intent bindIntent = new Intent(activity, DataService.class);
         return activity.bindService(bindIntent, mConnection, Context.BIND_ADJUST_WITH_ACTIVITY);
+    }
+    public boolean isBound() {
+        return mBound;
     }
     public void unbind(Activity activity) {
 

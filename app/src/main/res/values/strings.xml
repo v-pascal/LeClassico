@@ -4,7 +4,7 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="status">Status</string>
+    <string name="status">Status:</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>

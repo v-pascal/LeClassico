@@ -21,7 +21,6 @@ public final class Constants {
 
     // Preference keys
     public static final String APP_PREFERENCE = APP_NAME + "Preferences"; // Application preference
-    public static final String APP_PREFERENCE_INTRO_DONE = "introDone"; // Introduction done flag
 
 
     ////// Images
