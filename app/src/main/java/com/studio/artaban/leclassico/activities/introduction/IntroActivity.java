@@ -165,12 +165,25 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
                     .in(findViewById(R.id.fab));
         }
     }
-    private void quit(boolean displayIntro) { // Quit application (stop service)
+    private void finishApplication(boolean displayIntro) { // Quit application (stop service)
         Logs.add(Logs.Type.V, null);
 
         mIntroDone = displayIntro;
         DataService.stop(this);
         finish();
+    }
+    private void finishWithError() {
+
+        Logs.add(Logs.Type.V, null);
+        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
+            getSupportFragmentManager().popBackStack();
+            getSupportFragmentManager().executePendingTransactions();
+            // NB: This will stop background connection task
+        }
+
+        // Inform user of this critical error then quit application (this will restart data service)
+        Toast.makeText(IntroActivity.this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
+        finishApplication(mIntroDone);
     }
 
     private float mAlphaSkip;
@@ -320,7 +333,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         if (!mDataService.isBound()) {
 
             Logs.add(Logs.Type.I, "Bind data service");
-            mDataService.bind(this, new ServiceBinder.OnServiceListener() {
+            boolean bound = mDataService.bind(this, new ServiceBinder.OnServiceListener() {
                 @Override
                 public void onServiceConnected(DataService service) {
 
@@ -328,19 +341,13 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
                 @Override
                 public void onServiceDisconnected(ServiceConnection connection) { // SHOULD NOT HAPPEN!
-
                     Logs.add(Logs.Type.V, "connection: " + connection);
-                    if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
-                        getSupportFragmentManager().popBackStack();
-                        getSupportFragmentManager().executePendingTransactions();
-                        // NB: This will stop background connection task
-                    }
-
-                    // Inform user of this critical error then quit application (this will restart data service)
-                    Toast.makeText(IntroActivity.this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
-                    quit(mIntroDone);
+                    finishWithError();
                 }
             });
+            if (!bound) // SHOULD NOT HAPPEN!
+                finishWithError();
+
             return false;
         }
         return (mDataService.get() != null);
@@ -974,7 +981,8 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
             }
             case R.id.menu_quit: {
 
-                quit(false);
+                // Quit application
+                finishApplication(false);
                 return true;
             }
             case R.id.menu_help: {

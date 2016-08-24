@@ -106,6 +106,7 @@ public class Notify {
 
             case EVENT: { // Deprecated 'setLatestEventInfo' method
                 notify = new Notification.Builder(context)
+                        .setDefaults(Notification.DEFAULT_SOUND)
                         .setSmallIcon(icon)
                         .setContentTitle(title)
                         .setContentText(text)

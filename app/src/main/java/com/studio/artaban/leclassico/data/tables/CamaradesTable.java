@@ -10,7 +10,7 @@ import android.os.Parcelable;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -25,7 +25,7 @@ import java.util.List;
  * Created by pascal on 28/07/16.
  * Camarades database table class
  */
-public class CamaradesTable implements IDataTable {
+public class CamaradesTable extends DataTable {
 
     public static final int MALE = 2;
     public static final int FEMALE = 1;
@@ -51,18 +51,8 @@ public class CamaradesTable implements IDataTable {
     // Synchronize data with remote DB
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token);
-        String url = Constants.APP_WEBSERVICES + WebServices.URL_MEMBERS + "?" +
-                WebServices.DATA_TOKEN + "=" + token; // Add token to URL
-
-        // Get last synchronization date
-        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME),
-                new String[]{ "max(" + COLUMN_STATUS_DATE + ")" }, null, null, null);
-        cursor.moveToFirst();
-        if (cursor.getString(0) != null) {
-            Logs.add(Logs.Type.I, "Previous status date: " + cursor.getString(0));
-            url += "&" + WebServices.DATA_DATE + "=" + cursor.getString(0).replace(' ', 'n');
-        }
-        cursor.close();
+        String url = getUrlSynchroRequest(resolver, WebServices.URL_MEMBERS, token,
+                TABLE_NAME, COLUMN_STATUS_DATE);
 
         // Send remote DB request
         Internet.DownloadResult result = Internet.downloadHttpRequest(url, null,
@@ -76,67 +66,71 @@ public class CamaradesTable implements IDataTable {
                     JSONObject reply = new JSONObject(response);
                     if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
-                        if (reply.isNull(JSON_KEY_MEMBERS))
+                        if (reply.isNull(TABLE_NAME))
                             return true; // Already synchronized
 
-                        JSONArray members = reply.getJSONArray(JSON_KEY_MEMBERS);
-                        for (int i = 0; i < members.length(); ++i) {
+                        Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
+                        JSONArray entries = reply.getJSONArray(TABLE_NAME);
+                        for (int i = 0; i < entries.length(); ++i) {
 
-                            JSONObject member = (JSONObject) members.get(i);
-                            Uri memberUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
-                            String pseudo = member.getString(JSON_KEY_PSEUDO);
+                            JSONObject entry = (JSONObject) entries.get(i);
+                            String pseudo = entry.getString(JSON_KEY_PSEUDO);
 
-                            // Member data
+                            // Entry fields
                             ContentValues values = new ContentValues();
-                            values.put(COLUMN_CODE_CONF, member.getString(JSON_KEY_CODE_CONF));
-                            if (!member.isNull(JSON_KEY_NOM))
-                                values.put(COLUMN_NOM, member.getString(JSON_KEY_NOM));
-                            if (!member.isNull(JSON_KEY_PRENOM))
-                                values.put(COLUMN_PRENOM, member.getString(JSON_KEY_PRENOM));
-                            if (!member.isNull(JSON_KEY_SEXE))
-                                values.put(COLUMN_SEXE, member.getInt(JSON_KEY_SEXE));
-                            if (!member.isNull(JSON_KEY_BORN_DATE))
-                                values.put(COLUMN_BORN_DATE, member.getString(JSON_KEY_BORN_DATE));
-                            if (!member.isNull(JSON_KEY_ADRESSE))
-                                values.put(COLUMN_ADRESSE, member.getString(JSON_KEY_ADRESSE));
-                            if (!member.isNull(JSON_KEY_VILLE))
-                                values.put(COLUMN_VILLE, member.getString(JSON_KEY_VILLE));
-                            if (!member.isNull(JSON_KEY_POSTAL))
-                                values.put(COLUMN_POSTAL, member.getString(JSON_KEY_POSTAL));
-                            if (!member.isNull(JSON_KEY_EMAIL))
-                                values.put(COLUMN_EMAIL, member.getString(JSON_KEY_EMAIL));
-                            if (!member.isNull(JSON_KEY_HOBBIES))
-                                values.put(COLUMN_HOBBIES, member.getString(JSON_KEY_HOBBIES));
-                            if (!member.isNull(JSON_KEY_A_PROPOS))
-                                values.put(COLUMN_A_PROPOS, member.getString(JSON_KEY_A_PROPOS));
-                            if (!member.isNull(JSON_KEY_LOG_DATE))
-                                values.put(COLUMN_LOG_DATE, member.getString(JSON_KEY_LOG_DATE));
-                            values.put(COLUMN_ADMIN, member.getInt(JSON_KEY_ADMIN));
-                            if (!member.isNull(JSON_KEY_PROFILE))
-                                values.put(COLUMN_PROFILE, member.getString(JSON_KEY_PROFILE));
-                            if (!member.isNull(JSON_KEY_BANNER))
-                                values.put(COLUMN_BANNER, member.getString(JSON_KEY_BANNER));
-                            values.put(COLUMN_LOCATED, member.getInt(JSON_KEY_LOCATED));
-                            if (!member.isNull(JSON_KEY_LATITUDE))
-                                values.put(COLUMN_LATITUDE, member.getDouble(JSON_KEY_LATITUDE));
-                            if (!member.isNull(JSON_KEY_LONGITUDE))
-                                values.put(COLUMN_LONGITUDE, member.getDouble(JSON_KEY_LONGITUDE));
-                            values.put(COLUMN_STATUS_DATE, member.getString(JSON_KEY_STATUS_DATE));
+                            values.put(COLUMN_CODE_CONF, entry.getString(JSON_KEY_CODE_CONF));
+                            if (!entry.isNull(JSON_KEY_NOM))
+                                values.put(COLUMN_NOM, entry.getString(JSON_KEY_NOM));
+                            if (!entry.isNull(JSON_KEY_PRENOM))
+                                values.put(COLUMN_PRENOM, entry.getString(JSON_KEY_PRENOM));
+                            if (!entry.isNull(JSON_KEY_SEXE))
+                                values.put(COLUMN_SEXE, entry.getInt(JSON_KEY_SEXE));
+                            if (!entry.isNull(JSON_KEY_BORN_DATE))
+                                values.put(COLUMN_BORN_DATE, entry.getString(JSON_KEY_BORN_DATE));
+                            if (!entry.isNull(JSON_KEY_ADRESSE))
+                                values.put(COLUMN_ADRESSE, entry.getString(JSON_KEY_ADRESSE));
+                            if (!entry.isNull(JSON_KEY_VILLE))
+                                values.put(COLUMN_VILLE, entry.getString(JSON_KEY_VILLE));
+                            if (!entry.isNull(JSON_KEY_POSTAL))
+                                values.put(COLUMN_POSTAL, entry.getString(JSON_KEY_POSTAL));
+                            if (!entry.isNull(JSON_KEY_EMAIL))
+                                values.put(COLUMN_EMAIL, entry.getString(JSON_KEY_EMAIL));
+                            if (!entry.isNull(JSON_KEY_HOBBIES))
+                                values.put(COLUMN_HOBBIES, entry.getString(JSON_KEY_HOBBIES));
+                            if (!entry.isNull(JSON_KEY_A_PROPOS))
+                                values.put(COLUMN_A_PROPOS, entry.getString(JSON_KEY_A_PROPOS));
+                            if (!entry.isNull(JSON_KEY_LOG_DATE))
+                                values.put(COLUMN_LOG_DATE, entry.getString(JSON_KEY_LOG_DATE));
+                            values.put(COLUMN_ADMIN, entry.getInt(JSON_KEY_ADMIN));
+                            if (!entry.isNull(JSON_KEY_PROFILE))
+                                values.put(COLUMN_PROFILE, entry.getString(JSON_KEY_PROFILE));
+                            if (!entry.isNull(JSON_KEY_BANNER))
+                                values.put(COLUMN_BANNER, entry.getString(JSON_KEY_BANNER));
+                            values.put(COLUMN_LOCATED, entry.getInt(JSON_KEY_LOCATED));
+                            if (!entry.isNull(JSON_KEY_LATITUDE))
+                                values.put(COLUMN_LATITUDE, entry.getDouble(JSON_KEY_LATITUDE));
+                            if (!entry.isNull(JSON_KEY_LONGITUDE))
+                                values.put(COLUMN_LONGITUDE, entry.getDouble(JSON_KEY_LONGITUDE));
+                            values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
                                     DataProvider.Synchronized.DONE.getValue());
 
-                            // Check if member already exists
+                            // Check if entry already exists
                             String selection = COLUMN_PSEUDO + "='" + pseudo + "'";
-                            Cursor cursor = resolver.query(memberUri, new String[]{ "count(*)" },
-                                    COLUMN_PSEUDO + "='" + pseudo + "'",
-                                    null, null);
+                            Cursor cursor = resolver.query(tableUri, new String[]{ "count(*)" },
+                                    selection, null, null);
                             cursor.moveToFirst();
-                            if (cursor.getInt(0) > 0) // Update DB entry
-                                resolver.update(memberUri, values, selection, null);
+                            if (cursor.getInt(0) > 0) { // DB entry exists
+
+                                if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED)
+                                    resolver.delete(tableUri, selection, null); // Delete entry
+                                else // Update entry
+                                    resolver.update(tableUri, values, selection, null);
+                            }
                             else { // Insert entry into DB
 
                                 values.put(COLUMN_PSEUDO, pseudo);
-                                resolver.insert(memberUri, values);
+                                resolver.insert(tableUri, values);
                             }
                             cursor.close();
                         }
@@ -155,7 +149,6 @@ public class CamaradesTable implements IDataTable {
             }
         });
         if (result != Internet.DownloadResult.SUCCEEDED) {
-
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
             return false;
         }
@@ -234,8 +227,6 @@ public class CamaradesTable implements IDataTable {
     private static final short COLUMN_INDEX_SYNCHRONIZED = 21;
 
     // JSON keys
-    private static final String JSON_KEY_MEMBERS = "camarades";
-
     private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
     private static final String JSON_KEY_CODE_CONF = COLUMN_CODE_CONF.substring(4);
     private static final String JSON_KEY_NOM = COLUMN_NOM.substring(4);

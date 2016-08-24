@@ -9,6 +9,7 @@ public final class WebServices {
     ////// URL
     public static final String URL_CONNECTION = "/connexion.php"; // Connection web service
     public static final String URL_MEMBERS = "/camarades.php"; // Members web service
+    public static final String URL_FOLLOWERS = "/abonnements.php"; // Followers web service
     public static final String URL_PUBLICATIONS = "/actualites.php"; // Publications web service
     public static final String URL_COMMENTS = "/commentaires.php"; // Comments web service
 
@@ -24,12 +25,19 @@ public final class WebServices {
 
 
     ////// JSON keys
-    public static final String JSON_KEY_ERROR = "error"; // JSON object error field (containing the web service error codes)
+    public static final String JSON_KEY_ERROR = "Error"; // JSON object error field (containing the web service error codes)
+    public static final String JSON_KEY_STATUS = "Status"; // JSON object DB status field
 
     // Connection
-    public static final String JSON_KEY_LOGGED = "logged";
-    public static final String JSON_KEY_PSEUDO = "pseudo";
-    public static final String JSON_KEY_TOKEN = "token";
-    public static final String JSON_KEY_TIME_LAG = "timeLag";
+    public static final String JSON_KEY_LOGGED = "Logged";
+    public static final String JSON_KEY_PSEUDO = "Pseudo";
+    public static final String JSON_KEY_TOKEN = "Token";
+    public static final String JSON_KEY_TIME_LAG = "TimeLag";
+
+
+    ////// Status field IDs (eg. on 'Camarades' table the 'CAM_Status' field)
+    public static final int STATUS_FIELD_NEW = 0;
+    public static final int STATUS_FIELD_UPDATED = 1;
+    public static final int STATUS_FIELD_DELETED = 2;
 
 }

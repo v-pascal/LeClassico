@@ -4,6 +4,6 @@
     <!-- Main -->
     <style name="NavHeaderTextStyle" parent="MediumTextStyle">
         <item name="android:textColor">@android:color/black</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">22sp</item>
     </style>
 </resources>

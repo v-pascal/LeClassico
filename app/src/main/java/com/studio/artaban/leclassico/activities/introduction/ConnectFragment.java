@@ -206,7 +206,7 @@ public class ConnectFragment extends RevealFragment {
                 return false;
             }
         }
-        private boolean publishWaitProgress(byte step, boolean delay) {
+        private boolean publishWaitProgress(byte step, boolean delay) throws InterruptedException {
         // Publish progression and wait its display B4 marking a delay to let's the user to be informed
 
             Logs.add(Logs.Type.V, "step: " + step + ";delay: " + delay);
@@ -218,22 +218,13 @@ public class ConnectFragment extends RevealFragment {
                 publishProgress(stepToPublish);
 
                 // Wait progress published
-                try {
-                    stepToPublish.wait(DELAY_WAIT_PROGRESS);
-                } catch (InterruptedException e) {
-                    Logs.add(Logs.Type.E, "Wait display interrupted");
-                    return false;
-                }
+                stepToPublish.wait(DELAY_WAIT_PROGRESS);
             }
-            if (delay)
-                return true; // No delay requested
+            if (!delay)
+                return !isStopped(); // No delay requested
 
-            try {
-                Thread.sleep(DELAY_INFORM_USER, 0); // Sleep to inform user of the step
-            } catch (InterruptedException e) {
-                Logs.add(Logs.Type.W, "User delay interrupted");
-                return false;
-            }
+            // Sleep to inform user of the step
+            Thread.sleep(DELAY_INFORM_USER, 0);
             return !isStopped();
         }
 
@@ -402,42 +393,30 @@ public class ConnectFragment extends RevealFragment {
                 }
 
                 ////// Start service
+                Logs.add(Logs.Type.I, "Start service");
                 if (!publishWaitProgress(STEP_SYNCHRONIZATION_SUCCEEDED, true)) return Boolean.FALSE;
                 DataService.start(getWaitActivity());
 
-                ////// Wait activity service bound
+                ////// Wait service bound
+                Logs.add(Logs.Type.I, "Wait service bound");
                 mServiceBound = false;
                 while (!mServiceBound) {
 
                     if (!publishWaitProgress(STEP_SERVICE_BOUND, false)) return Boolean.FALSE;
 
                     // Check service request result
-                    if (!mServiceBound) {
-                        try {
-                            Thread.sleep(DELAY_WAIT_BOUND, 0);
-                        } catch (InterruptedException e) {
-
-                            Logs.add(Logs.Type.W, "Wait service bound interrupted");
-                            return Boolean.FALSE;
-                        }
-                    }
+                    if (!mServiceBound)
+                        Thread.sleep(DELAY_WAIT_BOUND, 0);
                 }
                 return Boolean.TRUE; ////// Succeeded
 
-            } catch (Exception e) {
+
+            } catch (NullPointerException e) { // May occur when activity not attached
                 Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
+                return Boolean.FALSE;
 
-
-
-
-
-
-
-
-
-
-
-
+            } catch (InterruptedException e) { // May occur if thread cancelled
+                Logs.add(Logs.Type.W, "Thread interrupted: " + e.getMessage());
                 return Boolean.FALSE;
             }
         }
@@ -446,8 +425,8 @@ public class ConnectFragment extends RevealFragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
             Logs.add(Logs.Type.V, null);
+
             synchronized (stopped) { // Own cancel connection task management
                 stopped.set(false);
             }
@@ -485,7 +464,8 @@ public class ConnectFragment extends RevealFragment {
                     }
                     break;
                 }
-                default: {
+                default: { // DB tables synchronization
+
                     update(STEP_SYNCHRONIZATION_PROGRESS, values[0]);
                     break;
                 }

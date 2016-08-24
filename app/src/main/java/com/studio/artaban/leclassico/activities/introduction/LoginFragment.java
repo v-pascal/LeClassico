@@ -30,6 +30,25 @@ public class LoginFragment extends RevealFragment {
         Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
                 ";savedInstanceState: " + savedInstanceState);
         mRootView = inflater.inflate(R.layout.layout_login, container, false);
+
+
+
+
+
+
+
+
+        ((EditText)mRootView.findViewById(R.id.edit_pseudo)).setText("pascal");
+        ((EditText)mRootView.findViewById(R.id.edit_password)).setText("ras34");
+
+
+
+
+
+
+
+
+
         return mRootView;
     }
 }

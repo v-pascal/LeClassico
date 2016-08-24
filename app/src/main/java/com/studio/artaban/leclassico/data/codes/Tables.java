@@ -20,5 +20,4 @@ public final class Tables {
     public static final byte ID_NOTIFICATIONS = 12;
 
     public static final byte ID_LAST = ID_NOTIFICATIONS;
-
 }

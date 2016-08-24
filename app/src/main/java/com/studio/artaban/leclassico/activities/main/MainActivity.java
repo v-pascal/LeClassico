@@ -35,14 +35,12 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 
-import com.studio.artaban.leclassico.helpers.Notify;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.helpers.Storage;
 
@@ -181,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements
                                             RoundedBitmapDrawable radiusBmp =
                                                     RoundedBitmapDrawableFactory.create(getResources(),
                                                             resource);
-                                            radiusBmp.setCornerRadius(0.25f);
+                                            radiusBmp.setCornerRadius(8.0f);
                                             imageView.setImageDrawable(radiusBmp);
                                             return true;
                                         }

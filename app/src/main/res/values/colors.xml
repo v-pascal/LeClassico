@@ -33,4 +33,7 @@
     <color name="colorButtonBackground">#00000000</color>
     <color name="colorButtonBackgroundPressed">#50ffffff</color>
 
+    <!-- Main -->
+    <color name="colorNavBackground">#ffefefef</color>
+
 </resources>
