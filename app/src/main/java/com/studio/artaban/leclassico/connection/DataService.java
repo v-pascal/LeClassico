@@ -19,6 +19,11 @@ import com.studio.artaban.leclassico.helpers.Notify;
  */
 public class DataService extends Service implements Internet.OnConnectivityListener {
 
+    private static final String EXTRA_DATA_PSEUDO = "pseudo";
+    private static final String EXTRA_DATA_TOKEN = "token";
+    private static final String EXTRA_DATA_TIME_LAG = "timeLag";
+    // Extra data keys
+
     private static boolean isRunning; // Service running flag
     public static boolean isRunning() {
         return isRunning;
@@ -34,14 +39,19 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         context.stopService(new Intent(context, DataService.class));
         return true;
     }
-    public static boolean start(Context context) throws NullPointerException { // Start service
+    public static boolean start(Context context, String pseudo, String token, long timeLag)
+            throws NullPointerException { // Start service
 
         Logs.add(Logs.Type.V, "context: " + context);
         if (isRunning) {
             Logs.add(Logs.Type.W, "Service already started");
             return false;
         }
-        context.startService(new Intent(context, DataService.class));
+        Intent intent = new Intent(context, DataService.class);
+        intent.putExtra(EXTRA_DATA_PSEUDO, pseudo);
+        intent.putExtra(EXTRA_DATA_TOKEN, token);
+        intent.putExtra(EXTRA_DATA_TIME_LAG, timeLag);
+        context.startService(intent);
         return true;
     }
 
@@ -102,30 +112,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private String mPseudo;
     // Login pseudo (used to get a token if working offline and an Internet connection is established)
 
-    public void connected(String pseudo, String token, long timeLag) {
-
-        Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";token: " + token + ";timeLag: " + timeLag);
-        mPseudo = pseudo;
-        mToken = token;
-        mTimeLag = timeLag;
-
-        // Add notification
-        Bundle notifyData = new Bundle();
-        notifyData.putInt(Notify.DATA_KEY_ICON, R.drawable.notification);
-        notifyData.putString(Notify.DATA_KEY_TITLE, Constants.APP_NAME);
-        notifyData.putString(Notify.DATA_KEY_TEXT, getString(R.string.pseudo_connected, pseudo));
-
-        Notify.update(this, Notify.Type.EVENT, null, notifyData);
-
-
-
-
-
-
-
-
-    }
-
     ////// Service /////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreate() {
@@ -143,6 +129,29 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Logs.add(Logs.Type.V, "intent: " + intent + ";flags: " + flags + ";startId: " + startId);
+        mPseudo = intent.getStringExtra(EXTRA_DATA_PSEUDO);
+        mToken = intent.getStringExtra(EXTRA_DATA_TOKEN);
+        mTimeLag = intent.getLongExtra(EXTRA_DATA_TIME_LAG, 0);
+
+        // Add notification
+        Bundle notifyData = new Bundle();
+        notifyData.putInt(Notify.DATA_KEY_ICON, R.drawable.notification);
+        notifyData.putString(Notify.DATA_KEY_TITLE, Constants.APP_NAME);
+        notifyData.putString(Notify.DATA_KEY_TEXT, getString(R.string.pseudo_connected, mPseudo));
+
+        Notify.update(this, Notify.Type.EVENT, null, notifyData);
+
+
+
+
+
+
+
+
+
+
+
+
         return START_NOT_STICKY;
     }
 

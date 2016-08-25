@@ -59,14 +59,12 @@ public class ConnectFragment extends RevealFragment {
     public static final byte STEP_INTERNET_NEEDED = 18;
     private static final byte STEP_SYNCHRONIZATION_PROGRESS = 21;
     private static final byte STEP_SYNCHRONIZATION_SUCCEEDED = 22;
-    private static final byte STEP_SERVICE_BOUND = 23;
     // Step codes
 
     public interface OnConnectListener { ///////////////////////////////////////////////////////////
 
         void onError(byte error);
-        boolean onServiceRequested();
-        void onConnected(String pseudo, String token, long timeLag);
+        void onConnected(String pseudo, boolean online);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,6 +183,8 @@ public class ConnectFragment extends RevealFragment {
     //     the activity is re-created (when configuration change) and then a destroy operation on this
     //     fragment is requested, the 'AsyncTask.cancel(true)' method call has no effect!
 
+    private volatile boolean mResumed; // Activity resume flag (false if in background)
+
     //////
     private OnConnectListener mListener; // Activity interface callback
     private ConnectTask mTask; // Connection asynchronous task
@@ -193,7 +193,7 @@ public class ConnectFragment extends RevealFragment {
 
         private static final int DELAY_WAIT_PROGRESS = 150; // Max delay to wait progress published (in ms)
         private static final int DELAY_INFORM_USER = 700; // Delay of displaying step (in ms)
-        private static final int DELAY_WAIT_BOUND = 700; // Delay to wait progress published (in ms)
+        private static final int DELAY_WAIT_RESUMED = 700; // Delay to wait activity resumed (in ms)
         // Delays
 
         private boolean isStopped() { // Own cancel connection task management
@@ -232,8 +232,6 @@ public class ConnectFragment extends RevealFragment {
         private String mPseudo; // User pseudo used to connect with
         private String mToken; // Token provided by the web service to identify user
         private long mTimeLag; // Time laps between remote server & current OS (in sec)
-
-        private volatile boolean mServiceBound; // Service bound flag
 
         //////
         @Override
@@ -392,22 +390,20 @@ public class ConnectFragment extends RevealFragment {
                     }
                 }
 
+                ////// Wait activity resumed (needed to avoid to start main activity when paused)
+                Logs.add(Logs.Type.I, "Wait activity resumed");
+                if (!publishWaitProgress(STEP_SYNCHRONIZATION_SUCCEEDED, true)) return Boolean.FALSE;
+                while (!mResumed) {
+
+                    // Check resume request result
+                    if (isStopped()) return Boolean.FALSE;
+                    Thread.sleep(DELAY_WAIT_RESUMED, 0);
+                }
+
                 ////// Start service
                 Logs.add(Logs.Type.I, "Start service");
-                if (!publishWaitProgress(STEP_SYNCHRONIZATION_SUCCEEDED, true)) return Boolean.FALSE;
-                DataService.start(getWaitActivity());
+                DataService.start(getWaitActivity(), mPseudo, mToken, mTimeLag);
 
-                ////// Wait service bound
-                Logs.add(Logs.Type.I, "Wait service bound");
-                mServiceBound = false;
-                while (!mServiceBound) {
-
-                    if (!publishWaitProgress(STEP_SERVICE_BOUND, false)) return Boolean.FALSE;
-
-                    // Check service request result
-                    if (!mServiceBound)
-                        Thread.sleep(DELAY_WAIT_BOUND, 0);
-                }
                 return Boolean.TRUE; ////// Succeeded
 
 
@@ -438,12 +434,6 @@ public class ConnectFragment extends RevealFragment {
             Logs.add(Logs.Type.V, "values[0]: " + values[0]);
             switch (values[0]) {
 
-                ////// Service requested
-                case STEP_SERVICE_BOUND: {
-                    if (mListener != null)
-                        mServiceBound = mListener.onServiceRequested();
-                    break;
-                }
                 ////// Error
                 case STEP_ERROR:
                 case STEP_LOGIN_FAILED:
@@ -477,7 +467,7 @@ public class ConnectFragment extends RevealFragment {
 
             Logs.add(Logs.Type.V, "aBoolean: " + aBoolean);
             if ((aBoolean) && (mListener != null))
-                mListener.onConnected(mPseudo, mToken, mTimeLag);
+                mListener.onConnected(mPseudo, (mToken != null));
         }
     }
 
@@ -529,6 +519,13 @@ public class ConnectFragment extends RevealFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+        mResumed = true;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
                 ";savedInstanceState: " + savedInstanceState);
@@ -558,6 +555,13 @@ public class ConnectFragment extends RevealFragment {
             update(mStep, mProgress);
         }
         return mRootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+        mResumed = false;
     }
 
     @Override

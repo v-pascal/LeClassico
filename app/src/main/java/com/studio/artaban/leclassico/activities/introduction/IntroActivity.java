@@ -172,19 +172,6 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         DataService.stop(this);
         finish();
     }
-    private void finishWithError() {
-
-        Logs.add(Logs.Type.V, null);
-        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
-            getSupportFragmentManager().popBackStack();
-            getSupportFragmentManager().executePendingTransactions();
-            // NB: This will stop background connection task
-        }
-
-        // Inform user of this critical error then quit application (this will restart data service)
-        Toast.makeText(IntroActivity.this, R.string.error_service_unavailable, Toast.LENGTH_LONG).show();
-        finishApplication(mIntroDone);
-    }
 
     private float mAlphaSkip;
     private float mAlphaStep1;
@@ -321,79 +308,34 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
     }
 
     @Override
-    public boolean onServiceRequested() {
+    public void onConnected(String pseudo, boolean online) {
 
-        Logs.add(Logs.Type.V, null);
-        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) == null)
-            return false; // Connection task stopped
-        if (!mResumed)
-            return false; // Activity in background
-
-        // Bind data service
-        if (!mDataService.isBound()) {
-
-            Logs.add(Logs.Type.I, "Bind data service");
-            boolean bound = mDataService.bind(this, new ServiceBinder.OnServiceListener() {
-                @Override
-                public void onServiceConnected(DataService service) {
-
-                }
-
-                @Override
-                public void onServiceDisconnected(ServiceConnection connection) { // SHOULD NOT HAPPEN!
-                    Logs.add(Logs.Type.V, "connection: " + connection);
-                    finishWithError();
-                }
-            });
-            if (!bound) // SHOULD NOT HAPPEN!
-                finishWithError();
-
-            return false;
-        }
-        return (mDataService.get() != null);
-    }
-
-    @Override
-    public void onConnected(String pseudo, String token, long timeLag) {
-
-        Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";token: " + token + ";timeLag: " + timeLag);
+        Logs.add(Logs.Type.V, "online: " + online);
         if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) == null)
             return; // Connection task stopped
 
-        try {
-            mDataService.get().connected(pseudo, token, timeLag);
+        if (!online) // Inform user if working offline
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(IntroActivity.this, R.string.working_offline, Toast.LENGTH_LONG).show();
+                }
+            }, 1200);
 
-            if (token == null) // Inform user if working offline
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(IntroActivity.this, R.string.working_offline, Toast.LENGTH_LONG).show();
-                    }
-                }, 1200);
+        mLogoutRequested = true; // Needed if back to activity (logout requested)
+        // NB: The only reason to be back from main activity to this activity is that the user has
+        //     requested a logout operation (see main activity)
 
-            mLogoutRequested = true; // Needed if back to activity (logout requested)
-            // NB: The only reason to be back from main activity to this activity is that the user has
-            //     requested a logout operation (see main activity)
-
-            ////// Start main activity
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, (token != null));
-            intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
-            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-
-        } catch (NullPointerException e) {
-
-            Logs.add(Logs.Type.E, "Unexpected service unbound");
-            getSupportFragmentManager().popBackStack();
-            getSupportFragmentManager().executePendingTransactions();
-            replaceButtonIcon(false);
-        }
+        ////// Start main activity
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
+        intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static final int DELAY_REVEAL_FRAGMENT = 300; // Delay of displaying or hiding fragment
-    private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
 
     //////
     public void onNextStep(View sender) { // Next step click event
@@ -465,7 +407,6 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
     private LimitlessViewPager mViewPager; // Introduction view pager component
 
     private boolean mIntroDone; // Introduction displayed flag
-    private boolean mResumed; // Activity active flag (false if in background)
     private boolean mLogoutRequested; // Flag used to logout when back to this activity after logged
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
@@ -943,13 +884,6 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Logs.add(Logs.Type.V, null);
-        mResumed = true;
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         Logs.add(Logs.Type.V, "menu: " + menu);
@@ -1027,18 +961,9 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Logs.add(Logs.Type.V, null);
-        mResumed = false;
-    }
-
-    @Override
     protected void onStop(){
         super.onStop();
-
         Logs.add(Logs.Type.V, null);
-        mDataService.unbind(this); // Unbind data service (if any)
 
         // Store persistent data
         SharedPreferences prefs = getSharedPreferences(Constants.APP_PREFERENCE, 0);
