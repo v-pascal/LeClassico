@@ -81,6 +81,7 @@ public class NotificationsTable implements IDataTable {
     public static final String COLUMN_OBJECT_DATE = "NOT_ObjDate";
     public static final String COLUMN_OBJECT_FROM = "NOT_ObjFrom";
     public static final String COLUMN_LU_FLAG = "NOT_LuFlag";
+    public static final String COLUMN_STATUS_DATE = "NOT_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -90,8 +91,9 @@ public class NotificationsTable implements IDataTable {
     private static final short COLUMN_INDEX_OBJECT_DATE = 5;
     private static final short COLUMN_INDEX_OBJECT_FROM = 6;
     private static final short COLUMN_INDEX_LU_FLAG = 7;
+    private static final short COLUMN_INDEX_STATUS_DATE = 8;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 9;
 
     //
     private NotificationsTable() { }
@@ -111,6 +113,7 @@ public class NotificationsTable implements IDataTable {
                 COLUMN_OBJECT_DATE + " TEXT," +
                 COLUMN_OBJECT_FROM + " TEXT," +
                 COLUMN_LU_FLAG + " INTEGER NOT NULL," +
+                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
