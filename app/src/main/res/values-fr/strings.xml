@@ -4,6 +4,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="status">Statut:</string>
+    <string name="search">Rechercher</string>
 
     <!-- Connection -->
     <string name="connection">Connexion</string>
