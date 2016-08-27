@@ -6,6 +6,7 @@
     <string name="cancel">Cancel</string>
     <string name="status">Status:</string>
     <string name="search">Search</string>
+    <string name="notifications">Notifications</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">LeClassico</string>

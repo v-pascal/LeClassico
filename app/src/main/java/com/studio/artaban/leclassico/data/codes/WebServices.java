@@ -10,6 +10,7 @@ public final class WebServices {
     public static final String URL_CONNECTION = "/connexion.php"; // Connection web service
     public static final String URL_MEMBERS = "/camarades.php"; // Members web service
     public static final String URL_FOLLOWERS = "/abonnements.php"; // Followers web service
+    public static final String URL_NOTIFICATIONS = "/notifications.php"; // Notifications web service
     public static final String URL_PUBLICATIONS = "/actualites.php"; // Publications web service
     public static final String URL_COMMENTS = "/commentaires.php"; // Comments web service
 

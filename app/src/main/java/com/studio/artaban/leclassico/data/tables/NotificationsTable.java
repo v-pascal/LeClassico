@@ -6,8 +6,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -15,7 +21,7 @@ import java.util.List;
  * Created by pascal on 08/08/16.
  * Notifications database table class
  */
-public class NotificationsTable implements IDataTable {
+public class NotificationsTable extends DataTable {
 
     public static class Pin extends DataField { //////////////////////////////// Notifications entry
 
@@ -34,9 +40,27 @@ public class NotificationsTable implements IDataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(ContentResolver resolver, String token) {
+    public boolean synchronize(final ContentResolver resolver, String token) {
     // Synchronize data with remote DB
 
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token);
+        String url = getUrlSynchroRequest(resolver, WebServices.URL_NOTIFICATIONS, token,
+                TABLE_NAME, COLUMN_STATUS_DATE);
+
+        // Send remote DB request
+        Internet.DownloadResult result = Internet.downloadHttpRequest(url, null,
+                new Internet.OnRequestListener() {
+
+                    @Override
+                    public boolean onReceiveReply(String response) {
+                        //Logs.add(Logs.Type.V, "response: " + response);
+                        try {
+
+                            JSONObject reply = new JSONObject(response);
+                            if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
+
+                                if (reply.isNull(TABLE_NAME))
+                                    return true; // Already synchronized
 
 
 
@@ -45,6 +69,36 @@ public class NotificationsTable implements IDataTable {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            } else {
+                                Logs.add(Logs.Type.E, "Synchronization error: #" +
+                                        reply.getInt(WebServices.JSON_KEY_ERROR));
+                                return false;
+                            }
+
+                        } catch (JSONException e) {
+                            Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                            return false;
+                        }
+                        return true;
+                    }
+                });
+        if (result != Internet.DownloadResult.SUCCEEDED) {
+            Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
+            return false;
+        }
         return true;
     }
 

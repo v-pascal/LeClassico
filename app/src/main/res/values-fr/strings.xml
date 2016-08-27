@@ -5,6 +5,7 @@
     <string name="cancel">Annuler</string>
     <string name="status">Statut:</string>
     <string name="search">Rechercher</string>
+    <string name="notifications">Notifications</string>
 
     <!-- Connection -->
     <string name="connection">Connexion</string>

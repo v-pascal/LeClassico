@@ -10,8 +10,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
@@ -122,9 +120,17 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    //
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -214,6 +220,14 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
             case Tables.ID_NOTIFICATIONS: { ////// Notifications
+
+
+
+
+
+
+                //mNotify = true;
+                //invalidateOptionsMenu();
 
 
 
@@ -354,6 +368,7 @@ public class MainActivity extends AppCompatActivity implements
         // Set Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Set drawer toggle
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -427,22 +442,18 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setupWithViewPager(viewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
+
+
+
+
+
 
 
 
@@ -461,16 +472,16 @@ public class MainActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, null);
         getMenuInflater().inflate(R.menu.options_menu, menu);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        MenuItem searchItem = menu.findItem(R.id.mnu_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
 
 
-
-
-
+        //if (mNotify)
+        //    menu.getItem(1).setIcon(getDrawable(R.drawable.ic_notifications_info_36dp));
 
 
 
