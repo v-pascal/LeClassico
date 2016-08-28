@@ -3,9 +3,36 @@
 
     <!-- Introduction -->
     <item name="comments_shadow" format="float" type="dimen">3.0</item>
-    <item name="comments_radius" format="float" type="dimen">2.0</item>
+    <item name="comments_radius" format="float" type="dimen">2.25</item>
 
     <item name="limitless_rotation_ratio" format="float" type="dimen">0.0285</item>
     <item name="translation_ratio" format="float" type="dimen">1.45</item>
+
+
+
+
+
+
+
+
+
+    <dimen name="login_width">256dp</dimen>
+    <dimen name="login_min_width">128dp</dimen>
+    <dimen name="login_text_size">20sp</dimen>
+    <dimen name="progress_text_size">18sp</dimen>
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Main -->
+    <item name="pseudo_shadow" format="float" type="dimen">2.25</item>
+    <item name="pseudo_radius" format="float" type="dimen">1.75</item>
 
 </resources>

@@ -8,8 +8,15 @@
     <item name="limitless_rotation_ratio" format="float" type="dimen">0.007</item>
     <item name="translation_ratio" format="float" type="dimen">1.9</item>
 
+    <dimen name="login_width">192dp</dimen>
+    <dimen name="login_min_width">96dp</dimen>
+    <dimen name="login_text_size">16sp</dimen>
+    <dimen name="progress_text_size">14sp</dimen>
+    <dimen name="progress_icon_size">24dp</dimen>
+
     <!-- Main -->
     <item name="pseudo_shadow" format="float" type="dimen">2.5</item>
     <item name="pseudo_radius" format="float" type="dimen">2.0</item>
+    <item name="profile_radius" format="float" type="dimen">32.0</item>
 
 </resources>

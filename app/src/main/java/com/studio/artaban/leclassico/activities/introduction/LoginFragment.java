@@ -38,8 +38,8 @@ public class LoginFragment extends RevealFragment {
 
 
 
-        ((EditText)mRootView.findViewById(R.id.edit_pseudo)).setText("pascal");
-        ((EditText)mRootView.findViewById(R.id.edit_password)).setText("ras34");
+        ((EditText)mRootView.findViewById(R.id.edit_pseudo)).setText("testers");
+        ((EditText)mRootView.findViewById(R.id.edit_password)).setText("testers");
 
 
 

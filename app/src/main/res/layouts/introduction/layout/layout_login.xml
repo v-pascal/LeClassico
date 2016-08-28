@@ -9,6 +9,7 @@
     <EditText
         android:layout_width="@dimen/login_width"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/login_text_size"
         android:minWidth="@dimen/login_min_width"
         android:layout_margin="@dimen/fab_margin"
         android:hint="@string/pseudo"
@@ -19,6 +20,7 @@
     <EditText
         android:layout_width="@dimen/login_width"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/login_text_size"
         android:minWidth="@dimen/login_min_width"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"

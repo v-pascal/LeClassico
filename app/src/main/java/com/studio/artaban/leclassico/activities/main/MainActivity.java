@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -200,7 +201,9 @@ public class MainActivity extends AppCompatActivity implements
                                             RoundedBitmapDrawable radiusBmp =
                                                     RoundedBitmapDrawableFactory.create(getResources(),
                                                             resource);
-                                            radiusBmp.setCornerRadius(8.0f);
+                                            TypedValue radius = new TypedValue();
+                                            getResources().getValue(R.dimen.profile_radius, radius, true);
+                                            radiusBmp.setCornerRadius(radius.getFloat());
                                             imageView.setImageDrawable(radiusBmp);
                                             return true;
                                         }
