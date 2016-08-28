@@ -41,6 +41,8 @@
 
 
 
+
+
                     <TextView
                         android:textColor="@android:color/darker_gray"
                         android:text="@string/app_name"
