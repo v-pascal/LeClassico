@@ -453,37 +453,18 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+
+
+
+
+
+
         // Set tabulation layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
         tabLayout.setTabMode(
                 (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ?
                         TabLayout.MODE_SCROLLABLE : TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     @Override
@@ -499,8 +480,12 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+
+
+
         //if (mNotify)
-        //    menu.getItem(1).setIcon(getDrawable(R.drawable.ic_notifications_info_36dp));
+        //    menu.getItem(1).setIcon(getDrawable(R.drawable.ic_notifications_info_24dp));
+
 
 
 
