@@ -136,7 +136,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         // Add notification
         Bundle notifyData = new Bundle();
         notifyData.putInt(Notify.DATA_KEY_ICON, R.drawable.notification);
-        notifyData.putString(Notify.DATA_KEY_TITLE, Constants.APP_NAME);
+        notifyData.putString(Notify.DATA_KEY_TITLE, getString(R.string.app_name));
         notifyData.putString(Notify.DATA_KEY_TEXT, getString(R.string.pseudo_connected, mPseudo));
 
         Notify.update(this, Notify.Type.EVENT, null, notifyData);

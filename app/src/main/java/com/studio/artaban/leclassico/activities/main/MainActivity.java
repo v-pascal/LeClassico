@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -187,9 +188,9 @@ public class MainActivity extends AppCompatActivity implements
                         if (profile != null)
                             Glider.with(MainActivity.this)
                                     .load(Storage.FOLDER_PROFILES +
-                                            File.separator + profile,
+                                                    File.separator + profile,
                                             Constants.APP_URL_PROFILES + "/" + profile)
-                                    .placeholder((female)? R.drawable.woman : R.drawable.man)
+                                    .placeholder((female) ? R.drawable.woman : R.drawable.man)
                                     .into((ImageView) navHeader.findViewById(R.id.image_profile),
                                             new Glider.OnLoadListener() {
 
@@ -208,12 +209,16 @@ public class MainActivity extends AppCompatActivity implements
                                             return true;
                                         }
                                     });
+                        else
+                            ((ImageView) navHeader.findViewById(R.id.image_profile))
+                                    .setImageDrawable(getDrawable((female) ?
+                                            R.drawable.woman : R.drawable.man));
 
                         // Banner
                         if (banner != null)
                             Glider.with(MainActivity.this)
                                     .load(Storage.FOLDER_PROFILES +
-                                            File.separator + banner,
+                                                    File.separator + banner,
                                             Constants.APP_URL_PROFILES + "/" + banner)
                                     .placeholder(R.drawable.banner)
                                     .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
@@ -442,14 +447,25 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
-
-
         ViewPager viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
 
+
+
+
+        // Set tabulation layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
+        tabLayout.setTabMode(
+                (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ?
+                        TabLayout.MODE_SCROLLABLE : TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
+
+
+
+
+
+
 
 
 

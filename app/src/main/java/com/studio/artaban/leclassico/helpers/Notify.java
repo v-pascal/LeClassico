@@ -65,7 +65,7 @@ public class Notify {
                 ";data: " + data);
         int icon = R.mipmap.ic_launcher;
         String ticker = NOTIFICATION_TICKER;
-        String title = Constants.APP_NAME;
+        String title = context.getString(R.string.app_name);
         long when = System.currentTimeMillis();
         int defaults = Notification.DEFAULT_SOUND|Notification.DEFAULT_VIBRATE;
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

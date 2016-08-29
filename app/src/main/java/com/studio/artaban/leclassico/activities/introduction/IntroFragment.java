@@ -343,11 +343,11 @@ public class IntroFragment extends Fragment {
             case 0: { // Welcome
 
                 title.setText(getResources().getString(R.string.intro_welcome));
-                description.setText(getResources().getString(R.string.intro_welcome_text,
-                        Constants.APP_NAME));
+                String appName = getResources().getString(R.string.app_name);
+                description.setText(getResources().getString(R.string.intro_welcome_text, appName));
 
                 // Add web site link to "LeClassico"
-                Pattern linkMatcher = Pattern.compile(Constants.APP_NAME);
+                Pattern linkMatcher = Pattern.compile(appName);
                 String urlLeClassico = Constants.APP_WEBSITE;
                 Linkify.addLinks(description, linkMatcher, urlLeClassico);
                 break;
