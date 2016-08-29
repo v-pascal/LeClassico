@@ -406,9 +406,9 @@ public class MainActivity extends AppCompatActivity implements
                 new int[]{Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK}));
         navigation.setItemIconTintList(null);
         navigation.getMenu().findItem(R.id.navig_profile).getIcon()
-                .setColorFilter(getResources().getColor(R.color.colorAccentProfile), PorterDuff.Mode.SRC_ATOP);
+                .setColorFilter(getResources().getColor(R.color.colorPrimaryProfile), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_location).getIcon()
-                .setColorFilter(getResources().getColor(R.color.colorAccentLocation), PorterDuff.Mode.SRC_ATOP);
+                .setColorFilter(getResources().getColor(R.color.colorPrimaryLocation), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_settings).getIcon()
                 .setColorFilter(getResources().getColor(R.color.colorPrimarySetting), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_logout).getIcon()
