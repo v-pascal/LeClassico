@@ -12,12 +12,12 @@ public final class Constants {
 
     ////// Application
     public static final String APP_NAME = "LeClassico"; // Application name
-    public static final String APP_WEBSITE = "http://www.leclassico.fr"; // Social network application web site
+    public static final String APP_WEBSITE = "http://www.leclassico.fr/"; // Social network application web site
     public static final String APP_URI_COMPANY = "studio.artaban"; // Application company URI
     public static final String APP_URI = "leclassico"; // Application URI
 
-    public static final String APP_WEBSERVICES = APP_WEBSITE + "/WebServices"; // LeClassico web services URL
-    public static final String APP_URL_PROFILES = APP_WEBSITE + "/Profiles"; // LeClassico profile URL
+    public static final String APP_WEBSERVICES = APP_WEBSITE + "WebServices"; // LeClassico web services URL
+    public static final String APP_URL_PROFILES = APP_WEBSITE + "Profiles"; // LeClassico profile URL
 
     // Preference keys
     public static final String APP_PREFERENCE = APP_NAME + "Preferences"; // Application preference

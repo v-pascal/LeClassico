@@ -348,7 +348,7 @@ public class IntroFragment extends Fragment {
 
                 // Add web site link to "LeClassico"
                 Pattern linkMatcher = Pattern.compile(appName);
-                String urlLeClassico = Constants.APP_WEBSITE;
+                String urlLeClassico = Constants.APP_WEBSITE + "index.php?lnk=";
                 Linkify.addLinks(description, linkMatcher, urlLeClassico);
                 break;
             }
