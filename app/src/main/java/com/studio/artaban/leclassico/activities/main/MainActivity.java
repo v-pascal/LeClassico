@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -33,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -373,7 +375,18 @@ public class MainActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Set Toolbar
+        // Set tool & app bars
+        ((AppBarLayout)findViewById(R.id.appbar)).addOnOffsetChangedListener(
+                new AppBarLayout.OnOffsetChangedListener() {
+
+                    @Override
+                    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+
+                        //Logs.add(Logs.Type.V, "appBarLayout: " + appBarLayout +
+                        //        ";verticalOffset: " + verticalOffset);
+                        appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
+                    }
+        });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -449,6 +462,7 @@ public class MainActivity extends AppCompatActivity implements
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
+
 
 
 
