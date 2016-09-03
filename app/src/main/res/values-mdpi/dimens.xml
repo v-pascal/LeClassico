@@ -7,26 +7,34 @@
     <item name="limitless_rotation_ratio" format="float" type="dimen">0.03925</item>
     <item name="translation_ratio" format="float" type="dimen">1.225</item>
 
-
-
-
-
-
-
-    <dimen name="login_width">256dp</dimen>
-    <dimen name="login_min_width">128dp</dimen>
-    <dimen name="login_text_size">20sp</dimen>
-    <dimen name="progress_text_size">18sp</dimen>
-
-
-
-
-
-
-
+    <dimen name="login_width">240dp</dimen>
+    <dimen name="login_min_width">120dp</dimen>
+    <dimen name="login_text_size">19sp</dimen>
+    <dimen name="progress_text_size">17sp</dimen>
+    <dimen name="progress_icon_size">33dp</dimen>
 
     <!-- Main -->
     <item name="pseudo_shadow" format="float" type="dimen">2.125</item>
     <item name="pseudo_radius" format="float" type="dimen">1.625</item>
+
+
+
+
+
+
+
+
+    <dimen name="shortcut_height">64dp</dimen>
+    <dimen name="shortcut_content_height">48dp</dimen><!-- = shortcut_height - appbar_padding_top -->
+
+    <dimen name="shortcut_text_separator">8dp</dimen>
+    <dimen name="shortcut_text_size">18sp</dimen>
+    <dimen name="shortcut_info_size">14sp</dimen>
+
+
+
+
+
+
 
 </resources>

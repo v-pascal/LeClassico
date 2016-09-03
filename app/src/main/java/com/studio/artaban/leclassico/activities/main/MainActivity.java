@@ -12,6 +12,7 @@ import android.graphics.PorterDuff;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
@@ -23,7 +24,6 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
@@ -34,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -100,56 +101,105 @@ public class MainActivity extends AppCompatActivity implements
             return rootView;
         }
     }
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //
+    private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
+    private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
+
+    private void updateShortcut(int section) {
+    // Display & position shortcut according selected section
+
+        Logs.add(Logs.Type.V, "section: " + section);
+        FragmentManager manager = getSupportFragmentManager();
+        switch (section) {
+
+            case 0: { ////// Home
+                manager.beginTransaction().replace(R.id.shortcut_center, new ShortcutFragment(),
+                        ShortcutFragment.TAG_HOME).commit();
+                manager.beginTransaction().replace(R.id.shortcut_right, new ShortcutFragment(),
+                        ShortcutFragment.TAG_PUBLICATIONS).commit();
+                break;
+            }
+            case 1: { ////// Publications
+                manager.beginTransaction().replace(R.id.shortcut_left, new ShortcutFragment(),
+                        ShortcutFragment.TAG_HOME).commit();
+                manager.beginTransaction().replace(R.id.shortcut_center, new ShortcutFragment(),
+                        ShortcutFragment.TAG_PUBLICATIONS).commit();
+                manager.beginTransaction().replace(R.id.shortcut_right, new ShortcutFragment(),
+                        ShortcutFragment.TAG_EVENTS).commit();
+                break;
+            }
+            case 2: { ////// Events
+
+
+
+                break;
+            }
+            case 3: { ////// Members
+
+
+
+                break;
+            }
+            case 4: { ////// Notifications
+
+
+
+                break;
+            }
         }
+        manager.executePendingTransactions();
 
-        //////
-        @Override
-        public Fragment getItem(int position) {
-            return PlaceholderFragment.newInstance(position);
-        }
+        if (mShortcutWidth == Constants.NO_DATA) {
+        // Get shortcut fragment width & height (if not already done)
 
-        @Override
-        public int getCount() {
-            return Constants.MAIN_PAGE_COUNT;
-        }
+            final View shortcut = findViewById(R.id.shortcut);
+            shortcut.getViewTreeObserver()
+                    .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            String[] pages = getResources().getStringArray(R.array.main_pages);
-            return pages[position];
+                        @Override
+                        public void onGlobalLayout() {
+                            Logs.add(Logs.Type.V, null);
+
+                            shortcut.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            mShortcutWidth = shortcut.getWidth();
+                            mShortcutHeight = shortcut.getHeight();
+
+                            findViewById(R.id.shortcut_left).setTranslationX(-mShortcutWidth);
+                            findViewById(R.id.shortcut_right).setTranslationX(mShortcutWidth);
+                            findViewById(R.id.shortcut_new).setTranslationY(-mShortcutHeight);
+                        }
+                    });
+
+        } else {
+            findViewById(R.id.shortcut_left).setTranslationX(-mShortcutWidth);
+            findViewById(R.id.shortcut_center).setTranslationX(0);
+            findViewById(R.id.shortcut_right).setTranslationX(mShortcutWidth);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     ////// OnQueryTextListener /////////////////////////////////////////////////////////////////////
     @Override
@@ -384,7 +434,9 @@ public class MainActivity extends AppCompatActivity implements
 
                         //Logs.add(Logs.Type.V, "appBarLayout: " + appBarLayout +
                         //        ";verticalOffset: " + verticalOffset);
-                        appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
+                        if (appBarLayout.findViewById(R.id.shortcut) != null)
+                            appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
+                        //else // NB: Can occur when search operation starts
                     }
         });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -451,27 +503,66 @@ public class MainActivity extends AppCompatActivity implements
         notificationData.putString(QueryLoader.DATA_KEY_SELECTION, NotificationsTable.COLUMN_LU_FLAG + "=0");
         mNotificationLoader.restart(this, Tables.ID_NOTIFICATIONS, notificationData);
 
+        // Set content view pager
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+            @Override
+            public Fragment getItem(int position) {
+                return PlaceholderFragment.newInstance(position);
+            }
 
+            @Override
+            public int getCount() {
+                return Constants.MAIN_PAGE_COUNT;
+            }
 
+            @Override
+            public CharSequence getPageTitle(int position) {
+                String[] pages = getResources().getStringArray(R.array.main_pages);
+                return pages[position];
+            }
+        });
+        viewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
+            private void animShortcut(boolean toTheLeft, float position) {
+            // Animate shortcut according section displayed and its position
 
+                //Logs.add(Logs.Type.V, "toTheLeft: " + toTheLeft + ";position: " + position);
+                if (((toTheLeft) && (position < 0f)) || (((!toTheLeft) && (position < 1f)))) {
 
+                    findViewById(R.id.shortcut_left).setTranslationX(-mShortcutWidth + (position * mShortcutWidth));
+                    findViewById(R.id.shortcut_center).setTranslationX(position * mShortcutWidth);
+                    findViewById(R.id.shortcut_right).setTranslationX(mShortcutWidth + (position * mShortcutWidth));
+                }
+            }
 
+            @Override
+            public void transformPage(View page, float position) {
 
+                if (position < 0f) { // This page is moving out to the left
+                    animShortcut(true, position);
+                } else if (position < 1f) { // This page is moving in from the right
+                    animShortcut(false, position);
+                }
+            }
+        });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
+            }
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
-        viewPager.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
+            @Override
+            public void onPageSelected(int position) {
+                Logs.add(Logs.Type.V, "position: " + position);
+                updateShortcut(position);
+            }
 
+            @Override
+            public void onPageScrollStateChanged(int state) {
 
-
-
-
-
-
-
-
-
+            }
+        });
 
         // Set tabulation layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -479,6 +570,13 @@ public class MainActivity extends AppCompatActivity implements
                 (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ?
                         TabLayout.MODE_SCROLLABLE : TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+        updateShortcut(((ViewPager) findViewById(R.id.container)).getCurrentItem());
     }
 
     @Override

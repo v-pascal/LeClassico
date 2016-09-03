@@ -8,28 +8,11 @@
     <item name="limitless_rotation_ratio" format="float" type="dimen">0.0285</item>
     <item name="translation_ratio" format="float" type="dimen">1.45</item>
 
-
-
-
-
-
-
-
-
-    <dimen name="login_width">256dp</dimen>
-    <dimen name="login_min_width">128dp</dimen>
-    <dimen name="login_text_size">20sp</dimen>
-    <dimen name="progress_text_size">18sp</dimen>
-
-
-
-
-
-
-
-
-
-
+    <dimen name="login_width">224dp</dimen>
+    <dimen name="login_min_width">112dp</dimen>
+    <dimen name="login_text_size">18sp</dimen>
+    <dimen name="progress_text_size">16sp</dimen>
+    <dimen name="progress_icon_size">30dp</dimen>
 
     <!-- Main -->
     <item name="pseudo_shadow" format="float" type="dimen">2.25</item>

@@ -6,6 +6,7 @@
     <string name="status">Statut:</string>
     <string name="search">Rechercher</string>
     <string name="notifications">Notifications</string>
+    <string name="welcome">Bienvenue</string>
 
     <!-- Connection -->
     <string name="connection">Connexion</string>
@@ -36,6 +37,9 @@
     <string name="intro_events_text">Restez informé\ndes évènements!</string>
     <string name="intro_location">Géolocation&#8230;</string>
     <string name="intro_location_text">Géolocaliser tous\nvos amis!</string>
+
+    <!-- Main -->
+    <string name="home_info">Nouveaux messages: %1$d - Nouveaux albums: %2$d</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

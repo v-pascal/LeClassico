@@ -33,7 +33,7 @@
                     android:padding="0dp"
                     android:layout_margin="0dp"
                     android:layout_width="match_parent"
-                    android:layout_height="64dp">
+                    android:layout_height="@dimen/shortcut_height">
 
                     <FrameLayout
                         android:id="@+id/shortcut"
@@ -43,23 +43,27 @@
                         <!-- Left -->
                         <FrameLayout
                             android:id="@+id/shortcut_left"
+                            android:layout_margin="@dimen/appbar_padding_top"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 
                         <!-- New -->
                         <FrameLayout
                             android:id="@+id/shortcut_new"
+                            android:layout_margin="@dimen/appbar_padding_top"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                         <!-- Center -->
                         <FrameLayout
                             android:id="@+id/shortcut_center"
+                            android:layout_margin="@dimen/appbar_padding_top"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 
                         <!-- Right -->
                         <FrameLayout
                             android:id="@+id/shortcut_right"
+                            android:layout_margin="@dimen/appbar_padding_top"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 

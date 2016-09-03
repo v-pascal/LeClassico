@@ -7,6 +7,7 @@
     <string name="status">Status:</string>
     <string name="search">Search</string>
     <string name="notifications">Notifications</string>
+    <string name="welcome">Welcome</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">Le Classico</string>
@@ -41,6 +42,9 @@
     <string name="intro_events_text">Stay informed of\nall events!</string>
     <string name="intro_location">Location&#8230;</string>
     <string name="intro_location_text">Locate all of\nyour friends!</string>
+
+    <!-- Main -->
+    <string name="home_info">New messages: %1$d - New albums: %2$d</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

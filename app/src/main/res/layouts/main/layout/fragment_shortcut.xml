@@ -1,0 +1,78 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/shortcut_content_height"
+              tools:context="com.studio.artaban.leclassico.activities.main.ShortcutFragment">
+
+    <!-- Start date -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/layout_start_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+
+
+
+
+
+    </LinearLayout>
+    <!-- Icon -->
+    <ImageView
+        android:id="@+id/image_icon"
+        android:layout_width="@dimen/shortcut_content_height"
+        android:layout_height="@dimen/shortcut_content_height"/>
+
+    <RelativeLayout
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <!-- Welcome -->
+        <TextView
+            android:layout_marginStart="@dimen/shortcut_text_separator"
+            android:id="@+id/text_welcome"
+            android:text="@string/welcome"
+            android:textSize="@dimen/shortcut_text_size"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <!-- Pseudo -->
+        <TextView
+            android:layout_marginStart="@dimen/shortcut_text_separator"
+            android:layout_toEndOf="@id/text_welcome"
+            android:id="@+id/text_pseudo"
+            android:textSize="@dimen/shortcut_text_size"
+            android:textColor="@color/colorPrimarySetting"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <!-- Info -->
+        <TextView
+            android:layout_marginStart="@dimen/shortcut_text_separator"
+            android:layout_below="@id/text_welcome"
+            android:id="@+id/text_info"
+            android:textSize="@dimen/shortcut_info_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+    <!-- Date -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/layout_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+
+
+
+
+    </LinearLayout>
+
+</LinearLayout>
