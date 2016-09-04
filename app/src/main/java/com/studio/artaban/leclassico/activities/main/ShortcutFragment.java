@@ -17,13 +17,6 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class ShortcutFragment extends Fragment {
 
-    public static final String TAG_HOME = "home";
-    public static final String TAG_PUBLICATIONS = "publications";
-    public static final String TAG_EVENTS = "events";
-    public static final String TAG_MEMBERS = "members";
-    public static final String TAG_NOTIFICATIONS = "notifications";
-    // Tags
-
     //////
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,9 +24,8 @@ public class ShortcutFragment extends Fragment {
                 ";savedInstanceState: " + savedInstanceState);
 
         View rootView = inflater.inflate(R.layout.fragment_shortcut, container, false);
-        switch (getTag()) {
-
-            case TAG_HOME: {
+        switch (getId()) {
+            case R.id.shortcut_home: {
                 rootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 ((ImageView)rootView.findViewById(R.id.image_icon)).setImageDrawable(
                         getResources().getDrawable(R.mipmap.ic_launcher));
@@ -44,7 +36,9 @@ public class ShortcutFragment extends Fragment {
                 rootView.findViewById(R.id.layout_date).setVisibility(View.GONE);
                 break;
             }
-            case TAG_PUBLICATIONS: {
+            case R.id.shortcut_publications: {
+
+
 
 
 
@@ -53,10 +47,85 @@ public class ShortcutFragment extends Fragment {
                 rootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 ((ImageView)rootView.findViewById(R.id.image_icon)).setImageDrawable(
                         getResources().getDrawable(R.mipmap.ic_launcher));
-                ((TextView)rootView.findViewById(R.id.text_pseudo)).setText("BOB");
+                ((TextView)rootView.findViewById(R.id.text_pseudo)).setText("Publication");
                 ((TextView)rootView.findViewById(R.id.text_info)).setText(
                         getString(R.string.home_info, 0, 0));
                 rootView.findViewById(R.id.layout_date).setVisibility(View.GONE);
+
+
+
+
+
+
+
+
+
+                break;
+            }
+            case R.id.shortcut_events: {
+
+
+
+
+
+
+
+                rootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
+                ((ImageView)rootView.findViewById(R.id.image_icon)).setImageDrawable(
+                        getResources().getDrawable(R.mipmap.ic_launcher));
+                ((TextView)rootView.findViewById(R.id.text_pseudo)).setText("Events");
+                ((TextView)rootView.findViewById(R.id.text_info)).setText(
+                        getString(R.string.home_info, 0, 0));
+                rootView.findViewById(R.id.layout_date).setVisibility(View.GONE);
+
+
+
+
+
+
+
+                break;
+            }
+            case R.id.shortcut_members: {
+
+
+
+
+
+
+
+                rootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
+                ((ImageView)rootView.findViewById(R.id.image_icon)).setImageDrawable(
+                        getResources().getDrawable(R.mipmap.ic_launcher));
+                ((TextView)rootView.findViewById(R.id.text_pseudo)).setText("Members");
+                ((TextView)rootView.findViewById(R.id.text_info)).setText(
+                        getString(R.string.home_info, 0, 0));
+                rootView.findViewById(R.id.layout_date).setVisibility(View.GONE);
+
+
+
+
+
+
+
+                break;
+            }
+            case R.id.shortcut_notifications: {
+
+
+
+
+
+
+
+                rootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
+                ((ImageView)rootView.findViewById(R.id.image_icon)).setImageDrawable(
+                        getResources().getDrawable(R.mipmap.ic_launcher));
+                ((TextView)rootView.findViewById(R.id.text_pseudo)).setText("Notifications");
+                ((TextView)rootView.findViewById(R.id.text_info)).setText(
+                        getString(R.string.home_info, 0, 0));
+                rootView.findViewById(R.id.layout_date).setVisibility(View.GONE);
+
 
 
 

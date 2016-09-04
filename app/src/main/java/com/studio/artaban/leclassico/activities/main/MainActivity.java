@@ -12,7 +12,6 @@ import android.graphics.PorterDuff;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
@@ -35,7 +34,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -98,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            rootView.setId(getArguments().getInt(ARG_SECTION_NUMBER) - 1);
             return rootView;
         }
     }
@@ -123,92 +122,22 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
-
-    //
-    private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
-    private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
-
-    private void updateShortcut(int section) {
-    // Display & position shortcut according selected section
-
-        Logs.add(Logs.Type.V, "section: " + section);
-        FragmentManager manager = getSupportFragmentManager();
-        switch (section) {
-
-            case 0: { ////// Home
-                manager.beginTransaction().replace(R.id.shortcut_center, new ShortcutFragment(),
-                        ShortcutFragment.TAG_HOME).commit();
-                manager.beginTransaction().replace(R.id.shortcut_right, new ShortcutFragment(),
-                        ShortcutFragment.TAG_PUBLICATIONS).commit();
-                break;
-            }
-            case 1: { ////// Publications
-                manager.beginTransaction().replace(R.id.shortcut_left, new ShortcutFragment(),
-                        ShortcutFragment.TAG_HOME).commit();
-                manager.beginTransaction().replace(R.id.shortcut_center, new ShortcutFragment(),
-                        ShortcutFragment.TAG_PUBLICATIONS).commit();
-                manager.beginTransaction().replace(R.id.shortcut_right, new ShortcutFragment(),
-                        ShortcutFragment.TAG_EVENTS).commit();
-                break;
-            }
-            case 2: { ////// Events
-
-
-
-                break;
-            }
-            case 3: { ////// Members
-
-
-
-                break;
-            }
-            case 4: { ////// Notifications
-
-
-
-                break;
-            }
-        }
-        manager.executePendingTransactions();
-
-        if (mShortcutWidth == Constants.NO_DATA) {
-        // Get shortcut fragment width & height (if not already done)
-
-            final View shortcut = findViewById(R.id.shortcut);
-            shortcut.getViewTreeObserver()
-                    .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                        @Override
-                        public void onGlobalLayout() {
-                            Logs.add(Logs.Type.V, null);
-
-                            shortcut.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                            mShortcutWidth = shortcut.getWidth();
-                            mShortcutHeight = shortcut.getHeight();
-
-                            findViewById(R.id.shortcut_left).setTranslationX(-mShortcutWidth);
-                            findViewById(R.id.shortcut_right).setTranslationX(mShortcutWidth);
-                            findViewById(R.id.shortcut_new).setTranslationY(-mShortcutHeight);
-                        }
-                    });
-
-        } else {
-            findViewById(R.id.shortcut_left).setTranslationX(-mShortcutWidth);
-            findViewById(R.id.shortcut_center).setTranslationX(0);
-            findViewById(R.id.shortcut_right).setTranslationX(mShortcutWidth);
-        }
-    }
-
     ////// OnQueryTextListener /////////////////////////////////////////////////////////////////////
     @Override
     public boolean onQueryTextSubmit(String query) {
+
+
+
+
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
+
+
+
+
         return false;
     }
 
@@ -340,9 +269,6 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
-
-
                 break;
             }
             case R.id.navig_location: { // Display location activity
@@ -351,14 +277,9 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
-
-
                 break;
             }
             case R.id.navig_settings: { // Display settings
-
-
 
 
 
@@ -524,43 +445,128 @@ public class MainActivity extends AppCompatActivity implements
         });
         viewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
-            private void animShortcut(boolean toTheLeft, float position) {
-            // Animate shortcut according section displayed and its position
+            private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
+            private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
 
-                //Logs.add(Logs.Type.V, "toTheLeft: " + toTheLeft + ";position: " + position);
-                if (((toTheLeft) && (position < 0f)) || (((!toTheLeft) && (position < 1f)))) {
+            private int mShortcut; // Selected shortcut index
 
-                    findViewById(R.id.shortcut_left).setTranslationX(-mShortcutWidth + (position * mShortcutWidth));
-                    findViewById(R.id.shortcut_center).setTranslationX(position * mShortcutWidth);
-                    findViewById(R.id.shortcut_right).setTranslationX(mShortcutWidth + (position * mShortcutWidth));
+            private int mPositionHome;
+            private int mPositionPublications;
+            private int mPositionEvents;
+            private int mPositionMembers;
+            private int mPositionNotifications;
+            // Shortcut positions
+
+            private void translateShortcut(int section) { // Update & translate shortcut position
+
+                Logs.add(Logs.Type.V, "section: " + section);
+                mShortcut = section;
+
+                switch (section) {
+                    case 0: { ////// Home
+
+                        mPositionHome = 0;
+                        mPositionPublications = mShortcutWidth;
+                        mPositionEvents = mShortcutWidth * 2;
+                        mPositionMembers = mShortcutWidth * 3;
+                        mPositionNotifications = mShortcutWidth * 4;
+                        break;
+                    }
+                    case 1: { ////// Publications
+
+                        mPositionHome = -mShortcutWidth;
+                        mPositionPublications = 0;
+                        mPositionEvents = mShortcutWidth;
+                        mPositionMembers = mShortcutWidth * 2;
+                        mPositionNotifications = mShortcutWidth * 3;
+                        break;
+                    }
+                    case 2: { ////// Events
+
+                        mPositionHome = mShortcutWidth * -2;
+                        mPositionPublications = -mShortcutWidth;
+                        mPositionEvents = 0;
+                        mPositionMembers = mShortcutWidth;
+                        mPositionNotifications = mShortcutWidth * 2;
+                        break;
+                    }
+                    case 3: { ////// Members
+
+                        mPositionHome = mShortcutWidth * -3;
+                        mPositionPublications = mShortcutWidth * -2;
+                        mPositionEvents = -mShortcutWidth;
+                        mPositionMembers = 0;
+                        mPositionNotifications = mShortcutWidth;
+                        break;
+                    }
+                    case 4: { ////// Notifications
+
+                        mPositionHome = mShortcutWidth * -4;
+                        mPositionPublications = mShortcutWidth * -3;
+                        mPositionEvents = mShortcutWidth * -2;
+                        mPositionMembers = -mShortcutWidth;
+                        mPositionNotifications = 0;
+                        break;
+                    }
                 }
+                findViewById(R.id.shortcut_home).setTranslationX(mPositionHome);
+                findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications);
+                findViewById(R.id.shortcut_events).setTranslationX(mPositionEvents);
+                findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers);
+                findViewById(R.id.shortcut_notifications).setTranslationX(mPositionNotifications);
+
+                findViewById(R.id.shortcut_new).setTranslationY(-mShortcutHeight);
+            }
+            private void positionShortcut(final int section) {
+            // Position shortcut according selected section
+
+                Logs.add(Logs.Type.V, "section: " + section);
+                if (mShortcutWidth == Constants.NO_DATA) {
+                // Get shortcut fragment width & height (if not already done)
+
+                    final View shortcut = findViewById(R.id.shortcut);
+                    shortcut.getViewTreeObserver()
+                            .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                @Override
+                                public void onGlobalLayout() {
+                                    Logs.add(Logs.Type.V, null);
+
+                                    shortcut.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                    mShortcutWidth = shortcut.getWidth();
+                                    mShortcutHeight = shortcut.getHeight();
+
+                                    translateShortcut(section);
+                                }
+                            });
+                } else
+                    translateShortcut(section);
             }
 
+            //////
             @Override
             public void transformPage(View page, float position) {
 
-                if (position < 0f) { // This page is moving out to the left
-                    animShortcut(true, position);
-                } else if (position < 1f) { // This page is moving in from the right
-                    animShortcut(false, position);
+                Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
+                if ((position == 1) || (position == -1)) {
+                    positionShortcut(viewPager.getCurrentItem());
+                    return;
                 }
-            }
-        });
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (page.getId() != mShortcut)
+                    return;
 
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Logs.add(Logs.Type.V, "position: " + position);
-                updateShortcut(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+                else if ((position > -1f) && (position < 1f)) {
+                    findViewById(R.id.shortcut_home).setTranslationX(mPositionHome +
+                            (position * mShortcutWidth));
+                    findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications +
+                            (position * mShortcutWidth));
+                    findViewById(R.id.shortcut_events).setTranslationX(mPositionEvents +
+                            (position * mShortcutWidth));
+                    findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers +
+                            (position * mShortcutWidth));
+                    findViewById(R.id.shortcut_notifications).setTranslationX(mPositionNotifications +
+                            (position * mShortcutWidth));
+                }
             }
         });
 
@@ -570,13 +576,6 @@ public class MainActivity extends AppCompatActivity implements
                 (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ?
                         TabLayout.MODE_SCROLLABLE : TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Logs.add(Logs.Type.V, null);
-        updateShortcut(((ViewPager) findViewById(R.id.container)).getCurrentItem());
     }
 
     @Override

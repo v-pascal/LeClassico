@@ -24,12 +24,14 @@
 
 
 
+
     <dimen name="shortcut_height">64dp</dimen>
     <dimen name="shortcut_content_height">48dp</dimen><!-- = shortcut_height - appbar_padding_top -->
 
     <dimen name="shortcut_text_separator">8dp</dimen>
     <dimen name="shortcut_text_size">18sp</dimen>
     <dimen name="shortcut_info_size">14sp</dimen>
+
 
 
 
