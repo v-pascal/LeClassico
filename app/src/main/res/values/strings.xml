@@ -88,21 +88,4 @@
     <string name="confirm_logout">Do you really want to logout?</string>
     <string name="confirm_quit">Do you really want to quit application and therefore logout?</string>
 
-
-
-
-
-
-
-
-    <string name="section_format" translatable="false">Hello World from section: %1$d</string>
-
-
-
-
-
-
-
-
-
 </resources>

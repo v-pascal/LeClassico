@@ -27,11 +27,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
@@ -57,70 +55,26 @@ import java.io.File;
  */
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
-        SearchView.OnQueryTextListener {
+        SearchView.OnQueryTextListener, MainFragment.OnFragmentListener {
 
     public static final String EXTRA_DATA_KEY_ONLINE = "online";
     public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
     // Extra data keys
 
+    ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
+    @Override
+    public void onSetInfo(int section, String info) {
 
+        Logs.add(Logs.Type.V, "section: " + section + ";info: " + info);
+        switch (section) {
+            case Constants.MAIN_SECTION_HOME: {
 
-
-
-
-
-
-
-
-
-
-
-
-
-    public static class PlaceholderFragment extends Fragment {
-
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber + 1);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        //////
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            rootView.setId(getArguments().getInt(ARG_SECTION_NUMBER) - 1);
-            return rootView;
+                ((ShortcutFragment)getSupportFragmentManager()
+                        .findFragmentById(R.id.shortcut_home)).setInfo(info);
+                break;
+            }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     ////// OnQueryTextListener /////////////////////////////////////////////////////////////////////
     @Override
@@ -426,10 +380,33 @@ public class MainActivity extends AppCompatActivity implements
 
         // Set content view pager
         final ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+
+
+
+
+
+
+
+
+
+
+        //viewPager.setOffscreenPageLimit(2);
+
+
+
+
+
+
+
+
+
+
+
         viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
-            public Fragment getItem(int position) {
-                return PlaceholderFragment.newInstance(position);
+            public Fragment getItem(int section) {
+                Logs.add(Logs.Type.V, "section: " + section);
+                return MainFragment.newInstance(section);
             }
 
             @Override
@@ -520,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements
             private void positionShortcut(final int section) {
             // Position shortcut according selected section
 
-                Logs.add(Logs.Type.V, "section: " + section);
+                //Logs.add(Logs.Type.V, "section: " + section);
                 if (mShortcutWidth == Constants.NO_DATA) {
                 // Get shortcut fragment width & height (if not already done)
 
@@ -547,12 +524,12 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void transformPage(View page, float position) {
 
-                Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
+                //Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
                 if ((position == 1) || (position == -1)) {
                     positionShortcut(viewPager.getCurrentItem());
                     return;
                 }
-                if (page.getId() != mShortcut)
+                if (mShortcut != (int)page.getTag())
                     return;
 
                 else if ((position > -1f) && (position < 1f)) {

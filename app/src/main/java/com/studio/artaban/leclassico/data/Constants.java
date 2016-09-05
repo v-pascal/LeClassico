@@ -69,6 +69,13 @@ public final class Constants {
 
 
     ////// Main
-    public static final int MAIN_PAGE_COUNT = 5; // Main page count
+    public static final int MAIN_SECTION_HOME = 0;
+    public static final int MAIN_SECTION_PUBLICATIONS = 1;
+    public static final int MAIN_SECTION_EVENTS = 2;
+    public static final int MAIN_SECTION_MEMBERS = 3;
+    public static final int MAIN_SECTION_NOTIFICATIONS = 4;
+    // Section indexes
+
+    public static final int MAIN_PAGE_COUNT = MAIN_SECTION_NOTIFICATIONS + 1; // Main page count
 
 }

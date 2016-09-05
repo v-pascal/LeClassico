@@ -549,11 +549,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
             private static final float TRANSLATE_RATIO_RED_MARKER_Y = 20f;
             // Translation ratio of the location representation elements (markers): follow map.
 
-            private void anim(boolean toTheLeft, View page, float position) {
+            private void anim(View page, float position) {
             // Apply animation to the representation images
 
-                //Logs.add(Logs.Type.V, "toTheLeft: " + toTheLeft + ";page: " + page +
-                //        ";position: " + position);
+                //Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
                 float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
 
                 ////// Album photos: flip photos!
@@ -663,12 +662,9 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
             @Override
             public void transformPage(View page, float position) {
-
-                if (position < 0f) { // This page is moving out to the left
-                    anim(true, page, position);
-                } else if (position < 1f) { // This page is moving in from the right
-                    anim(false, page, position);
-                }
+                //Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
+                if (position < 1)
+                    anim(page, position);
             }
         });
         mViewPager.setOnLimitlessListener(new LimitlessViewPager.OnLimitCrossedListener() {
