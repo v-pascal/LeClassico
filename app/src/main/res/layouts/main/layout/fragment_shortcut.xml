@@ -5,7 +5,7 @@
               android:layout_height="@dimen/shortcut_content_height"
               tools:context="com.studio.artaban.leclassico.activities.main.ShortcutFragment">
 
-    <!-- Start date -->
+    <!-- Start date | Icon -->
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/layout_start_date"
@@ -19,52 +19,40 @@
 
 
     </LinearLayout>
-    <!-- Icon -->
     <ImageView
         android:id="@+id/image_icon"
         android:layout_width="@dimen/shortcut_content_height"
         android:layout_height="@dimen/shortcut_content_height"/>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent">
 
-        <!-- Welcome -->
+        <!-- Message -->
         <TextView
-            android:layout_marginStart="@dimen/shortcut_text_separator"
-            android:id="@+id/text_welcome"
-            android:text="@string/welcome"
+            android:layout_marginStart="@dimen/shortcut_text_margin"
+            android:id="@+id/text_message"
             android:textSize="@dimen/shortcut_text_size"
+            android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <!-- Pseudo -->
-        <TextView
-            android:layout_marginStart="@dimen/shortcut_text_separator"
-            android:layout_toEndOf="@id/text_welcome"
-            android:id="@+id/text_pseudo"
-            android:textSize="@dimen/shortcut_text_size"
-            android:textColor="@color/colorPrimarySetting"
-            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <!-- Info -->
         <TextView
-            android:layout_marginStart="@dimen/shortcut_text_separator"
-            android:layout_below="@id/text_welcome"
+            android:layout_marginStart="@dimen/shortcut_text_margin"
             android:id="@+id/text_info"
             android:textSize="@dimen/shortcut_info_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-    <!-- Date -->
+    <!-- End date -->
     <LinearLayout
         android:orientation="vertical"
-        android:id="@+id/layout_date"
+        android:id="@+id/layout_end_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 

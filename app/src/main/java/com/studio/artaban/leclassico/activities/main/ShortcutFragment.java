@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.activities.main;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,15 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class ShortcutFragment extends Fragment {
 
-    public void setInfo(String info) {
+    public void setMessage(SpannableStringBuilder message) {
+        Logs.add(Logs.Type.V, "message: " + message);
+        ((TextView) mRootView.findViewById(R.id.text_message))
+                .setText(message, TextView.BufferType.SPANNABLE);
+    }
+    public void setInfo(SpannableStringBuilder info) {
         Logs.add(Logs.Type.V, "info: " + info);
-        ((TextView) mRootView.findViewById(R.id.text_info)).setText(info);
+        ((TextView) mRootView.findViewById(R.id.text_info))
+                .setText(info, TextView.BufferType.SPANNABLE);
     }
 
     private View mRootView; // Fragment root view
@@ -37,11 +44,27 @@ public class ShortcutFragment extends Fragment {
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 ((ImageView)mRootView.findViewById(R.id.image_icon)).setImageDrawable(
                         getResources().getDrawable(R.mipmap.ic_launcher));
-                ((TextView)mRootView.findViewById(R.id.text_pseudo)).setText(
-                        getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO));
-                mRootView.findViewById(R.id.layout_date).setVisibility(View.GONE);
+                mRootView.findViewById(R.id.layout_end_date).setVisibility(View.GONE);
                 break;
             }
+
+
+
+
+
+
+
+            default: {
+                mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
+                ((ImageView)mRootView.findViewById(R.id.image_icon)).setImageDrawable(
+                        getResources().getDrawable(R.mipmap.ic_launcher));
+                mRootView.findViewById(R.id.layout_end_date).setVisibility(View.GONE);
+                ((TextView)mRootView.findViewById(R.id.text_message)).setText("ID: " + getId());
+                break;
+            }
+
+
+            /*
             case R.id.shortcut_publications: {
 
 
@@ -70,6 +93,7 @@ public class ShortcutFragment extends Fragment {
 
                 break;
             }
+            */
         }
         return mRootView;
     }

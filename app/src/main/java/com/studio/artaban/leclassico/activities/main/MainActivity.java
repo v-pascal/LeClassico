@@ -26,6 +26,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,7 +64,20 @@ public class MainActivity extends AppCompatActivity implements
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
     @Override
-    public void onSetInfo(int section, String info) {
+    public void onSetMessage(int section, SpannableStringBuilder message) {
+
+        Logs.add(Logs.Type.V, "section: " + section + ";message: " + message);
+        switch (section) {
+            case Constants.MAIN_SECTION_HOME: {
+
+                ((ShortcutFragment)getSupportFragmentManager()
+                        .findFragmentById(R.id.shortcut_home)).setMessage(message);
+                break;
+            }
+        }
+    }
+    @Override
+    public void onSetInfo(int section, SpannableStringBuilder info) {
 
         Logs.add(Logs.Type.V, "section: " + section + ";info: " + info);
         switch (section) {
@@ -181,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
         }
+        cursor.close();
     }
 
     @Override
@@ -524,11 +539,13 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void transformPage(View page, float position) {
 
-                //Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
-                if ((position == 1) || (position == -1)) {
+                //Logs.add(Logs.Type.V, "page: " + page.getTag() + ";position: " + position);
+                if ((position == 1) || (position == 0) || (position == -1)) {
                     positionShortcut(viewPager.getCurrentItem());
                     return;
                 }
+                if (((mShortcut + 2) == (int)page.getTag()) || ((mShortcut - 2) == (int)page.getTag()))
+                    positionShortcut(viewPager.getCurrentItem());
                 if (mShortcut != (int)page.getTag())
                     return;
 

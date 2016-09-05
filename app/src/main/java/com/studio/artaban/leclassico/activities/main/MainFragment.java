@@ -1,8 +1,8 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.SpannableStringBuilder;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -31,7 +31,8 @@ public class MainFragment extends Fragment {
     public interface OnFragmentListener {
 
         ////// Shortcut
-        void onSetInfo(int section, String info);
+        void onSetMessage(int section, SpannableStringBuilder message);
+        void onSetInfo(int section, SpannableStringBuilder info);
     }
     protected OnFragmentListener mListener;
 
