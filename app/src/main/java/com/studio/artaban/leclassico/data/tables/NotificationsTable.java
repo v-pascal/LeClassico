@@ -1,17 +1,22 @@
 package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,7 +73,53 @@ public class NotificationsTable extends DataTable {
 
 
 
+                                /*
+                                Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
+                                JSONArray entries = reply.getJSONArray(TABLE_NAME);
+                                for (int i = 0; i < entries.length(); ++i) {
 
+                                    JSONObject entry = (JSONObject) entries.get(i);
+                                    String pseudo = entry.getString(JSON_KEY_PSEUDO);
+                                    String date = entry.getString(JSON_KEY_DATE);
+                                    String time = entry.getString(JSON_KEY_TIME);
+
+                                    // Entry fields
+                                    ContentValues values = new ContentValues();
+                                    values.put(COLUMN_FROM, entry.getString(JSON_KEY_FROM));
+                                    values.put(COLUMN_MESSAGE, entry.getString(JSON_KEY_MESSAGE));
+                                    values.put(COLUMN_LU_FLAG, entry.getInt(JSON_KEY_LU_FLAG));
+                                    values.put(COLUMN_READ_STK, entry.getInt(JSON_KEY_READ_STK));
+                                    values.put(COLUMN_WRITE_STK, entry.getInt(JSON_KEY_WRITE_STK));
+                                    if (!entry.isNull(JSON_KEY_OBJET))
+                                        values.put(COLUMN_OBJET, entry.getString(JSON_KEY_OBJET));
+                                    values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                            DataProvider.Synchronized.DONE.getValue());
+
+                                    // Check if entry already exists
+                                    String selection = COLUMN_PSEUDO + "='" + pseudo +
+                                            "' AND " + COLUMN_DATE + "='" + date +
+                                            "' AND " + COLUMN_TIME + "='" + time + "'";
+                                    Cursor cursor = resolver.query(tableUri, new String[]{ "count(*)" },
+                                            selection, null, null);
+                                    cursor.moveToFirst();
+                                    if (cursor.getInt(0) > 0) { // DB entry exists
+
+                                        if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED)
+                                            resolver.delete(tableUri, selection, null); // Delete entry
+                                        else // Update entry
+                                            resolver.update(tableUri, values, selection, null);
+                                    }
+                                    else { // Insert entry into DB
+
+                                        values.put(COLUMN_PSEUDO, pseudo);
+                                        values.put(COLUMN_DATE, date);
+                                        values.put(COLUMN_TIME, time);
+                                        resolver.insert(tableUri, values);
+                                    }
+                                    cursor.close();
+                                }
+                                */
 
 
 
@@ -148,6 +199,16 @@ public class NotificationsTable extends DataTable {
     private static final short COLUMN_INDEX_STATUS_DATE = 8;
 
     private static final short COLUMN_INDEX_SYNCHRONIZED = 9;
+
+    // JSON keys
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_DATE = COLUMN_DATE.substring(4);
+    private static final String JSON_KEY_OBJECT_TYPE = COLUMN_OBJECT_TYPE.substring(4);
+    private static final String JSON_KEY_OBJECT_ID = COLUMN_OBJECT_ID.substring(4);
+    private static final String JSON_KEY_OBJECT_DATE = COLUMN_OBJECT_DATE.substring(4);
+    private static final String JSON_KEY_OBJECT_FROM = COLUMN_OBJECT_FROM.substring(4);
+    private static final String JSON_KEY_LU_FLAG = COLUMN_LU_FLAG.substring(4);
+    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     //
     private NotificationsTable() { }

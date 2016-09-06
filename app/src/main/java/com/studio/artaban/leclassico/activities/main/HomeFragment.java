@@ -119,6 +119,21 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                         NotificationsTable.COLUMN_LU_FLAG + "=0");
         mNotificationsLoader.restart(getActivity(), Tables.ID_NOTIFICATIONS, shortcutData);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         return rootView;
     }
 }

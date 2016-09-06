@@ -539,17 +539,21 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void transformPage(View page, float position) {
 
-                //Logs.add(Logs.Type.V, "page: " + page.getTag() + ";position: " + position);
+                Logs.add(Logs.Type.V, "page: " + page.getTag() + ";position: " + position);
+                findViewById(R.id.shortcut).setVisibility(View.VISIBLE);
                 if ((position == 1) || (position == 0) || (position == -1)) {
                     positionShortcut(viewPager.getCurrentItem());
                     return;
                 }
-                if (((mShortcut + 2) == (int)page.getTag()) || ((mShortcut - 2) == (int)page.getTag()))
+                if (((mShortcut + 2) == (int)page.getTag()) || ((mShortcut - 2) == (int)page.getTag())) {
                     positionShortcut(viewPager.getCurrentItem());
+                    if ((position != 2) && (position != -2)) // Avoid to let's shortcut invisible
+                        findViewById(R.id.shortcut).setVisibility(View.INVISIBLE);
+                }
                 if (mShortcut != (int)page.getTag())
                     return;
 
-                else if ((position > -1f) && (position < 1f)) {
+                if ((position > -1f) && (position < 1f)) {
                     findViewById(R.id.shortcut_home).setTranslationX(mPositionHome +
                             (position * mShortcutWidth));
                     findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications +
