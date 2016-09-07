@@ -19,4 +19,27 @@
     <item name="pseudo_radius" format="float" type="dimen">2.0</item>
     <item name="profile_radius" format="float" type="dimen">32.0</item>
 
+
+
+
+
+
+
+
+
+    <dimen name="shortcut_height">48dp</dimen>
+    <dimen name="shortcut_content_height">40dp</dimen><!-- = shortcut_height - appbar_padding_top -->
+
+    <dimen name="shortcut_text_margin">6dp</dimen>
+    <dimen name="shortcut_text_size">16sp</dimen>
+    <dimen name="shortcut_info_size">12sp</dimen>
+
+
+
+
+
+
+
+
+
 </resources>

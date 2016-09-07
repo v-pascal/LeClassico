@@ -33,9 +33,6 @@ public class MainFragment extends Fragment {
         ////// Shortcut
         void onSetMessage(int section, SpannableStringBuilder message);
         void onSetInfo(int section, SpannableStringBuilder info);
-
-        ////// New notification(s)
-        void displayNewNotification();
     }
     protected OnFragmentListener mListener;
 

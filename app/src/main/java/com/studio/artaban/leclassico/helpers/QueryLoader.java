@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
@@ -69,23 +70,7 @@ public class QueryLoader {
             String contentUri = DataProvider.CONTENT_URI;
             mLoaderId = id;
 
-            switch ((byte)id) {
-
-                case Tables.ID_CAMARADES: contentUri += CamaradesTable.TABLE_NAME; break;
-                case Tables.ID_ABONNEMENTS: contentUri += AbonnementsTable.TABLE_NAME; break;
-                case Tables.ID_ACTUALITES: contentUri += ActualitesTable.TABLE_NAME; break;
-                case Tables.ID_ALBUMS: contentUri += AlbumsTable.TABLE_NAME; break;
-                case Tables.ID_COMMENTAIRES: contentUri += CommentairesTable.TABLE_NAME; break;
-                case Tables.ID_EVENEMENTS: contentUri += EvenementsTable.TABLE_NAME; break;
-                case Tables.ID_MESSAGERIE: contentUri += MessagerieTable.TABLE_NAME; break;
-                case Tables.ID_MUSIC: contentUri += MusicTable.TABLE_NAME; break;
-                case Tables.ID_PHOTOS: contentUri += PhotosTable.TABLE_NAME; break;
-                case Tables.ID_PRESENTS: contentUri += PresentsTable.TABLE_NAME; break;
-                case Tables.ID_VOTES: contentUri += VotesTable.TABLE_NAME; break;
-                case Tables.ID_NOTIFICATIONS: contentUri += NotificationsTable.TABLE_NAME; break;
-                default:
-                    throw new IllegalArgumentException("Unexpected loader ID");
-            }
+            contentUri += Queries.getTableUri(id); // Add table URI
 
             // Check single row query
             if (args.getBoolean(DATA_KEY_URI_SINGLE, false))
@@ -128,7 +113,6 @@ public class QueryLoader {
     }
     public void restart(Activity activity, int id, Bundle args) {
     // Restart a loader with new query parameters
-    // NB: Do not send several request with same ID otherwise only one 'onLoadFinished' will be called
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";id: " + id + ";args: " + args);
         activity.getLoaderManager().restartLoader(id, args, mLoaderCallbacks);

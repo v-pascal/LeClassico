@@ -43,7 +43,7 @@
     <string name="intro_location_text">Locate all of\nyour friends!</string>
 
     <!-- Main -->
-    <string name="home_welcome">Welcome %1$s!</string>
+    <string name="home_connected">Member %1$s connected!</string>
     <string name="home_info">New messages: %1$d - New notifications: %2$d</string>
 
     <!-- Titles -->

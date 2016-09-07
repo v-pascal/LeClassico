@@ -13,8 +13,10 @@ import android.view.ViewGroup;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
+import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 
@@ -24,16 +26,10 @@ import com.studio.artaban.leclassico.helpers.QueryLoader;
  */
 public class HomeFragment extends MainFragment implements QueryLoader.OnResultListener {
 
+    public static final String TAG = "home";
+
     private int mNewMail; // New mail count
     private int mNewNotification; // New notification count
-
-    public void setNewNotification(int count, boolean display) {
-        Logs.add(Logs.Type.V, "count: " + count + ";display: " + display);
-
-        mNewNotification = count;
-        if (display)
-            setShortcutInfo();
-    }
 
     //////
     private void setShortcutInfo() { // Set shortcut text info with colors (new mail & notification)
@@ -53,16 +49,25 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         mListener.onSetInfo(Constants.MAIN_SECTION_HOME, infoBuilder);
     }
 
-    private QueryLoader mMailLoader; // Shortcut new mails query loader
+    private QueryLoader mMailLoader; // Shortcut new mail query loader
+    private QueryLoader mNewNotifyLoader; // Shortcut new notification query loader
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-
         cursor.moveToFirst();
-        if (((byte)id) == Tables.ID_MESSAGERIE) ////// New mail count
-            mNewMail = cursor.getInt(0);
+
+        switch (id) {
+            case Tables.ID_MESSAGERIE: { ////// New mail count
+                mNewMail = cursor.getInt(0);
+                break;
+            }
+            case Queries.MAIN_NOTIFICATION_COUNT: { ////// New notification count
+                mNewNotification = cursor.getInt(0);
+                break;
+            }
+        }
         cursor.close();
         setShortcutInfo();
     }
@@ -78,6 +83,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         super.onAttach(context);
         Logs.add(Logs.Type.V, "context: " + context);
         mMailLoader = new QueryLoader(context, this);
+        mNewNotifyLoader = new QueryLoader(context, this);
     }
 
     @Override
@@ -109,6 +115,12 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                         MessagerieTable.COLUMN_LU_FLAG + "=0");
         mMailLoader.restart(getActivity(), Tables.ID_MESSAGERIE, shortcutData);
 
+        shortcutData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
+        shortcutData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
+        shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
+                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        NotificationsTable.COLUMN_LU_FLAG + "=0");
+        mNewNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATION_COUNT, shortcutData);
 
 
 

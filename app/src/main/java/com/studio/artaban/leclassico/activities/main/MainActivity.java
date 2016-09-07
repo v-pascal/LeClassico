@@ -12,7 +12,6 @@ import android.graphics.PorterDuff;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
@@ -40,6 +39,7 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //
-    private int mNewNotification; // New notification count
+    private boolean mNewNotification; // New notification flag
 
     ////// OnQueryTextListener /////////////////////////////////////////////////////////////////////
     @Override
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
 
         cursor.moveToFirst();
-        switch ((byte)id) {
+        switch (id) {
             case Tables.ID_CAMARADES: { ////// User info
 
                 // Get DB data
@@ -194,18 +194,19 @@ public class MainActivity extends AppCompatActivity implements
                 });
                 break;
             }
-            case Tables.ID_NOTIFICATIONS: {
+            case Queries.MAIN_NOTIFICATION_FLAG: {
 
                 Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
-                mNewNotification = cursor.getInt(0);
+                if (cursor.getInt(0) > 0) {
 
-                if (mNewNotification > 0)
+                    mNewNotification = true; // New notification(s)
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             invalidateOptionsMenu();
                         }
                     });
+                }
                 break;
             }
         }
@@ -324,38 +325,6 @@ public class MainActivity extends AppCompatActivity implements
 
     //////
     private ViewPager mViewPager; // Content view pager
-    private MainPagerAdapter mPagerAdapter; // Content view pager adapter
-
-    private class MainPagerAdapter extends FragmentPagerAdapter {
-
-        public MainPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        //////
-        @Override
-        public Fragment getItem(int section) {
-            Logs.add(Logs.Type.V, "section: " + section);
-            if (section == Constants.MAIN_SECTION_HOME) {
-
-                HomeFragment home = (HomeFragment)MainFragment.newInstance(section);
-                home.setNewNotification(mNewNotification); // Needed to display new notification count
-                return home;
-            }
-            return MainFragment.newInstance(section);
-        }
-
-        @Override
-        public int getCount() {
-            return Constants.MAIN_PAGE_COUNT;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            String[] pages = getResources().getStringArray(R.array.main_pages);
-            return pages[position];
-        }
-    }
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
@@ -441,11 +410,11 @@ public class MainActivity extends AppCompatActivity implements
         userData.putString(QueryLoader.DATA_KEY_SELECTION,
                 NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
                         NotificationsTable.COLUMN_LU_FLAG + "=0");
-        mNewNotifyLoader.restart(this, Tables.ID_NOTIFICATIONS, userData);
+        mNewNotifyLoader.restart(this, Queries.MAIN_NOTIFICATION_FLAG, userData);
 
         // Set content view pager
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mPagerAdapter = new M
+
 
 
 
@@ -467,7 +436,24 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-        mViewPager.setAdapter(new );
+        mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+            @Override
+            public Fragment getItem(int section) {
+                Logs.add(Logs.Type.V, "section: " + section);
+                return MainFragment.newInstance(section);
+            }
+
+            @Override
+            public int getCount() {
+                return Constants.MAIN_PAGE_COUNT;
+            }
+
+            @Override
+            public CharSequence getPageTitle(int position) {
+                String[] pages = getResources().getStringArray(R.array.main_pages);
+                return pages[position];
+            }
+        });
         mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
             private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
@@ -619,7 +605,7 @@ public class MainActivity extends AppCompatActivity implements
         searchView.setOnQueryTextListener(this);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        if (mNewNotification > 0)
+        if (mNewNotification)
             menu.findItem(R.id.mnu_notification).setIcon(getDrawable(R.drawable.ic_notifications_info_24dp));
 
         return true;

@@ -38,7 +38,7 @@
     <string name="intro_location_text">Géolocaliser tous\nvos amis!</string>
 
     <!-- Main -->
-    <string name="home_welcome">Bienvenue %1$s!</string>
+    <string name="home_connected">Membre %1$s connecté!</string>
     <string name="home_info">Nouveaux messages: %1$d - Nouvelles notifications: %2$d</string>
 
     <!-- Titles -->
