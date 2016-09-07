@@ -37,6 +37,8 @@
             android:textSize="@dimen/shortcut_text_size"
             android:textStyle="bold"
             android:textColor="@android:color/black"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <!-- Info -->
@@ -44,6 +46,8 @@
             android:layout_marginStart="@dimen/shortcut_text_margin"
             android:id="@+id/text_info"
             android:textSize="@dimen/shortcut_info_size"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

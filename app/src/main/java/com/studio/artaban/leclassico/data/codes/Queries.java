@@ -32,10 +32,12 @@ public class Queries {
 
         switch (id) {
 
-            ////// Main
+            ////// Main ////////////////////////////////////////////////////////////////////////////
             case MAIN_NOTIFICATION_FLAG:
             case MAIN_NOTIFICATION_COUNT:
                 return NotificationsTable.TABLE_NAME;
+
+            ////////////////////////////////////////////////////////////////////////////////////////
         }
         switch ((byte)id) {
 

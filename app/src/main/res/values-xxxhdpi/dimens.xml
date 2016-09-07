@@ -17,4 +17,12 @@
     <item name="pseudo_shadow" format="float" type="dimen">2.625</item>
     <item name="pseudo_radius" format="float" type="dimen">2.125</item>
 
+    <dimen name="shortcut_margin">3dp</dimen>
+    <dimen name="shortcut_height">34dp</dimen>
+    <dimen name="shortcut_content_height">28dp</dimen><!-- = shortcut_height - (2 * shortcut_margin) -->
+
+    <dimen name="shortcut_text_margin">6dp</dimen>
+    <dimen name="shortcut_text_size">13sp</dimen>
+    <dimen name="shortcut_info_size">9sp</dimen>
+
 </resources>

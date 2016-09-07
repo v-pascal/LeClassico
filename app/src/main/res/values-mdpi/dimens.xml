@@ -17,28 +17,12 @@
     <item name="pseudo_shadow" format="float" type="dimen">2.125</item>
     <item name="pseudo_radius" format="float" type="dimen">1.625</item>
 
-
-
-
-
-
-
-
-
-    <dimen name="shortcut_height">64dp</dimen>
-    <dimen name="shortcut_content_height">48dp</dimen><!-- = shortcut_height - appbar_padding_top -->
+    <dimen name="shortcut_margin">7dp</dimen>
+    <dimen name="shortcut_height">58dp</dimen>
+    <dimen name="shortcut_content_height">44dp</dimen><!-- = shortcut_height - (2 * shortcut_margin) -->
 
     <dimen name="shortcut_text_margin">8dp</dimen>
-    <dimen name="shortcut_text_size">18sp</dimen>
-    <dimen name="shortcut_info_size">14sp</dimen>
-
-
-
-
-
-
-
-
-
+    <dimen name="shortcut_text_size">17sp</dimen>
+    <dimen name="shortcut_info_size">13sp</dimen>
 
 </resources>

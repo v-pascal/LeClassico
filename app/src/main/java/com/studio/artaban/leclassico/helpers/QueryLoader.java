@@ -12,19 +12,6 @@ import android.os.Bundle;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.codes.Queries;
-import com.studio.artaban.leclassico.data.codes.Tables;
-import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
-import com.studio.artaban.leclassico.data.tables.ActualitesTable;
-import com.studio.artaban.leclassico.data.tables.AlbumsTable;
-import com.studio.artaban.leclassico.data.tables.CamaradesTable;
-import com.studio.artaban.leclassico.data.tables.CommentairesTable;
-import com.studio.artaban.leclassico.data.tables.EvenementsTable;
-import com.studio.artaban.leclassico.data.tables.MessagerieTable;
-import com.studio.artaban.leclassico.data.tables.MusicTable;
-import com.studio.artaban.leclassico.data.tables.NotificationsTable;
-import com.studio.artaban.leclassico.data.tables.PhotosTable;
-import com.studio.artaban.leclassico.data.tables.PresentsTable;
-import com.studio.artaban.leclassico.data.tables.VotesTable;
 
 /**
  * Created by pascal on 14/08/16.
