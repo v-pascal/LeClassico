@@ -15,7 +15,6 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
-import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 
@@ -25,29 +24,36 @@ import com.studio.artaban.leclassico.helpers.QueryLoader;
  */
 public class HomeFragment extends MainFragment implements QueryLoader.OnResultListener {
 
-    private int mNewMails; // New mail count
-    private int mNewNotifications; // New notification count
+    private int mNewMail; // New mail count
+    private int mNewNotification; // New notification count
 
-    private void setShortcutInfo() {
-    // Set shortcut text info with colors (new messages & albums)
+    public void setNewNotification(int count, boolean display) {
+        Logs.add(Logs.Type.V, "count: " + count + ";display: " + display);
+
+        mNewNotification = count;
+        if (display)
+            setShortcutInfo();
+    }
+
+    //////
+    private void setShortcutInfo() { // Set shortcut text info with colors (new mail & notification)
 
         Logs.add(Logs.Type.V, null);
         SpannableStringBuilder infoBuilder = new SpannableStringBuilder();
-        SpannableString info = new SpannableString(getString(R.string.home_info, mNewMails, mNewNotifications));
+        SpannableString info = new SpannableString(getString(R.string.home_info, mNewMail, mNewNotification));
 
-        String mails = String.valueOf(mNewMails);
-        String notifications = String.valueOf(mNewNotifications);
+        String mails = String.valueOf(mNewMail);
+        String notifications = String.valueOf(mNewNotification);
         int messagesPos = info.toString().indexOf(mails);
-        int albumsPos = info.toString().lastIndexOf(notifications);
+        int notifyPos = info.toString().lastIndexOf(notifications);
 
         infoBuilder.append(info);
         infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), messagesPos, messagesPos + mails.length(), 0);
-        infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), albumsPos, albumsPos + notifications.length(), 0);
+        infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), notifyPos, notifyPos + notifications.length(), 0);
         mListener.onSetInfo(Constants.MAIN_SECTION_HOME, infoBuilder);
     }
 
     private QueryLoader mMailLoader; // Shortcut new mails query loader
-    private QueryLoader mNotificationsLoader; // Shortcut new photos query loader
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -55,18 +61,8 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
 
         cursor.moveToFirst();
-        switch ((byte)id) {
-            case Tables.ID_MESSAGERIE: { ////// New mail count
-                mNewMails = cursor.getInt(0);
-                break;
-            }
-            case Tables.ID_NOTIFICATIONS: { ////// New notification count
-                mNewNotifications = cursor.getInt(0);
-                if (mNewNotifications > 0)
-                    mListener.displayNewNotification();
-                break;
-            }
-        }
+        if (((byte)id) == Tables.ID_MESSAGERIE) ////// New mail count
+            mNewMail = cursor.getInt(0);
         cursor.close();
         setShortcutInfo();
     }
@@ -80,10 +76,8 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         Logs.add(Logs.Type.V, "context: " + context);
         mMailLoader = new QueryLoader(context, this);
-        mNotificationsLoader = new QueryLoader(context, this);
     }
 
     @Override
@@ -97,10 +91,11 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         // Set shortcut data
         String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO);
         SpannableStringBuilder msgBuilder = new SpannableStringBuilder();
-        SpannableString msg = new SpannableString(getString(R.string.home_welcome, pseudo));
+        SpannableString msg = new SpannableString(getString(R.string.home_connected, pseudo));
+        int pseudoPos = msg.toString().indexOf(pseudo);
         msgBuilder.append(msg);
         msgBuilder.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
-                msg.length() - pseudo.length() - 1, msg.length() - 1, 0);
+                pseudoPos, pseudoPos + pseudo.length(), 0);
 
         mListener.onSetMessage(Constants.MAIN_SECTION_HOME, msgBuilder);
         setShortcutInfo();
@@ -113,13 +108,6 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                 MessagerieTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
                         MessagerieTable.COLUMN_LU_FLAG + "=0");
         mMailLoader.restart(getActivity(), Tables.ID_MESSAGERIE, shortcutData);
-
-        shortcutData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        shortcutData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
-        shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
-                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        NotificationsTable.COLUMN_LU_FLAG + "=0");
-        mNotificationsLoader.restart(getActivity(), Tables.ID_NOTIFICATIONS, shortcutData);
 
 
 
