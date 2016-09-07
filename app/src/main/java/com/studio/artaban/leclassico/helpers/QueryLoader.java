@@ -128,6 +128,7 @@ public class QueryLoader {
     }
     public void restart(Activity activity, int id, Bundle args) {
     // Restart a loader with new query parameters
+    // NB: Do not send several request with same ID otherwise only one 'onLoadFinished' will be called
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";id: " + id + ";args: " + args);
         activity.getLoaderManager().restartLoader(id, args, mLoaderCallbacks);

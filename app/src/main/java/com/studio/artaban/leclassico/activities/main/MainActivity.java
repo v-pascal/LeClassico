@@ -41,7 +41,6 @@ import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
-import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -64,31 +63,61 @@ public class MainActivity extends AppCompatActivity implements
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
     @Override
-    public void onSetMessage(int section, SpannableStringBuilder message) {
+    public void onSetMessage(final int section, final SpannableStringBuilder message) {
 
         Logs.add(Logs.Type.V, "section: " + section + ";message: " + message);
-        switch (section) {
-            case Constants.MAIN_SECTION_HOME: {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
-                ((ShortcutFragment)getSupportFragmentManager()
-                        .findFragmentById(R.id.shortcut_home)).setMessage(message);
-                break;
+                Logs.add(Logs.Type.V, null);
+                switch (section) {
+                    case Constants.MAIN_SECTION_HOME: {
+
+                        ((ShortcutFragment)getSupportFragmentManager()
+                                .findFragmentById(R.id.shortcut_home)).setMessage(message);
+                        break;
+                    }
+                }
             }
-        }
+        });
     }
     @Override
-    public void onSetInfo(int section, SpannableStringBuilder info) {
+    public void onSetInfo(final int section, final SpannableStringBuilder info) {
 
         Logs.add(Logs.Type.V, "section: " + section + ";info: " + info);
-        switch (section) {
-            case Constants.MAIN_SECTION_HOME: {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
-                ((ShortcutFragment)getSupportFragmentManager()
-                        .findFragmentById(R.id.shortcut_home)).setInfo(info);
-                break;
+                Logs.add(Logs.Type.V, null);
+                switch (section) {
+                    case Constants.MAIN_SECTION_HOME: {
+
+                        ((ShortcutFragment)getSupportFragmentManager()
+                                .findFragmentById(R.id.shortcut_home)).setInfo(info);
+                        break;
+                    }
+                }
             }
-        }
+        });
     }
+
+    @Override
+    public void displayNewNotification() {
+
+        Logs.add(Logs.Type.V, null);
+        mNotify = true; // New notification(s)
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                invalidateOptionsMenu();
+            }
+        });
+    }
+
+    //
+    private boolean mNotify; // New notification flag
 
     ////// OnQueryTextListener /////////////////////////////////////////////////////////////////////
     @Override
@@ -176,24 +205,6 @@ public class MainActivity extends AppCompatActivity implements
                 });
                 break;
             }
-            case Tables.ID_NOTIFICATIONS: { ////// Notifications
-
-
-
-
-
-
-                //mNotify = true;
-                //invalidateOptionsMenu();
-
-
-
-
-
-
-
-                break;
-            }
         }
         cursor.close();
     }
@@ -209,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements
     // Query column index
 
     private final QueryLoader mUserLoader = new QueryLoader(this, this); // User data query loader
-    private final QueryLoader mNotificationLoader = new QueryLoader(this, this); // Notification data query loader
 
     ////// OnNavigationItemSelectedListener ////////////////////////////////////////////////////////
     @Override
@@ -308,6 +318,9 @@ public class MainActivity extends AppCompatActivity implements
         mNavItemSelected = Constants.NO_DATA;
     }
 
+    //
+    private ViewPager mViewPager; // Content view pager
+
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -387,14 +400,8 @@ public class MainActivity extends AppCompatActivity implements
         userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + "'");
         mUserLoader.restart(this, Tables.ID_CAMARADES, userData);
 
-        Bundle notificationData = new Bundle();
-        notificationData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        notificationData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
-        notificationData.putString(QueryLoader.DATA_KEY_SELECTION, NotificationsTable.COLUMN_LU_FLAG + "=0");
-        mNotificationLoader.restart(this, Tables.ID_NOTIFICATIONS, notificationData);
-
         // Set content view pager
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (ViewPager) findViewById(R.id.container);
 
 
 
@@ -417,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-        viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+        mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int section) {
                 Logs.add(Logs.Type.V, "section: " + section);
@@ -435,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements
                 return pages[position];
             }
         });
-        viewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
+        mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
             private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
             private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
@@ -542,11 +549,11 @@ public class MainActivity extends AppCompatActivity implements
                 Logs.add(Logs.Type.V, "page: " + page.getTag() + ";position: " + position);
                 findViewById(R.id.shortcut).setVisibility(View.VISIBLE);
                 if ((position == 1) || (position == 0) || (position == -1)) {
-                    positionShortcut(viewPager.getCurrentItem());
+                    positionShortcut(mViewPager.getCurrentItem());
                     return;
                 }
                 if (((mShortcut + 2) == (int)page.getTag()) || ((mShortcut - 2) == (int)page.getTag())) {
-                    positionShortcut(viewPager.getCurrentItem());
+                    positionShortcut(mViewPager.getCurrentItem());
                     if ((position != 2) && (position != -2)) // Avoid to let's shortcut invisible
                         findViewById(R.id.shortcut).setVisibility(View.INVISIBLE);
                 }
@@ -573,7 +580,7 @@ public class MainActivity extends AppCompatActivity implements
         tabLayout.setTabMode(
                 (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ?
                         TabLayout.MODE_SCROLLABLE : TabLayout.MODE_FIXED);
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setupWithViewPager(mViewPager);
     }
 
     @Override
@@ -586,21 +593,21 @@ public class MainActivity extends AppCompatActivity implements
         searchView.setOnQueryTextListener(this);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-
-
-
-
-
-        //if (mNotify)
-        //    menu.getItem(1).setIcon(getDrawable(R.drawable.ic_notifications_info_24dp));
-
-
-
-
-
+        if (mNotify)
+            menu.findItem(R.id.mnu_notification).setIcon(getDrawable(R.drawable.ic_notifications_info_24dp));
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Logs.add(Logs.Type.V, "item: " + item);
+        if (item.getItemId() == R.id.mnu_notification) {
+
+            mViewPager.setCurrentItem(Constants.MAIN_SECTION_NOTIFICATIONS);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

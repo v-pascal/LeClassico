@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.tables;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Parcel;
@@ -11,7 +12,6 @@ import android.os.Parcelable;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
-import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -67,13 +67,6 @@ public class NotificationsTable extends DataTable {
                                 if (reply.isNull(TABLE_NAME))
                                     return true; // Already synchronized
 
-
-
-
-
-
-
-                                /*
                                 Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
                                 JSONArray entries = reply.getJSONArray(TABLE_NAME);
                                 for (int i = 0; i < entries.length(); ++i) {
@@ -81,17 +74,25 @@ public class NotificationsTable extends DataTable {
                                     JSONObject entry = (JSONObject) entries.get(i);
                                     String pseudo = entry.getString(JSON_KEY_PSEUDO);
                                     String date = entry.getString(JSON_KEY_DATE);
-                                    String time = entry.getString(JSON_KEY_TIME);
+                                    String objType = null;
+                                    if (!entry.isNull(JSON_KEY_OBJECT_TYPE))
+                                        objType = DatabaseUtils
+                                                .sqlEscapeString(entry.getString(JSON_KEY_OBJECT_TYPE));
+                                    int objID = Constants.NO_DATA;
+                                    if (!entry.isNull(JSON_KEY_OBJECT_ID))
+                                        objID = entry.getInt(JSON_KEY_OBJECT_ID);
+                                    String objFrom = null;
+                                    if (!entry.isNull(JSON_KEY_OBJECT_FROM))
+                                        objFrom = DatabaseUtils
+                                                .sqlEscapeString(entry.getString(JSON_KEY_OBJECT_FROM));
+                                    String objDate = null;
+                                    if (!entry.isNull(JSON_KEY_OBJECT_DATE))
+                                        objDate = DatabaseUtils
+                                                .sqlEscapeString(entry.getString(JSON_KEY_OBJECT_DATE));
 
                                     // Entry fields
                                     ContentValues values = new ContentValues();
-                                    values.put(COLUMN_FROM, entry.getString(JSON_KEY_FROM));
-                                    values.put(COLUMN_MESSAGE, entry.getString(JSON_KEY_MESSAGE));
                                     values.put(COLUMN_LU_FLAG, entry.getInt(JSON_KEY_LU_FLAG));
-                                    values.put(COLUMN_READ_STK, entry.getInt(JSON_KEY_READ_STK));
-                                    values.put(COLUMN_WRITE_STK, entry.getInt(JSON_KEY_WRITE_STK));
-                                    if (!entry.isNull(JSON_KEY_OBJET))
-                                        values.put(COLUMN_OBJET, entry.getString(JSON_KEY_OBJET));
                                     values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
                                             DataProvider.Synchronized.DONE.getValue());
@@ -99,7 +100,11 @@ public class NotificationsTable extends DataTable {
                                     // Check if entry already exists
                                     String selection = COLUMN_PSEUDO + "='" + pseudo +
                                             "' AND " + COLUMN_DATE + "='" + date +
-                                            "' AND " + COLUMN_TIME + "='" + time + "'";
+                                            "' AND " + COLUMN_OBJECT_TYPE + "=" + objType +
+                                            " AND " + COLUMN_OBJECT_ID + "=" +
+                                                ((objID != Constants.NO_DATA)? objID:"null") +
+                                            " AND " + COLUMN_OBJECT_FROM + "=" + objFrom +
+                                            " AND " + COLUMN_OBJECT_DATE + "=" + objDate;
                                     Cursor cursor = resolver.query(tableUri, new String[]{ "count(*)" },
                                             selection, null, null);
                                     cursor.moveToFirst();
@@ -114,24 +119,14 @@ public class NotificationsTable extends DataTable {
 
                                         values.put(COLUMN_PSEUDO, pseudo);
                                         values.put(COLUMN_DATE, date);
-                                        values.put(COLUMN_TIME, time);
+                                        values.put(COLUMN_OBJECT_TYPE, objType);
+                                        values.put(COLUMN_OBJECT_ID, (objID != Constants.NO_DATA)? objID:null);
+                                        values.put(COLUMN_OBJECT_FROM, objFrom);
+                                        values.put(COLUMN_OBJECT_DATE, objDate);
                                         resolver.insert(tableUri, values);
                                     }
                                     cursor.close();
                                 }
-                                */
-
-
-
-
-
-
-
-
-
-
-
-
 
                             } else {
                                 Logs.add(Logs.Type.E, "Synchronization error: #" +

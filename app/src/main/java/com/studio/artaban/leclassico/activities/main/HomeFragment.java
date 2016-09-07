@@ -62,6 +62,8 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
             }
             case Tables.ID_NOTIFICATIONS: { ////// New notification count
                 mNewNotifications = cursor.getInt(0);
+                if (mNewNotifications > 0)
+                    mListener.displayNewNotification();
                 break;
             }
         }
@@ -118,7 +120,6 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                 NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
                         NotificationsTable.COLUMN_LU_FLAG + "=0");
         mNotificationsLoader.restart(getActivity(), Tables.ID_NOTIFICATIONS, shortcutData);
-
 
 
 
