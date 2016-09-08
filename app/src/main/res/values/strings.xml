@@ -70,7 +70,7 @@
         <item>Home</item>
         <item>News Feed</item>
         <item>Events</item>
-        <item>Friends</item>
+        <item>Followed members</item>
         <item>Notifications</item>
     </string-array>
     <string-array name="profile_pages">

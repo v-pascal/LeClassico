@@ -241,7 +241,7 @@ public class DataProvider extends ContentProvider {
         int result;
 
         // Do not delete records without "TO_DELETE" synchronized flag but set it to this value instead
-        if ((selection == null) || (!selection.contains(Constants.DATA_DELETE_SELECTION))) {
+        if (!selection.contains(Constants.DATA_DELETE_SELECTION)) {
 
             ContentValues values = new ContentValues();
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TO_DELETE.getValue());

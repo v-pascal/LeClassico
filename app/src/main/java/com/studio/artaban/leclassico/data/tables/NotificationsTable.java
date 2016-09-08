@@ -110,8 +110,14 @@ public class NotificationsTable extends DataTable {
                                     cursor.moveToFirst();
                                     if (cursor.getInt(0) > 0) { // DB entry exists
 
-                                        if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED)
-                                            resolver.delete(tableUri, selection, null); // Delete entry
+                                        if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED) {
+
+                                            // Delete entry (definitively)
+                                            values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                                    DataProvider.Synchronized.TO_DELETE.getValue());
+                                            resolver.update(tableUri, values, selection, null);
+                                            resolver.delete(tableUri, selection, null);
+                                        }
                                         else // Update entry
                                             resolver.update(tableUri, values, selection, null);
                                     }

@@ -76,8 +76,11 @@ public class AlbumsTable implements IDataTable {
     public static final String COLUMN_NOM = "ALB_Nom";
     public static final String COLUMN_PSEUDO = "ALB_Pseudo";
     public static final String COLUMN_SHARED = "ALB_Shared";
+    public static final String COLUMN_SHARED_UPD = "ALB_SharedUPD";
     public static final String COLUMN_EVENT_ID = "ALB_EventID";
+    public static final String COLUMN_EVENT_ID_UPD = "ALB_EventIdUPD";
     public static final String COLUMN_REMARK = "ALB_Remark";
+    public static final String COLUMN_REMARK_UPD = "ALB_RemarkUPD";
     public static final String COLUMN_DATE = "ALB_Date";
     public static final String COLUMN_STATUS_DATE = "ALB_StatusDate";
 
@@ -85,12 +88,15 @@ public class AlbumsTable implements IDataTable {
     private static final short COLUMN_INDEX_NOM = 1; // DataField.COLUMN_INDEX_ID + 1
     private static final short COLUMN_INDEX_PSEUDO = 2;
     private static final short COLUMN_INDEX_SHARED = 3;
-    private static final short COLUMN_INDEX_EVENT_ID = 4;
-    private static final short COLUMN_INDEX_REMARK = 5;
-    private static final short COLUMN_INDEX_DATE = 6;
-    private static final short COLUMN_INDEX_STATUS_DATE = 7;
+    private static final short COLUMN_INDEX_SHARED_UPD = 4;
+    private static final short COLUMN_INDEX_EVENT_ID = 5;
+    private static final short COLUMN_INDEX_EVENT_ID_UPD = 6;
+    private static final short COLUMN_INDEX_REMARK = 7;
+    private static final short COLUMN_INDEX_REMARK_UPD = 8;
+    private static final short COLUMN_INDEX_DATE = 9;
+    private static final short COLUMN_INDEX_STATUS_DATE = 10;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 11;
 
     //
     private AlbumsTable() { }
@@ -106,8 +112,11 @@ public class AlbumsTable implements IDataTable {
                 COLUMN_NOM + " TEXT NOT NULL," +
                 COLUMN_PSEUDO + " TEXT NOT NULL," +
                 COLUMN_SHARED + " INTEGER NOT NULL," +
+                COLUMN_SHARED_UPD + " TEXT NOT NULL," +
                 COLUMN_EVENT_ID + " INTEGER NOT NULL," +
+                COLUMN_EVENT_ID_UPD + " TEXT NOT NULL," +
                 COLUMN_REMARK + " TEXT," +
+                COLUMN_REMARK_UPD + " TEXT NOT NULL," +
                 COLUMN_DATE + " TEXT," +
                 COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 

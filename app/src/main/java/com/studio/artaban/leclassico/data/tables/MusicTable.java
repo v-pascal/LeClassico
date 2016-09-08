@@ -78,8 +78,11 @@ public class MusicTable implements IDataTable {
     public static final String COLUMN_FICHIER = "MSG_Fichier";
     public static final String COLUMN_PSEUDO = "MSC_Pseudo";
     public static final String COLUMN_ARTISTE = "MSC_Artiste";
+    public static final String COLUMN_ARTISTE_UPD = "MSC_ArtisteUPD";
     public static final String COLUMN_ALBUM = "MSC_Album";
+    public static final String COLUMN_ALBUM_UPD = "MSC_AlbumUPD";
     public static final String COLUMN_MORCEAU = "MSC_Morceau";
+    public static final String COLUMN_MORCEAU_UPD = "MSC_MorceauUPD";
     public static final String COLUMN_SOURCE = "MSC_Source";
     public static final String COLUMN_STATUS_DATE = "MSC_StatusDate";
 
@@ -87,12 +90,15 @@ public class MusicTable implements IDataTable {
     private static final short COLUMN_INDEX_FICHIER = 1; // DataField.COLUMN_INDEX_ID + 1
     private static final short COLUMN_INDEX_PSEUDO = 2;
     private static final short COLUMN_INDEX_ARTISTE = 3;
-    private static final short COLUMN_INDEX_ALBUM = 4;
-    private static final short COLUMN_INDEX_MORCEAU = 5;
-    private static final short COLUMN_INDEX_SOURCE = 6;
-    private static final short COLUMN_INDEX_STATUS_DATE = 7;
+    private static final short COLUMN_INDEX_ARTISTE_UPD = 4;
+    private static final short COLUMN_INDEX_ALBUM = 5;
+    private static final short COLUMN_INDEX_ALBUM_UPD = 6;
+    private static final short COLUMN_INDEX_MORCEAU = 7;
+    private static final short COLUMN_INDEX_MORCEAU_UPD = 8;
+    private static final short COLUMN_INDEX_SOURCE = 9;
+    private static final short COLUMN_INDEX_STATUS_DATE = 10;
 
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 11;
 
     //
     private MusicTable() { }
@@ -108,8 +114,11 @@ public class MusicTable implements IDataTable {
                 COLUMN_FICHIER + " TEXT NOT NULL," +
                 COLUMN_PSEUDO + " TEXT NOT NULL," +
                 COLUMN_ARTISTE + " TEXT NOT NULL," +
+                COLUMN_ARTISTE_UPD + " TEXT NOT NULL," +
                 COLUMN_ALBUM + " TEXT NOT NULL," +
+                COLUMN_ALBUM_UPD + " TEXT NOT NULL," +
                 COLUMN_MORCEAU + " TEXT NOT NULL," +
+                COLUMN_MORCEAU_UPD + " TEXT NOT NULL," +
                 COLUMN_SOURCE + " TEXT NOT NULL," +
                 COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 

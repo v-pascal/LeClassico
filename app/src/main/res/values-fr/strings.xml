@@ -65,7 +65,7 @@
         <item>Accueil</item>
         <item>Fil d\'actualité</item>
         <item>Evènements</item>
-        <item>Camarades</item>
+        <item>Membres suivis</item>
         <item>Notifications</item>
     </string-array>
     <string-array name="profile_pages">
