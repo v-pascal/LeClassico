@@ -267,14 +267,18 @@ public class CamaradesTable extends DataTable {
                                     resolver.update(tableUri, values, selection, null);
                                 }
                             }
-                            else { ////// Insert entry into DB
+                            else {
                                 cursor.close();
-                                values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                        DataProvider.Synchronized.DONE.getValue());
 
-                                //
-                                values.put(COLUMN_PSEUDO, pseudo);
-                                resolver.insert(tableUri, values);
+                                if (entry.getInt(WebServices.JSON_KEY_STATUS) != WebServices.STATUS_FIELD_DELETED) {
+
+                                    ////// Insert entry into DB
+                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                            DataProvider.Synchronized.DONE.getValue());
+
+                                    values.put(COLUMN_PSEUDO, pseudo);
+                                    resolver.insert(tableUri, values);
+                                }
                             }
                         }
 

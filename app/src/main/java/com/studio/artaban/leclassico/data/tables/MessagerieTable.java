@@ -108,8 +108,9 @@ public class MessagerieTable extends DataTable {
                                         else // Update entry
                                             resolver.update(tableUri, values, selection, null);
                                     }
-                                    else { // Insert entry into DB
+                                    else if (entry.getInt(WebServices.JSON_KEY_STATUS) != WebServices.STATUS_FIELD_DELETED) {
 
+                                        // Insert entry into DB
                                         values.put(COLUMN_PSEUDO, pseudo);
                                         values.put(COLUMN_DATE, date);
                                         values.put(COLUMN_TIME, time);
