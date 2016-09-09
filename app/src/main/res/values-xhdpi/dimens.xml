@@ -16,6 +16,8 @@
     <!-- Main -->
     <item name="pseudo_shadow" format="float" type="dimen">2.375</item>
     <item name="pseudo_radius" format="float" type="dimen">1.875</item>
+    <item name="profile_radius" format="float" type="dimen">26.0</item>
+    <dimen name="profile_border_radius">15dp</dimen>
 
     <dimen name="shortcut_margin">5dp</dimen>
     <dimen name="shortcut_height">46dp</dimen>

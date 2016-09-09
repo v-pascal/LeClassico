@@ -18,6 +18,7 @@
     <item name="pseudo_shadow" format="float" type="dimen">2.0</item>
     <item name="pseudo_radius" format="float" type="dimen">1.5</item>
     <item name="profile_radius" format="float" type="dimen">8.0</item>
+    <dimen name="profile_border_radius">12dp</dimen>
 
     <dimen name="shortcut_margin">8dp</dimen>
     <dimen name="shortcut_height">64dp</dimen>
