@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:orientation="horizontal"
+              android:gravity="center"
               android:layout_width="match_parent"
               android:layout_height="@dimen/shortcut_content_height"
               tools:context="com.studio.artaban.leclassico.activities.main.ShortcutFragment">
@@ -9,6 +10,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/layout_start_date"
+        android:gravity="center"
         android:layout_width="@dimen/shortcut_content_height"
         android:layout_height="@dimen/shortcut_content_height">
 
@@ -74,6 +76,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/layout_end_date"
+        android:gravity="center"
         android:layout_width="@dimen/shortcut_content_height"
         android:layout_height="@dimen/shortcut_content_height">
 

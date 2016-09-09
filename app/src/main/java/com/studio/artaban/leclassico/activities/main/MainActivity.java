@@ -63,6 +63,21 @@ public class MainActivity extends AppCompatActivity implements
     public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
     // Extra data keys
 
+    private static int getShortcutID(int section) {
+    // Return shortcut fragment container ID according selected section
+
+        Logs.add(Logs.Type.V, null);
+        switch (section) {
+            case Constants.MAIN_SECTION_HOME: return R.id.shortcut_home;
+            case Constants.MAIN_SECTION_PUBLICATIONS: return R.id.shortcut_publications;
+            case Constants.MAIN_SECTION_EVENTS: return R.id.shortcut_events;
+            case Constants.MAIN_SECTION_MEMBERS: return R.id.shortcut_members;
+            case Constants.MAIN_SECTION_NOTIFICATIONS: return R.id.shortcut_notifications;
+            default:
+                throw new IllegalArgumentException("Unexpected section");
+        }
+    }
+
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
     @Override
     public void onSetMessage(final int section, final SpannableStringBuilder message) {
@@ -71,15 +86,9 @@ public class MainActivity extends AppCompatActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 Logs.add(Logs.Type.V, null);
-                int shortcutId = Constants.NO_DATA;
-                switch (section) {
-                    case Constants.MAIN_SECTION_HOME: shortcutId = R.id.shortcut_home; break;
-                    case Constants.MAIN_SECTION_PUBLICATIONS: shortcutId = R.id.shortcut_publications; break;
-                }
                 ((ShortcutFragment)getSupportFragmentManager()
-                        .findFragmentById(shortcutId)).setMessage(message);
+                        .findFragmentById(getShortcutID(section))).setMessage(message);
             }
         });
     }
@@ -90,14 +99,9 @@ public class MainActivity extends AppCompatActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 Logs.add(Logs.Type.V, null);
-                int shortcutId = Constants.NO_DATA;
-                switch (section) {
-                    case Constants.MAIN_SECTION_HOME: shortcutId = R.id.shortcut_home; break;
-                    case Constants.MAIN_SECTION_PUBLICATIONS: shortcutId = R.id.shortcut_publications; break;
-                }
-                ((ShortcutFragment)getSupportFragmentManager().findFragmentById(shortcutId)).setInfo(info);
+                ((ShortcutFragment)getSupportFragmentManager()
+                        .findFragmentById(getShortcutID(section))).setInfo(info);
             }
         });
     }

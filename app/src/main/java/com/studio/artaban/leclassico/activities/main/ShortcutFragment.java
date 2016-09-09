@@ -4,10 +4,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.SpannableStringBuilder;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
@@ -35,18 +36,19 @@ public class ShortcutFragment extends Fragment {
     //////
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
                 ";savedInstanceState: " + savedInstanceState);
+        mRootView = inflater.inflate(R.layout.fragment_shortcut, container, false);
 
         // Set UI components according section displayed
-        mRootView = inflater.inflate(R.layout.fragment_shortcut, container, false);
         switch (getId()) {
-            case R.id.shortcut_home: { // Home
+            case R.id.shortcut_home: { ////// Home
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 mRootView.findViewById(R.id.layout_end_date).setVisibility(View.GONE);
                 break;
             }
-            case R.id.shortcut_publications: { // Publications
+            case R.id.shortcut_publications: { ////// Publications
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 mRootView.findViewById(R.id.layout_data).setBackground(getResources()
                         .getDrawable(R.drawable.publication_background));
@@ -54,48 +56,33 @@ public class ShortcutFragment extends Fragment {
                 ((TextView)mRootView.findViewById(R.id.text_info)).setTextColor(Color.WHITE);
                 break;
             }
-
-
-
-
-
-
-
-
-
-
-            default: {
+            case R.id.shortcut_events: { ////// Events
+                mRootView.findViewById(R.id.image_icon).setVisibility(View.GONE);
+                mRootView.findViewById(R.id.layout_start_date).setBackground(getResources()
+                        .getDrawable(R.drawable.event_date_background));
+                mRootView.findViewById(R.id.layout_end_date).setBackground(getResources()
+                        .getDrawable(R.drawable.event_date_background));
+                ((TextView)mRootView.findViewById(R.id.end_date)).setTextColor(Color.WHITE);
+                ((TextView)mRootView.findViewById(R.id.end_time)).setTextColor(Color.WHITE);
+                ((LinearLayout)mRootView.findViewById(R.id.layout_data)).setGravity(Gravity.CENTER);
+                break;
+            }
+            case R.id.shortcut_members: { ////// Members
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
-                ((ImageView)mRootView.findViewById(R.id.image_icon)).setImageDrawable(
-                        getResources().getDrawable(R.mipmap.ic_launcher));
                 mRootView.findViewById(R.id.layout_end_date).setVisibility(View.GONE);
-                ((TextView)mRootView.findViewById(R.id.text_message)).setText("ID: " + getId());
-                break;
-            }
-
-            /*
-            case R.id.shortcut_events: {
-
-
-
-
-                break;
-            }
-            case R.id.shortcut_members: {
-
-
-
-
+                ((LinearLayout.LayoutParams)mRootView.findViewById(R.id.layout_data).getLayoutParams()).weight = 0;
+                ((LinearLayout.LayoutParams)mRootView.findViewById(R.id.layout_data).getLayoutParams())
+                        .width = ViewGroup.LayoutParams.WRAP_CONTENT;
                 break;
             }
             case R.id.shortcut_notifications: {
-
-
-
-
+                mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
+                mRootView.findViewById(R.id.layout_end_date).setBackground(getResources()
+                        .getDrawable(R.drawable.notifcation_date_background));
+                ((TextView)mRootView.findViewById(R.id.end_date)).setTextColor(Color.WHITE);
+                ((TextView)mRootView.findViewById(R.id.end_time)).setTextColor(Color.WHITE);
                 break;
             }
-            */
         }
         return mRootView;
     }
