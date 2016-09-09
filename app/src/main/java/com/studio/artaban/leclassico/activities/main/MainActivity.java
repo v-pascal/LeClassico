@@ -520,13 +520,6 @@ public class MainActivity extends AppCompatActivity implements
                         break;
                     }
                 }
-                findViewById(R.id.shortcut_home).setTranslationX(mPositionHome);
-                findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications);
-                findViewById(R.id.shortcut_events).setTranslationX(mPositionEvents);
-                findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers);
-                findViewById(R.id.shortcut_notifications).setTranslationX(mPositionNotifications);
-
-                findViewById(R.id.shortcut_new).setTranslationY(-mShortcutHeight);
             }
             private void positionShortcut(final int section) {
             // Position shortcut according selected section
@@ -548,6 +541,13 @@ public class MainActivity extends AppCompatActivity implements
                                     mShortcutHeight = shortcut.getHeight();
 
                                     translateShortcut(section);
+
+                                    findViewById(R.id.shortcut_home).setTranslationX(mPositionHome);
+                                    findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications);
+                                    findViewById(R.id.shortcut_events).setTranslationX(mPositionEvents);
+                                    findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers);
+                                    findViewById(R.id.shortcut_notifications).setTranslationX(mPositionNotifications);
+                                    findViewById(R.id.shortcut_new).setTranslationY(-mShortcutHeight);
                                 }
                             });
                 } else
@@ -558,21 +558,13 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void transformPage(View page, float position) {
 
-                Logs.add(Logs.Type.V, "page: " + page.getTag() + ";position: " + position);
-                findViewById(R.id.shortcut).setVisibility(View.VISIBLE);
-                if ((position == 1) || (position == 0) || (position == -1)) {
+                //Logs.add(Logs.Type.V, "page: " + page.getTag() + ";position: " + position +
+                //        ";current: " + mViewPager.getCurrentItem());
+                if ((position == 1) || (position == 0) || (position == -1) ||
+                        ((mShortcut + 2) == (int)page.getTag()) || ((mShortcut - 2) == (int)page.getTag()))
                     positionShortcut(mViewPager.getCurrentItem());
-                    return;
-                }
-                if (((mShortcut + 2) == (int)page.getTag()) || ((mShortcut - 2) == (int)page.getTag())) {
-                    positionShortcut(mViewPager.getCurrentItem());
-                    if ((position != 2) && (position != -2)) // Avoid to let's shortcut invisible
-                        findViewById(R.id.shortcut).setVisibility(View.INVISIBLE);
-                }
-                if (mShortcut != (int)page.getTag())
-                    return;
 
-                if ((position > -1f) && (position < 1f)) {
+                if (mShortcut == (int)page.getTag()) {
                     findViewById(R.id.shortcut_home).setTranslationX(mPositionHome +
                             (position * mShortcutWidth));
                     findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications +

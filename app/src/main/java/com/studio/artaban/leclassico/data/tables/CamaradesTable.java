@@ -88,7 +88,7 @@ public class CamaradesTable extends DataTable {
                             values.put(COLUMN_PRENOM_UPD, entry.getString(JSON_KEY_PRENOM_UPD));
                             if (!entry.isNull(JSON_KEY_SEXE))
                                 values.put(COLUMN_SEXE, entry.getInt(JSON_KEY_SEXE));
-                            values.put(COLUMN_SEXE_UPD, entry.getInt(JSON_KEY_SEXE_UPD));
+                            values.put(COLUMN_SEXE_UPD, entry.getString(JSON_KEY_SEXE_UPD));
                             if (!entry.isNull(JSON_KEY_BORN_DATE))
                                 values.put(COLUMN_BORN_DATE, entry.getString(JSON_KEY_BORN_DATE));
                             values.put(COLUMN_BORN_DATE_UPD, entry.getString(JSON_KEY_BORN_DATE_UPD));
@@ -114,7 +114,7 @@ public class CamaradesTable extends DataTable {
                                 values.put(COLUMN_LOG_DATE, entry.getString(JSON_KEY_LOG_DATE));
                             values.put(COLUMN_LOG_DATE_UPD, entry.getString(JSON_KEY_LOG_DATE_UPD));
                             values.put(COLUMN_ADMIN, entry.getInt(JSON_KEY_ADMIN));
-                            values.put(COLUMN_ADMIN_UPD, entry.getInt(JSON_KEY_ADMIN_UPD));
+                            values.put(COLUMN_ADMIN_UPD, entry.getString(JSON_KEY_ADMIN_UPD));
                             if (!entry.isNull(JSON_KEY_PROFILE))
                                 values.put(COLUMN_PROFILE, entry.getString(JSON_KEY_PROFILE));
                             values.put(COLUMN_PROFILE_UPD, entry.getString(JSON_KEY_PROFILE_UPD));
@@ -122,13 +122,13 @@ public class CamaradesTable extends DataTable {
                                 values.put(COLUMN_BANNER, entry.getString(JSON_KEY_BANNER));
                             values.put(COLUMN_BANNER_UPD, entry.getString(JSON_KEY_BANNER_UPD));
                             values.put(COLUMN_LOCATED, entry.getInt(JSON_KEY_LOCATED));
-                            values.put(COLUMN_LOCATED_UPD, entry.getInt(JSON_KEY_LOCATED_UPD));
+                            values.put(COLUMN_LOCATED_UPD, entry.getString(JSON_KEY_LOCATED_UPD));
                             if (!entry.isNull(JSON_KEY_LATITUDE))
                                 values.put(COLUMN_LATITUDE, entry.getDouble(JSON_KEY_LATITUDE));
-                            values.put(COLUMN_LATITUDE_UPD, entry.getDouble(JSON_KEY_LATITUDE_UPD));
+                            values.put(COLUMN_LATITUDE_UPD, entry.getString(JSON_KEY_LATITUDE_UPD));
                             if (!entry.isNull(JSON_KEY_LONGITUDE))
                                 values.put(COLUMN_LONGITUDE, entry.getDouble(JSON_KEY_LONGITUDE));
-                            values.put(COLUMN_LONGITUDE_UPD, entry.getDouble(JSON_KEY_LONGITUDE_UPD));
+                            values.put(COLUMN_LONGITUDE_UPD, entry.getString(JSON_KEY_LONGITUDE_UPD));
                             values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
 
                             // Check if entry already exists
@@ -266,8 +266,8 @@ public class CamaradesTable extends DataTable {
 
                                     resolver.update(tableUri, values, selection, null);
                                 }
-                            }
-                            else {
+
+                            } else {
                                 cursor.close();
 
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) != WebServices.STATUS_FIELD_DELETED) {
