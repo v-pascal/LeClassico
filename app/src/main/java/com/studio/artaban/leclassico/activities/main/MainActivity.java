@@ -73,14 +73,13 @@ public class MainActivity extends AppCompatActivity implements
             public void run() {
 
                 Logs.add(Logs.Type.V, null);
+                int shortcutId = Constants.NO_DATA;
                 switch (section) {
-                    case Constants.MAIN_SECTION_HOME: {
-
-                        ((ShortcutFragment)getSupportFragmentManager()
-                                .findFragmentById(R.id.shortcut_home)).setMessage(message);
-                        break;
-                    }
+                    case Constants.MAIN_SECTION_HOME: shortcutId = R.id.shortcut_home; break;
+                    case Constants.MAIN_SECTION_PUBLICATIONS: shortcutId = R.id.shortcut_publications; break;
                 }
+                ((ShortcutFragment)getSupportFragmentManager()
+                        .findFragmentById(shortcutId)).setMessage(message);
             }
         });
     }
@@ -93,14 +92,12 @@ public class MainActivity extends AppCompatActivity implements
             public void run() {
 
                 Logs.add(Logs.Type.V, null);
+                int shortcutId = Constants.NO_DATA;
                 switch (section) {
-                    case Constants.MAIN_SECTION_HOME: {
-
-                        ((ShortcutFragment)getSupportFragmentManager()
-                                .findFragmentById(R.id.shortcut_home)).setInfo(info);
-                        break;
-                    }
+                    case Constants.MAIN_SECTION_HOME: shortcutId = R.id.shortcut_home; break;
+                    case Constants.MAIN_SECTION_PUBLICATIONS: shortcutId = R.id.shortcut_publications; break;
                 }
+                ((ShortcutFragment)getSupportFragmentManager().findFragmentById(shortcutId)).setInfo(info);
             }
         });
     }

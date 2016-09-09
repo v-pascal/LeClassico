@@ -23,6 +23,7 @@
     <color name="red">#ffff0000</color>
     <color name="blue">#ff0000ff</color>
     <color name="yellow">#ffffff00</color>
+    <color name="orange">#ff8000</color>
 
     <!-- Introduction -->
     <color name="colorIntroPublications">#800080ff</color>
@@ -32,6 +33,10 @@
 
     <color name="colorButtonBackground">#00000000</color>
     <color name="colorButtonBackgroundPressed">#50ffffff</color>
+
+    <!-- LeClassico -->
+    <color name="colorPublication">#d5ddc3</color>
+    <color name="colorPublicationDark">#bacc9a</color>
 
     <!-- Main -->
     <color name="colorWindowBackground">#ffefefef</color>

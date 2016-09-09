@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.SpannableStringBuilder;
@@ -37,16 +38,25 @@ public class ShortcutFragment extends Fragment {
         Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
                 ";savedInstanceState: " + savedInstanceState);
 
+        // Set UI components according section displayed
         mRootView = inflater.inflate(R.layout.fragment_shortcut, container, false);
         switch (getId()) {
-            case R.id.shortcut_home: {
-
+            case R.id.shortcut_home: { // Home
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
-                ((ImageView)mRootView.findViewById(R.id.image_icon)).setImageDrawable(
-                        getResources().getDrawable(R.mipmap.ic_launcher));
                 mRootView.findViewById(R.id.layout_end_date).setVisibility(View.GONE);
                 break;
             }
+            case R.id.shortcut_publications: { // Publications
+                mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
+                mRootView.findViewById(R.id.layout_data).setBackground(getResources()
+                        .getDrawable(R.drawable.publication_background));
+                ((TextView)mRootView.findViewById(R.id.text_message)).setTextColor(Color.WHITE);
+                ((TextView)mRootView.findViewById(R.id.text_info)).setTextColor(Color.WHITE);
+                break;
+            }
+
+
+
 
 
 
@@ -63,15 +73,7 @@ public class ShortcutFragment extends Fragment {
                 break;
             }
 
-
             /*
-            case R.id.shortcut_publications: {
-
-
-
-
-                break;
-            }
             case R.id.shortcut_events: {
 
 

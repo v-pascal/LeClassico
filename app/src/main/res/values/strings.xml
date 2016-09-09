@@ -45,6 +45,11 @@
     <!-- Main -->
     <string name="home_connected">Member %1$s connected!</string>
     <string name="home_info">New messages: %1$d - New notifications: %2$d</string>
+    <string name="no_publication">No publication</string>
+    <string name="no_publication_info">No followed member has published yet</string>
+
+    <string name="no_date" translatable="false">--/--</string>
+    <string name="no_time" translatable="false">--:--</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

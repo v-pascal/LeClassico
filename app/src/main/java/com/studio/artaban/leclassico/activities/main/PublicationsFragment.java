@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,23 @@ public class PublicationsFragment extends MainFragment {
 
         View rootView = inflater.inflate(R.layout.fragment_publications, container, false);
         rootView.setTag(Constants.MAIN_SECTION_PUBLICATIONS);
+
+        // Set shortcut data (default)
+        SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_publication));
+        mListener.onSetMessage(Constants.MAIN_SECTION_PUBLICATIONS, data);
+        data = new SpannableStringBuilder(getString(R.string.no_publication_info));
+        mListener.onSetInfo(Constants.MAIN_SECTION_PUBLICATIONS, data);
+
+
+
+
+
+
+
+
+
+
+
         return rootView;
     }
 }

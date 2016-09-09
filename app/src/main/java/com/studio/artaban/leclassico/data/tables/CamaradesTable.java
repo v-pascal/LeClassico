@@ -279,6 +279,7 @@ public class CamaradesTable extends DataTable {
                                     values.put(COLUMN_PSEUDO, pseudo);
                                     resolver.insert(tableUri, values);
                                 }
+                                //else // Do not add a deleted entry
                             }
                         }
 

@@ -18,13 +18,16 @@
     <item name="pseudo_radius" format="float" type="dimen">1.625</item>
     <item name="profile_radius" format="float" type="dimen">14.0</item>
     <dimen name="profile_border_radius">13dp</dimen>
+    <dimen name="shortcut_background_radius">9dp</dimen>
 
     <dimen name="shortcut_margin">7dp</dimen>
     <dimen name="shortcut_height">58dp</dimen>
     <dimen name="shortcut_content_height">44dp</dimen><!-- = shortcut_height - (2 * shortcut_margin) -->
-
     <dimen name="shortcut_text_margin">8dp</dimen>
-    <dimen name="shortcut_text_size">17sp</dimen>
+    <dimen name="shortcut_text_size">16sp</dimen>
     <dimen name="shortcut_info_size">13sp</dimen>
+    <dimen name="shortcut_date_margin">4dp</dimen>
+    <dimen name="shortcut_date_size">11sp</dimen>
+    <dimen name="shortcut_data_radius">7dp</dimen>
 
 </resources>

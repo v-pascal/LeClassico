@@ -107,8 +107,8 @@ public class MessagerieTable extends DataTable {
                                         }
                                         else // Update entry
                                             resolver.update(tableUri, values, selection, null);
-                                    }
-                                    else if (entry.getInt(WebServices.JSON_KEY_STATUS) != WebServices.STATUS_FIELD_DELETED) {
+
+                                    } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != WebServices.STATUS_FIELD_DELETED) {
 
                                         // Insert entry into DB
                                         values.put(COLUMN_PSEUDO, pseudo);
@@ -116,6 +116,7 @@ public class MessagerieTable extends DataTable {
                                         values.put(COLUMN_TIME, time);
                                         resolver.insert(tableUri, values);
                                     }
+                                    //else // Do not add a deleted entry
                                     cursor.close();
                                 }
 
