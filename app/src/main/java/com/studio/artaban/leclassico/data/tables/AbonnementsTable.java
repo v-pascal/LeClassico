@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -44,12 +45,19 @@ public class AbonnementsTable extends DataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(final ContentResolver resolver, String token) {
+    public boolean synchronize(final ContentResolver resolver, String token, String pseudo) {
     // Synchronize data with remote DB
 
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token);
-        String url = getUrlSynchroRequest(resolver, WebServices.URL_FOLLOWERS, token,
-                TABLE_NAME, COLUMN_STATUS_DATE);
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+        Bundle data = new Bundle();
+
+        data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_FOLLOWERS);
+        data.putString(DataTable.DATA_KEY_TOKEN, token);
+        data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
+        data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
+        data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, COLUMN_STATUS_DATE);
+        data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        String url = getUrlSynchroRequest(resolver, data);
 
         // Send remote DB request
         Internet.DownloadResult result = Internet.downloadHttpRequest(url, null,

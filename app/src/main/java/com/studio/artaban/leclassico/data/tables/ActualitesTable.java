@@ -34,7 +34,7 @@ public class ActualitesTable implements IDataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(ContentResolver resolver, String token) {
+    public boolean synchronize(ContentResolver resolver, String token, String pseudo) {
     // Synchronize data with remote DB
 
 
