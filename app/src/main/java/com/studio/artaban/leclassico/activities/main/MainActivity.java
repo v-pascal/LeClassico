@@ -6,14 +6,11 @@ import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,7 +24,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +44,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.helpers.Storage;
+import com.studio.artaban.leclassico.tools.Tools;
 
 import java.io.File;
 
@@ -87,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void run() {
                 Logs.add(Logs.Type.V, null);
-                ((ShortcutFragment)getSupportFragmentManager()
+                ((ShortcutFragment) getSupportFragmentManager()
                         .findFragmentById(getShortcutID(section))).setMessage(message);
             }
         });
@@ -102,6 +99,19 @@ public class MainActivity extends AppCompatActivity implements
                 Logs.add(Logs.Type.V, null);
                 ((ShortcutFragment)getSupportFragmentManager()
                         .findFragmentById(getShortcutID(section))).setInfo(info);
+            }
+        });
+    }
+    @Override
+    public void onSetIcon(final int section, final boolean female, final String profile) {
+
+        Logs.add(Logs.Type.V, "section: " + section + ";female: " + female + ";profile: " + profile);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Logs.add(Logs.Type.V, null);
+                ((ShortcutFragment)getSupportFragmentManager()
+                        .findFragmentById(getShortcutID(section))).setIcon(female, profile);
             }
         });
     }
@@ -138,8 +148,8 @@ public class MainActivity extends AppCompatActivity implements
             case Tables.ID_CAMARADES: { ////// User info
 
                 // Get DB data
-                final boolean female = (!cursor.isNull(COLUMN_INDEX_SEXE)) &&
-                        (cursor.getInt(COLUMN_INDEX_SEXE) == CamaradesTable.FEMALE);
+                final boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
+                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
                 final String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
                         cursor.getString(COLUMN_INDEX_PROFILE) : null;
                 final String banner = (!cursor.isNull(COLUMN_INDEX_BANNER))?
@@ -153,35 +163,8 @@ public class MainActivity extends AppCompatActivity implements
                         View navHeader = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
 
                         // Profile
-                        if (profile != null)
-                            Glider.with(MainActivity.this)
-                                    .load(Storage.FOLDER_PROFILES +
-                                                    File.separator + profile,
-                                            Constants.APP_URL_PROFILES + "/" + profile)
-                                    .placeholder((female) ? R.drawable.woman : R.drawable.man)
-                                    .into((ImageView) navHeader.findViewById(R.id.image_profile),
-                                            new Glider.OnLoadListener() {
-
-                                        @Override
-                                        public boolean setResource(Bitmap resource, ImageView imageView) {
-                                            //Logs.add(Logs.Type.V, "resource: " + resource +
-                                            //        ";imageView: " + imageView);
-
-                                            RoundedBitmapDrawable radiusBmp =
-                                                    RoundedBitmapDrawableFactory.create(getResources(),
-                                                            resource);
-                                            TypedValue radius = new TypedValue();
-                                            getResources().getValue(R.dimen.profile_radius, radius, true);
-                                            radiusBmp.setCornerRadius(radius.getFloat());
-                                            imageView.setImageDrawable(radiusBmp);
-                                            return true;
-                                        }
-                                    });
-                        else
-                            ((ImageView) navHeader.findViewById(R.id.image_profile))
-                                    .setImageDrawable(getDrawable((female) ?
-                                            R.drawable.woman : R.drawable.man));
-
+                        Tools.setProfile(MainActivity.this,
+                                (ImageView)navHeader.findViewById(R.id.image_profile), female, profile);
                         // Banner
                         if (banner != null)
                             Glider.with(MainActivity.this)
@@ -219,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private static final byte COLUMN_INDEX_SEXE = 0;
+    private static final byte COLUMN_INDEX_SEX = 0;
     private static final byte COLUMN_INDEX_PROFILE = 1;
     private static final byte COLUMN_INDEX_BANNER = 2;
     // Query column index
@@ -399,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements
         userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
         userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
 
-                CamaradesTable.COLUMN_SEXE, // COLUMN_INDEX_SEXE
+                CamaradesTable.COLUMN_SEXE, // COLUMN_INDEX_SEX
                 CamaradesTable.COLUMN_PROFILE, // COLUMN_INDEX_PROFILE
                 CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
         });

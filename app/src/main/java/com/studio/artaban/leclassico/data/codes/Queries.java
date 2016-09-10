@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.data.codes;
 
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
@@ -25,21 +26,29 @@ public class Queries {
     ////// Main
     public static final int MAIN_NOTIFICATION_FLAG = MAX_TABLE_ID;
     public static final int MAIN_NOTIFICATION_COUNT = MAX_TABLE_ID + 1;
+    public static final int MAIN_LAST_FOLLOWED = MAX_TABLE_ID + 2;
 
     //////
     public static String getTableUri(int id) {
         Logs.add(Logs.Type.V, "id: " + id);
 
-        switch (id) {
+        switch (id) { // Switch on particular table query ID & SQL query ID
 
-            ////// Main ////////////////////////////////////////////////////////////////////////////
+            ////// Particular table query ID ///////////////////////////////////////////////////////
+
+            // Main
             case MAIN_NOTIFICATION_FLAG:
             case MAIN_NOTIFICATION_COUNT:
                 return NotificationsTable.TABLE_NAME;
 
-            ////////////////////////////////////////////////////////////////////////////////////////
+            ////// SQL query ID ////////////////////////////////////////////////////////////////////
+
+            // Main
+            case MAIN_LAST_FOLLOWED:
+
+                return DataTable.SQL_QUERY_URI; // SQL query (complex queries)
         }
-        switch ((byte)id) {
+        switch ((byte)id) { // Switch on table ID
 
             case Tables.ID_CAMARADES: return CamaradesTable.TABLE_NAME;
             case Tables.ID_ABONNEMENTS: return AbonnementsTable.TABLE_NAME;

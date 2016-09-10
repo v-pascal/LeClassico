@@ -14,6 +14,8 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public abstract class DataTable implements IDataTable {
 
+    public static final String SQL_QUERY_URI = "SQL"; // Reserved SQL query URI (for complex queries)
+
     //////
     protected static String getUrlSynchroRequest(ContentResolver resolver, String serviceUrl,
                                                  String token, String tableName, String statusDate) {

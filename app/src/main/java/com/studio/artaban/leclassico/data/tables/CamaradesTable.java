@@ -503,6 +503,9 @@ public class CamaradesTable extends DataTable {
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " + TABLE_NAME + "(" + COLUMN_PSEUDO +")");
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

@@ -57,7 +57,7 @@ public class DataProvider extends ContentProvider {
     private static final UriMatcher URI_MATCHER;
     static {
 
-        // Table requests
+        ////// Tables URI
         URI_MATCHER_SINGLE = new UriMatcher(UriMatcher.NO_MATCH);
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME + SINGLE_ROW, Tables.ID_CAMARADES);
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, AbonnementsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_ABONNEMENTS);
@@ -85,6 +85,9 @@ public class DataProvider extends ContentProvider {
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME, Tables.ID_PRESENTS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME, Tables.ID_VOTES);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME, Tables.ID_NOTIFICATIONS);
+
+        ////// Reserved URI
+        // * DataTable.SQL_QUERY_URI: for multiple table queries
     }
 
     //
@@ -144,11 +147,14 @@ public class DataProvider extends ContentProvider {
         else {
 
             table = getUriTable(URI_MATCHER, uri);
-            if (table == null)
-                throw new IllegalArgumentException("Unexpected content URI: " + uri);
+            if (table == null) // SQL query (for multiple table queries)
+                return mDB.getDB().rawQuery(selection, selectionArgs);
         }
         builder.setTables(table);
         return builder.query(mDB.getDB(), projection, selection, selectionArgs, null, null, sortOrder);
+
+
+
     }
 
     @Nullable

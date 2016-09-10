@@ -10,8 +10,9 @@ import android.view.ViewGroup;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 
@@ -23,27 +24,29 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
 
     private QueryLoader mLastMemberLoader; // Shortcut last followed member query loader
 
+    // Query column indexes
+    private static final int COLUMN_INDEX_PSEUDO = 1;
+    private static final int COLUMN_INDEX_SEX = 2;
+    private static final int COLUMN_INDEX_PROFILE = 3;
+
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
         cursor.moveToFirst();
 
-        if ((byte)id == Tables.ID_ABONNEMENTS) {
+        if (id == Queries.MAIN_LAST_FOLLOWED) {
 
-
-
-
-            /*
-            ((ImageView)mRootView.findViewById(R.id.image_icon))
-                    .setImageDrawable(getResources().getDrawable(R.drawable.man));
-            */
-
-
-
-
-            SpannableStringBuilder member = new SpannableStringBuilder(cursor.getString(1));
+            // Set message
+            SpannableStringBuilder member = new SpannableStringBuilder(cursor.getString(COLUMN_INDEX_PSEUDO));
             mListener.onSetMessage(Constants.MAIN_SECTION_MEMBERS, member);
+
+            // Set profile icon
+            boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
+                    (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+            String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
+                    cursor.getString(COLUMN_INDEX_PROFILE) : null;
+            mListener.onSetIcon(Constants.MAIN_SECTION_MEMBERS, female, profile);
         }
         cursor.close();
     }
@@ -75,14 +78,21 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
 
         // Load shortcut info (using query loaders)
         Bundle shortcutData = new Bundle();
-        shortcutData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        shortcutData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
-                "max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")",
-                AbonnementsTable.COLUMN_CAMARADE
-        });
-        shortcutData.putString(QueryLoader.DATA_KEY_SELECTION, AbonnementsTable.COLUMN_PSEUDO + "='" +
+        shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
+                "SELECT max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")," +
+                        CamaradesTable.COLUMN_PSEUDO + "," + // COLUMN_INDEX_PSEUDO
+                        CamaradesTable.COLUMN_SEXE + "," + // COLUMN_INDEX_SEX
+                        CamaradesTable.COLUMN_PROFILE + // COLUMN_INDEX_PROFILE
+                        " FROM " + AbonnementsTable.TABLE_NAME +
+                        " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
+                        AbonnementsTable.COLUMN_CAMARADE + "=" + CamaradesTable.COLUMN_PSEUDO +
+                        " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" +
                         getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) + "'");
-        mLastMemberLoader.restart(getActivity(), Tables.ID_ABONNEMENTS, shortcutData);
+        mLastMemberLoader.restart(getActivity(), Queries.MAIN_LAST_FOLLOWED, shortcutData);
+
+
+
+
 
 
 

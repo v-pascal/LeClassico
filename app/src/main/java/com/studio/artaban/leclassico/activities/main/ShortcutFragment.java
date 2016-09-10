@@ -8,11 +8,13 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.tools.Tools;
 
 /**
  * Created by pascal on 03/09/16.
@@ -29,6 +31,10 @@ public class ShortcutFragment extends Fragment {
         Logs.add(Logs.Type.V, "info: " + info);
         ((TextView) mRootView.findViewById(R.id.text_info))
                 .setText(info, TextView.BufferType.SPANNABLE);
+    }
+    public void setIcon(boolean female, String profile) {
+        Logs.add(Logs.Type.V, "female: " + female + ";profile: " + profile);
+        Tools.setProfile(getActivity(), (ImageView)mRootView.findViewById(R.id.image_icon), female, profile);
     }
 
     private View mRootView; // Fragment root view
