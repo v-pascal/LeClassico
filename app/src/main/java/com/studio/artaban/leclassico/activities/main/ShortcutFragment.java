@@ -81,7 +81,7 @@ public class ShortcutFragment extends Fragment {
                         .width = ViewGroup.LayoutParams.WRAP_CONTENT;
                 break;
             }
-            case R.id.shortcut_notifications: {
+            case R.id.shortcut_notifications: { ////// Notifications
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 mRootView.findViewById(R.id.layout_end_date).setBackground(getResources()
                         .getDrawable(R.drawable.notifcation_date_background));

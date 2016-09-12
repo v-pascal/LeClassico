@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Search -->
-    <item android:id="@+id/mnu_search"
-          android:title="@string/search"
-          android:icon="@drawable/ic_search_white_24dp"
-          app:showAsAction="collapseActionView|ifRoom"
-          app:actionViewClass="android.support.v7.widget.SearchView" />
-
     <!-- Notifications -->
     <item android:id="@+id/mnu_notification"
           android:title="@string/notifications"

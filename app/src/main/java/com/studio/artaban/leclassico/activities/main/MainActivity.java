@@ -1,7 +1,5 @@
 package com.studio.artaban.leclassico.activities.main;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -16,7 +14,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -54,7 +51,7 @@ import java.io.File;
  */
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
-        SearchView.OnQueryTextListener, MainFragment.OnFragmentListener {
+        MainFragment.OnFragmentListener {
 
     public static final String EXTRA_DATA_KEY_ONLINE = "online";
     public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
@@ -118,25 +115,6 @@ public class MainActivity extends AppCompatActivity implements
 
     //
     private boolean mNewNotification; // New notification flag
-
-    ////// OnQueryTextListener /////////////////////////////////////////////////////////////////////
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-
-
-
-
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-
-
-
-
-        return false;
-    }
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -454,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements
 
             private void translateShortcut(int section) { // Update & translate shortcut position
 
-                Logs.add(Logs.Type.V, "section: " + section);
+                //Logs.add(Logs.Type.V, "section: " + section);
                 mShortcut = section;
 
                 switch (section) {
@@ -510,7 +488,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 //Logs.add(Logs.Type.V, "section: " + section);
                 if (mShortcutWidth == Constants.NO_DATA) {
-                // Get shortcut fragment width & height (if not already done)
+                    // Get shortcut fragment width & height (if not already done)
 
                     final View shortcut = findViewById(R.id.shortcut);
                     shortcut.getViewTreeObserver()
@@ -575,15 +553,8 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         Logs.add(Logs.Type.V, null);
         getMenuInflater().inflate(R.menu.options_menu, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.mnu_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         if (mNewNotification)
             menu.findItem(R.id.mnu_notification).setIcon(getDrawable(R.drawable.ic_notifications_info_24dp));
-
         return true;
     }
 

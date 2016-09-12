@@ -1,12 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
+    <!-- Date separator -->
+    <LinearLayout
+        android:id="@+id/date_separator"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="@dimen/notify_item_margin"
+        android:layout_marginBottom="@dimen/notify_item_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:background="@color/colorPublication"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="2dp"/>
+        <TextView
+            android:id="@+id/text_date"
+
+
+            android:text="Today"
+
+
+            android:textColor="@color/colorPublicationDark"
+            android:textSize="@dimen/notify_tiny_text_size"
+            android:layout_marginStart="@dimen/notify_tiny_text_margin"
+            android:layout_marginEnd="@dimen/notify_tiny_text_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <View
+            android:background="@color/colorPublication"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="2dp"/>
+
+    </LinearLayout>
+
+    <!-- Pseudo icon -->
+    <ImageView
+        android:id="@+id/image_pseudo"
+        android:layout_below="@id/date_separator"
+
+
+        android:src="@mipmap/ic_launcher"
+
+
+        android:layout_alignBottom="@dimen/notify_item_bottom"
+        android:layout_width="@dimen/notify_item_height"
+        android:layout_height="@dimen/notify_item_height"/>
+
+    <!-- Message -->
     <TextView
-        android:text="Notifications"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:id="@+id/text_message"
 
-</LinearLayout>
+
+        android:text="Bob a publié sur votre journal de votre profil"
+
+
+        android:layout_marginStart="@dimen/notify_text_margin"
+        android:layout_marginEnd="@dimen/notify_item_height"
+        android:layout_toEndOf="@id/image_pseudo"
+        android:layout_below="@id/date_separator"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/notify_text_size"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/notify_message_height"/>
+
+    <!-- Type icon -->
+    <ImageView
+        android:id="@+id/image_type"
+        android:layout_toEndOf="@id/image_pseudo"
+        android:layout_below="@id/text_message"
+
+
+        android:src="@mipmap/ic_launcher"
+
+
+        android:layout_marginStart="@dimen/notify_text_margin"
+        android:layout_width="@dimen/notify_info_height"
+        android:layout_height="@dimen/notify_info_height"/>
+
+    <!-- Info -->
+    <TextView
+        android:id="@+id/text_info"
+
+
+
+        android:text="Voilà le truc dont je te parlais hier soir juste avant minuit passé de quelques minutes!"
+
+
+        android:layout_marginStart="@dimen/notify_tiny_text_margin"
+        android:layout_marginEnd="@dimen/notify_item_height"
+        android:layout_toEndOf="@id/image_type"
+        android:layout_below="@id/text_message"
+        android:textSize="@dimen/notify_tiny_text_size"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"/>
+
+    <!-- Time -->
+    <TextView
+
+
+        android:text="00:00"
+
+
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/date_separator"
+        android:id="@+id/text_time"
+        android:fontFamily="monospace"
+        android:textSize="@dimen/notify_text_size"
+        android:gravity="center|end"
+        android:layout_width="@dimen/notify_item_height"
+        android:layout_height="@dimen/notify_item_height"/>
+
+</RelativeLayout>

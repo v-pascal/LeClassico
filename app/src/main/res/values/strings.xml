@@ -98,4 +98,8 @@
     <string name="confirm_logout">Do you really want to logout?</string>
     <string name="confirm_quit">Do you really want to quit application and therefore logout?</string>
 
+    <!-- Formats -->
+    <string name="format_date" translatable="false">%2d/%2d</string>
+    <string name="foramt_time" translatable="false">%2d:%2d</string>
+
 </resources>

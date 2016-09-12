@@ -30,4 +30,26 @@
     <dimen name="shortcut_date_size">11sp</dimen>
     <dimen name="shortcut_data_radius">7dp</dimen>
 
+
+
+
+
+
+
+    <dimen name="notify_tiny_text_margin">6dp</dimen>
+    <dimen name="notify_text_margin">8dp</dimen>
+    <dimen name="notify_item_margin">16dp</dimen>
+    <dimen name="notify_item_bottom">8dp</dimen>
+    <dimen name="notify_item_height">56dp</dimen>
+    <dimen name="notify_message_height">38dp</dimen><!-- = notify_item_height - notify_info_height -->
+    <dimen name="notify_info_height">18dp</dimen><!-- = notify_item_height - notify_message_height -->
+    <dimen name="notify_tiny_text_size">14sp</dimen>
+    <dimen name="notify_text_size">18sp</dimen>
+
+
+
+
+
+
+
 </resources>
