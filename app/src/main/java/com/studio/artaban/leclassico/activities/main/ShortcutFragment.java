@@ -76,9 +76,11 @@ public class ShortcutFragment extends Fragment {
             case R.id.shortcut_members: { ////// Members
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 mRootView.findViewById(R.id.layout_end_date).setVisibility(View.GONE);
-                ((LinearLayout.LayoutParams)mRootView.findViewById(R.id.layout_data).getLayoutParams()).weight = 0;
-                ((LinearLayout.LayoutParams)mRootView.findViewById(R.id.layout_data).getLayoutParams())
-                        .width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                LinearLayout search = (LinearLayout)mRootView.findViewById(R.id.layout_search);
+                ((LinearLayout.LayoutParams)search.getLayoutParams()).weight = 2;
+                ((LinearLayout.LayoutParams)mRootView.findViewById(R.id.layout_data).getLayoutParams()).weight = 1;
+                ((LinearLayout.LayoutParams)search.getLayoutParams()).width = 0;
+                search.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.shortcut_notifications: { ////// Notifications

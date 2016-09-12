@@ -6,7 +6,7 @@
               android:layout_height="@dimen/shortcut_content_height"
               tools:context="com.studio.artaban.leclassico.activities.main.ShortcutFragment">
 
-    <!-- Start date | Icon -->
+    <!-- Start date & time -->
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/layout_start_date"
@@ -14,7 +14,6 @@
         android:layout_width="@dimen/shortcut_content_height"
         android:layout_height="@dimen/shortcut_content_height">
 
-        <!-- Date -->
         <TextView
             android:id="@+id/start_date"
             android:text="@string/no_date"
@@ -24,7 +23,6 @@
             android:textSize="@dimen/shortcut_date_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <!-- Time -->
         <TextView
             android:id="@+id/start_time"
             android:text="@string/no_time"
@@ -36,12 +34,15 @@
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
+
+    <!-- Icon -->
     <ImageView
         android:id="@+id/image_icon"
         android:src="@mipmap/ic_launcher"
         android:layout_width="@dimen/shortcut_content_height"
         android:layout_height="@dimen/shortcut_content_height"/>
 
+    <!-- Message & info -->
     <LinearLayout
         android:id="@+id/layout_data"
         android:orientation="vertical"
@@ -49,7 +50,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent">
 
-        <!-- Message -->
         <TextView
             android:layout_marginStart="@dimen/shortcut_text_margin"
             android:id="@+id/text_message"
@@ -60,7 +60,6 @@
             android:ellipsize="end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <!-- Info -->
         <TextView
             android:layout_marginStart="@dimen/shortcut_text_margin"
             android:id="@+id/text_info"
@@ -72,7 +71,41 @@
 
     </LinearLayout>
 
-    <!-- End date -->
+    <!-- Search -->
+    <LinearLayout
+        android:id="@+id/layout_search"
+        android:visibility="gone"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/shortcut_content_height">
+
+
+
+
+
+
+
+
+
+
+
+        <TextView
+            android:text="test"
+            android:background="@color/blue"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
+
+
+
+
+
+
+
+    </LinearLayout>
+
+    <!-- End date & time -->
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/layout_end_date"
@@ -80,7 +113,6 @@
         android:layout_width="@dimen/shortcut_content_height"
         android:layout_height="@dimen/shortcut_content_height">
 
-        <!-- Date -->
         <TextView
             android:id="@+id/end_date"
             android:layout_margin="@dimen/shortcut_date_margin"
@@ -90,7 +122,6 @@
             android:textSize="@dimen/shortcut_date_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <!-- Time -->
         <TextView
             android:id="@+id/end_time"
             android:layout_margin="@dimen/shortcut_date_margin"
