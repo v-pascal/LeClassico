@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
+              android:theme="@style/ShortcutMainTheme"
               android:orientation="horizontal"
               android:focusableInTouchMode="true"
               android:layout_width="match_parent"
@@ -84,16 +85,20 @@
         <EditText
             android:id="@+id/edit_search"
             android:hint="@string/pseudo"
+            android:textColorHint="@color/colorPublication"
+            android:textColor="@android:color/white"
             android:inputType="text"
+            android:visibility="invisible"
             android:layout_margin="@dimen/shortcut_border_margin"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"/>
-        <ImageView
+        <ImageButton
             android:id="@+id/button_search"
             android:src="@drawable/ic_search_white_36dp"
-            android:focusable="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:padding="@dimen/shortcut_border_margin"
+            android:onClick="onSearch"
             android:layout_width="@dimen/shortcut_content_height"
             android:layout_height="@dimen/shortcut_content_height"/>
 

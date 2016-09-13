@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,7 +23,7 @@ import com.studio.artaban.leclassico.tools.Tools;
  * Created by pascal on 03/09/16.
  * Main activity shortcut fragment class
  */
-public class ShortcutFragment extends Fragment {
+public class ShortcutFragment extends Fragment implements View.OnClickListener {
 
     public void setMessage(SpannableStringBuilder message) {
         Logs.add(Logs.Type.V, "message: " + message);
@@ -34,12 +37,45 @@ public class ShortcutFragment extends Fragment {
     }
     public void setIcon(boolean female, String profile) {
         Logs.add(Logs.Type.V, "female: " + female + ";profile: " + profile);
-        Tools.setProfile(getActivity(), (ImageView)mRootView.findViewById(R.id.image_icon), female, profile);
+        Tools.setProfile(getActivity(), (ImageView) mRootView.findViewById(R.id.image_icon), female, profile);
     }
 
     private View mRootView; // Fragment root view
+    private boolean mSearching; // Search flag (search edit box display)
 
-    //////
+    ////// OnClickListener /////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onClick(View sender) { // Search clicked (display or hide search edit box)
+
+        Logs.add(Logs.Type.V, "sender: " + sender);
+        View search = mRootView.findViewById(R.id.edit_search);
+        InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if ((sender.getId() == R.id.button_search) && (mSearching)) {
+            mSearching = false;
+
+            ((ImageView)mRootView.findViewById(R.id.button_search))
+                    .setImageDrawable(getResources().getDrawable(R.drawable.ic_search_white_36dp));
+
+            imm.hideSoftInputFromWindow(search.getWindowToken(), 0); // Hide keyboard (if displayed)
+            ((EditText) search).setText(null);
+            search.clearFocus();
+            search.setVisibility(View.INVISIBLE);
+
+        } else {
+            mSearching = true;
+
+            ((ImageView)mRootView.findViewById(R.id.button_search))
+                    .setImageDrawable(getResources().getDrawable(R.drawable.ic_close_white_36dp));
+            search.setVisibility(View.VISIBLE);
+            search.requestFocus();
+
+            // Force displaying keyboard
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        }
+    }
+
+    ////// ShortcutFragment ////////////////////////////////////////////////////////////////////////
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -81,6 +117,8 @@ public class ShortcutFragment extends Fragment {
                 ((LinearLayout.LayoutParams)mRootView.findViewById(R.id.layout_data).getLayoutParams()).weight = 1;
                 ((LinearLayout.LayoutParams)search.getLayoutParams()).width = 0;
                 search.setVisibility(View.VISIBLE);
+                mRootView.findViewById(R.id.button_search).setOnClickListener(this);
+                mRootView.findViewById(R.id.layout_search).setOnClickListener(this);
                 break;
             }
             case R.id.shortcut_notifications: { ////// Notifications

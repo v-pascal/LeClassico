@@ -20,11 +20,6 @@
             android:layout_height="2dp"/>
         <TextView
             android:id="@+id/text_date"
-
-
-            android:text="Today"
-
-
             android:textColor="@color/colorPublicationDark"
             android:textSize="@dimen/notify_tiny_text_size"
             android:layout_marginStart="@dimen/notify_tiny_text_margin"
@@ -43,11 +38,6 @@
     <ImageView
         android:id="@+id/image_pseudo"
         android:layout_below="@id/date_separator"
-
-
-        android:src="@mipmap/ic_launcher"
-
-
         android:layout_alignBottom="@dimen/notify_item_bottom"
         android:layout_width="@dimen/notify_item_height"
         android:layout_height="@dimen/notify_item_height"/>
@@ -55,11 +45,6 @@
     <!-- Message -->
     <TextView
         android:id="@+id/text_message"
-
-
-        android:text="Bob a publié sur votre journal de votre profil"
-
-
         android:layout_marginStart="@dimen/notify_text_margin"
         android:layout_marginEnd="@dimen/notify_item_height"
         android:layout_toEndOf="@id/image_pseudo"
@@ -77,11 +62,6 @@
         android:id="@+id/image_type"
         android:layout_toEndOf="@id/image_pseudo"
         android:layout_below="@id/text_message"
-
-
-        android:src="@mipmap/ic_launcher"
-
-
         android:layout_marginStart="@dimen/notify_text_margin"
         android:layout_width="@dimen/notify_info_height"
         android:layout_height="@dimen/notify_info_height"/>
@@ -89,12 +69,6 @@
     <!-- Info -->
     <TextView
         android:id="@+id/text_info"
-
-
-
-        android:text="Voilà le truc dont je te parlais hier soir juste avant minuit passé de quelques minutes!"
-
-
         android:layout_marginStart="@dimen/notify_tiny_text_margin"
         android:layout_marginEnd="@dimen/notify_item_height"
         android:layout_toEndOf="@id/image_type"
@@ -108,11 +82,6 @@
 
     <!-- Time -->
     <TextView
-
-
-        android:text="00:00"
-
-
         android:layout_alignParentEnd="true"
         android:layout_below="@id/date_separator"
         android:id="@+id/text_time"

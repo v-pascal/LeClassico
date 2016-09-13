@@ -27,6 +27,7 @@ public class Queries {
     public static final int MAIN_NOTIFICATION_FLAG = MAX_TABLE_ID;
     public static final int MAIN_NOTIFICATION_COUNT = MAX_TABLE_ID + 1;
     public static final int MAIN_LAST_FOLLOWED = MAX_TABLE_ID + 2;
+    public static final int MAIN_NOTIFICATIONS = MAX_TABLE_ID + 3;
 
     //////
     public static String getTableUri(int id) {
@@ -39,6 +40,7 @@ public class Queries {
             // Main
             case MAIN_NOTIFICATION_FLAG:
             case MAIN_NOTIFICATION_COUNT:
+            case MAIN_NOTIFICATIONS:
                 return NotificationsTable.TABLE_NAME;
 
             ////// SQL query ID ////////////////////////////////////////////////////////////////////
