@@ -26,7 +26,7 @@
     <dimen name="shortcut_text_margin">8dp</dimen>
     <dimen name="shortcut_text_size">16sp</dimen>
     <dimen name="shortcut_info_size">13sp</dimen>
-    <dimen name="shortcut_date_margin">4dp</dimen>
+    <dimen name="shortcut_border_margin">4dp</dimen>
     <dimen name="shortcut_date_size">11sp</dimen>
     <dimen name="shortcut_data_radius">7dp</dimen>
 
