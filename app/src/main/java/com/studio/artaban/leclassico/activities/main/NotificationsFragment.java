@@ -13,11 +13,11 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
-import com.studio.artaban.leclassico.data.tables.AlbumsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
+import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 
@@ -54,7 +54,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         @Override
         public int getItemCount() {
-            return 0;
+            return mNotifyData.getCount();
         }
 
         //////
@@ -99,9 +99,20 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     private QueryLoader mNotifyLoader; // User notification query loader
 
     // Query column indexes
-    private static final int COLUMN_INDEX_PSEUDO = 0;
-    private static final int COLUMN_INDEX_SEX = 1;
-    private static final int COLUMN_INDEX_PROFILE = 2;
+    private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
+    private static final int COLUMN_INDEX_OBJECT_ID = 1;
+    private static final int COLUMN_INDEX_OBJECT_DATE = 2;
+    private static final int COLUMN_INDEX_OBJECT_FROM = 3;
+    private static final int COLUMN_INDEX_DATE = 4;
+    private static final int COLUMN_INDEX_PSEUDO = 5;
+    private static final int COLUMN_INDEX_SEX = 6;
+    private static final int COLUMN_INDEX_PROFILE = 7;
+    private static final int COLUMN_INDEX_ALBUM = 8;
+    private static final int COLUMN_INDEX_PUB_TEXT = 9;
+    private static final int COLUMN_INDEX_MSG_TEXT = 10;
+    private static final int COLUMN_INDEX_MSG_DATE = 11;
+    private static final int COLUMN_INDEX_MSG_TIME = 12;
+    private static final int COLUMN_INDEX_COM_TEXT = 13;
 
     ////// MainFragment ////////////////////////////////////////////////////////////////////////////
     @Override
@@ -122,50 +133,47 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         // Load notification data (using query loader)
         Bundle queryData = new Bundle();
-
-
-
-
-
-
-
-        /*
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")," +
+                "SELECT " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + "," + // COLUMN_INDEX_OBJECT_TYPE
+                        NotificationsTable.COLUMN_OBJECT_ID + "," + // COLUMN_INDEX_OBJECT_ID
+                        NotificationsTable.COLUMN_OBJECT_DATE + "," + // COLUMN_INDEX_OBJECT_DATE
+                        NotificationsTable.COLUMN_OBJECT_FROM + "," + // COLUMN_INDEX_OBJECT_FROM
+                        NotificationsTable.COLUMN_DATE + "," + // COLUMN_INDEX_DATE
                         CamaradesTable.COLUMN_PSEUDO + "," + // COLUMN_INDEX_PSEUDO
                         CamaradesTable.COLUMN_SEXE + "," + // COLUMN_INDEX_SEX
-                        CamaradesTable.COLUMN_PROFILE + // COLUMN_INDEX_PROFILE
-                        " FROM " + AbonnementsTable.TABLE_NAME +
-                        " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
-                        AbonnementsTable.COLUMN_CAMARADE + "=" + CamaradesTable.COLUMN_PSEUDO +
-                        " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" +
-                        getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) + "'");
-                        */
-
-        queryData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT " + CamaradesTable.COLUMN_PSEUDO + "," + // COLUMN_INDEX_PSEUDO
-                        CamaradesTable.COLUMN_SEXE + "," + // COLUMN_INDEX_SEX
                         CamaradesTable.COLUMN_PROFILE + "," + // COLUMN_INDEX_PROFILE
-                        AlbumsTable.COLUMN_NOM + "," +
-                        ActualitesTable.COLUMN_TEXT + "," +
-                        MessagerieTable.COLUMN_MESSAGE + "," +
-                        CommentairesTable.COLUMN_TEXT +
+                        PhotosTable.COLUMN_ALBUM + "," + // COLUMN_INDEX_ALBUM
+                        ActualitesTable.COLUMN_TEXT + "," + // COLUMN_INDEX_PUB_TEXT
+                        MessagerieTable.COLUMN_MESSAGE + "," + // COLUMN_INDEX_MSG_TEXT
+                        MessagerieTable.COLUMN_DATE + "," + // COLUMN_INDEX_MSG_DATE
+                        MessagerieTable.COLUMN_TIME + "," + // COLUMN_INDEX_MSG_TIME
+                        CommentairesTable.COLUMN_TEXT + // COLUMN_INDEX_COM_TEXT
+
                         " FROM " + NotificationsTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
                         NotificationsTable.COLUMN_OBJECT_FROM + "=" + CamaradesTable.COLUMN_PSEUDO +
-                        " LEFT JOIN " + AlbumsTable.TABLE_NAME + " ON " +
-
-
+                        " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_ID + "=" + PhotosTable.COLUMN_FICHIER_ID + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_SHARED + "' AND " +
+                        NotificationsTable.COLUMN_OBJECT_DATE + " IS NULL" +
+                        " LEFT JOIN " + ActualitesTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_ID + "=" + ActualitesTable.COLUMN_ACTU_ID + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_WALL + "'" +
+                        " LEFT JOIN " + MessagerieTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_DATE + "=" +
+                        MessagerieTable.COLUMN_DATE + "||' '||" + MessagerieTable.COLUMN_TIME + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_MAIL + "' AND " +
+                        NotificationsTable.COLUMN_OBJECT_ID + " IS NULL" +
+                        " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_ID + "=" + CommentairesTable.COLUMN_OBJ_ID + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + "=" + CommentairesTable.COLUMN_OBJ_TYPE + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_DATE + "=" + CommentairesTable.COLUMN_DATE + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_FROM + "=" + CommentairesTable.COLUMN_PSEUDO +
                         " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" +
                         getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) +
-                        "' LIMIT 50");
-
-
-
-
-
-
-
+                        "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
+                        " LIMIT " + Constants.MAIN_QUERY_LIMIT_NOTIFICATIONS);
         mNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
 
         // Set shortcut data (default)

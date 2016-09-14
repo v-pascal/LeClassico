@@ -29,6 +29,13 @@ import java.util.List;
  */
 public class NotificationsTable extends DataTable {
 
+    public static final char TYPE_SHARED = 'S'; // Photo added into the user shared album
+    public static final char TYPE_WALL = 'W'; // Publication added onto the user wall
+    public static final char TYPE_MAIL = 'M'; // Mail received
+    public static final char TYPE_PUB_COMMENT = 'A'; // User publication commented
+    public static final char TYPE_PIC_COMMENT = 'P'; // User photo commented
+    // Notification types
+
     public static class Pin extends DataField { //////////////////////////////// Notifications entry
 
         public Pin(short count, long id) { super(count, id); }
@@ -82,21 +89,15 @@ public class NotificationsTable extends DataTable {
                                     JSONObject entry = (JSONObject) entries.get(i);
                                     String pseudo = entry.getString(JSON_KEY_PSEUDO);
                                     String date = entry.getString(JSON_KEY_DATE);
-                                    String objType = null;
-                                    if (!entry.isNull(JSON_KEY_OBJECT_TYPE))
-                                        objType = DatabaseUtils
-                                                .sqlEscapeString(entry.getString(JSON_KEY_OBJECT_TYPE));
+                                    String objType = DatabaseUtils.sqlEscapeString(entry.getString(JSON_KEY_OBJECT_TYPE));
                                     int objID = Constants.NO_DATA;
                                     if (!entry.isNull(JSON_KEY_OBJECT_ID))
                                         objID = entry.getInt(JSON_KEY_OBJECT_ID);
-                                    String objFrom = null;
-                                    if (!entry.isNull(JSON_KEY_OBJECT_FROM))
-                                        objFrom = DatabaseUtils
-                                                .sqlEscapeString(entry.getString(JSON_KEY_OBJECT_FROM));
                                     String objDate = null;
                                     if (!entry.isNull(JSON_KEY_OBJECT_DATE))
                                         objDate = DatabaseUtils
                                                 .sqlEscapeString(entry.getString(JSON_KEY_OBJECT_DATE));
+                                    String objFrom = DatabaseUtils.sqlEscapeString(entry.getString(JSON_KEY_OBJECT_FROM));
 
                                     // Entry fields
                                     ContentValues values = new ContentValues();
@@ -234,10 +235,10 @@ public class NotificationsTable extends DataTable {
 
                 COLUMN_PSEUDO + " TEXT NOT NULL," +
                 COLUMN_DATE + " TEXT NOT NULL," +
-                COLUMN_OBJECT_TYPE + " TEXT," +
+                COLUMN_OBJECT_TYPE + " TEXT NOT NULL," +
                 COLUMN_OBJECT_ID + " INTEGER," +
                 COLUMN_OBJECT_DATE + " TEXT," +
-                COLUMN_OBJECT_FROM + " TEXT," +
+                COLUMN_OBJECT_FROM + " TEXT NOT NULL," +
                 COLUMN_LU_FLAG + " INTEGER NOT NULL," +
                 COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 

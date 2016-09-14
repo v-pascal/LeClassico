@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.tools;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.support.annotation.DrawableRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.TypedValue;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
@@ -51,5 +53,20 @@ public final class Tools {
                             });
         else
             view.setImageDrawable(activity.getDrawable((female) ? R.drawable.woman : R.drawable.man));
+    }
+
+    public static @DrawableRes int getNotifyIcon(char type) {
+
+        Logs.add(Logs.Type.V, "type: " + type);
+        switch (type) {
+            case NotificationsTable.TYPE_SHARED: return R.drawable.ic_add_a_photo_black_18dp;
+            case NotificationsTable.TYPE_WALL: return R.drawable.ic_publish_black_18dp;
+            case NotificationsTable.TYPE_MAIL: return R.drawable.ic_mail_black_18dp;
+            case NotificationsTable.TYPE_PUB_COMMENT:
+            case NotificationsTable.TYPE_PIC_COMMENT:
+                return R.drawable.ic_message_black_18dp;
+            default:
+                throw new IllegalArgumentException("Unexpected notification type: " + type);
+        }
     }
 }

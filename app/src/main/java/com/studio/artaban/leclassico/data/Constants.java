@@ -69,6 +69,8 @@ public final class Constants {
 
 
     ////// Main
+    public static final short MAIN_QUERY_LIMIT_NOTIFICATIONS = 50; // Max notification count to display at start
+
     public static final int MAIN_SECTION_HOME = 0;
     public static final int MAIN_SECTION_PUBLICATIONS = 1;
     public static final int MAIN_SECTION_EVENTS = 2;
