@@ -43,53 +43,60 @@
         android:layout_width="@dimen/notify_item_height"
         android:layout_height="@dimen/notify_item_height"/>
 
-    <!-- Message -->
-    <TextView
-        android:id="@+id/text_message"
-        android:layout_marginStart="@dimen/notify_text_margin"
-        android:layout_marginEnd="@dimen/notify_item_height"
+    <RelativeLayout
+        android:id="@+id/layout_data"
         android:layout_toEndOf="@id/image_pseudo"
         android:layout_below="@id/date_separator"
-        android:textColor="@android:color/black"
-        android:textSize="@dimen/notify_text_size"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:gravity="top"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/notify_message_height"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <!-- Type icon -->
-    <ImageView
-        android:id="@+id/image_type"
-        android:layout_toEndOf="@id/image_pseudo"
-        android:layout_below="@id/text_message"
-        android:layout_marginStart="@dimen/notify_text_margin"
-        android:layout_width="@dimen/notify_info_height"
-        android:layout_height="@dimen/notify_info_height"/>
+        <!-- Message -->
+        <TextView
+            android:id="@+id/text_message"
+            android:layout_marginStart="@dimen/notify_text_margin"
+            android:layout_marginEnd="@dimen/notify_item_height"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/notify_text_size"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/notify_message_height"/>
 
-    <!-- Info -->
-    <TextView
-        android:id="@+id/text_info"
-        android:layout_marginStart="@dimen/notify_tiny_text_margin"
-        android:layout_marginEnd="@dimen/notify_item_height"
-        android:layout_toEndOf="@id/image_type"
-        android:layout_below="@id/text_message"
-        android:textSize="@dimen/notify_tiny_text_size"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="18dp"/>
+        <!-- Type icon -->
+        <ImageView
+            android:id="@+id/image_type"
+            android:layout_below="@id/text_message"
+            android:scaleType="center"
+            android:layout_marginStart="@dimen/notify_text_margin"
+            android:layout_width="@dimen/notify_info_height"
+            android:layout_height="@dimen/notify_info_height"/>
 
-    <!-- Time -->
-    <TextView
-        android:id="@+id/text_time"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/date_separator"
-        android:fontFamily="monospace"
-        android:textSize="@dimen/notify_time_size"
-        android:gravity="center|end"
-        android:layout_width="@dimen/notify_item_height"
-        android:layout_height="@dimen/notify_item_height"/>
+        <!-- Info -->
+        <TextView
+            android:id="@+id/text_info"
+            android:layout_marginStart="@dimen/notify_tiny_text_margin"
+            android:layout_marginEnd="@dimen/notify_item_height"
+            android:layout_toEndOf="@id/image_type"
+            android:layout_below="@id/text_message"
+            android:textSize="@dimen/notify_tiny_text_size"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"/>
+
+        <!-- Time -->
+        <TextView
+            android:id="@+id/text_time"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/notify_tiny_time_margin"
+            android:fontFamily="monospace"
+            android:textSize="@dimen/notify_time_size"
+            android:gravity="center|end"
+            android:layout_width="@dimen/notify_item_height"
+            android:layout_height="@dimen/notify_item_height"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

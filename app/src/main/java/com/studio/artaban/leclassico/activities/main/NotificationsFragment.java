@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
@@ -90,7 +91,11 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 }
             }
 
-            // Set pseudo icon
+            // Set unread notification display (if the case)
+            if (mNotifyData.getInt(COLUMN_INDEX_LU_FLAG) == 0)
+                holder.mNotifyData.setBackground(getResources().getDrawable(R.drawable.selected_background));
+
+            // Set from pseudo icon
             boolean female = (!mNotifyData.isNull(COLUMN_INDEX_SEX)) &&
                     (mNotifyData.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
             String profile = (!mNotifyData.isNull(COLUMN_INDEX_PROFILE))?
@@ -180,6 +185,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             public final LinearLayout mDateSeparator; // Date separator view
             public final TextView mTextDate; // Notification date text view
             public final ImageView mImagePseudo; // Pseudo profile image view
+            public final RelativeLayout mNotifyData; // Notification data layout view
             public final TextView mNotifyMessage; // Notification message text view
             public final TextView mNotifyInfo; // Notification info text view
             public final ImageView mNotifyType; // Notification type image view
@@ -193,6 +199,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 mDateSeparator = (LinearLayout)view.findViewById(R.id.date_separator);
                 mTextDate = (TextView)view.findViewById(R.id.text_date);
                 mImagePseudo = (ImageView)view.findViewById(R.id.image_pseudo);
+                mNotifyData = (RelativeLayout)view.findViewById(R.id.layout_data);
                 mNotifyMessage = (TextView)view.findViewById(R.id.text_message);
                 mNotifyInfo = (TextView)view.findViewById(R.id.text_info);
                 mNotifyType = (ImageView)view.findViewById(R.id.image_type);
