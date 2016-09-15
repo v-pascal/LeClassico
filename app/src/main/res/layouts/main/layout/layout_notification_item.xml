@@ -39,6 +39,7 @@
     <ImageView
         android:id="@+id/image_pseudo"
         android:layout_below="@id/date_separator"
+        android:layout_marginStart="@dimen/notify_item_horizontal_margin"
         android:layout_alignBottom="@dimen/notify_item_bottom"
         android:layout_width="@dimen/notify_item_height"
         android:layout_height="@dimen/notify_item_height"/>
@@ -47,6 +48,7 @@
         android:id="@+id/layout_data"
         android:layout_toEndOf="@id/image_pseudo"
         android:layout_below="@id/date_separator"
+        android:layout_marginEnd="@dimen/notify_item_horizontal_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -68,6 +70,7 @@
             android:id="@+id/image_type"
             android:layout_below="@id/text_message"
             android:scaleType="center"
+            android:tint="@android:color/black"
             android:layout_marginStart="@dimen/notify_text_margin"
             android:layout_width="@dimen/notify_info_height"
             android:layout_height="@dimen/notify_info_height"/>
@@ -90,7 +93,7 @@
         <TextView
             android:id="@+id/text_time"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="@dimen/notify_tiny_time_margin"
+            android:layout_marginEnd="@dimen/notify_text_margin"
             android:fontFamily="monospace"
             android:textSize="@dimen/notify_time_size"
             android:gravity="center|end"
@@ -98,5 +101,4 @@
             android:layout_height="@dimen/notify_item_height"/>
 
     </RelativeLayout>
-
 </RelativeLayout>

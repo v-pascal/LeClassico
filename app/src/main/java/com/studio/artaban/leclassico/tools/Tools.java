@@ -61,12 +61,12 @@ public final class Tools {
 
         Logs.add(Logs.Type.V, "type: " + type);
         switch (type) {
-            case NotificationsTable.TYPE_SHARED: return R.drawable.ic_add_a_photo_black_18dp;
-            case NotificationsTable.TYPE_WALL: return R.drawable.ic_publish_black_18dp;
-            case NotificationsTable.TYPE_MAIL: return R.drawable.ic_mail_black_18dp;
+            case NotificationsTable.TYPE_SHARED: return R.drawable.ic_add_a_photo_white_18dp;
+            case NotificationsTable.TYPE_WALL: return R.drawable.ic_publish_white_18dp;
+            case NotificationsTable.TYPE_MAIL: return R.drawable.ic_mail_white_18dp;
             case NotificationsTable.TYPE_PUB_COMMENT:
             case NotificationsTable.TYPE_PIC_COMMENT:
-                return R.drawable.ic_message_black_18dp;
+                return R.drawable.ic_message_white_18dp;
 
             default:
                 throw new IllegalArgumentException("Unexpected notification type: " + type);

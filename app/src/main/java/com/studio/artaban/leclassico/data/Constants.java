@@ -65,6 +65,9 @@ public final class Constants {
     public static final String DATA_DELETE_SELECTION = DATA_COLUMN_SYNCHRONIZED + "=" + DataProvider.Synchronized.TO_DELETE;
     // Selection criteria to delete records from DB definitively
 
+    public static final int DATA_UNREAD = 0;
+    public static final int DATA_READ = 1;
+    // Read flags
 
     ////// Main
     public static final int MAIN_SECTION_HOME = 0;

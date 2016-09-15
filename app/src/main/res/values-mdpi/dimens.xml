@@ -36,8 +36,9 @@
 
 
 
+
+
     <dimen name="notify_tiny_text_margin">6dp</dimen>
-    <dimen name="notify_tiny_time_margin">4dp</dimen>
     <dimen name="notify_tiny_text_size">14sp</dimen>
     <dimen name="notify_text_margin">8dp</dimen>
     <dimen name="notify_text_size">18sp</dimen>
@@ -47,6 +48,8 @@
     <dimen name="notify_message_height">28dp</dimen><!-- = notify_item_height - notify_info_height -->
     <dimen name="notify_info_height">24dp</dimen><!-- = notify_item_height - notify_message_height -->
     <dimen name="notify_time_size">16sp</dimen>
+
+
 
 
 

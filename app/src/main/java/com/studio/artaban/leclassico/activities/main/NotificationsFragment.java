@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.activities.main;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -92,8 +93,17 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             }
 
             // Set unread notification display (if the case)
-            if (mNotifyData.getInt(COLUMN_INDEX_LU_FLAG) == 0)
+            int pseudoColor = R.color.colorPrimaryProfile;
+            if (mNotifyData.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
+
                 holder.mNotifyData.setBackground(getResources().getDrawable(R.drawable.selected_background));
+                holder.mNotifyType.setImageTintList(null);
+                holder.mNotifyType.setColorFilter(Color.RED);
+                holder.mNotifyMessage.setTypeface(Typeface.DEFAULT_BOLD);
+                holder.mTextTime.setTypeface(Typeface.DEFAULT_BOLD);
+                holder.mTextTime.setTextColor(Color.RED);
+                pseudoColor = R.color.red;
+            }
 
             // Set from pseudo icon
             boolean female = (!mNotifyData.isNull(COLUMN_INDEX_SEX)) &&
@@ -113,14 +123,13 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                     message = new SpannableStringBuilder(getString(R.string.notify_shared_message, pseudo));
                     int pseudoPos = getResources().getInteger(R.integer.notify_shared_message_pseudo_pos);
-                    message.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
+                    message.setSpan(new ForegroundColorSpan(getResources().getColor(pseudoColor)),
                             pseudoPos, pseudoPos + pseudo.length(), 0);
 
                     String album = mNotifyData.getString(COLUMN_INDEX_ALBUM);
                     info = new SpannableStringBuilder(getString(R.string.notify_shared_info, album));
                     int albumPos = getResources().getInteger(R.integer.notify_shared_info_album_pos);
                     info.setSpan(new ForegroundColorSpan(Color.BLUE), albumPos, albumPos + album.length(), 0);
-
                     break;
                 }
                 case NotificationsTable.TYPE_WALL: { ////// Wall publication
@@ -129,26 +138,24 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                             getResources().getStringArray(R.array.notify_wall_types)[Tools.getNotifyWallType(mNotifyData,
                                     COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER)]));
                     int pseudoPos = getResources().getInteger(R.integer.notify_wall_message_pseudo_pos);
-                    message.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
+                    message.setSpan(new ForegroundColorSpan(getResources().getColor(pseudoColor)),
                             pseudoPos, pseudoPos + pseudo.length(), 0);
 
                     info = new SpannableStringBuilder(
                             (!mNotifyData.isNull(COLUMN_INDEX_PUB_TEXT))?
                                     mNotifyData.getString(COLUMN_INDEX_PUB_TEXT).replaceAll("\\s{2,}", " "):
                                     getString(R.string.notify_no_info));
-
                     break;
                 }
                 case NotificationsTable.TYPE_MAIL: { ////// Mail received
 
                     message = new SpannableStringBuilder(getString(R.string.notify_mail_message, pseudo));
                     int pseudoPos = getResources().getInteger(R.integer.notify_mail_pseudo_pos);
-                    message.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
+                    message.setSpan(new ForegroundColorSpan(getResources().getColor(pseudoColor)),
                             pseudoPos, pseudoPos + pseudo.length(), 0);
 
                     info = (SpannableStringBuilder)Html.fromHtml(mNotifyData.getString(COLUMN_INDEX_MSG_TEXT)
                             .replaceAll("\\s{2,}", " "));
-
                     break;
                 }
                 case NotificationsTable.TYPE_PUB_COMMENT:
@@ -158,11 +165,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     message = new SpannableStringBuilder(getString(R.string.notify_comment_message, pseudo,
                             getResources().getStringArray(R.array.notify_comment_types)[typeIdx]));
                     int pseudoPos = getResources().getInteger(R.integer.notify_comment_pseudo_pos);
-                    message.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
+                    message.setSpan(new ForegroundColorSpan(getResources().getColor(pseudoColor)),
                             pseudoPos, pseudoPos + pseudo.length(), 0);
 
                     info = new SpannableStringBuilder(mNotifyData.getString(COLUMN_INDEX_COM_TEXT));
-
                     break;
                 }
             }
