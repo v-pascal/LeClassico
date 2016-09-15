@@ -7,8 +7,6 @@ package com.studio.artaban.leclassico.data;
 public final class Constants {
 
     public static final int NO_DATA = -1; // No value (integer)
-    public static final String DATABASE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.000"; // SQLite date format
-
 
     ////// Application
     public static final String APP_NAME = "LeClassico"; // Application name
@@ -69,8 +67,6 @@ public final class Constants {
 
 
     ////// Main
-    public static final short MAIN_QUERY_LIMIT_NOTIFICATIONS = 50; // Max notification count to display at start
-
     public static final int MAIN_SECTION_HOME = 0;
     public static final int MAIN_SECTION_PUBLICATIONS = 1;
     public static final int MAIN_SECTION_EVENTS = 2;

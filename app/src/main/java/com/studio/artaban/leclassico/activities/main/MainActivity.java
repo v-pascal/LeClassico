@@ -75,8 +75,7 @@ public class MainActivity extends AppCompatActivity implements
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
     @Override
     public void onSetMessage(final int section, final SpannableStringBuilder message) {
-
-        Logs.add(Logs.Type.V, "section: " + section + ";message: " + message);
+        //Logs.add(Logs.Type.V, "section: " + section + ";message: " + message);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -88,8 +87,7 @@ public class MainActivity extends AppCompatActivity implements
     }
     @Override
     public void onSetInfo(final int section, final SpannableStringBuilder info) {
-
-        Logs.add(Logs.Type.V, "section: " + section + ";info: " + info);
+        //Logs.add(Logs.Type.V, "section: " + section + ";info: " + info);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -101,8 +99,7 @@ public class MainActivity extends AppCompatActivity implements
     }
     @Override
     public void onSetIcon(final int section, final boolean female, final String profile) {
-
-        Logs.add(Logs.Type.V, "section: " + section + ";female: " + female + ";profile: " + profile);
+        //Logs.add(Logs.Type.V, "section: " + section + ";female: " + female + ";profile: " + profile);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

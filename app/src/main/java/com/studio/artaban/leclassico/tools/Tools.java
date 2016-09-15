@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.tools;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -56,6 +57,7 @@ public final class Tools {
     }
 
     public static @DrawableRes int getNotifyIcon(char type) {
+    // Return the drawable ID of the notification icon type passed as parameter
 
         Logs.add(Logs.Type.V, "type: " + type);
         switch (type) {
@@ -65,8 +67,26 @@ public final class Tools {
             case NotificationsTable.TYPE_PUB_COMMENT:
             case NotificationsTable.TYPE_PIC_COMMENT:
                 return R.drawable.ic_message_black_18dp;
+
             default:
                 throw new IllegalArgumentException("Unexpected notification type: " + type);
         }
+    }
+
+    private static final short NOTIFY_WALL_TYPE_TEXT = 0;
+    private static final short NOTIFY_WALL_TYPE_LINK = 1;
+    private static final short NOTIFY_WALL_TYPE_IMAGE = 2;
+
+    public static short getNotifyWallType(Cursor cursor, int linkIndex, int imageIndex) {
+    // Return the wall type resource string ID according notification link & image fields
+
+        Logs.add(Logs.Type.V, "cursor: " + cursor + ";linkIndex: " + linkIndex + ";imageIndex: " + imageIndex);
+        if (!cursor.isNull(linkIndex))
+            return NOTIFY_WALL_TYPE_LINK;
+
+        if (!cursor.isNull(imageIndex))
+            return NOTIFY_WALL_TYPE_IMAGE;
+
+        return NOTIFY_WALL_TYPE_TEXT;
     }
 }

@@ -17,9 +17,13 @@ import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
  * Created by pascal on 07/09/16.
- * Query IDs
+ * Query ID & limit
  */
 public class Queries {
+
+    public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss"; // Query date & time format
+
+    ////// ID //////////////////////////////////////////////////////////////////////////////////////
 
     private static final int MAX_TABLE_ID = 255;
 
@@ -40,12 +44,12 @@ public class Queries {
             // Main
             case MAIN_NOTIFICATION_FLAG:
             case MAIN_NOTIFICATION_COUNT:
-            case MAIN_NOTIFICATIONS:
                 return NotificationsTable.TABLE_NAME;
 
             ////// SQL query ID ////////////////////////////////////////////////////////////////////
 
             // Main
+            case MAIN_NOTIFICATIONS:
             case MAIN_LAST_FOLLOWED:
 
                 return DataTable.SQL_QUERY_URI; // SQL query (complex queries)
@@ -68,4 +72,9 @@ public class Queries {
                 throw new IllegalArgumentException("Unexpected loader ID");
         }
     }
+
+    ////// Limit ///////////////////////////////////////////////////////////////////////////////////
+
+    public static final short LIMIT_NOTIFICATIONS = 50; // Max notification count to display at start
+
 }

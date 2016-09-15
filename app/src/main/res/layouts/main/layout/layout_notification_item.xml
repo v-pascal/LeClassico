@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
     <!-- Date separator -->
     <LinearLayout
         android:id="@+id/date_separator"
+        android:visibility="gone"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginTop="@dimen/notify_item_margin"
@@ -34,7 +35,7 @@
 
     </LinearLayout>
 
-    <!-- Pseudo icon -->
+    <!-- From pseudo icon -->
     <ImageView
         android:id="@+id/image_pseudo"
         android:layout_below="@id/date_separator"
@@ -53,7 +54,7 @@
         android:textSize="@dimen/notify_text_size"
         android:singleLine="true"
         android:ellipsize="end"
-        android:gravity="center_vertical"
+        android:gravity="top"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/notify_message_height"/>
 
@@ -82,11 +83,11 @@
 
     <!-- Time -->
     <TextView
+        android:id="@+id/text_time"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/date_separator"
-        android:id="@+id/text_time"
         android:fontFamily="monospace"
-        android:textSize="@dimen/notify_text_size"
+        android:textSize="@dimen/notify_time_size"
         android:gravity="center|end"
         android:layout_width="@dimen/notify_item_height"
         android:layout_height="@dimen/notify_item_height"/>

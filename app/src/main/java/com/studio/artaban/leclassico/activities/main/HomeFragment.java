@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
@@ -35,17 +34,16 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
     private void setShortcutInfo() { // Set shortcut text info with colors (new mail & notification)
 
         Logs.add(Logs.Type.V, null);
-        SpannableStringBuilder infoBuilder = new SpannableStringBuilder();
-        SpannableString info = new SpannableString(getString(R.string.home_info, mNewMail, mNewNotification));
+        SpannableStringBuilder infoBuilder =
+                new SpannableStringBuilder(getString(R.string.home_info, mNewMail, mNewNotification));
 
-        String mails = String.valueOf(mNewMail);
-        String notifications = String.valueOf(mNewNotification);
-        int messagesPos = info.toString().indexOf(mails);
-        int notifyPos = info.toString().lastIndexOf(notifications);
+        int mailsLen = String.valueOf(mNewMail).length();
+        int mailPos = getResources().getInteger(R.integer.home_info_mail_pos);
+        int notifyPos = getResources().getInteger(R.integer.home_info_notify_pos) + mailsLen;
 
-        infoBuilder.append(info);
-        infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), messagesPos, messagesPos + mails.length(), 0);
-        infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), notifyPos, notifyPos + notifications.length(), 0);
+        infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), mailPos, mailPos + mailsLen, 0);
+        infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), notifyPos, notifyPos +
+                String.valueOf(mNewNotification).length(), 0);
         mListener.onSetInfo(Constants.MAIN_SECTION_HOME, infoBuilder);
     }
 
@@ -96,10 +94,9 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
 
         // Set shortcut data
         String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO);
-        SpannableStringBuilder msgBuilder = new SpannableStringBuilder();
-        SpannableString msg = new SpannableString(getString(R.string.home_connected, pseudo));
-        int pseudoPos = msg.toString().indexOf(pseudo);
-        msgBuilder.append(msg);
+        int pseudoPos = getResources().getInteger(R.integer.home_connected_pseudo_pos);
+        SpannableStringBuilder msgBuilder =
+                new SpannableStringBuilder(getString(R.string.home_connected, pseudo));
         msgBuilder.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
                 pseudoPos, pseudoPos + pseudo.length(), 0);
 

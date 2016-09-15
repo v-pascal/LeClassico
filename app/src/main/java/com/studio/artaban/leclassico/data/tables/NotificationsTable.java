@@ -89,15 +89,14 @@ public class NotificationsTable extends DataTable {
                                     JSONObject entry = (JSONObject) entries.get(i);
                                     String pseudo = entry.getString(JSON_KEY_PSEUDO);
                                     String date = entry.getString(JSON_KEY_DATE);
-                                    String objType = DatabaseUtils.sqlEscapeString(entry.getString(JSON_KEY_OBJECT_TYPE));
+                                    String objType = entry.getString(JSON_KEY_OBJECT_TYPE);
                                     int objID = Constants.NO_DATA;
                                     if (!entry.isNull(JSON_KEY_OBJECT_ID))
                                         objID = entry.getInt(JSON_KEY_OBJECT_ID);
                                     String objDate = null;
                                     if (!entry.isNull(JSON_KEY_OBJECT_DATE))
-                                        objDate = DatabaseUtils
-                                                .sqlEscapeString(entry.getString(JSON_KEY_OBJECT_DATE));
-                                    String objFrom = DatabaseUtils.sqlEscapeString(entry.getString(JSON_KEY_OBJECT_FROM));
+                                        objDate = entry.getString(JSON_KEY_OBJECT_DATE);
+                                    String objFrom = entry.getString(JSON_KEY_OBJECT_FROM);
 
                                     // Entry fields
                                     ContentValues values = new ContentValues();
@@ -107,13 +106,13 @@ public class NotificationsTable extends DataTable {
                                             DataProvider.Synchronized.DONE.getValue());
 
                                     // Check if entry already exists
-                                    String selection = COLUMN_PSEUDO + "='" + pseudo +
-                                            "' AND " + COLUMN_DATE + "='" + date +
-                                            "' AND " + COLUMN_OBJECT_TYPE + "=" + objType +
+                                    String selection = COLUMN_PSEUDO + "=" + DatabaseUtils.sqlEscapeString(pseudo) +
+                                            " AND " + COLUMN_DATE + "='" + date + "'" +
+                                            " AND " + COLUMN_OBJECT_TYPE + "='" + objType + "'" +
                                             " AND " + COLUMN_OBJECT_ID + "=" +
                                                 ((objID != Constants.NO_DATA)? objID:"null") +
-                                            " AND " + COLUMN_OBJECT_FROM + "=" + objFrom +
-                                            " AND " + COLUMN_OBJECT_DATE + "=" + objDate;
+                                            " AND " + COLUMN_OBJECT_FROM + "=" + DatabaseUtils.sqlEscapeString(objFrom) +
+                                            " AND " + COLUMN_OBJECT_DATE + "='" + objDate + "'";
                                     Cursor cursor = resolver.query(tableUri, new String[]{ "count(*)" },
                                             selection, null, null);
                                     cursor.moveToFirst();
@@ -245,6 +244,10 @@ public class NotificationsTable extends DataTable {
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " +
+                TABLE_NAME + "(" + COLUMN_PSEUDO + ")");
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

@@ -99,83 +99,91 @@ public class ConnectFragment extends RevealFragment {
     public void update(byte step, int progress) { // Update UI connection progress
 
         Logs.add(Logs.Type.V, "step: " + step + ";progress: " + progress);
-        switch (step) {
-            case STEP_CHECK_INTERNET: {
-                mProgress = 0;
-                mStep = step;
-                reset(true);
-                break;
-            }
-            case STEP_LOGIN_ONLINE: {
-                mProgress = 0;
-                mStep = step;
-                mOnline = true;
-                reset(true);
+        try {
+            switch (step) {
+                case STEP_CHECK_INTERNET: {
+                    mProgress = 0;
+                    mStep = step;
+                    reset(true);
+                    break;
+                }
+                case STEP_LOGIN_ONLINE: {
+                    mProgress = 0;
+                    mStep = step;
+                    mOnline = true;
+                    reset(true);
 
-                ((ImageView)mRootView.findViewById(R.id.checked_internet))
-                        .setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
-                mRootView.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
-                break;
-            }
-            case STEP_LOGIN_OFFLINE: {
-                mProgress = 0;
-                mStep = step;
-                mOnline = false;
-                reset(true);
+                    ((ImageView)mRootView.findViewById(R.id.checked_internet))
+                            .setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
+                    mRootView.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
+                    break;
+                }
+                case STEP_LOGIN_OFFLINE: {
+                    mProgress = 0;
+                    mStep = step;
+                    mOnline = false;
+                    reset(true);
 
-                ((ImageView)mRootView.findViewById(R.id.checked_internet))
-                        .setImageDrawable(getResources().getDrawable(R.drawable.cancel_orange));
-                mRootView.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
-                break;
-            }
-            case STEP_SYNCHRONIZATION_PROGRESS: {
-                mProgress = progress;
-                mStep = step;
-                reset(false);
+                    ((ImageView)mRootView.findViewById(R.id.checked_internet))
+                            .setImageDrawable(getResources().getDrawable(R.drawable.cancel_orange));
+                    mRootView.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
+                    break;
+                }
+                case STEP_SYNCHRONIZATION_PROGRESS: {
+                    mProgress = progress;
+                    mStep = step;
+                    reset(false);
 
-                ((ImageView)mRootView.findViewById(R.id.checked_internet))
-                        .setImageDrawable(getResources().getDrawable((mOnline) ?
-                                R.drawable.checked_orange : R.drawable.cancel_orange));
-                ImageView pin = (ImageView)mRootView.findViewById(R.id.checked_identification);
-                pin.setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
-                pin.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
-                mRootView.findViewById(R.id.checked_synchro).setVisibility(View.VISIBLE);
+                    ((ImageView)mRootView.findViewById(R.id.checked_internet))
+                            .setImageDrawable(getResources().getDrawable((mOnline) ?
+                                    R.drawable.checked_orange : R.drawable.cancel_orange));
+                    ImageView pin = (ImageView)mRootView.findViewById(R.id.checked_identification);
+                    pin.setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
+                    pin.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
+                    mRootView.findViewById(R.id.checked_synchro).setVisibility(View.VISIBLE);
 
-                ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
-                progressBar.setIndeterminate(false);
-                progressBar.invalidate();
-                progressBar.setProgress(progress);
-                ((TextView)mRootView.findViewById(R.id.progress_percentage))
-                        .setText(String.format("%d%%", (byte) (progress * 100f / Tables.ID_LAST)));
-                break;
-            }
-            case STEP_SYNCHRONIZATION_SUCCEEDED: {
-                mProgress = 0;
-                mStep = step;
-                reset(true);
+                    ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
+                    progressBar.setIndeterminate(false);
+                    progressBar.invalidate();
+                    progressBar.setProgress(progress);
+                    ((TextView)mRootView.findViewById(R.id.progress_percentage))
+                            .setText(String.format("%d%%", (byte) (progress * 100f / Tables.ID_LAST)));
+                    break;
+                }
+                case STEP_SYNCHRONIZATION_SUCCEEDED: {
+                    mProgress = 0;
+                    mStep = step;
+                    reset(true);
 
-                ((ImageView)mRootView.findViewById(R.id.checked_internet))
-                        .setImageDrawable(getResources().getDrawable((mOnline) ?
-                                R.drawable.checked_orange : R.drawable.cancel_orange));
-                ImageView pin = (ImageView)mRootView.findViewById(R.id.checked_identification);
-                pin.setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
-                pin.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
-                pin = (ImageView)mRootView.findViewById(R.id.checked_synchro);
-                pin.setImageDrawable(getResources().getDrawable((mOnline) ?
-                                R.drawable.checked_orange : R.drawable.cancel_orange));
-                pin.setVisibility(View.VISIBLE);
-                mRootView.findViewById(R.id.checked_notification).setVisibility(View.VISIBLE);
-                break;
+                    ((ImageView)mRootView.findViewById(R.id.checked_internet))
+                            .setImageDrawable(getResources().getDrawable((mOnline) ?
+                                    R.drawable.checked_orange : R.drawable.cancel_orange));
+                    ImageView pin = (ImageView)mRootView.findViewById(R.id.checked_identification);
+                    pin.setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
+                    pin.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
+                    pin = (ImageView)mRootView.findViewById(R.id.checked_synchro);
+                    pin.setImageDrawable(getResources().getDrawable((mOnline) ?
+                                    R.drawable.checked_orange : R.drawable.cancel_orange));
+                    pin.setVisibility(View.VISIBLE);
+                    mRootView.findViewById(R.id.checked_notification).setVisibility(View.VISIBLE);
+                    break;
+                }
+                default: // Do not save data
+                    return;
             }
-            default: // Do not save data
-                return;
+            // Save persistent data coz unable to use save instance state behavior (not working if in pause)
+            SharedPreferences prefs = getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
+            prefs.edit().putInt(Preferences.CONNECTION_STEP, mStep)
+                        .putInt(Preferences.CONNECTION_PROGRESS, mProgress)
+                        .putBoolean(Preferences.CONNECTION_ONLINE, mOnline)
+                        .apply();
+
+            // NB: Exception caught below coz can occur if fragment not attached to Activity (cancelled)
+        } catch (IllegalStateException e) {
+            Logs.add(Logs.Type.E, "Illegal state exception: " + e.getMessage());
+        } catch (Exception e) {
+            Logs.add(Logs.Type.F, "Unknown exception: " + e.getMessage());
         }
-        // Save persistent data coz unable to use save instance state behavior (not working if in pause)
-        SharedPreferences prefs = getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
-        prefs.edit().putInt(Preferences.CONNECTION_STEP, mStep)
-                    .putInt(Preferences.CONNECTION_PROGRESS, mProgress)
-                    .putBoolean(Preferences.CONNECTION_ONLINE, mOnline)
-                    .apply();
     }
 
     public static final SyncValue<Boolean> stopped = new SyncValue<>(false);

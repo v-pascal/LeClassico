@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.tables;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -140,7 +141,7 @@ public class CamaradesTable extends DataTable {
                             values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
 
                             // Check if entry already exists
-                            String selection = COLUMN_PSEUDO + "='" + pseudo + "'";
+                            String selection = COLUMN_PSEUDO + "=" + DatabaseUtils.sqlEscapeString(pseudo);
                             Cursor cursor = resolver.query(tableUri, null, selection, null, null);
                             cursor.moveToFirst();
                             if (cursor.getCount() > 0) { // DB entry exists
@@ -513,7 +514,8 @@ public class CamaradesTable extends DataTable {
                 ");");
 
         // Add indexes
-        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " + TABLE_NAME + "(" + COLUMN_PSEUDO +")");
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " +
+                TABLE_NAME + "(" + COLUMN_PSEUDO + ")");
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

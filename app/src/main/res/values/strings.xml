@@ -43,8 +43,8 @@
     <string name="intro_location_text">Locate all of\nyour friends!</string>
 
     <!-- Main -->
-    <string name="home_connected">Member %1$s connected!</string>
-    <string name="home_info">New messages: %1$d - New notifications: %2$d</string>
+    <string name="home_connected">Member %1$s connected!</string><!-- @integer/home_connected_pseudo_pos -->
+    <string name="home_info">New messages: %1$d - New notifications: %2$d</string><!-- @integer/home_info_mail_pos & home_info_notify_pos -->
     <string name="no_publication">No publication</string>
     <string name="no_publication_info">No followed member has published yet</string>
     <string name="no_event">No event</string>
@@ -55,6 +55,22 @@
 
     <string name="no_date" translatable="false">--/--</string>
     <string name="no_time" translatable="false">--:--</string>
+
+    <string name="notify_shared_message">%1$s has added a photo</string><!-- @integer/notify_shared_message_pseudo_pos -->
+    <string name="notify_shared_info">To your %1$s album</string><!-- @integer/notify_shared_info_album_pos -->
+    <string name="notify_wall_message">%1$s has published %2$s on your wall</string><!-- @integer/notify_wall_message_pseudo_pos -->
+    <string-array name="notify_wall_types">
+        <item>a text</item>
+        <item>a link</item>
+        <item>an image</item>
+    </string-array>
+    <string name="notify_no_info">[NO MESSAGE]</string>
+    <string name="notify_mail_message">%1$s has sent you a private message</string><!-- @integer/notify_mail_pseudo_pos -->
+    <string name="notify_comment_message">%1$s has added a comment to %2$s</string><!-- @integer/notify_comment_pseudo_pos -->
+    <string-array name="notify_comment_types">
+        <item>your publication</item>
+        <item>one of your photo</item>
+    </string-array>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>
@@ -100,6 +116,6 @@
 
     <!-- Formats -->
     <string name="format_date" translatable="false">%2d/%2d</string>
-    <string name="foramt_time" translatable="false">%2d:%2d</string>
+    <string name="format_time" translatable="false">%2d:%2d</string>
 
 </resources>

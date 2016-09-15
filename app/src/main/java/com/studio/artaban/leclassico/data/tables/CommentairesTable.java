@@ -88,6 +88,9 @@ public class CommentairesTable implements IDataTable {
 
     private static final short COLUMN_INDEX_SYNCHRONIZED = 6;
 
+    // JSON keys
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+
     //
     private CommentairesTable() { }
     public static CommentairesTable newInstance() { return new CommentairesTable(); }
@@ -108,6 +111,10 @@ public class CommentairesTable implements IDataTable {
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " +
+                TABLE_NAME + "(" + COLUMN_PSEUDO + ")");
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

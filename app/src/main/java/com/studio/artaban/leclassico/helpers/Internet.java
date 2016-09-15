@@ -91,6 +91,7 @@ public final class Internet {
     //////
     private static final int BUFFER_SIZE = 4096;
     private static final String POST_CONTENT_ENCODING = "UTF-8";
+    private static final String REPLY_ENCODER = "ISO-8859-1";
 
     public enum DownloadResult {
 
@@ -225,7 +226,7 @@ public final class Internet {
             if (listener != null) {
 
                 is = httpConnection.getInputStream();
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                BufferedReader br = new BufferedReader(new InputStreamReader(is, REPLY_ENCODER));
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null)

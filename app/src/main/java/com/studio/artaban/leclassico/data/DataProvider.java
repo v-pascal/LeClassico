@@ -152,9 +152,6 @@ public class DataProvider extends ContentProvider {
         }
         builder.setTables(table);
         return builder.query(mDB.getDB(), projection, selection, selectionArgs, null, null, sortOrder);
-
-
-
     }
 
     @Nullable

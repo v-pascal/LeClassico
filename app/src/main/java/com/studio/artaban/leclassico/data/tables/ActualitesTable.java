@@ -90,6 +90,9 @@ public class ActualitesTable implements IDataTable {
 
     private static final short COLUMN_INDEX_SYNCHRONIZED = 7;
 
+    // JSON keys
+    private static final String JSON_KEY_ACTU_ID = COLUMN_ACTU_ID.substring(4);
+
     //
     private ActualitesTable() { }
     public static ActualitesTable newInstance() { return new ActualitesTable(); }
@@ -112,6 +115,10 @@ public class ActualitesTable implements IDataTable {
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_ACTU_ID + " ON " +
+                TABLE_NAME + "(" + COLUMN_ACTU_ID + ")");
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

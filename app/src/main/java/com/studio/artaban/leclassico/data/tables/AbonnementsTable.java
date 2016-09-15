@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.tables;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -89,8 +90,8 @@ public class AbonnementsTable extends DataTable {
                                     DataProvider.Synchronized.DONE.getValue());
 
                             // Check if entry already exists
-                            String selection = COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                                    COLUMN_CAMARADE + "='" + camarade + "'";
+                            String selection = COLUMN_PSEUDO + "=" + DatabaseUtils.sqlEscapeString(pseudo) +
+                                    " AND " + COLUMN_CAMARADE + "=" + DatabaseUtils.sqlEscapeString(camarade);
                             Cursor cursor = resolver.query(tableUri, new String[]{ "count(*)" },
                                     selection, null, null);
                             cursor.moveToFirst();

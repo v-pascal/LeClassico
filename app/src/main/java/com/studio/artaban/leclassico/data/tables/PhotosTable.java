@@ -91,6 +91,9 @@ public class PhotosTable implements IDataTable {
 
     private static final short COLUMN_INDEX_SYNCHRONIZED = 6;
 
+    // JSON keys
+    private static final String JSON_KEY_FICHIER_ID = COLUMN_FICHIER_ID.substring(4);
+
     //
     private PhotosTable() { }
     public static PhotosTable newInstance() { return new PhotosTable(); }
@@ -111,6 +114,10 @@ public class PhotosTable implements IDataTable {
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_FICHIER_ID + " ON " +
+                TABLE_NAME + "(" + COLUMN_FICHIER_ID + ")");
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

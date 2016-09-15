@@ -890,10 +890,17 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         switch (item.getItemId()) {
             case android.R.id.home: {
 
-                // Back to introduction layout
-                mIntroDone = false;
+                if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
 
-                displayConnection(false);
+                    // Cancel connection task
+                    getSupportFragmentManager().popBackStack();
+                    getSupportFragmentManager().executePendingTransactions();
+                    replaceButtonIcon(false);
+
+                } else { // Back to introduction layout
+                    mIntroDone = false;
+                    displayConnection(false);
+                }
                 return true;
             }
             case R.id.menu_about: {

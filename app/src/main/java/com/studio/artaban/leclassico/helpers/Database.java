@@ -34,6 +34,8 @@ public class Database extends SQLiteOpenHelper {
     private static final String NAME = Constants.APP_NAME + ".db"; // Database name
     public static final int VERSION = 1; // Database version
 
+    public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss.000"; // SQLite date & time format
+
     protected SQLiteDatabase mDatabase;
 
     protected static Map<String, IDataTable> mTableMap = new HashMap<>();
