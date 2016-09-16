@@ -46,6 +46,8 @@
 
     <RelativeLayout
         android:id="@+id/layout_data"
+        android:clickable="true"
+        android:background="@drawable/notify_read_background"
         android:layout_toEndOf="@id/image_pseudo"
         android:layout_below="@id/date_separator"
         android:layout_marginEnd="@dimen/notify_item_horizontal_margin"

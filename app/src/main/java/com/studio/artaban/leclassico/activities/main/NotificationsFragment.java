@@ -96,7 +96,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             int pseudoColor = R.color.colorPrimaryProfile;
             if (mNotifyData.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
 
-                holder.mNotifyData.setBackground(getResources().getDrawable(R.drawable.selected_background));
+                holder.mNotifyData.setBackground(getResources().getDrawable(R.drawable.notify_unread_background));
                 holder.mNotifyType.setImageTintList(null);
                 holder.mNotifyType.setColorFilter(Color.RED);
                 holder.mNotifyMessage.setTypeface(Typeface.DEFAULT_BOLD);
@@ -217,8 +217,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
-
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+        cursor.moveToFirst();
+
         if (id == Queries.MAIN_NOTIFICATIONS) {
 
 
