@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Introduction -->
+
+    <color name="colorIntroPublications">#800080ff</color>
+    <color name="colorIntroAlbums">#80ff8000</color>
+    <color name="colorIntroEvents">#8000ff00</color>
+    <color name="colorSecondaryText">#ffffff</color>
+
+    <color name="colorButtonBackground">#00000000</color>
+    <color name="colorButtonBackgroundPressed">#50ffffff</color>
+
+</resources>

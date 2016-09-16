@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Introduction -->
+
+    <string name="intro_welcome">Bienvenue&#8230;</string>
+    <string name="intro_welcome_text">Dans l\'application\n%1$s!</string>
+    <string name="intro_publications">Fil d\'actualité&#8230;</string>
+    <string name="intro_publications_text">Suivez l\'actualité\nde vos amis!</string>
+    <string name="intro_albums">Albums&#8230;</string>
+    <string name="intro_albums_text">Partager vos\nalbums photos!</string>
+    <string name="intro_events">Evènements&#8230;</string>
+    <string name="intro_events_text">Restez informé\ndes évènements!</string>
+    <string name="intro_location">Géolocation&#8230;</string>
+    <string name="intro_location_text">Géolocaliser tous\nvos amis!</string>
+
+    <!-- Connection -->
+    <string name="connection">Connexion</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="password">Mot de passe</string>
+    <string name="wait">Veuillez patienter&#8230;</string>
+    <string name="check_internet">Connexion Internet</string>
+    <string name="no_internet">Pas de connexion Internet!\nNécessaire lors de la première identification.</string>
+    <string name="data_synchro">Synchronisation des données</string>
+    <string name="help_connection">Si vous n\'avez pas de compte, sachez que seul un membre du Classico peut vous en créer un.\nEt si c\'est le hasard qui vous a conduit ici, alors continuez à vous exercer en tapant un pseudo &amp; mot de passe au hasard!</string>
+    <string name="identification">Identification</string>
+    <string name="notification_service">Service de notification</string>
+    <string name="login_missing">Pseudo et/ou mote de passe manquant!</string>
+    <string name="login_failed">Echec durant l\'identification!\nPseudo et/ou mot de passe incorrecte.</string>
+    <string name="error_webservice">Web service indisponible!\nVeuillez ré-essayer plus tard.</string>
+    <string name="error_synchro">Une erreur est intervenue durant la synchronisation!\nVeuillez vous reconnecter plus tard.</string>
+    <string name="working_offline">Connexion hors ligne</string>
+    <string name="pseudo_connected">%1$s est connecté</string>
+
+    <!-- Menus -->
+    <string name="mnu_help">Aide</string>
+    <string name="mnu_quit">Quitter</string>
+    <string name="mnu_about">A propos</string>
+
+</resources>

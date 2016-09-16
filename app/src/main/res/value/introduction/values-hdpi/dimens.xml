@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Introduction -->
+
+    <item name="comments_shadow" format="float" type="dimen">3.0</item>
+    <item name="comments_radius" format="float" type="dimen">2.25</item>
+
+    <item name="limitless_rotation_ratio" format="float" type="dimen">0.0285</item>
+    <item name="translation_ratio" format="float" type="dimen">1.45</item>
+
+    <!-- Login & connection -->
+    <dimen name="login_width">224dp</dimen>
+    <dimen name="login_min_width">112dp</dimen>
+    <dimen name="login_text_size">18sp</dimen>
+
+    <dimen name="progress_text_size">16sp</dimen>
+    <dimen name="progress_icon_size">30dp</dimen>
+
+</resources>

@@ -1,0 +1,34 @@
+<resources>
+
+    <!-- Application themes. -->
+    <style name="MainAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowActivityTransitions">true</item>
+
+        <!-- Default activity transitions -->
+        <item name="android:windowEnterTransition">@android:transition/slide_right</item>
+        <item name="android:windowExitTransition">@android:transition/explode</item>
+
+        <item name="colorPrimary">@color/colorPrimaryMain</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkMain</item>
+        <item name="colorAccent">@color/colorAccentMain</item>
+
+    </style>
+    <style name="ProfileAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimaryProfile</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkProfile</item>
+        <item name="colorAccent">@color/colorAccentProfile</item>
+    </style>
+    <style name="SettingAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimarySetting</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkSetting</item>
+        <item name="colorAccent">@color/colorAccentSetting</item>
+
+        <item name="android:textColorSecondary">@color/colorSecondaryText</item>
+    </style>
+    <style name="LocationAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimaryLocation</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkLocation</item>
+        <item name="colorAccent">@color/colorAccentLocation</item>
+    </style>
+
+</resources>

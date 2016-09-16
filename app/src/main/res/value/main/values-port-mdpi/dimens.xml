@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Main -->
+
+    <!-- Notification -->
+    <dimen name="notify_item_horizontal_margin">0dp</dimen>
+
+</resources>

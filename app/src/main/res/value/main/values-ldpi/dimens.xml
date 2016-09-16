@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Main -->
+
+    <item name="pseudo_shadow" format="float" type="dimen">2.0</item>
+    <item name="pseudo_radius" format="float" type="dimen">1.5</item>
+    <item name="profile_radius" format="float" type="dimen">8.0</item>
+    <dimen name="profile_border_radius">12dp</dimen>
+    <dimen name="shortcut_background_radius">10dp</dimen>
+
+    <!-- Shortcut -->
+    <dimen name="shortcut_margin">8dp</dimen>
+    <dimen name="shortcut_height">64dp</dimen>
+    <dimen name="shortcut_content_height">48dp</dimen><!-- = shortcut_height - (2 * shortcut_margin) -->
+    <dimen name="shortcut_text_margin">8dp</dimen>
+    <dimen name="shortcut_text_size">17sp</dimen>
+    <dimen name="shortcut_info_size">14sp</dimen>
+    <dimen name="shortcut_border_margin">4dp</dimen>
+    <dimen name="shortcut_date_size">12sp</dimen>
+    <dimen name="shortcut_data_radius">8dp</dimen>
+
+</resources>

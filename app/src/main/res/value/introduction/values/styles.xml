@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Introduction -->
+
+    <!-- Custom theme -->
+    <style name="IntroAppTheme" parent="MainAppTheme">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+
+        <item name="android:windowBackground">@drawable/window_background</item>
+        <item name="android:colorControlHighlight">@color/colorButtonBackgroundPressed</item>
+
+    </style>
+    <style name="ConnectAppTheme" parent="IntroAppTheme">
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+    <style name="LoginAppTheme" parent="ConnectAppTheme">
+        <item name="colorAccent">@color/green</item>
+    </style>
+
+    <!-- Custom styles -->
+    <style name="IntroSelectableItemBackground">
+        <item name="android:theme">@style/IntroAppTheme</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
+
+</resources>

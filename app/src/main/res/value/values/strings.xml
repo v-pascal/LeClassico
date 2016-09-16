@@ -1,0 +1,35 @@
+<resources>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="status">Status:</string>
+    <string name="search">Search</string>
+    <string name="notifications">Notifications</string>
+
+    <!-- Application -->
+    <string name="app_name" translatable="false">Le Classico</string>
+    <string name="app_about" translatable="false">APP: %1$s\nVERSION: 1.0\nAUTHOR: Pascal VIGUIE\nDATE: 2016&#8211;07&#8211;15</string>
+
+    <!-- Titles -->
+    <string name="title_activity_intro">Introduction</string>
+
+    <string name="error">Error</string>
+    <string name="warning">Warning</string>
+    <string name="help">Help</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Errors -->
+    <string name="error_no_storage">CRITICAL ERROR: Storage unavailable! Please to restart application later.</string>
+    <string name="error_service_unavailable">CRITICAL ERROR: Service unavailable! Please to restart application.</string>
+
+    <!-- Confirmation -->
+    <string name="confirm_logout">Do you really want to logout?</string>
+    <string name="confirm_quit">Do you really want to quit application and therefore logout?</string>
+
+    <!-- Formats -->
+    <string name="format_date" translatable="false">%2d/%2d</string>
+    <string name="format_time" translatable="false">%2d:%2d</string>
+
+</resources>

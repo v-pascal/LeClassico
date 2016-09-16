@@ -23,8 +23,12 @@ android {
                      'src/main/res/layouts/main',
                      'src/main/res/drawables/introduction',
                      'src/main/res/drawables/main',
+                     'src/main/res/value/introduction',
+                     'src/main/res/value/main',
+                     'src/main/res/value/profile',
                      'src/main/res/layouts',
                      'src/main/res/drawables',
+                     'src/main/res/value',
                      'src/main/res'
                     ]
         }

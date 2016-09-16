@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Application theme colors -->
+    <color name="colorPrimaryMain">#9c27b0</color>
+    <color name="colorPrimaryDarkMain">#7b1fa2</color>
+    <color name="colorAccentMain">#03a9f4</color>
+
+    <color name="colorPrimaryProfile">#4caf50</color>
+    <color name="colorPrimaryDarkProfile">#388e3c</color>
+    <color name="colorAccentProfile">#ffc107</color>
+
+    <color name="colorPrimarySetting">#ff5722</color>
+    <color name="colorPrimaryDarkSetting">#e64a19</color>
+    <color name="colorAccentSetting">#cddc39</color>
+
+    <color name="colorPrimaryLocation">#03a9f4</color>
+    <color name="colorPrimaryDarkLocation">#0288d1</color>
+    <color name="colorAccentLocation">#e040fb</color>
+
+    <!-- Colors -->
+    <color name="green">#ff00ff00</color>
+    <color name="red">#ffff0000</color>
+    <color name="blue">#ff0000ff</color>
+    <color name="yellow">#ffffff00</color>
+    <color name="orange">#ff8000</color>
+
+    <!-- LeClassico -->
+    <color name="colorPublication">#d7dec5</color>
+    <color name="colorPublicationDark">#adbd8f</color>
+
+</resources>

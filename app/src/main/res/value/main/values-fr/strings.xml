@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Main -->
+
+    <string name="home_connected">Membre %1$s connecté!</string>
+    <string name="home_info">Nouveaux messages: %1$d - Nouvelles notifications: %2$d</string>
+    <string name="no_publication">Aucune publication</string>
+    <string name="no_publication_info">Rien n\'a été publié par les membres suivis</string>
+    <string name="no_event">Aucun événement</string>
+    <string name="no_event_info">Pas d\'événement annoncé</string>
+    <string name="last_followed_info">Dernier membre suivi</string>
+    <string name="no_notification">Aucune notification</string>
+    <string name="no_notification_info">Pas d\'événement justifiant une notification</string>
+
+    <string name="notify_shared_message">%1$s a ajouté une photo</string>
+    <string name="notify_shared_info">Dans votre album %1$s</string>
+    <string name="notify_wall_message">%1$s a publié %2$s sur votre mur</string>
+    <string-array name="notify_wall_types">
+        <item>un message</item>
+        <item>un lien</item>
+        <item>une image</item>
+    </string-array>
+    <string name="notify_no_info">[AUCUN MESSAGE]</string>
+    <string name="notify_mail_message">%1$s vous a envoyé un message privé</string>
+    <string name="notify_comment_message">%1$s a ajouté un commentaire %2$s</string>
+    <string-array name="notify_comment_types">
+        <item>à votre publication</item>
+        <item>sur une de vos photos</item>
+    </string-array>
+
+    <!-- Navigation -->
+    <string name="nav_profile">Profil</string>
+    <string name="nav_location">Géolocation</string>
+    <string name="nav_settings">Paramètres</string>
+    <string name="nav_logout">Déconnexion</string>
+    <string name="nav_exit">Quitter</string>
+
+    <!-- Pages -->
+    <string-array name="main_pages">
+        <item>Accueil</item>
+        <item>Fil d\'actualité</item>
+        <item>Evènements</item>
+        <item>Membres suivis</item>
+        <item>Notifications</item>
+    </string-array>
+
+</resources>

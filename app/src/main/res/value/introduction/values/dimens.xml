@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Introduction -->
+
+    <dimen name="intro_padding_bottom">68dp</dimen><!-- activity_vertical_margin * 2 + 36dp (image) -->
+    <dimen name="container_padding_bottom">28dp</dimen>
+
+    <dimen name="comments_text_title">21sp</dimen>
+    <dimen name="comments_text_desc">19sp</dimen>
+
+</resources>

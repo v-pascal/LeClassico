@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Introduction -->
+
+    <string name="intro_welcome">Welcome&#8230;</string>
+    <string name="intro_welcome_text">To the application\n%1$s!</string>
+    <string name="intro_publications">News&#8230;</string>
+    <string name="intro_publications_text">Follow publications\nof your friends!</string>
+    <string name="intro_albums">Albums&#8230;</string>
+    <string name="intro_albums_text">Create &amp; share\nphoto albums!</string>
+    <string name="intro_events">Events&#8230;</string>
+    <string name="intro_events_text">Stay informed of\nall events!</string>
+    <string name="intro_location">Location&#8230;</string>
+    <string name="intro_location_text">Locate all of\nyour friends!</string>
+
+    <!-- Connection -->
+    <string name="connection">Connection</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="password">Password</string>
+    <string name="wait">Please wait&#8230;</string>
+    <string name="check_internet">Internet connection</string>
+    <string name="no_internet">No Internet connection!\nNeeded during the first identification.</string>
+    <string name="data_synchro">Data synchronization</string>
+    <string name="help_connection">If you do not have an account, please note that only a Classico member can create you one.\nAnd if it was chance that brought you here, so keep on practicing it by entering a username &amp; password to chance!</string>
+    <string name="identification">Identification</string>
+    <string name="notification_service">Notification service</string>
+    <string name="login_missing">Missing pseudo and/or password!</string>
+    <string name="login_failed">Login failed!\nWrong pseudo and/or password.</string>
+    <string name="error_webservice">Web service unavailable!\nPlease try later.</string>
+    <string name="error_synchro">An error occurred during the synchronization!\nPlease try to login later.</string>
+    <string name="working_offline">Working offline</string>
+    <string name="pseudo_connected">%1$s is connected</string>
+
+    <!-- Menus -->
+    <string name="mnu_help">Help</string>
+    <string name="mnu_quit">Quit</string>
+    <string name="mnu_about">About</string>
+
+</resources>

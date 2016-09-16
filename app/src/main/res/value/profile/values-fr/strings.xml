@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Profile -->
+
+    <!-- Pages -->
+    <string-array name="profile_pages">
+        <item>Publications</item>
+        <item>A Propos</item>
+        <item>Albums</item>
+        <item>Messagerie</item>
+    </string-array>
+
+</resources>
