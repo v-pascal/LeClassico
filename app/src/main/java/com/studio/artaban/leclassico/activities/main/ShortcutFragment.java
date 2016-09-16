@@ -106,7 +106,8 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                         .getDrawable(R.drawable.event_date_background));
                 ((TextView)mRootView.findViewById(R.id.end_date)).setTextColor(Color.WHITE);
                 ((TextView)mRootView.findViewById(R.id.end_time)).setTextColor(Color.WHITE);
-                ((LinearLayout)mRootView.findViewById(R.id.layout_data)).setGravity(Gravity.CENTER);
+                ((TextView)mRootView.findViewById(R.id.text_message)).setGravity(Gravity.CENTER);
+                ((TextView)mRootView.findViewById(R.id.text_info)).setGravity(Gravity.CENTER);
                 break;
             }
             case R.id.shortcut_members: { ////// Members
@@ -127,6 +128,7 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                         .getDrawable(R.drawable.notifcation_date_background));
                 ((TextView)mRootView.findViewById(R.id.end_date)).setTextColor(Color.WHITE);
                 ((TextView)mRootView.findViewById(R.id.end_time)).setTextColor(Color.WHITE);
+                mRootView.findViewById(R.id.image_type).setVisibility(View.VISIBLE);
                 break;
             }
         }
