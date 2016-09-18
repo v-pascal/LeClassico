@@ -53,6 +53,7 @@
 
         <TextView
             android:id="@+id/text_message"
+            android:text="@string/not_defined"
             android:textSize="@dimen/shortcut_text_size"
             android:textStyle="bold"
             android:textColor="@android:color/black"
@@ -99,15 +100,21 @@
             android:hint="@string/pseudo"
             android:textColorHint="@color/colorPublication"
             android:textColor="@android:color/white"
+            android:textSize="@dimen/notify_search_size"
             android:inputType="text"
             android:visibility="invisible"
-            android:layout_margin="@dimen/shortcut_border_margin"
+            android:paddingStart="@dimen/shortcut_tiny_text_margin"
+            android:paddingTop="1dp"
+            android:paddingEnd="1dp"
+            android:paddingBottom="1dp"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"/>
         <ImageButton
             android:id="@+id/button_search"
-            android:src="@drawable/ic_search_white_36dp"
+            android:src="@drawable/search"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:padding="@dimen/shortcut_border_margin"
             android:onClick="onSearch"

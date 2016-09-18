@@ -33,7 +33,7 @@ public class MainFragment extends Fragment {
         ////// Shortcut
         void onSetMessage(int section, SpannableStringBuilder message);
         void onSetInfo(int section, SpannableStringBuilder info);
-        void onSetIcon(int section, boolean female, String profile);
+        void onSetIcon(int section, boolean female, String profile, int size);
     }
     protected OnFragmentListener mListener;
 

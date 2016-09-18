@@ -113,6 +113,8 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
         Logs.add(Logs.Type.V, "cancel: " + cancel);
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        invalidateOptionsMenu();
+
         if (cancel) { // Display close icon
 
             fab.setImageDrawable(getDrawable(R.drawable.ic_close_white_36dp));
@@ -880,6 +882,9 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
         Logs.add(Logs.Type.V, "menu: " + menu);
         getMenuInflater().inflate(R.menu.menu_connect, menu);
+
+        // Disable menu when connecting
+        menu.setGroupEnabled(0, getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) == null);
         return true;
     }
 

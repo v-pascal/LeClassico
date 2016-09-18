@@ -13,49 +13,25 @@
     <dimen name="shortcut_content_height">44dp</dimen><!-- = shortcut_height - (2 * shortcut_margin) -->
     <dimen name="shortcut_text_margin">8dp</dimen>
     <dimen name="shortcut_text_size">16sp</dimen>
-
-
     <dimen name="shortcut_text_height">24dp</dimen><!-- = shortcut_content_height - shortcut_info_height -->
     <dimen name="shortcut_info_height">20dp</dimen><!-- = shortcut_content_height - shortcut_text_height -->
-
-
     <dimen name="shortcut_info_size">13sp</dimen>
     <dimen name="shortcut_border_margin">4dp</dimen>
     <dimen name="shortcut_date_size">11sp</dimen>
     <dimen name="shortcut_data_radius">7dp</dimen>
-
-
     <dimen name="shortcut_tiny_text_margin">6dp</dimen>
-
-
-
-
-
-
-
-
-
-
-
 
     <!-- Notification -->
     <dimen name="notify_tiny_text_margin">6dp</dimen>
-    <dimen name="notify_tiny_text_size">14sp</dimen>
+    <dimen name="notify_tiny_text_size">13sp</dimen>
     <dimen name="notify_text_margin">8dp</dimen>
     <dimen name="notify_text_size">18sp</dimen>
-    <dimen name="notify_item_margin">16dp</dimen>
+    <dimen name="notify_item_margin">15dp</dimen>
     <dimen name="notify_item_bottom">8dp</dimen>
-    <dimen name="notify_item_height">52dp</dimen>
+    <dimen name="notify_item_height">51dp</dimen>
     <dimen name="notify_message_height">28dp</dimen><!-- = notify_item_height - notify_info_height -->
-    <dimen name="notify_info_height">24dp</dimen><!-- = notify_item_height - notify_message_height -->
-    <dimen name="notify_time_size">16sp</dimen>
-
-
-
-
-
-
-
-
+    <dimen name="notify_info_height">23dp</dimen><!-- = notify_item_height - notify_message_height -->
+    <dimen name="notify_time_size">15sp</dimen>
+    <dimen name="notify_search_size">16sp</dimen>
 
 </resources>

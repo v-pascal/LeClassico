@@ -98,14 +98,14 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
     @Override
-    public void onSetIcon(final int section, final boolean female, final String profile) {
+    public void onSetIcon(final int section, final boolean female, final String profile, final int size) {
         //Logs.add(Logs.Type.V, "section: " + section + ";female: " + female + ";profile: " + profile);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Logs.add(Logs.Type.V, null);
                 ((ShortcutFragment)getSupportFragmentManager()
-                        .findFragmentById(getShortcutID(section))).setIcon(female, profile);
+                        .findFragmentById(getShortcutID(section))).setIcon(female, profile, size);
             }
         });
     }
@@ -139,7 +139,8 @@ public class MainActivity extends AppCompatActivity implements
 
                         // Profile
                         Tools.setProfile(MainActivity.this,
-                                (ImageView)navHeader.findViewById(R.id.image_profile), female, profile);
+                                (ImageView)navHeader.findViewById(R.id.image_profile),
+                                female, profile, R.dimen.profile_size);
                         // Banner
                         if (banner != null)
                             Glider.with(MainActivity.this)

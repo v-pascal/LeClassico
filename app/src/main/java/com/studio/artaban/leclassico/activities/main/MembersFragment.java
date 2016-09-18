@@ -36,6 +36,8 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
         cursor.moveToFirst();
 
         if (id == Queries.MAIN_LAST_FOLLOWED) {
+            if (cursor.getString(COLUMN_INDEX_PSEUDO) == null)
+                return; // No data found yet
 
             // Set message
             SpannableStringBuilder member = new SpannableStringBuilder(cursor.getString(COLUMN_INDEX_PSEUDO));
@@ -46,7 +48,7 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
                     (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
             String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
                     cursor.getString(COLUMN_INDEX_PROFILE) : null;
-            mListener.onSetIcon(Constants.MAIN_SECTION_MEMBERS, female, profile);
+            mListener.onSetIcon(Constants.MAIN_SECTION_MEMBERS, female, profile, R.dimen.shortcut_content_height);
         }
         cursor.close();
     }
@@ -77,6 +79,7 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
         mListener.onSetInfo(Constants.MAIN_SECTION_MEMBERS, data);
 
         // Load shortcut info (using query loaders)
+        String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO);
         Bundle shortcutData = new Bundle();
         shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")," +
@@ -85,9 +88,9 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
                         CamaradesTable.COLUMN_PROFILE + // COLUMN_INDEX_PROFILE
                         " FROM " + AbonnementsTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
-                        AbonnementsTable.COLUMN_CAMARADE + "=" + CamaradesTable.COLUMN_PSEUDO +
-                        " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" +
-                        getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) + "'");
+                        AbonnementsTable.COLUMN_CAMARADE + "=" + CamaradesTable.COLUMN_PSEUDO + " AND " +
+                        AbonnementsTable.COLUMN_CAMARADE + "<>'" + pseudo + "'" +
+                        " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "'");
         mLastMemberLoader.restart(getActivity(), Queries.MAIN_LAST_FOLLOWED, shortcutData);
 
 

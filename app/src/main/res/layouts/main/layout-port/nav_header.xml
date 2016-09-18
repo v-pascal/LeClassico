@@ -16,8 +16,8 @@
     <!-- Profile -->
     <ImageView
         android:id="@+id/image_profile"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
+        android:layout_width="@dimen/profile_size"
+        android:layout_height="@dimen/profile_size"
         android:src="@drawable/man"
         android:background="@drawable/profile_border"
         android:layout_alignParentBottom="true"

@@ -2,5 +2,6 @@
 <resources><!-- Main -->
 
     <dimen name="profile_border_width">6dp</dimen>
+    <dimen name="profile_size">96dp</dimen>
 
 </resources>

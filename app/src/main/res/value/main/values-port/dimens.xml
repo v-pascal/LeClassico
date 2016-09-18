@@ -3,5 +3,4 @@
 
     <!-- Notification -->
     <dimen name="notify_item_horizontal_margin">0dp</dimen>
-
 </resources>

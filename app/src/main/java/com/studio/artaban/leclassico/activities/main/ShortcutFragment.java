@@ -35,9 +35,10 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
         ((TextView) mRootView.findViewById(R.id.text_info))
                 .setText(info, TextView.BufferType.SPANNABLE);
     }
-    public void setIcon(boolean female, String profile) {
+    public void setIcon(boolean female, String profile, int size) {
         Logs.add(Logs.Type.V, "female: " + female + ";profile: " + profile);
-        Tools.setProfile(getActivity(), (ImageView) mRootView.findViewById(R.id.image_icon), female, profile);
+        Tools.setProfile(getActivity(), (ImageView) mRootView.findViewById(R.id.image_icon),
+                female, profile, size);
     }
 
     private View mRootView; // Fragment root view
@@ -55,7 +56,7 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
             mSearching = false;
 
             ((ImageView)mRootView.findViewById(R.id.button_search))
-                    .setImageDrawable(getResources().getDrawable(R.drawable.ic_search_white_36dp));
+                    .setImageDrawable(getResources().getDrawable(R.drawable.search));
 
             imm.hideSoftInputFromWindow(search.getWindowToken(), 0); // Hide keyboard (if displayed)
             ((EditText) search).setText(null);
@@ -66,7 +67,7 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
             mSearching = true;
 
             ((ImageView)mRootView.findViewById(R.id.button_search))
-                    .setImageDrawable(getResources().getDrawable(R.drawable.ic_close_white_36dp));
+                    .setImageDrawable(getResources().getDrawable(R.drawable.close));
             search.setVisibility(View.VISIBLE);
             search.requestFocus();
 

@@ -7,6 +7,7 @@
     <string name="status">Status:</string>
     <string name="search">Search</string>
     <string name="notifications">Notifications</string>
+    <string name="not_defined">[NOT DEFINED]</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">Le Classico</string>

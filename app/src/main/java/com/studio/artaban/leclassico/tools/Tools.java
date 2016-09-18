@@ -24,7 +24,9 @@ import java.io.File;
  */
 public final class Tools {
 
-    public static void setProfile(final Activity activity, ImageView view, boolean female, String profile) {
+    private static float PROFILE_SIZE_RADIUS_FACTOR = 80f;
+    public static void setProfile(final Activity activity, ImageView view, boolean female,
+                                  String profile, final int size) {
     // Display profile image using 'Glider' class (expected user profile & gender)
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
@@ -47,7 +49,10 @@ public final class Tools {
                                                     resource);
                                     TypedValue radius = new TypedValue();
                                     activity.getResources().getValue(R.dimen.profile_radius, radius, true);
-                                    radiusBmp.setCornerRadius(radius.getFloat());
+                                    float factor = activity.getResources().getDimension(size) /
+                                            activity.getResources().getDisplayMetrics().density;
+                                    radiusBmp.setCornerRadius(radius.getFloat() * (factor /
+                                            PROFILE_SIZE_RADIUS_FACTOR));
                                     imageView.setImageDrawable(radiusBmp);
                                     return true;
                                 }

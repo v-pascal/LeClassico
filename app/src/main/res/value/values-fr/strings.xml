@@ -6,6 +6,7 @@
     <string name="status">Statut:</string>
     <string name="search">Rechercher</string>
     <string name="notifications">Notifications</string>
+    <string name="not_defined">[NON DEFINI]</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

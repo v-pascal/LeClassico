@@ -2,6 +2,5 @@
 <resources><!-- Main -->
 
     <!-- Notification -->
-    <dimen name="notify_item_horizontal_margin">96dp</dimen>
-
+    <dimen name="notify_item_horizontal_margin">80dp</dimen>
 </resources>
