@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Synchronization -->
+    <dimen name="sync_height">22dp</dimen>
+    <dimen name="sync_text_margin">6dp</dimen>
+    <dimen name="sync_text_size">14sp</dimen>
+
+</resources>

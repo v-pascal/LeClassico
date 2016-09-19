@@ -309,7 +309,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                             IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_MSG_ID
                         CommentairesTable.COLUMN_TEXT + "," + // COLUMN_INDEX_COM_TEXT
                         CommentairesTable.TABLE_NAME + "." +
-                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_COMMENT_ID
+                            IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
 
                         " FROM " + NotificationsTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
