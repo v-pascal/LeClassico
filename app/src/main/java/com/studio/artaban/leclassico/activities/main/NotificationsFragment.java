@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -246,22 +247,23 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
     // Query column indexes
     private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
-    private static final int COLUMN_INDEX_OBJECT_ID = 1;
-    private static final int COLUMN_INDEX_OBJECT_DATE = 2;
-    private static final int COLUMN_INDEX_OBJECT_FROM = 3;
-    private static final int COLUMN_INDEX_DATE = 4;
-    private static final int COLUMN_INDEX_LU_FLAG = 5;
-    private static final int COLUMN_INDEX_PSEUDO = 6;
-    private static final int COLUMN_INDEX_SEX = 7;
-    private static final int COLUMN_INDEX_PROFILE = 8;
-    private static final int COLUMN_INDEX_ALBUM = 9;
+    private static final int COLUMN_INDEX_NOTIFY_ID = 1;
+    private static final int COLUMN_INDEX_DATE = 2;
+    private static final int COLUMN_INDEX_LU_FLAG = 3;
+    private static final int COLUMN_INDEX_PSEUDO = 4;
+    private static final int COLUMN_INDEX_SEX = 5;
+    private static final int COLUMN_INDEX_PROFILE = 6;
+    private static final int COLUMN_INDEX_MEMBER_ID = 7;
+    private static final int COLUMN_INDEX_ALBUM = 8;
+    private static final int COLUMN_INDEX_PHOTO_ID = 9;
     private static final int COLUMN_INDEX_PUB_TEXT = 10;
     private static final int COLUMN_INDEX_LINK = 11;
     private static final int COLUMN_INDEX_FICHIER = 12;
-    private static final int COLUMN_INDEX_MSG_TEXT = 13;
-    private static final int COLUMN_INDEX_MSG_DATE = 14;
-    private static final int COLUMN_INDEX_MSG_TIME = 15;
+    private static final int COLUMN_INDEX_PUB_ID = 13;
+    private static final int COLUMN_INDEX_MSG_TEXT = 14;
+    private static final int COLUMN_INDEX_MSG_ID = 15;
     private static final int COLUMN_INDEX_COM_TEXT = 16;
+    private static final int COLUMN_INDEX_COMMENT_ID = 17;
 
     ////// MainFragment ////////////////////////////////////////////////////////////////////////////
     @Override
@@ -285,22 +287,29 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + "," + // COLUMN_INDEX_OBJECT_TYPE
-                        NotificationsTable.COLUMN_OBJECT_ID + "," + // COLUMN_INDEX_OBJECT_ID
-                        NotificationsTable.COLUMN_OBJECT_DATE + "," + // COLUMN_INDEX_OBJECT_DATE
-                        NotificationsTable.COLUMN_OBJECT_FROM + "," + // COLUMN_INDEX_OBJECT_FROM
+                        NotificationsTable.TABLE_NAME + "." +
+                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_NOTIFY_ID
                         NotificationsTable.COLUMN_DATE + "," + // COLUMN_INDEX_DATE
                         NotificationsTable.COLUMN_LU_FLAG + "," + // COLUMN_INDEX_LU_FLAG
                         CamaradesTable.COLUMN_PSEUDO + "," + // COLUMN_INDEX_PSEUDO
                         CamaradesTable.COLUMN_SEXE + "," + // COLUMN_INDEX_SEX
                         CamaradesTable.COLUMN_PROFILE + "," + // COLUMN_INDEX_PROFILE
+                        CamaradesTable.TABLE_NAME + "." +
+                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_MEMBER_ID
                         PhotosTable.COLUMN_ALBUM + "," + // COLUMN_INDEX_ALBUM
+                        PhotosTable.TABLE_NAME + "." +
+                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_PHOTO_ID
                         ActualitesTable.COLUMN_TEXT + "," + // COLUMN_INDEX_PUB_TEXT
                         ActualitesTable.COLUMN_LINK + "," + // COLUMN_INDEX_LINK
                         ActualitesTable.COLUMN_FICHIER + "," + // COLUMN_INDEX_FICHIER
+                        ActualitesTable.TABLE_NAME + "." +
+                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_PUB_ID
                         MessagerieTable.COLUMN_MESSAGE + "," + // COLUMN_INDEX_MSG_TEXT
-                        MessagerieTable.COLUMN_DATE + "," + // COLUMN_INDEX_MSG_DATE
-                        MessagerieTable.COLUMN_TIME + "," + // COLUMN_INDEX_MSG_TIME
-                        CommentairesTable.COLUMN_TEXT + // COLUMN_INDEX_COM_TEXT
+                        MessagerieTable.TABLE_NAME + "." +
+                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_MSG_ID
+                        CommentairesTable.COLUMN_TEXT + "," + // COLUMN_INDEX_COM_TEXT
+                        CommentairesTable.TABLE_NAME + "." +
+                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_COMMENT_ID
 
                         " FROM " + NotificationsTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
