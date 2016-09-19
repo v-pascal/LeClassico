@@ -33,4 +33,8 @@
     <string name="format_date" translatable="false">%2d/%2d</string>
     <string name="format_time" translatable="false">%2d:%2d</string>
 
+    <!-- Synchronization -->
+    <string name="to_synchronize">To synchronize</string>
+    <string name="synchronizing">Synchronizing</string>
+
 </resources>

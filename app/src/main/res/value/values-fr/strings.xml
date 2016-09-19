@@ -24,4 +24,8 @@
     <string name="confirm_logout">Souhaitez-vous vraiment vous déconnecter?</string>
     <string name="confirm_quit">Souhaitez-vous vraiment quitter l\'application, et donc vous déconnecter?</string>
 
+    <!-- Synchronization -->
+    <string name="to_synchronize">A synchroniser</string>
+    <string name="synchronizing">Synchronisation en cours</string>
+
 </resources>

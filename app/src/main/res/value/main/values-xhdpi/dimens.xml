@@ -27,7 +27,6 @@
     <dimen name="notify_text_margin">7dp</dimen>
     <dimen name="notify_text_size">17sp</dimen>
     <dimen name="notify_item_margin">13dp</dimen>
-    <dimen name="notify_item_bottom">7dp</dimen>
     <dimen name="notify_item_height">49dp</dimen>
     <dimen name="notify_message_height">27dp</dimen><!-- = notify_item_height - notify_info_height -->
     <dimen name="notify_info_height">22dp</dimen><!-- = notify_item_height - notify_message_height -->

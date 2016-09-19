@@ -45,7 +45,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     private RecyclerView mNotifyList; // Recycler view containing notification list
     private Cursor mNotifyData; // Cursor containing notification data
 
-    private class NotifyRecyclerViewAdapter extends RecyclerView.Adapter<NotifyRecyclerViewAdapter.ViewHolder> {
+    private class NotifyRecyclerViewAdapter extends RecyclerView.Adapter<NotifyRecyclerViewAdapter.ViewHolder>
+        implements View.OnClickListener {
 
         private void displayDate(TextView viewDate, String date) {
         // Display the notification date separator (with notification date formatted as locale user)
@@ -59,6 +60,32 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
             } catch (ParseException e) {
                 Logs.add(Logs.Type.E, "Wrong notification date: " + date);
+            }
+        }
+
+        ////// View.OnClickListener ////////////////////////////////////////////////////////////////
+        @Override
+        public void onClick(View sender) {
+            Logs.add(Logs.Type.V, "sender: " + sender);
+            switch (sender.getId()) {
+
+                case R.id.layout_data: {
+
+
+
+
+
+                    break;
+                }
+                case R.id.image_pseudo: {
+
+
+
+
+
+
+                    break;
+                }
             }
         }
 
@@ -179,6 +206,15 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             // Set notification type icon & time
             holder.mNotifyType.setImageDrawable(getResources().getDrawable(Tools.getNotifyIcon(type)));
             holder.mTextTime.setText(mNotifyData.getString(COLUMN_INDEX_DATE).substring(11, 16));
+
+            // Set notify synchronization
+            Tools.setSyncView(getContext(), holder.mSyncDate, holder.mSyncIcon,
+                    mNotifyData.getString(COLUMN_INDEX_STATUS_DATE),
+                    (byte)mNotifyData.getInt(COLUMN_INDEX_SYNC));
+
+            // Events
+            holder.mNotifyData.setOnClickListener(this);
+            holder.mImagePseudo.setOnClickListener(this);
         }
 
         @Override
@@ -198,6 +234,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             public final ImageView mNotifyType; // Notification type image view
             public final TextView mTextTime; // Notification time text view
 
+            public final TextView mSyncDate; // Notify synchronization date text view
+            public final ImageView mSyncIcon; // Notify synchronization image view
+
             //
             public ViewHolder(View view) {
                 super(view);
@@ -211,6 +250,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 mNotifyInfo = (TextView)view.findViewById(R.id.text_info);
                 mNotifyType = (ImageView)view.findViewById(R.id.image_type);
                 mTextTime = (TextView)view.findViewById(R.id.text_time);
+
+                mSyncDate = (TextView)view.findViewById(R.id.text_sync_date);
+                mSyncIcon = (ImageView)view.findViewById(R.id.image_sync);
             }
         }
     }
@@ -247,23 +289,25 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
     // Query column indexes
     private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
-    private static final int COLUMN_INDEX_NOTIFY_ID = 1;
-    private static final int COLUMN_INDEX_DATE = 2;
-    private static final int COLUMN_INDEX_LU_FLAG = 3;
-    private static final int COLUMN_INDEX_PSEUDO = 4;
-    private static final int COLUMN_INDEX_SEX = 5;
-    private static final int COLUMN_INDEX_PROFILE = 6;
-    private static final int COLUMN_INDEX_MEMBER_ID = 7;
-    private static final int COLUMN_INDEX_ALBUM = 8;
-    private static final int COLUMN_INDEX_PHOTO_ID = 9;
-    private static final int COLUMN_INDEX_PUB_TEXT = 10;
-    private static final int COLUMN_INDEX_LINK = 11;
-    private static final int COLUMN_INDEX_FICHIER = 12;
-    private static final int COLUMN_INDEX_PUB_ID = 13;
-    private static final int COLUMN_INDEX_MSG_TEXT = 14;
-    private static final int COLUMN_INDEX_MSG_ID = 15;
-    private static final int COLUMN_INDEX_COM_TEXT = 16;
-    private static final int COLUMN_INDEX_COMMENT_ID = 17;
+    private static final int COLUMN_INDEX_STATUS_DATE = 1;
+    private static final int COLUMN_INDEX_SYNC = 2;
+    private static final int COLUMN_INDEX_NOTIFY_ID = 3;
+    private static final int COLUMN_INDEX_DATE = 4;
+    private static final int COLUMN_INDEX_LU_FLAG = 5;
+    private static final int COLUMN_INDEX_PSEUDO = 6;
+    private static final int COLUMN_INDEX_SEX = 7;
+    private static final int COLUMN_INDEX_PROFILE = 8;
+    private static final int COLUMN_INDEX_MEMBER_ID = 9;
+    private static final int COLUMN_INDEX_ALBUM = 10;
+    private static final int COLUMN_INDEX_PHOTO_ID = 11;
+    private static final int COLUMN_INDEX_PUB_TEXT = 12;
+    private static final int COLUMN_INDEX_LINK = 13;
+    private static final int COLUMN_INDEX_FICHIER = 14;
+    private static final int COLUMN_INDEX_PUB_ID = 15;
+    private static final int COLUMN_INDEX_MSG_TEXT = 16;
+    private static final int COLUMN_INDEX_MSG_ID = 17;
+    private static final int COLUMN_INDEX_COM_TEXT = 18;
+    private static final int COLUMN_INDEX_COMMENT_ID = 19;
 
     ////// MainFragment ////////////////////////////////////////////////////////////////////////////
     @Override
@@ -287,6 +331,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + "," + // COLUMN_INDEX_OBJECT_TYPE
+                        NotificationsTable.COLUMN_STATUS_DATE + "," + // COLUMN_INDEX_STATUS_DATE
+                        NotificationsTable.TABLE_NAME + "." +
+                            Constants.DATA_COLUMN_SYNCHRONIZED + "," + // COLUMN_INDEX_SYNC
                         NotificationsTable.TABLE_NAME + "." +
                             IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_NOTIFY_ID
                         NotificationsTable.COLUMN_DATE + "," + // COLUMN_INDEX_DATE

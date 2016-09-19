@@ -1,22 +1,34 @@
 package com.studio.artaban.leclassico.tools;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.annotation.DrawableRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.TypedValue;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by pascal on 10/09/16.
@@ -93,5 +105,49 @@ public final class Tools {
             return NOTIFY_WALL_TYPE_IMAGE;
 
         return NOTIFY_WALL_TYPE_TEXT;
+    }
+
+    public static void setSyncView(Context context, TextView text, ImageView icon, String date, byte status) {
+    // Fill synchronization UI components according its status
+
+        Logs.add(Logs.Type.V, "context: " + context + ";date: " + date + ";status: " + status +
+                ";text: " + text + ";icon: " + icon);
+        icon.setColorFilter(Color.BLACK);
+        icon.clearAnimation();
+
+        if (status == DataProvider.Synchronized.TODO.getValue()) { // To synchronize
+            text.setText(context.getString(R.string.to_synchronize));
+            icon.setImageDrawable(context.getDrawable(R.drawable.ic_sync_white_18dp));
+
+        } else if (status == DataProvider.Synchronized.IN_PROGRESS.getValue()) { // Synchronizing
+            text.setText(context.getString(R.string.synchronizing));
+            icon.setColorFilter(Color.TRANSPARENT);
+            icon.setImageDrawable(context.getDrawable(R.drawable.spinner_black_16));
+
+            RotateAnimation anim = new RotateAnimation(0f, 350f,
+                    Animation.RELATIVE_TO_SELF, 0.5f,
+                    Animation.RELATIVE_TO_SELF, 0.5f);
+            anim.setInterpolator(new LinearInterpolator());
+            anim.setRepeatCount(Animation.INFINITE);
+            anim.setDuration(700);
+            icon.startAnimation(anim);
+
+        } else if (status == DataProvider.Synchronized.DONE.getValue()) { // Synchronized
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
+            try {
+                Date syncDate = dateFormat.parse(date);
+                DateFormat userDate = android.text.format.DateFormat.getMediumDateFormat(context);
+                DateFormat userTime = android.text.format.DateFormat.getTimeFormat(context);
+
+                text.setText(userDate.format(syncDate) + " " + userTime.format(syncDate));
+
+            } catch (ParseException e) {
+                Logs.add(Logs.Type.E, "Wrong status date format: " + date);
+            }
+            icon.setImageDrawable(context.getDrawable(R.drawable.ic_check_white_18dp));
+        }
+        //else // status == DataProvider.Synchronized.TO_DELETE.getValue()
+        //        NB: Should not happen coz nothing to display!
     }
 }

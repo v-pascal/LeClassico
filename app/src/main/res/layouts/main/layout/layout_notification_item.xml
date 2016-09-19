@@ -38,6 +38,14 @@
     <!-- From pseudo icon -->
     <ImageView
         android:id="@+id/image_pseudo"
+        android:clickable="true"
+
+
+
+        android:background="@drawable/pseudo_ripple"
+
+
+
         android:layout_below="@id/date_separator"
         android:layout_marginStart="@dimen/notify_item_horizontal_margin"
         android:layout_width="@dimen/notify_item_height"
@@ -109,26 +117,14 @@
         android:layout_below="@id/image_pseudo"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/notify_item_horizontal_margin"
-        android:layout_alignBottom="@dimen/notify_item_bottom"
         android:scaleType="center"
-        android:src="@drawable/ic_check_white_18dp"
-        android:tint="@android:color/black"
         android:layout_marginStart="@dimen/sync_text_margin"
         android:layout_width="@dimen/sync_height"
         android:layout_height="@dimen/sync_height"/>
     <TextView
-        android:id="@+id/sync_date"
+        android:id="@+id/text_sync_date"
         android:layout_below="@id/image_pseudo"
         android:layout_toStartOf="@id/image_sync"
-
-
-
-
-        android:text="11 jan, 2016 - 10:15"
-
-
-
-
         android:textSize="@dimen/sync_text_size"
         android:gravity="center_vertical"
         android:layout_width="wrap_content"
