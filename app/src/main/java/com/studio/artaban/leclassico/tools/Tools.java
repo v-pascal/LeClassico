@@ -2,9 +2,11 @@ package com.studio.artaban.leclassico.tools;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.RippleDrawable;
 import android.support.annotation.DrawableRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -37,12 +39,12 @@ import java.util.Date;
 public final class Tools {
 
     private static float PROFILE_SIZE_RADIUS_FACTOR = 80f;
-    public static void setProfile(final Activity activity, ImageView view, boolean female,
-                                  String profile, final int size) {
+    public static void setProfile(final Activity activity, ImageView view, final boolean female,
+                                  String profile, final int size, final boolean clickable) {
     // Display profile image using 'Glider' class (expected user profile & gender)
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
-                ";profile: " + profile);
+                ";profile: " + profile + ";clickable: " + clickable);
         if (profile != null)
             Glider.with(activity)
                     .load(Storage.FOLDER_PROFILES +
@@ -52,7 +54,21 @@ public final class Tools {
                     .into(view, new Glider.OnLoadListener() {
 
                                 @Override
-                                public boolean setResource(Bitmap resource, ImageView imageView) {
+                                public void onLoadFailed(ImageView imageView) {
+
+                                    //Logs.add(Logs.Type.V, "imageView: " + imageView);
+                                    if (clickable) {
+                                        imageView.setImageDrawable(null); // Remove placeholder
+                                        imageView.setBackground(
+                                                new RippleDrawable(ColorStateList.valueOf(activity
+                                                        .getResources().getColor(R.color.black_transparent)),
+                                                activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
+                                                activity.getDrawable(R.drawable.man)));
+                                    }
+                                }
+
+                                @Override
+                                public boolean onSetResource(Bitmap resource, ImageView imageView) {
                                     //Logs.add(Logs.Type.V, "resource: " + resource +
                                     //        ";imageView: " + imageView);
 
@@ -65,12 +81,25 @@ public final class Tools {
                                             activity.getResources().getDisplayMetrics().density;
                                     radiusBmp.setCornerRadius(radius.getFloat() * (factor /
                                             PROFILE_SIZE_RADIUS_FACTOR));
-                                    imageView.setImageDrawable(radiusBmp);
+
+                                    if (clickable) { // Check to display a ripple effect
+                                        imageView.setImageDrawable(null); // Remove placeholder
+                                        imageView.setBackground(
+                                                new RippleDrawable(ColorStateList.valueOf(activity
+                                                        .getResources().getColor(R.color.black_transparent)),
+                                                radiusBmp, radiusBmp));
+                                    } else
+                                        imageView.setImageDrawable(radiusBmp);
                                     return true;
                                 }
                             });
-        else
+        else if (!clickable)
             view.setImageDrawable(activity.getDrawable((female) ? R.drawable.woman : R.drawable.man));
+        else
+            view.setBackground(new RippleDrawable(ColorStateList.valueOf(activity.getResources()
+                    .getColor(R.color.black_transparent)),
+                    activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
+                    activity.getDrawable(R.drawable.man)));
     }
 
     public static @DrawableRes int getNotifyIcon(char type) {

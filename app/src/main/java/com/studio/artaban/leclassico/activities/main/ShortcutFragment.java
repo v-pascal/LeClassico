@@ -38,7 +38,7 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
     public void setIcon(boolean female, String profile, int size) {
         Logs.add(Logs.Type.V, "female: " + female + ";profile: " + profile);
         Tools.setProfile(getActivity(), (ImageView) mRootView.findViewById(R.id.image_icon),
-                female, profile, size);
+                female, profile, size, false);
     }
 
     private View mRootView; // Fragment root view

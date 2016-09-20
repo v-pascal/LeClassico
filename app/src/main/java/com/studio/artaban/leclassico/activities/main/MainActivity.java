@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements
                         // Profile
                         Tools.setProfile(MainActivity.this,
                                 (ImageView)navHeader.findViewById(R.id.image_profile),
-                                female, profile, R.dimen.profile_size);
+                                female, profile, R.dimen.profile_size, false);
                         // Banner
                         if (banner != null)
                             Glider.with(MainActivity.this)

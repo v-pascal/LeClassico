@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.helpers;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
 import android.widget.ImageView;
@@ -57,7 +58,8 @@ public class Glider {
     }
 
     public interface OnLoadListener { //////////////////////////////////////////////////////////////
-        boolean setResource(Bitmap resource, ImageView imageView);
+        void onLoadFailed(ImageView imageView);
+        boolean onSetResource(Bitmap resource, ImageView imageView);
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +78,15 @@ public class Glider {
             .centerCrop()
             .placeholder(mPlaceholderId)
             .into(new BitmapImageViewTarget(imageView) {
+
+                @Override
+                public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                    super.onLoadFailed(e, errorDrawable);
+
+                    //Logs.add(Logs.Type.V, "e: " + e + ";errorDrawable: " + errorDrawable);
+                    if (listener != null)
+                        listener.onLoadFailed(imageView);
+                }
 
                 @Override
                 protected void setResource(Bitmap resource) {
@@ -101,7 +112,7 @@ public class Glider {
                     }
 
                     // Check if needed to display image (using listener)
-                    if ((listener == null) || (!listener.setResource(resource, imageView)))
+                    if ((listener == null) || (!listener.onSetResource(resource, imageView)))
                         imageView.setImageBitmap(resource);
                 }
             });

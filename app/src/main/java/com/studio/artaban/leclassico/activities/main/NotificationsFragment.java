@@ -138,7 +138,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     (mNotifyData.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
             String profile = (!mNotifyData.isNull(COLUMN_INDEX_PROFILE))?
                     mNotifyData.getString(COLUMN_INDEX_PROFILE) : null;
-            Tools.setProfile(getActivity(), holder.mImagePseudo, female, profile, R.dimen.shortcut_content_height);
+            Tools.setProfile(getActivity(), holder.mImagePseudo, female, profile,
+                    R.dimen.shortcut_content_height, true);
 
             // Set notification message & info
             char type = mNotifyData.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);

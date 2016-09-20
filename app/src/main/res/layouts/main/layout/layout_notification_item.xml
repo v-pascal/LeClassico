@@ -39,13 +39,6 @@
     <ImageView
         android:id="@+id/image_pseudo"
         android:clickable="true"
-
-
-
-        android:background="@drawable/pseudo_ripple"
-
-
-
         android:layout_below="@id/date_separator"
         android:layout_marginStart="@dimen/notify_item_horizontal_margin"
         android:layout_width="@dimen/notify_item_height"
