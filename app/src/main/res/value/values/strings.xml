@@ -8,6 +8,7 @@
     <string name="search">Search</string>
     <string name="notifications">Notifications</string>
     <string name="not_defined">[NOT DEFINED]</string>
+    <string name="unread">unread</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">Le Classico</string>

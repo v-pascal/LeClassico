@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Main -->
 
+    <!-- Shortcut -->
     <string name="home_connected">Membre %1$s connecté!</string>
     <string name="home_info">Nouveaux messages: %1$d - Nouvelles notifications: %2$d</string>
     <string name="no_publication">Aucune publication</string>
@@ -10,7 +11,9 @@
     <string name="last_followed_info">Dernier membre suivi</string>
     <string name="no_notification">Aucune notification</string>
     <string name="no_notification_info">Pas d\'événement justifiant une notification</string>
+    <string name="notification_info">Dernière notification reçue</string>
 
+    <!-- Notification -->
     <string name="notify_shared_message">%1$s a ajouté une photo</string>
     <string name="notify_shared_info">Dans votre album %1$s</string>
     <string name="notify_wall_message">%1$s a publié %2$s sur votre mur</string>

@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,55 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
     private RecyclerView mNotifyList; // Recycler view containing notification list
     private Cursor mNotifyData; // Cursor containing notification data
+
+    private SpannableStringBuilder getNotifyMessage(int color) {
+
+        Logs.add(Logs.Type.V, "color: " + color);
+        char type = mNotifyData.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
+        String pseudo = mNotifyData.getString(COLUMN_INDEX_PSEUDO);
+
+        SpannableStringBuilder message = null;
+        switch (type) {
+            case NotificationsTable.TYPE_SHARED: { ////// Photo added (into shared album)
+
+                message = new SpannableStringBuilder(getString(R.string.notify_shared_message, pseudo));
+                int pseudoPos = getResources().getInteger(R.integer.notify_shared_message_pseudo_pos);
+                message.setSpan(new ForegroundColorSpan(getResources().getColor(color)),
+                        pseudoPos, pseudoPos + pseudo.length(), 0);
+                break;
+            }
+            case NotificationsTable.TYPE_WALL: { ////// Wall publication
+
+                message = new SpannableStringBuilder(getString(R.string.notify_wall_message, pseudo,
+                        getResources().getStringArray(R.array.notify_wall_types)[Tools.getNotifyWallType(mNotifyData,
+                                COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER)]));
+                int pseudoPos = getResources().getInteger(R.integer.notify_wall_message_pseudo_pos);
+                message.setSpan(new ForegroundColorSpan(getResources().getColor(color)),
+                        pseudoPos, pseudoPos + pseudo.length(), 0);
+                break;
+            }
+            case NotificationsTable.TYPE_MAIL: { ////// Mail received
+
+                message = new SpannableStringBuilder(getString(R.string.notify_mail_message, pseudo));
+                int pseudoPos = getResources().getInteger(R.integer.notify_mail_pseudo_pos);
+                message.setSpan(new ForegroundColorSpan(getResources().getColor(color)),
+                        pseudoPos, pseudoPos + pseudo.length(), 0);
+                break;
+            }
+            case NotificationsTable.TYPE_PUB_COMMENT:
+            case NotificationsTable.TYPE_PIC_COMMENT: { ////// Comment added (onto publication or photo)
+
+                int typeIdx = (type == NotificationsTable.TYPE_PUB_COMMENT)? 0:1;
+                message = new SpannableStringBuilder(getString(R.string.notify_comment_message, pseudo,
+                        getResources().getStringArray(R.array.notify_comment_types)[typeIdx]));
+                int pseudoPos = getResources().getInteger(R.integer.notify_comment_pseudo_pos);
+                message.setSpan(new ForegroundColorSpan(getResources().getColor(color)),
+                        pseudoPos, pseudoPos + pseudo.length(), 0);
+                break;
+            }
+        }
+        return message;
+    }
 
     private class NotifyRecyclerViewAdapter extends RecyclerView.Adapter<NotifyRecyclerViewAdapter.ViewHolder>
         implements View.OnClickListener {
@@ -143,17 +193,12 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
             // Set notification message & info
             char type = mNotifyData.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
-            String pseudo = mNotifyData.getString(COLUMN_INDEX_PSEUDO);
 
-            SpannableStringBuilder message = null;
+            SpannableStringBuilder message = getNotifyMessage(pseudoColor);
             SpannableStringBuilder info = null;
             switch (type) {
-                case NotificationsTable.TYPE_SHARED: { ////// Photo added (into shared album)
 
-                    message = new SpannableStringBuilder(getString(R.string.notify_shared_message, pseudo));
-                    int pseudoPos = getResources().getInteger(R.integer.notify_shared_message_pseudo_pos);
-                    message.setSpan(new ForegroundColorSpan(getResources().getColor(pseudoColor)),
-                            pseudoPos, pseudoPos + pseudo.length(), 0);
+                case NotificationsTable.TYPE_SHARED: { ////// Photo added (into shared album)
 
                     String album = mNotifyData.getString(COLUMN_INDEX_ALBUM);
                     info = new SpannableStringBuilder(getString(R.string.notify_shared_info, album));
@@ -163,13 +208,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 }
                 case NotificationsTable.TYPE_WALL: { ////// Wall publication
 
-                    message = new SpannableStringBuilder(getString(R.string.notify_wall_message, pseudo,
-                            getResources().getStringArray(R.array.notify_wall_types)[Tools.getNotifyWallType(mNotifyData,
-                                    COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER)]));
-                    int pseudoPos = getResources().getInteger(R.integer.notify_wall_message_pseudo_pos);
-                    message.setSpan(new ForegroundColorSpan(getResources().getColor(pseudoColor)),
-                            pseudoPos, pseudoPos + pseudo.length(), 0);
-
                     info = new SpannableStringBuilder(
                             (!mNotifyData.isNull(COLUMN_INDEX_PUB_TEXT))?
                                     mNotifyData.getString(COLUMN_INDEX_PUB_TEXT).replaceAll("\\s{2,}", " "):
@@ -178,24 +216,12 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 }
                 case NotificationsTable.TYPE_MAIL: { ////// Mail received
 
-                    message = new SpannableStringBuilder(getString(R.string.notify_mail_message, pseudo));
-                    int pseudoPos = getResources().getInteger(R.integer.notify_mail_pseudo_pos);
-                    message.setSpan(new ForegroundColorSpan(getResources().getColor(pseudoColor)),
-                            pseudoPos, pseudoPos + pseudo.length(), 0);
-
                     info = (SpannableStringBuilder)Html.fromHtml(mNotifyData.getString(COLUMN_INDEX_MSG_TEXT)
                             .replaceAll("\\s{2,}", " "));
                     break;
                 }
                 case NotificationsTable.TYPE_PUB_COMMENT:
                 case NotificationsTable.TYPE_PIC_COMMENT: { ////// Comment added (onto publication or photo)
-
-                    int typeIdx = (type == NotificationsTable.TYPE_PUB_COMMENT)? 0:1;
-                    message = new SpannableStringBuilder(getString(R.string.notify_comment_message, pseudo,
-                            getResources().getStringArray(R.array.notify_comment_types)[typeIdx]));
-                    int pseudoPos = getResources().getInteger(R.integer.notify_comment_pseudo_pos);
-                    message.setSpan(new ForegroundColorSpan(getResources().getColor(pseudoColor)),
-                            pseudoPos, pseudoPos + pseudo.length(), 0);
 
                     info = new SpannableStringBuilder(mNotifyData.getString(COLUMN_INDEX_COM_TEXT));
                     break;
@@ -262,12 +288,28 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-        cursor.moveToFirst();
 
+        cursor.moveToFirst();
         if (id == Queries.MAIN_NOTIFICATIONS) {
 
+            // Update shortcut
+            mNotifyData = cursor;
+            mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
+                    getNotifyMessage(R.color.colorPrimaryProfile));
+            SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.notification_info));
+            if (mNotifyData.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
+
+                int unreadPos = info.length() + 2; // ' ' + '(' = 2
+                String unread = getString(R.string.unread);
+                info.append(" (" + unread + ")");
+                info.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), unreadPos,
+                        unreadPos + unread.length(), 0);
+            }
+            mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, info);
 
 
+            //mListener.onSetIcon();
+            //mListener.onSetIcon(); // Notification (add flag)
 
 
 
@@ -275,7 +317,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
             // Fill notification list
-            mNotifyData = cursor;
             mNotifyList.setAdapter(new NotifyRecyclerViewAdapter());
         }
     }

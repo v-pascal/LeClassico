@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Main -->
 
+    <!-- Shortcut -->
     <string name="home_connected">Member %1$s connected!</string><!-- @integer/home_connected_pseudo_pos -->
     <string name="home_info">New messages: %1$d - New notifications: %2$d</string><!-- @integer/home_info_mail_pos & home_info_notify_pos -->
     <string name="no_publication">No publication</string>
@@ -10,10 +11,9 @@
     <string name="last_followed_info">Last followed member</string>
     <string name="no_notification">No notification</string>
     <string name="no_notification_info">No event justifying a notification</string>
+    <string name="notification_info">Last notification received</string>
 
-    <string name="no_date" translatable="false">--/--</string>
-    <string name="no_time" translatable="false">--:--</string>
-
+    <!-- Notification -->
     <string name="notify_shared_message">%1$s has added a photo</string><!-- @integer/notify_shared_message_pseudo_pos -->
     <string name="notify_shared_info">To your %1$s album</string><!-- @integer/notify_shared_info_album_pos -->
     <string name="notify_wall_message">%1$s has published %2$s on your wall</string><!-- @integer/notify_wall_message_pseudo_pos -->
@@ -29,6 +29,10 @@
         <item>your publication</item>
         <item>one of your photo</item>
     </string-array>
+
+    <!-- Formats -->
+    <string name="no_date" translatable="false">--/--</string>
+    <string name="no_time" translatable="false">--:--</string>
 
     <!-- Navigation -->
     <string name="nav_profile">Profile</string>
