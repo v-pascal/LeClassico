@@ -292,29 +292,30 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         cursor.moveToFirst();
         if (id == Queries.MAIN_NOTIFICATIONS) {
 
-            // Update shortcut
+            // Fill shortcut
             mNotifyData = cursor;
             mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
                     getNotifyMessage(R.color.colorPrimaryProfile));
+            boolean unread = mNotifyData.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD;
+            char type = mNotifyData.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
             SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.notification_info));
-            if (mNotifyData.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
+            if (unread) {
 
                 int unreadPos = info.length() + 2; // ' ' + '(' = 2
-                String unread = getString(R.string.unread);
-                info.append(" (" + unread + ")");
-                info.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), unreadPos,
-                        unreadPos + unread.length(), 0);
+                String notRead = getString(R.string.unread);
+                info.append(" (" + notRead + ")");
+                info.setSpan(new StyleSpan(Typeface.BOLD), unreadPos, unreadPos + notRead.length(), 0);
             }
+            boolean female = (!mNotifyData.isNull(COLUMN_INDEX_SEX)) &&
+                    (mNotifyData.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+            String profile = (!mNotifyData.isNull(COLUMN_INDEX_PROFILE))?
+                    mNotifyData.getString(COLUMN_INDEX_PROFILE) : null;
+
+            mListener.onSetNotify(type, !unread);
             mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, info);
-
-
-            //mListener.onSetIcon();
-            //mListener.onSetIcon(); // Notification (add flag)
-
-
-
-
-
+            mListener.onSetDate(Constants.MAIN_SECTION_NOTIFICATIONS, false, mNotifyData.getString(COLUMN_INDEX_DATE));
+            mListener.onSetIcon(Constants.MAIN_SECTION_NOTIFICATIONS, female, profile,
+                    R.dimen.shortcut_content_height);
 
             // Fill notification list
             mNotifyList.setAdapter(new NotifyRecyclerViewAdapter());

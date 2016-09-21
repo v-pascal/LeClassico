@@ -34,6 +34,9 @@ public class MainFragment extends Fragment {
         void onSetMessage(int section, SpannableStringBuilder message);
         void onSetInfo(int section, SpannableStringBuilder info);
         void onSetIcon(int section, boolean female, String profile, int size);
+        void onSetDate(int section, boolean start, String dateTime);
+
+        void onSetNotify(char type, boolean read);
     }
     protected OnFragmentListener mListener;
 

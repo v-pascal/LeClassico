@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void run() {
                 Logs.add(Logs.Type.V, null);
-                ((ShortcutFragment)getSupportFragmentManager()
+                ((ShortcutFragment) getSupportFragmentManager()
                         .findFragmentById(getShortcutID(section))).setInfo(info);
             }
         });
@@ -104,8 +104,34 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void run() {
                 Logs.add(Logs.Type.V, null);
-                ((ShortcutFragment)getSupportFragmentManager()
+                ((ShortcutFragment) getSupportFragmentManager()
                         .findFragmentById(getShortcutID(section))).setIcon(female, profile, size);
+            }
+        });
+    }
+    @Override
+    public void onSetDate(final int section, final boolean start, final String dateTime) {
+        //Logs.add(Logs.Type.V, "section: " + section + ";start: " + start + ";dateTime: " + dateTime);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Logs.add(Logs.Type.V, null);
+                ((ShortcutFragment) getSupportFragmentManager()
+                        .findFragmentById(getShortcutID(section))).setDate(start, dateTime);
+            }
+        });
+    }
+
+    @Override
+    public void onSetNotify(final char type, final boolean read) {
+        //Logs.add(Logs.Type.V, "type: " + type + ";read: " + read);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Logs.add(Logs.Type.V, null);
+                ((ShortcutFragment) getSupportFragmentManager()
+                        .findFragmentById(getShortcutID(Constants.MAIN_SECTION_NOTIFICATIONS)))
+                        .setNotify(type, read);
             }
         });
     }
