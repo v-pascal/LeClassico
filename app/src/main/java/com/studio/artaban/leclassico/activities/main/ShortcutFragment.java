@@ -25,29 +25,28 @@ import com.studio.artaban.leclassico.tools.Tools;
  */
 public class ShortcutFragment extends Fragment implements View.OnClickListener {
 
-    public void setMessage(SpannableStringBuilder message) {
+    public void setMessage(SpannableStringBuilder message) { // Set message text
         Logs.add(Logs.Type.V, "message: " + message);
         ((TextView) mRootView.findViewById(R.id.text_message))
                 .setText(message, TextView.BufferType.SPANNABLE);
     }
-    public void setInfo(SpannableStringBuilder info) {
+    public void setInfo(SpannableStringBuilder info) { // Set info text
         Logs.add(Logs.Type.V, "info: " + info);
         ((TextView) mRootView.findViewById(R.id.text_info))
                 .setText(info, TextView.BufferType.SPANNABLE);
     }
-    public void setIcon(boolean female, String profile, int size) {
+    public void setIcon(boolean female, String profile, int size) { // Set profile icon
         Logs.add(Logs.Type.V, "female: " + female + ";profile: " + profile);
         Tools.setProfile(getActivity(), (ImageView) mRootView.findViewById(R.id.image_icon),
                 female, profile, size, false);
     }
-    public void setDate(boolean start, String dateTime) {
+    public void setDate(boolean start, String dateTime) { // Set start or end date
         Logs.add(Logs.Type.V, "start: " + start + ";dateTime: " + dateTime);
-
-
-
-
-
-
+        TextView date = (start)?
+                (TextView)mRootView.findViewById(R.id.start_date):(TextView)mRootView.findViewById(R.id.end_date);
+        TextView time = (start)?
+                (TextView)mRootView.findViewById(R.id.start_time):(TextView)mRootView.findViewById(R.id.end_time);
+        Tools.setDateTime(getContext(), date, time, dateTime);
     }
 
     public void setNotify(char type, boolean read) {

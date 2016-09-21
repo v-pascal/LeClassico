@@ -179,4 +179,25 @@ public final class Tools {
         //else // status == DataProvider.Synchronized.TO_DELETE.getValue()
         //        NB: Should not happen coz nothing to display!
     }
+
+    public static void setDateTime(Context context, TextView date, TextView time, String dateTime) {
+    // Fill date & time text views according a date & time parameter (in query date & time format)
+    // i.e: --/-- for the date & --:-- for the time
+
+        Logs.add(Logs.Type.V, "context: " + context + ";date: " + date + ";time: " + time);
+        DateFormat paramFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
+        try {
+            Date paramDate = paramFormat.parse(dateTime);
+            DateFormat dateFormat = new SimpleDateFormat(context.getString(R.string.format_date));
+            DateFormat timeFormat = new SimpleDateFormat(context.getString(R.string.format_time));
+
+            String dateText = dateFormat.format(paramDate);
+            date.setText((dateText.compareTo(dateFormat.format(new Date())) != 0)?
+                    dateText : context.getString(R.string.today));
+            time.setText(timeFormat.format(paramDate));
+
+        } catch (ParseException e) {
+            Logs.add(Logs.Type.E, "Wrong query date & time format: " + dateTime);
+        }
+    }
 }

@@ -9,6 +9,7 @@
     <string name="notifications">Notifications</string>
     <string name="not_defined">[NOT DEFINED]</string>
     <string name="unread">unread</string>
+    <string name="today">Today</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">Le Classico</string>
@@ -31,8 +32,8 @@
     <string name="confirm_quit">Do you really want to quit application and therefore logout?</string>
 
     <!-- Formats -->
-    <string name="format_date" translatable="false">%2d/%2d</string>
-    <string name="format_time" translatable="false">%2d:%2d</string>
+    <string name="format_date">dd/MM</string>
+    <string name="format_time" translatable="false">HH:mm</string>
 
     <!-- Synchronization -->
     <string name="to_synchronize">To synchronize</string>

@@ -106,7 +106,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             try {
                 Date notifyDate = dateFormat.parse(date);
                 DateFormat user = android.text.format.DateFormat.getMediumDateFormat(getContext());
-                viewDate.setText(user.format(notifyDate));
+                String userDate = user.format(notifyDate);
+                viewDate.setText((userDate.compareTo(user.format(new Date())) != 0)?
+                        userDate : getResources().getString(R.string.today));
 
             } catch (ParseException e) {
                 Logs.add(Logs.Type.E, "Wrong notification date: " + date);

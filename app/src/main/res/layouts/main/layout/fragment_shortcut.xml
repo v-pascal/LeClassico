@@ -11,28 +11,30 @@
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/layout_start_date"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:layout_width="@dimen/shortcut_content_height"
         android:layout_height="@dimen/shortcut_content_height">
 
         <TextView
             android:id="@+id/start_date"
             android:text="@string/no_date"
-            android:layout_margin="@dimen/shortcut_border_margin"
             android:textColor="@android:color/white"
-            android:fontFamily="monospace"
             android:textSize="@dimen/shortcut_date_size"
+            android:fontFamily="monospace"
+            android:gravity="bottom"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="0dp"/>
         <TextView
             android:id="@+id/start_time"
             android:text="@string/no_time"
-            android:layout_margin="@dimen/shortcut_border_margin"
             android:textColor="@android:color/white"
-            android:fontFamily="monospace"
             android:textSize="@dimen/shortcut_date_size"
+            android:fontFamily="monospace"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="0dp"/>
 
     </LinearLayout>
 
@@ -127,29 +129,30 @@
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/layout_end_date"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:layout_width="@dimen/shortcut_content_height"
         android:layout_height="@dimen/shortcut_content_height">
 
         <TextView
             android:id="@+id/end_date"
-            android:layout_margin="@dimen/shortcut_border_margin"
             android:text="@string/no_date"
             android:textColor="@android:color/black"
-            android:fontFamily="monospace"
             android:textSize="@dimen/shortcut_date_size"
+            android:fontFamily="monospace"
+            android:gravity="bottom"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="0dp"/>
         <TextView
             android:id="@+id/end_time"
-            android:layout_margin="@dimen/shortcut_border_margin"
             android:text="@string/no_time"
             android:textColor="@android:color/black"
-            android:fontFamily="monospace"
             android:textSize="@dimen/shortcut_date_size"
+            android:fontFamily="monospace"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="0dp"/>
 
     </LinearLayout>
-
 </LinearLayout>

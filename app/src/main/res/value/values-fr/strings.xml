@@ -8,6 +8,7 @@
     <string name="notifications">Notifications</string>
     <string name="not_defined">[NON DEFINI]</string>
     <string name="unread">non lu</string>
+    <string name="today">Aujourd\'hui</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>
