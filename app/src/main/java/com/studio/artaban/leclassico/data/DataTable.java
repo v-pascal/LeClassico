@@ -24,6 +24,7 @@ public abstract class DataTable implements IDataTable {
     public static final String DATA_KEY_TABLE_NAME = "tableName";
     public static final String DATA_KEY_FIELD_STATUS_DATE = "statusDate";
     public static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
+    public static final String DATA_KEY_LIMIT = "limit";
 
     //////
     protected static String getUrlSynchroRequest(ContentResolver resolver, Bundle data) {
@@ -42,6 +43,9 @@ public abstract class DataTable implements IDataTable {
             Logs.add(Logs.Type.I, "Previous status date: " + cursor.getString(0));
             url += "&" + WebServices.DATA_DATE + "=" + cursor.getString(0).replace(' ', 'n');
         }
+        if (data.containsKey(DATA_KEY_LIMIT))
+            url += "&" + WebServices.DATA_LIMIT + "=" + data.getShort(DATA_KEY_LIMIT);
+
         cursor.close();
         return url;
     }

@@ -19,6 +19,7 @@ public final class WebServices {
     ////// GET & POST data keys
     public static final String DATA_TOKEN = "Clf";
     public static final String DATA_DATE = "Date";
+    public static final String DATA_LIMIT = "Count";
 
     // Connection
     public static final String CONNECTION_DATA_PSEUDO = "psd";

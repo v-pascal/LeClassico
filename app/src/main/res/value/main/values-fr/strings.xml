@@ -8,6 +8,7 @@
     <string name="no_publication_info">Rien n\'a été publié par les membres suivis</string>
     <string name="no_event">Aucun événement</string>
     <string name="no_event_info">Pas d\'événement annoncé</string>
+    <string name="last_event_info">Dernier événement annoncé</string>
     <string name="last_followed_info">Dernier membre suivi</string>
     <string name="no_notification">Aucune notification</string>
     <string name="no_notification_info">Pas d\'événement justifiant une notification</string>
