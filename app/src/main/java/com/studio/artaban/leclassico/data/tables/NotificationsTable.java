@@ -36,6 +36,11 @@ public class NotificationsTable extends DataTable {
     public static final char TYPE_PIC_COMMENT = 'P'; // User photo commented
     // Notification types
 
+    public static final short DEFAULT_LIMIT = 25; // Default remote DB query limit
+
+    public static final short DISPLAY_INITIAL_COUNT = 20; // Notification count to display initially
+    public static final short DISPLAY_INCREASE_COUNT = 5; // Default remote DB query limit
+
     public static class Pin extends DataField { //////////////////////////////// Notifications entry
 
         public Pin(short count, long id) { super(count, id); }
@@ -62,6 +67,7 @@ public class NotificationsTable extends DataTable {
         data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_NOTIFICATIONS);
         data.putString(DataTable.DATA_KEY_TOKEN, token);
         data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
+        data.putShort(DataTable.DATA_KEY_LIMIT, DEFAULT_LIMIT);
         data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
         data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, COLUMN_STATUS_DATE);
         data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
