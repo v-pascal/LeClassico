@@ -326,11 +326,17 @@ public class MainActivity extends AppCompatActivity implements
 
                     @Override
                     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-
                         //Logs.add(Logs.Type.V, "appBarLayout: " + appBarLayout +
                         //        ";verticalOffset: " + verticalOffset);
-                        if (appBarLayout.findViewById(R.id.shortcut) != null)
+
+                        if (appBarLayout.findViewById(R.id.shortcut) != null) {
+                            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+                                int actionHeight = -getResources().getDimensionPixelSize(R.dimen.appbar_padding_title);
+                                verticalOffset = (verticalOffset < actionHeight)? verticalOffset - actionHeight:0;
+                            }
                             appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
+                        }
                         //else // NB: Can occur when search operation starts
                     }
                 });
