@@ -332,10 +332,9 @@ public class MainActivity extends AppCompatActivity implements
                             appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
                         //else // NB: Can occur when search operation starts
                     }
-        });
+                });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Set drawer toggle
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

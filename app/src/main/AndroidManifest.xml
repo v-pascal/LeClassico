@@ -56,7 +56,7 @@
 
         <!-- Content providers -->
         <provider
-            android:name=".data.DataProvider"
+            android:name=".data.DataProvider" android:exported="false"
             android:authorities="com.studio.artaban.provider.leclassico"/>
 
         <!-- Services -->
