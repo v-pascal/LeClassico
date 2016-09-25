@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
@@ -335,6 +336,21 @@ public class MainActivity extends AppCompatActivity implements
                 });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+            // Display shortcut below action bar title & icons
+            findViewById(R.id.text_title).setVisibility(View.VISIBLE);
+
+            Point screenSize = new Point();
+            getWindowManager().getDefaultDisplay().getSize(screenSize);
+            int margin = getResources().getDimensionPixelSize(R.dimen.shortcut_margin_horizontal);
+
+            View toolbarLayout = findViewById(R.id.layout_toolbar);
+            toolbarLayout.setTranslationX(margin - getResources().getDimensionPixelSize(R.dimen.appbar_padding_title));
+            toolbarLayout.getLayoutParams().width = screenSize.x -(margin << 1);
+        }
 
         // Set drawer toggle
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -529,10 +545,16 @@ public class MainActivity extends AppCompatActivity implements
 
                                     findViewById(R.id.shortcut_home).setTranslationX(mPositionHome);
                                     findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications);
+                                    findViewById(R.id.shortcut_new_publication).setTranslationX(mPositionPublications);
                                     findViewById(R.id.shortcut_events).setTranslationX(mPositionEvents);
+                                    findViewById(R.id.shortcut_new_event).setTranslationX(mPositionEvents);
                                     findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers);
                                     findViewById(R.id.shortcut_notifications).setTranslationX(mPositionNotifications);
-                                    findViewById(R.id.shortcut_new).setTranslationY(-mShortcutHeight);
+                                    findViewById(R.id.shortcut_new_notification).setTranslationX(mPositionNotifications);
+
+                                    findViewById(R.id.shortcut_new_publication).setTranslationY(-mShortcutHeight);
+                                    findViewById(R.id.shortcut_new_event).setTranslationY(-mShortcutHeight);
+                                    findViewById(R.id.shortcut_new_notification).setTranslationY(-mShortcutHeight);
                                 }
                             });
                 } else
@@ -554,11 +576,17 @@ public class MainActivity extends AppCompatActivity implements
                             (position * mShortcutWidth));
                     findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications +
                             (position * mShortcutWidth));
+                    findViewById(R.id.shortcut_new_publication).setTranslationX(mPositionPublications +
+                            (position * mShortcutWidth));
                     findViewById(R.id.shortcut_events).setTranslationX(mPositionEvents +
+                            (position * mShortcutWidth));
+                    findViewById(R.id.shortcut_new_event).setTranslationX(mPositionEvents +
                             (position * mShortcutWidth));
                     findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers +
                             (position * mShortcutWidth));
                     findViewById(R.id.shortcut_notifications).setTranslationX(mPositionNotifications +
+                            (position * mShortcutWidth));
+                    findViewById(R.id.shortcut_new_notification).setTranslationX(mPositionNotifications +
                             (position * mShortcutWidth));
                 }
             }

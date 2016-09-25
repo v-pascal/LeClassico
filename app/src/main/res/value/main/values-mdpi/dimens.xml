@@ -6,6 +6,7 @@
     <item name="profile_radius" format="float" type="dimen">14.0</item>
     <dimen name="profile_border_radius">13dp</dimen>
     <dimen name="shortcut_background_radius">9dp</dimen>
+    <dimen name="appbar_title_size">18sp</dimen>
 
     <!-- Shortcut -->
     <dimen name="shortcut_margin">7dp</dimen>
@@ -20,6 +21,7 @@
     <dimen name="shortcut_date_size">11sp</dimen>
     <dimen name="shortcut_data_radius">7dp</dimen>
     <dimen name="shortcut_tiny_text_margin">6dp</dimen>
+    <dimen name="shortcut_margin_horizontal">8dp</dimen>
 
     <!-- Notification -->
     <dimen name="notify_tiny_text_margin">6dp</dimen>

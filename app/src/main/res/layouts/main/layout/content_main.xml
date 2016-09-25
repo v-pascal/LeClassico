@@ -15,64 +15,89 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
+            android:padding="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways|snap">
 
-            <!-- Toolbar shortcut info -->
-            <FrameLayout
-                android:background="@drawable/shortcut_bakground"
-                android:layout_marginTop="@dimen/appbar_padding_top"
+            <LinearLayout
+                android:id="@+id/layout_toolbar"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/shortcut_height">
+                android:layout_height="wrap_content">
 
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/text_title"
+                    android:text="@string/app_name"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/appbar_title_size"
+                    android:visibility="gone"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/appbar_padding_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="?attr/actionBarSize"/>
+
+                <!-- Toolbar shortcut info -->
                 <FrameLayout
-                    android:id="@+id/shortcut"
+                    android:background="@drawable/shortcut_bakground"
+                    android:layout_marginTop="@dimen/shortcut_margin_top"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="@dimen/shortcut_height">
 
-                    <!-- New shortcut -->
                     <FrameLayout
-                        android:id="@+id/shortcut_new"
-                        android:layout_margin="@dimen/shortcut_margin"
+                        android:id="@+id/shortcut"
+                        android:padding="@dimen/shortcut_margin"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
+                        android:layout_height="match_parent">
 
-                    <!-- Shortcuts -->
-                    <fragment
-                        class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
-                        android:id="@+id/shortcut_home"
-                        android:layout_margin="@dimen/shortcut_margin"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-                    <fragment
-                        class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
-                        android:id="@+id/shortcut_publications"
-                        android:layout_margin="@dimen/shortcut_margin"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-                    <fragment
-                        class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
-                        android:id="@+id/shortcut_events"
-                        android:layout_margin="@dimen/shortcut_margin"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-                    <fragment
-                        class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
-                        android:id="@+id/shortcut_members"
-                        android:layout_margin="@dimen/shortcut_margin"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-                    <fragment
-                        class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
-                        android:id="@+id/shortcut_notifications"
-                        android:layout_margin="@dimen/shortcut_margin"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
+                        <!-- New shortcut -->
+                        <FrameLayout
+                            android:id="@+id/shortcut_new_publication"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                        <FrameLayout
+                            android:id="@+id/shortcut_new_event"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                        <FrameLayout
+                            android:id="@+id/shortcut_new_notification"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
 
+                        <!-- Shortcuts -->
+                        <fragment
+                            class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
+                            android:id="@+id/shortcut_home"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                        <fragment
+                            class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
+                            android:id="@+id/shortcut_publications"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                        <fragment
+                            class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
+                            android:id="@+id/shortcut_events"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                        <fragment
+                            class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
+                            android:id="@+id/shortcut_members"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                        <fragment
+                            class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
+                            android:id="@+id/shortcut_notifications"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+                    </FrameLayout>
                 </FrameLayout>
-            </FrameLayout>
+
+            </LinearLayout>
 
         </android.support.v7.widget.Toolbar>
 
