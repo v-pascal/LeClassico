@@ -7,6 +7,9 @@ import android.text.SpannableStringBuilder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import java.lang.ref.WeakReference;
+import java.util.Hashtable;
+
 /**
  * Created by pascal on 05/09/16.
  * Main fragment class (MainActivity parent fragment)
@@ -16,15 +19,26 @@ public class MainFragment extends Fragment {
     public static Fragment newInstance(int section) {
 
         Logs.add(Logs.Type.V, "section: " + section);
+        Fragment newFragment;
         switch (section) {
-            case Constants.MAIN_SECTION_HOME: return new HomeFragment();
-            case Constants.MAIN_SECTION_PUBLICATIONS: return new PublicationsFragment();
-            case Constants.MAIN_SECTION_EVENTS: return new EventsFragment();
-            case Constants.MAIN_SECTION_MEMBERS: return new MembersFragment();
-            case Constants.MAIN_SECTION_NOTIFICATIONS: return new NotificationsFragment();
+            case Constants.MAIN_SECTION_HOME: newFragment = new HomeFragment(); break;
+            case Constants.MAIN_SECTION_PUBLICATIONS: newFragment = new PublicationsFragment(); break;
+            case Constants.MAIN_SECTION_EVENTS: newFragment = new EventsFragment(); break;
+            case Constants.MAIN_SECTION_MEMBERS: newFragment = new MembersFragment(); break;
+            case Constants.MAIN_SECTION_NOTIFICATIONS: newFragment = new NotificationsFragment(); break;
             default:
                 throw new IllegalArgumentException("Unexpected section");
         }
+        fragmentInstances.put(section, new WeakReference<>(newFragment));
+        return newFragment;
+    }
+
+    private static Hashtable<Integer, WeakReference<Fragment>> fragmentInstances = new Hashtable<>();
+    public static Fragment getBySection(int section) {
+    // Return fragment according section (or null if not exist)
+
+        WeakReference<Fragment> reference = fragmentInstances.get(section);
+        return (reference != null)? reference.get():null;
     }
 
     //

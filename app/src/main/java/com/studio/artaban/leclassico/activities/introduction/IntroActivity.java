@@ -43,7 +43,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
-import com.studio.artaban.leclassico.tools.InOutScreen;
+import com.studio.artaban.leclassico.animations.InOutScreen;
 import com.studio.artaban.leclassico.tools.SizeUtils;
 
 /**

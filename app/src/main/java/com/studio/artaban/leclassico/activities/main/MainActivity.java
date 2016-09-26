@@ -313,6 +313,26 @@ public class MainActivity extends AppCompatActivity implements
     //////
     private ViewPager mViewPager; // Content view pager
 
+    public void onAction(View sender) { // Floating action button click event
+
+        Logs.add(Logs.Type.V, "sender: " + sender);
+        switch (mViewPager.getCurrentItem()) {
+            case Constants.MAIN_SECTION_NOTIFICATIONS: { ////// Mark notifications as read
+
+                ((NotificationsFragment)MainFragment
+                        .getBySection(Constants.MAIN_SECTION_NOTIFICATIONS)).read();
+                break;
+            }
+            case Constants.MAIN_SECTION_PUBLICATIONS: { ////// Add publication
+
+
+
+
+                break;
+            }
+        }
+    }
+
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {

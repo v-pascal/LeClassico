@@ -46,6 +46,58 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     private RecyclerView mNotifyList; // Recycler view containing notification list
     private Cursor mNotifyData; // Cursor containing notification data
 
+
+
+
+
+
+
+
+
+
+
+    public void read() { // Mark unread notification(s) as read
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+
+
+
+
+
+        //notifyItemChanged(position - 1);
+        //notifyItemInserted();
+        //notifyItemRemoved();
+
+        //notifyItemRangeChanged();
+        //notifyItemRangeInserted();
+        //notifyItemRangeRemoved();
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private SpannableStringBuilder getNotifyMessage(int color) {
 
         Logs.add(Logs.Type.V, "color: " + color);
@@ -94,6 +146,17 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         }
         return message;
     }
+
+
+
+
+
+
+
+
+
+
+
 
     private class NotifyRecyclerViewAdapter extends RecyclerView.Adapter<NotifyRecyclerViewAdapter.ViewHolder>
         implements View.OnClickListener {
@@ -285,6 +348,24 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override

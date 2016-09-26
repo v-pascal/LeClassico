@@ -2,6 +2,4 @@
 <resources>
 
     <dimen name="activity_horizontal_margin">48dp</dimen>
-    <dimen name="appbar_padding_title">64dp</dimen>
-
 </resources>

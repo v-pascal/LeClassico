@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico.tools;
+package com.studio.artaban.leclassico.animations;
 
 import android.app.Activity;
 import android.graphics.Point;
