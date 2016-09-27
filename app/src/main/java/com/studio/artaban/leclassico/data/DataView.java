@@ -21,20 +21,35 @@ public class DataView {
         mColumnKey = columnKey;
     }
 
+    private void clear() { // Clear all data
+        Logs.add(Logs.Type.V, null);
+        for (ArrayList<Object> data : mData)
+            data.clear();
+    }
+
     //
     public void fill(Cursor cursor) { // Fill data according initial cursor
         Logs.add(Logs.Type.V, "cursor: " + cursor);
+        clear();
 
+        if (cursor.moveToFirst()) {
+            do {
+                ArrayList<Object> record = new ArrayList<>();
 
-        //cursor.getColumnCount();
+                for (int i = 0; i < cursor.getColumnCount(); ++i) {
+                    switch (cursor.getType(i)) {
+                        case Cursor.FIELD_TYPE_STRING: record.add(cursor.getString(i)); break;
+                        case Cursor.FIELD_TYPE_INTEGER: record.add(cursor.getInt(i)); break;
+                        case Cursor.FIELD_TYPE_FLOAT: record.add(cursor.getFloat(i)); break;
+                        case Cursor.FIELD_TYPE_NULL: record.add(null); break;
+                        case Cursor.FIELD_TYPE_BLOB:
+                            throw new IllegalArgumentException("Un-managed field type");
+                    }
+                }
+                mData.add(record);
 
-        //cursor.getType(0);
-        //Cursor.FIELD_TYPE_FLOAT
-        //Cursor.FIELD_TYPE_INTEGER
-        //Cursor.FIELD_TYPE_NULL
-        //Cursor.FIELD_TYPE_STRING
-
-
+            } while (cursor.moveToNext());
+        }
     }
     public void swap(RecyclerView view, Cursor cursor) {
         // Swap data with new cursor then notify recycler view accordingly
@@ -48,42 +63,20 @@ public class DataView {
     }
 
     public boolean isNull(int rank, int column) {
-
-
-
-
-        return false;
+        return (mData.get(rank).get(column) == null);
     }
     public int getCount() {
-
-
-
-
-        return 0;
+        return mData.size();
     }
 
     //////
     public String getString(int rank, int column) {
-
-
-
-
-        return null;
+        return (String)mData.get(rank).get(column);
     }
-
     public int getInt(int rank, int column) {
-
-
-
-
-        return 0;
+        return (Integer)mData.get(rank).get(column);
     }
-
     public float getFloat(int rank, int column) {
-
-
-
-
-        return 0;
+        return (Float)mData.get(rank).get(column);
     }
 }

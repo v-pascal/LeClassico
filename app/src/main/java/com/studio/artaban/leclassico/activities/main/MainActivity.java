@@ -75,66 +75,36 @@ public class MainActivity extends AppCompatActivity implements
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
     @Override
-    public void onSetMessage(final int section, final SpannableStringBuilder message) {
+    public void onSetMessage(int section, SpannableStringBuilder message) {
         //Logs.add(Logs.Type.V, "section: " + section + ";message: " + message);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Logs.add(Logs.Type.V, null);
-                ((ShortcutFragment) getSupportFragmentManager()
-                        .findFragmentById(getShortcutID(section))).setMessage(message);
-            }
-        });
+        ((ShortcutFragment) getSupportFragmentManager()
+                .findFragmentById(getShortcutID(section))).setMessage(message);
     }
     @Override
-    public void onSetInfo(final int section, final SpannableStringBuilder info) {
+    public void onSetInfo(int section, SpannableStringBuilder info) {
         //Logs.add(Logs.Type.V, "section: " + section + ";info: " + info);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Logs.add(Logs.Type.V, null);
-                ((ShortcutFragment) getSupportFragmentManager()
-                        .findFragmentById(getShortcutID(section))).setInfo(info);
-            }
-        });
+        ((ShortcutFragment) getSupportFragmentManager()
+                .findFragmentById(getShortcutID(section))).setInfo(info);
     }
     @Override
-    public void onSetIcon(final int section, final boolean female, final String profile, final int size) {
+    public void onSetIcon(int section, boolean female, String profile, int size) {
         //Logs.add(Logs.Type.V, "section: " + section + ";female: " + female + ";profile: " + profile);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Logs.add(Logs.Type.V, null);
-                ((ShortcutFragment) getSupportFragmentManager()
-                        .findFragmentById(getShortcutID(section))).setIcon(female, profile, size);
-            }
-        });
+        ((ShortcutFragment) getSupportFragmentManager()
+                .findFragmentById(getShortcutID(section))).setIcon(female, profile, size);
     }
     @Override
-    public void onSetDate(final int section, final boolean start, final String dateTime) {
+    public void onSetDate(int section, boolean start, String dateTime) {
         //Logs.add(Logs.Type.V, "section: " + section + ";start: " + start + ";dateTime: " + dateTime);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Logs.add(Logs.Type.V, null);
-                ((ShortcutFragment) getSupportFragmentManager()
-                        .findFragmentById(getShortcutID(section))).setDate(start, dateTime);
-            }
-        });
+        ((ShortcutFragment) getSupportFragmentManager()
+                .findFragmentById(getShortcutID(section))).setDate(start, dateTime);
     }
 
     @Override
-    public void onSetNotify(final char type, final boolean read) {
+    public void onSetNotify(char type, boolean read) {
         //Logs.add(Logs.Type.V, "type: " + type + ";read: " + read);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Logs.add(Logs.Type.V, null);
-                ((ShortcutFragment) getSupportFragmentManager()
-                        .findFragmentById(getShortcutID(Constants.MAIN_SECTION_NOTIFICATIONS)))
-                        .setNotify(type, read);
-            }
-        });
+        ((ShortcutFragment) getSupportFragmentManager()
+                .findFragmentById(getShortcutID(Constants.MAIN_SECTION_NOTIFICATIONS)))
+                .setNotify(type, read);
     }
 
     //

@@ -314,15 +314,14 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             }
             boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
                     (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
-            String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
-                    cursor.getString(COLUMN_INDEX_PROFILE) : null;
+            String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))? cursor.getString(COLUMN_INDEX_PROFILE):null;
+            String pseudo = cursor.getString(COLUMN_INDEX_PSEUDO);
             char type = cursor.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
 
             mListener.onSetNotify(type, !unread);
             mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, info);
             mListener.onSetDate(Constants.MAIN_SECTION_NOTIFICATIONS, false, cursor.getString(COLUMN_INDEX_DATE));
-            mListener.onSetIcon(Constants.MAIN_SECTION_NOTIFICATIONS, female, profile,
-                    R.dimen.shortcut_content_height);
+            mListener.onSetIcon(Constants.MAIN_SECTION_NOTIFICATIONS, female, profile, R.dimen.shortcut_content_height);
 
             // Fill notification list
             NotifyRecyclerViewAdapter notifyAdapter =
@@ -330,8 +329,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             notifyAdapter.setSource(cursor);
             mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
                     getNotifyMessage(type, Tools.getNotifyWallType(notifyAdapter.getDataSource(),
-                                    0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER),
-                            cursor.getString(COLUMN_INDEX_PSEUDO), R.color.colorPrimaryProfile));
+                                    0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
             mNotifyList.setAdapter(notifyAdapter);
         }
         cursor.close();
