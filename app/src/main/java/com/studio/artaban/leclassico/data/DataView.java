@@ -36,7 +36,6 @@ public class DataView {
 
 
     }
-
     public void swap(RecyclerView view, Cursor cursor) {
         // Swap data with new cursor then notify recycler view accordingly
 
@@ -47,12 +46,20 @@ public class DataView {
 
 
     }
+
     public boolean isNull(int rank, int column) {
 
 
 
 
         return false;
+    }
+    public int getCount() {
+
+
+
+
+        return 0;
     }
 
     //////

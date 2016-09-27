@@ -3,7 +3,6 @@ package com.studio.artaban.leclassico.tools;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataView;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
@@ -123,14 +123,15 @@ public final class Tools {
     private static final short NOTIFY_WALL_TYPE_LINK = 1;
     private static final short NOTIFY_WALL_TYPE_IMAGE = 2;
 
-    public static short getNotifyWallType(Cursor cursor, int linkIndex, int imageIndex) {
+    public static short getNotifyWallType(DataView data, int rank, int linkIndex, int imageIndex) {
     // Return the wall type resource string ID according notification link & image fields
 
-        Logs.add(Logs.Type.V, "cursor: " + cursor + ";linkIndex: " + linkIndex + ";imageIndex: " + imageIndex);
-        if (!cursor.isNull(linkIndex))
+        Logs.add(Logs.Type.V, "data: " + data + ";rank: " + rank + ";linkIndex: " + linkIndex +
+                ";imageIndex: " + imageIndex);
+        if (!data.isNull(rank, linkIndex))
             return NOTIFY_WALL_TYPE_LINK;
 
-        if (!cursor.isNull(imageIndex))
+        if (!data.isNull(rank, imageIndex))
             return NOTIFY_WALL_TYPE_IMAGE;
 
         return NOTIFY_WALL_TYPE_TEXT;
