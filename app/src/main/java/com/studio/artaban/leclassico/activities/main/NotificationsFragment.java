@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
@@ -43,8 +44,8 @@ import java.util.Date;
  */
 public class NotificationsFragment extends MainFragment implements QueryLoader.OnResultListener {
 
-
-
+    private static final String DATA_KEY_QUERY_LIMIT = "queryLimit";
+    // Data keys
 
 
 
@@ -58,27 +59,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         Logs.add(Logs.Type.V, null);
 
 
-
-
-
-
-
-
-
-
-        //notifyItemChanged(position - 1);
-        //notifyItemInserted();
-        //notifyItemRemoved();
-
-        //notifyItemRangeChanged();
-        //notifyItemRangeInserted();
-        //notifyItemRangeRemoved();
-
-
-
-
-
-
     }
 
 
@@ -90,14 +70,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
 
-
-
-
-
-
-
     private SpannableStringBuilder getNotifyMessage(char type, short wallType, String pseudo, int color) {
-    // Return notification message formatted according its type
+        // Return notification message formatted according its type
 
         Logs.add(Logs.Type.V, "type: " + type + ";wallType: " + wallType + ";pseudo: " + pseudo +
                 ";color: " + color);
@@ -131,7 +105,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             case NotificationsTable.TYPE_PUB_COMMENT:
             case NotificationsTable.TYPE_PIC_COMMENT: { ////// Comment added (onto publication or photo)
 
-                int typeIdx = (type == NotificationsTable.TYPE_PUB_COMMENT)? 0:1;
+                int typeIdx = (type == NotificationsTable.TYPE_PUB_COMMENT) ? 0 : 1;
                 message = new SpannableStringBuilder(getString(R.string.notify_comment_message, pseudo,
                         getResources().getStringArray(R.array.notify_comment_types)[typeIdx]));
                 int pseudoPos = getResources().getInteger(R.integer.notify_comment_pseudo_pos);
@@ -144,6 +118,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     }
 
     private RecyclerView mNotifyList; // Recycler view containing notification list
+    private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
+    private short mNotifyLimit = Queries.LIMIT_NOTIFICATIONS; // Notification query limit
+
     private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
 
         public NotifyRecyclerViewAdapter(@LayoutRes int layout, int key) {
@@ -151,7 +128,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         }
 
         private void displayDate(TextView viewDate, String date) {
-        // Display the notification date separator (with notification date formatted as locale user)
+            // Display the notification date separator (with notification date formatted as locale user)
 
             Logs.add(Logs.Type.V, "viewDate: " + viewDate + ";date: " + date);
             SimpleDateFormat dateFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
@@ -159,7 +136,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 Date notifyDate = dateFormat.parse(date);
                 DateFormat user = android.text.format.DateFormat.getMediumDateFormat(getContext());
                 String userDate = user.format(notifyDate);
-                viewDate.setText((userDate.compareTo(user.format(new Date())) != 0)?
+                viewDate.setText((userDate.compareTo(user.format(new Date())) != 0) ?
                         userDate : getResources().getString(R.string.today));
 
             } catch (ParseException e) {
@@ -176,16 +153,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 case R.id.layout_data: {
 
 
-
-
-
                     break;
                 }
                 case R.id.image_pseudo: {
-
-
-
-
 
 
                     break;
@@ -200,7 +170,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
             // Set notification date
             if (position == 0) {
-                displayDate((TextView)holder.mRootView.findViewById(R.id.text_date),
+                displayDate((TextView) holder.mRootView.findViewById(R.id.text_date),
                         mDataSource.getString(position, COLUMN_INDEX_DATE));
                 holder.mRootView.findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
 
@@ -209,22 +179,22 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 String curDate = mDataSource.getString(position, COLUMN_INDEX_DATE);
 
                 if (prevDate.compareTo(curDate.substring(0, 10)) != 0) { // Display the different date (separator)
-                    displayDate((TextView)holder.mRootView.findViewById(R.id.text_date), curDate);
+                    displayDate((TextView) holder.mRootView.findViewById(R.id.text_date), curDate);
                     holder.mRootView.findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
                 }
             }
 
             // Set unread notification display (if the case)
             int pseudoColor = R.color.colorPrimaryProfile;
-            ImageView notifyType = (ImageView)holder.mRootView.findViewById(R.id.image_type);
-            TextView textTime = (TextView)holder.mRootView.findViewById(R.id.text_time);
+            ImageView notifyType = (ImageView) holder.mRootView.findViewById(R.id.image_type);
+            TextView textTime = (TextView) holder.mRootView.findViewById(R.id.text_time);
             if (mDataSource.getInt(position, COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
 
                 holder.mRootView.findViewById(R.id.layout_data)
                         .setBackground(getResources().getDrawable(R.drawable.notify_unread_background));
                 notifyType.setImageTintList(null);
                 notifyType.setColorFilter(Color.RED);
-                ((TextView)holder.mRootView.findViewById(R.id.text_message)).setTypeface(Typeface.DEFAULT_BOLD);
+                ((TextView) holder.mRootView.findViewById(R.id.text_message)).setTypeface(Typeface.DEFAULT_BOLD);
                 textTime.setTypeface(Typeface.DEFAULT_BOLD);
                 textTime.setTextColor(Color.RED);
                 pseudoColor = R.color.red;
@@ -233,9 +203,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             // Set from pseudo icon
             boolean female = (!mDataSource.isNull(position, COLUMN_INDEX_SEX)) &&
                     (mDataSource.getInt(position, COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
-            String profile = (!mDataSource.isNull(position, COLUMN_INDEX_PROFILE))?
+            String profile = (!mDataSource.isNull(position, COLUMN_INDEX_PROFILE)) ?
                     mDataSource.getString(position, COLUMN_INDEX_PROFILE) : null;
-            Tools.setProfile(getActivity(), (ImageView)holder.mRootView.findViewById(R.id.image_pseudo),
+            Tools.setProfile(getActivity(), (ImageView) holder.mRootView.findViewById(R.id.image_pseudo),
                     female, profile, R.dimen.shortcut_content_height, true);
 
             // Set notification message & info
@@ -257,14 +227,14 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 }
                 case NotificationsTable.TYPE_WALL: { ////// Wall publication
 
-                    info = new SpannableStringBuilder((!mDataSource.isNull(position, COLUMN_INDEX_PUB_TEXT))?
-                            mDataSource.getString(position, COLUMN_INDEX_PUB_TEXT).replaceAll("\\s{2,}", " "):
+                    info = new SpannableStringBuilder((!mDataSource.isNull(position, COLUMN_INDEX_PUB_TEXT)) ?
+                            mDataSource.getString(position, COLUMN_INDEX_PUB_TEXT).replaceAll("\\s{2,}", " ") :
                             getString(R.string.notify_no_info));
                     break;
                 }
                 case NotificationsTable.TYPE_MAIL: { ////// Mail received
 
-                    info = (SpannableStringBuilder)Html.fromHtml(mDataSource.getString(position, COLUMN_INDEX_MSG_TEXT)
+                    info = (SpannableStringBuilder) Html.fromHtml(mDataSource.getString(position, COLUMN_INDEX_MSG_TEXT)
                             .replaceAll("\\s{2,}", " "));
                     break;
                 }
@@ -275,23 +245,36 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     break;
                 }
             }
-            ((TextView)holder.mRootView.findViewById(R.id.text_message)).setText(message, TextView.BufferType.SPANNABLE);
-            ((TextView)holder.mRootView.findViewById(R.id.text_info)).setText(info, TextView.BufferType.SPANNABLE);
+            ((TextView) holder.mRootView.findViewById(R.id.text_message)).setText(message, TextView.BufferType.SPANNABLE);
+            ((TextView) holder.mRootView.findViewById(R.id.text_info)).setText(info, TextView.BufferType.SPANNABLE);
 
             // Set notification type icon & time
             notifyType.setImageDrawable(getResources().getDrawable(Tools.getNotifyIcon(type)));
             textTime.setText(mDataSource.getString(position, COLUMN_INDEX_DATE).substring(11, 16));
 
             // Set notify synchronization
-            Tools.setSyncView(getContext(), (TextView)holder.mRootView.findViewById(R.id.text_sync_date),
-                    (ImageView)holder.mRootView.findViewById(R.id.image_sync),
+            Tools.setSyncView(getContext(), (TextView) holder.mRootView.findViewById(R.id.text_sync_date),
+                    (ImageView) holder.mRootView.findViewById(R.id.image_sync),
                     mDataSource.getString(position, COLUMN_INDEX_STATUS_DATE),
-                    (byte)mDataSource.getInt(position, COLUMN_INDEX_SYNC));
+                    (byte) mDataSource.getInt(position, COLUMN_INDEX_SYNC));
 
             // Events
             holder.mRootView.findViewById(R.id.layout_data).setOnClickListener(this);
             holder.mRootView.findViewById(R.id.image_pseudo).setOnClickListener(this);
         }
+    }
+
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        // WARNING: Not in UI thread
+
+
+
+
+
+
+
     }
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
@@ -302,35 +285,57 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         cursor.moveToFirst();
         if (id == Queries.MAIN_NOTIFICATIONS) {
 
-            // Fill shortcut
-            boolean unread = cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD;
-            SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.notification_info));
-            if (unread) {
+            // Register content observer on each notification
+            mDataObserver.register(getContext().getContentResolver(), cursor,
+                    NotificationsTable.TABLE_NAME, COLUMN_INDEX_NOTIFY_ID);
 
-                int unreadPos = info.length() + 2; // ' ' + '(' = 2
-                String notRead = getString(R.string.unread);
-                info.append(" (" + notRead + ")");
-                info.setSpan(new StyleSpan(Typeface.BOLD), unreadPos, unreadPos + notRead.length(), 0);
+            // Check if not the initial query
+            if (mNotifyAdapter != null) {
+                Logs.add(Logs.Type.I, "Query update");
+
+                // Update shortcut
+
+
+
+
+                // Update notification list
+
+
+
+
+
+            } else {
+                Logs.add(Logs.Type.I, "Initial query");
+
+                // Fill shortcut
+                boolean unread = cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD;
+                SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.notification_info));
+                if (unread) {
+
+                    int unreadPos = info.length() + 2; // ' ' + '(' = 2
+                    String notRead = getString(R.string.unread);
+                    info.append(" (" + notRead + ")");
+                    info.setSpan(new StyleSpan(Typeface.BOLD), unreadPos, unreadPos + notRead.length(), 0);
+                }
+                boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
+                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+                String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE)) ? cursor.getString(COLUMN_INDEX_PROFILE) : null;
+                String pseudo = cursor.getString(COLUMN_INDEX_PSEUDO);
+                char type = cursor.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
+
+                mListener.onSetNotify(type, !unread);
+                mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, info);
+                mListener.onSetDate(Constants.MAIN_SECTION_NOTIFICATIONS, false, cursor.getString(COLUMN_INDEX_DATE));
+                mListener.onSetIcon(Constants.MAIN_SECTION_NOTIFICATIONS, female, profile, R.dimen.shortcut_content_height);
+
+                // Fill notification list
+                mNotifyAdapter = new NotifyRecyclerViewAdapter(R.layout.layout_notification_item, COLUMN_INDEX_NOTIFY_ID);
+                mNotifyAdapter.getDataSource().fill(cursor);
+                mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
+                        getNotifyMessage(type, Tools.getNotifyWallType(mNotifyAdapter.getDataSource(),
+                                0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
+                mNotifyList.setAdapter(mNotifyAdapter);
             }
-            boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
-                    (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
-            String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))? cursor.getString(COLUMN_INDEX_PROFILE):null;
-            String pseudo = cursor.getString(COLUMN_INDEX_PSEUDO);
-            char type = cursor.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
-
-            mListener.onSetNotify(type, !unread);
-            mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, info);
-            mListener.onSetDate(Constants.MAIN_SECTION_NOTIFICATIONS, false, cursor.getString(COLUMN_INDEX_DATE));
-            mListener.onSetIcon(Constants.MAIN_SECTION_NOTIFICATIONS, female, profile, R.dimen.shortcut_content_height);
-
-            // Fill notification list
-            NotifyRecyclerViewAdapter notifyAdapter =
-                    new NotifyRecyclerViewAdapter(R.layout.layout_notification_item, COLUMN_INDEX_NOTIFY_ID);
-            notifyAdapter.setSource(cursor);
-            mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
-                    getNotifyMessage(type, Tools.getNotifyWallType(notifyAdapter.getDataSource(),
-                                    0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
-            mNotifyList.setAdapter(notifyAdapter);
         }
         cursor.close();
     }
@@ -380,7 +385,29 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 ";savedInstanceState: " + savedInstanceState);
         View rootView = inflater.inflate(R.layout.layout_notifications, container, false);
         rootView.setTag(Constants.MAIN_SECTION_NOTIFICATIONS);
-        mNotifyList = (RecyclerView)rootView.findViewById(R.id.list_notification);
+        mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
+
+        // Restore data
+        if (savedInstanceState != null)
+            mNotifyLimit = savedInstanceState.getShort(DATA_KEY_QUERY_LIMIT);
+
+        // Set shortcut data (default)
+        SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));
+        mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS, data);
+        data = new SpannableStringBuilder(getString(R.string.no_notification_info));
+        mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, data);
+
+        return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+
+
+
+
 
 
 
@@ -394,31 +421,24 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + "," + // COLUMN_INDEX_OBJECT_TYPE
                         NotificationsTable.COLUMN_STATUS_DATE + "," + // COLUMN_INDEX_STATUS_DATE
-                        NotificationsTable.TABLE_NAME + "." +
-                            Constants.DATA_COLUMN_SYNCHRONIZED + "," + // COLUMN_INDEX_SYNC
-                        NotificationsTable.TABLE_NAME + "." +
-                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_NOTIFY_ID
+                        NotificationsTable.TABLE_NAME + "." + Constants.DATA_COLUMN_SYNCHRONIZED + "," + // COLUMN_INDEX_SYNC
+                        NotificationsTable.TABLE_NAME + "." + IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_NOTIFY_ID
                         NotificationsTable.COLUMN_DATE + "," + // COLUMN_INDEX_DATE
                         NotificationsTable.COLUMN_LU_FLAG + "," + // COLUMN_INDEX_LU_FLAG
                         CamaradesTable.COLUMN_PSEUDO + "," + // COLUMN_INDEX_PSEUDO
                         CamaradesTable.COLUMN_SEXE + "," + // COLUMN_INDEX_SEX
                         CamaradesTable.COLUMN_PROFILE + "," + // COLUMN_INDEX_PROFILE
-                        CamaradesTable.TABLE_NAME + "." +
-                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_MEMBER_ID
+                        CamaradesTable.TABLE_NAME + "." + IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_MEMBER_ID
                         PhotosTable.COLUMN_ALBUM + "," + // COLUMN_INDEX_ALBUM
-                        PhotosTable.TABLE_NAME + "." +
-                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_PHOTO_ID
+                        PhotosTable.TABLE_NAME + "." + IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_PHOTO_ID
                         ActualitesTable.COLUMN_TEXT + "," + // COLUMN_INDEX_PUB_TEXT
                         ActualitesTable.COLUMN_LINK + "," + // COLUMN_INDEX_LINK
                         ActualitesTable.COLUMN_FICHIER + "," + // COLUMN_INDEX_FICHIER
-                        ActualitesTable.TABLE_NAME + "." +
-                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_PUB_ID
+                        ActualitesTable.TABLE_NAME + "." + IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_PUB_ID
                         MessagerieTable.COLUMN_MESSAGE + "," + // COLUMN_INDEX_MSG_TEXT
-                        MessagerieTable.TABLE_NAME + "." +
-                            IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_MSG_ID
+                        MessagerieTable.TABLE_NAME + "." + IDataTable.DataField.COLUMN_ID + "," + // COLUMN_INDEX_MSG_ID
                         CommentairesTable.COLUMN_TEXT + "," + // COLUMN_INDEX_COM_TEXT
-                        CommentairesTable.TABLE_NAME + "." +
-                            IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
+                        CommentairesTable.TABLE_NAME + "." + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
 
                         " FROM " + NotificationsTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
@@ -444,23 +464,25 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" +
                         getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) + "'" +
                         " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
-                        " LIMIT " + Queries.LIMIT_NOTIFICATIONS);
+                        " LIMIT " + mNotifyLimit);
         mNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
+    }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
 
+        outState.putShort(DATA_KEY_QUERY_LIMIT, mNotifyLimit);
 
+        Logs.add(Logs.Type.V, "outState: " + outState);
+        super.onSaveInstanceState(outState);
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
 
-
-
-
-
-        // Set shortcut data (default)
-        SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));
-        mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS, data);
-        data = new SpannableStringBuilder(getString(R.string.no_notification_info));
-        mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, data);
-
-        return rootView;
+        // Unregister all content observer
+        mDataObserver.unregister(getContext().getContentResolver());
     }
 }

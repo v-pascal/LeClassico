@@ -1,10 +1,13 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v4.app.Fragment;
 import android.text.SpannableStringBuilder;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.lang.ref.WeakReference;
@@ -14,7 +17,7 @@ import java.util.Hashtable;
  * Created by pascal on 05/09/16.
  * Main fragment class (MainActivity parent fragment)
  */
-public class MainFragment extends Fragment {
+public abstract class MainFragment extends Fragment implements DataObserver.OnContentListener {
 
     public static Fragment newInstance(int section) {
 
@@ -52,16 +55,23 @@ public class MainFragment extends Fragment {
 
         void onSetNotify(char type, boolean read);
     }
-    protected OnFragmentListener mListener;
+    protected OnFragmentListener mListener; // Activity listener
+    protected DataObserver mDataObserver; // Data observer to notify DB changes
 
     //////
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         Logs.add(Logs.Type.V, "context: " + context);
-        if (context instanceof OnFragmentListener)
-            mListener = (OnFragmentListener)context;
-        else
+        if (context instanceof OnFragmentListener) {
+
+            mListener = (OnFragmentListener) context;
+
+            HandlerThread observerThread = new HandlerThread("mainDataObserverThread");
+            observerThread.start();
+            mDataObserver = new DataObserver(new Handler(observerThread.getLooper()), this);
+
+        } else
             throw new RuntimeException(context.toString() + " must implement 'OnFragmentListener'");
     }
 

@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.activities.main;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -49,6 +50,14 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
 
     private QueryLoader mMailLoader; // Shortcut new mail query loader
     private QueryLoader mNewNotifyLoader; // Shortcut new notification query loader
+
+
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        // WARNING: Not in UI thread
+
+    }
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override

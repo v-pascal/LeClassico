@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
@@ -16,7 +17,14 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class PublicationsFragment extends MainFragment {
 
-    //////
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        // WARNING: Not in UI thread
+
+    }
+
+    ////// MainFragment ////////////////////////////////////////////////////////////////////////////
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +

@@ -17,9 +17,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.DataView;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
@@ -123,7 +123,7 @@ public final class Tools {
     private static final short NOTIFY_WALL_TYPE_LINK = 1;
     private static final short NOTIFY_WALL_TYPE_IMAGE = 2;
 
-    public static short getNotifyWallType(DataView data, int rank, int linkIndex, int imageIndex) {
+    public static short getNotifyWallType(RecyclerAdapter.DataView data, int rank, int linkIndex, int imageIndex) {
     // Return the wall type resource string ID according notification link & image fields
 
         Logs.add(Logs.Type.V, "data: " + data + ";rank: " + rank + ";linkIndex: " + linkIndex +

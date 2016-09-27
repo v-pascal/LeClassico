@@ -75,6 +75,6 @@ public class Queries {
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////
 
-    public static final short LIMIT_NOTIFICATIONS = 50; // Max notification count to display at start
+    public static final short LIMIT_NOTIFICATIONS = 20; // Max notification count to display at start
 
 }

@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
@@ -28,6 +29,13 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
     private static final int COLUMN_INDEX_PSEUDO = 1;
     private static final int COLUMN_INDEX_SEX = 2;
     private static final int COLUMN_INDEX_PROFILE = 3;
+
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        // WARNING: Not in UI thread
+
+    }
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
