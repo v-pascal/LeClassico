@@ -1,11 +1,14 @@
 package com.studio.artaban.leclassico.tools;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
+import android.net.Uri;
 import android.support.annotation.DrawableRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -200,5 +203,18 @@ public final class Tools {
         } catch (ParseException e) {
             Logs.add(Logs.Type.E, "Wrong query date & time format: " + dateTime);
         }
+    }
+
+    public static int getEntryCount(ContentResolver resolver, String table, String selection) {
+    // Get entry count on specific table and according selection criteria
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";table: " + table + ";selection: " + selection);
+        Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + table),
+                new String[]{"count(*)"}, selection, null, null);
+        result.moveToFirst();
+        int count = result.getInt(0);
+        result.close();
+
+        return count;
     }
 }

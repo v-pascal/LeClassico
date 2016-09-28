@@ -31,6 +31,7 @@ import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SyncValue;
+import com.studio.artaban.leclassico.tools.Tools;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -260,11 +261,7 @@ public class ConnectFragment extends RevealFragment {
 
                     // No Internet connection so check existing DB to work offline
                     ContentResolver cr = getWaitActivity().getContentResolver();
-                    Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                            new String[]{"count(*)"}, null, null, null);
-                    result.moveToFirst();
-                    int membersCount = result.getInt(0);
-                    result.close();
+                    int membersCount = Tools.getEntryCount(cr, CamaradesTable.TABLE_NAME, null);
 
                     if (isStopped()) return Boolean.FALSE;
                     if (membersCount > 0) { // Found existing DB (try to work offline)
@@ -273,7 +270,7 @@ public class ConnectFragment extends RevealFragment {
                         String pseudo = null;
 
                         // Offline identification
-                        result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                        Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                                 new String[]{CamaradesTable.COLUMN_PSEUDO},
                                 "UPPER(" + CamaradesTable.COLUMN_PSEUDO + ")=" +
                                         DatabaseUtils.sqlEscapeString(mPseudo.toUpperCase()) +

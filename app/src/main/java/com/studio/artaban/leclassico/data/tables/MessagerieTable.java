@@ -16,6 +16,7 @@ import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.tools.Tools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -101,10 +102,7 @@ public class MessagerieTable extends DataTable {
                                     String selection = COLUMN_PSEUDO + "=" + DatabaseUtils.sqlEscapeString(pseudo) +
                                             " AND " + COLUMN_DATE + "='" + date + "'" +
                                             " AND " + COLUMN_TIME + "='" + time + "'";
-                                    Cursor cursor = resolver.query(tableUri, new String[]{ "count(*)" },
-                                            selection, null, null);
-                                    cursor.moveToFirst();
-                                    if (cursor.getInt(0) > 0) { // DB entry exists
+                                    if (Tools.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
 
                                         if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED) {
 
@@ -126,7 +124,6 @@ public class MessagerieTable extends DataTable {
                                         resolver.insert(tableUri, values);
                                     }
                                     //else // Do not add a deleted entry
-                                    cursor.close();
                                 }
 
                             } else {

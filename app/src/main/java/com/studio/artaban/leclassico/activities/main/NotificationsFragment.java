@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -43,9 +44,6 @@ import java.util.Date;
  * Notifications fragment class (MainActivity)
  */
 public class NotificationsFragment extends MainFragment implements QueryLoader.OnResultListener {
-
-    private static final String DATA_KEY_QUERY_LIMIT = "queryLimit";
-    // Data keys
 
 
 
@@ -119,7 +117,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
     private RecyclerView mNotifyList; // Recycler view containing notification list
     private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
-    private short mNotifyLimit = Queries.LIMIT_NOTIFICATIONS; // Notification query limit
 
     private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
 
@@ -285,6 +282,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         cursor.moveToFirst();
         if (id == Queries.MAIN_NOTIFICATIONS) {
 
+            mQueryId = cursor.getInt(COLUMN_INDEX_NOTIFY_ID);
+            mQueryCount = (short)cursor.getCount();
+
             // Register content observer on each notification
             mDataObserver.register(getContext().getContentResolver(), cursor,
                     NotificationsTable.TABLE_NAME, COLUMN_INDEX_NOTIFY_ID);
@@ -387,10 +387,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         rootView.setTag(Constants.MAIN_SECTION_NOTIFICATIONS);
         mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
 
-        // Restore data
-        if (savedInstanceState != null)
-            mNotifyLimit = savedInstanceState.getShort(DATA_KEY_QUERY_LIMIT);
-
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));
         mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS, data);
@@ -405,15 +401,21 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         super.onResume();
         Logs.add(Logs.Type.V, null);
 
+        // Get query limit
+        short queryLimit = 0;
+        String selection = NotificationsTable.COLUMN_PSEUDO + "='" +
+                getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) + "'";
+        if (mQueryId != Constants.NO_DATA) {
 
-
-
-
-
-
-
-
-
+            queryLimit = mQueryCount;
+            queryLimit += (mQueryOld)? Queries.OLDER_NOTIFICATIONS:0;
+            queryLimit += (short)Tools.getEntryCount(getContext().getContentResolver(),
+                    NotificationsTable.TABLE_NAME, selection + " AND " +
+                            NotificationsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + '>' + mQueryId);
+            // NB: The new DB entry count query just above should be executed quickly (UI thread)
+        }
+        if (queryLimit < Queries.LIMIT_NOTIFICATIONS)
+            queryLimit = Queries.LIMIT_NOTIFICATIONS;
 
         // Load notification data (using query loader)
         Bundle queryData = new Bundle();
@@ -461,20 +463,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         NotificationsTable.COLUMN_OBJECT_TYPE + "=" + CommentairesTable.COLUMN_OBJ_TYPE + " AND " +
                         NotificationsTable.COLUMN_OBJECT_DATE + "=" + CommentairesTable.COLUMN_DATE + " AND " +
                         NotificationsTable.COLUMN_OBJECT_FROM + "=" + CommentairesTable.COLUMN_PSEUDO +
-                        " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" +
-                        getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) + "'" +
+                        " WHERE " + selection +
                         " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
-                        " LIMIT " + mNotifyLimit);
+                        " LIMIT " + queryLimit);
         mNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-
-        outState.putShort(DATA_KEY_QUERY_LIMIT, mNotifyLimit);
-
-        Logs.add(Logs.Type.V, "outState: " + outState);
-        super.onSaveInstanceState(outState);
     }
 
     @Override

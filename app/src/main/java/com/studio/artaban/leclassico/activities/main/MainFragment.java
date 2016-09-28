@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,11 @@ import java.util.Hashtable;
  * Main fragment class (MainActivity parent fragment)
  */
 public abstract class MainFragment extends Fragment implements DataObserver.OnContentListener {
+
+    private static final String DATA_KEY_QUERY_COUNT = "queryCount";
+    private static final String DATA_KEY_QUERY_ID = "queryID";
+    private static final String DATA_KEY_QUERY_OLD = "queryOld";
+    // Data keys
 
     public static Fragment newInstance(int section) {
 
@@ -56,7 +62,13 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
         void onSetNotify(char type, boolean read);
     }
     protected OnFragmentListener mListener; // Activity listener
-    protected DataObserver mDataObserver; // Data observer to notify DB changes
+
+    // Data observer to notify DB changes
+    protected DataObserver mDataObserver;
+
+    protected short mQueryCount; // DB query result count
+    protected int mQueryId = Constants.NO_DATA; // First record Id displayed
+    protected boolean mQueryOld; // DB old entries request flag
 
     //////
     @Override
@@ -73,6 +85,29 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
 
         } else
             throw new RuntimeException(context.toString() + " must implement 'OnFragmentListener'");
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Restore data
+        if (savedInstanceState != null) {
+            mQueryCount = savedInstanceState.getShort(DATA_KEY_QUERY_COUNT);
+            mQueryId = savedInstanceState.getInt(DATA_KEY_QUERY_ID);
+            mQueryOld = savedInstanceState.getBoolean(DATA_KEY_QUERY_OLD);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putShort(DATA_KEY_QUERY_COUNT, mQueryCount);
+        outState.putInt(DATA_KEY_QUERY_ID, mQueryId);
+        outState.putBoolean(DATA_KEY_QUERY_OLD, mQueryOld);
+
+        Logs.add(Logs.Type.V, "outState: " + outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
