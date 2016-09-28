@@ -67,8 +67,8 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     protected DataObserver mDataObserver;
 
     protected short mQueryCount; // DB query result count
-    protected int mQueryId = Constants.NO_DATA; // First record Id displayed
-    protected boolean mQueryOld; // DB old entries request flag
+    protected int mQueryID = Constants.NO_DATA; // Max record Id (used to check if new entries)
+    protected short mQueryOld; // DB old entries requested
 
     //////
     @Override
@@ -94,8 +94,8 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
         // Restore data
         if (savedInstanceState != null) {
             mQueryCount = savedInstanceState.getShort(DATA_KEY_QUERY_COUNT);
-            mQueryId = savedInstanceState.getInt(DATA_KEY_QUERY_ID);
-            mQueryOld = savedInstanceState.getBoolean(DATA_KEY_QUERY_OLD);
+            mQueryID = savedInstanceState.getInt(DATA_KEY_QUERY_ID);
+            mQueryOld = savedInstanceState.getShort(DATA_KEY_QUERY_OLD);
         }
     }
 
@@ -103,8 +103,8 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     public void onSaveInstanceState(Bundle outState) {
 
         outState.putShort(DATA_KEY_QUERY_COUNT, mQueryCount);
-        outState.putInt(DATA_KEY_QUERY_ID, mQueryId);
-        outState.putBoolean(DATA_KEY_QUERY_OLD, mQueryOld);
+        outState.putInt(DATA_KEY_QUERY_ID, mQueryID);
+        outState.putShort(DATA_KEY_QUERY_OLD, mQueryOld);
 
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);

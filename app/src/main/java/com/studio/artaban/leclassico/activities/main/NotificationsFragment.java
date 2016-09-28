@@ -279,61 +279,68 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
 
         cursor.moveToFirst();
-        if (id == Queries.MAIN_NOTIFICATIONS) {
+        switch (id) {
 
-            mQueryId = cursor.getInt(COLUMN_INDEX_NOTIFY_ID);
-            mQueryCount = (short)cursor.getCount();
+            case Queries.MAIN_NOTIFICATIONS: {
+                mQueryCount = (short)cursor.getCount();
 
-            // Register content observer on each notification
-            mDataObserver.register(getContext().getContentResolver(), cursor,
-                    NotificationsTable.TABLE_NAME, COLUMN_INDEX_NOTIFY_ID);
+                // Register content observer on each notification
+                mDataObserver.register(getContext().getContentResolver(), cursor,
+                        NotificationsTable.TABLE_NAME, COLUMN_INDEX_NOTIFY_ID);
 
-            // Check if not the initial query
-            if (mNotifyAdapter != null) {
-                Logs.add(Logs.Type.I, "Query update");
+                // Check if not the initial query
+                if (mNotifyAdapter != null) {
+                    Logs.add(Logs.Type.I, "Query update");
 
-                // Update shortcut
-
-
-
-
-                // Update notification list
+                    // Update shortcut
 
 
 
 
+                    // Update notification list
 
-            } else {
-                Logs.add(Logs.Type.I, "Initial query");
 
-                // Fill shortcut
-                boolean unread = cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD;
-                SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.notification_info));
-                if (unread) {
 
-                    int unreadPos = info.length() + 2; // ' ' + '(' = 2
-                    String notRead = getString(R.string.unread);
-                    info.append(" (" + notRead + ")");
-                    info.setSpan(new StyleSpan(Typeface.BOLD), unreadPos, unreadPos + notRead.length(), 0);
+
+
+                } else {
+                    Logs.add(Logs.Type.I, "Initial query");
+
+                    // Fill shortcut
+                    boolean unread = cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD;
+                    SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.notification_info));
+                    if (unread) {
+
+                        int unreadPos = info.length() + 2; // ' ' + '(' = 2
+                        String notRead = getString(R.string.unread);
+                        info.append(" (" + notRead + ")");
+                        info.setSpan(new StyleSpan(Typeface.BOLD), unreadPos, unreadPos + notRead.length(), 0);
+                    }
+                    boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
+                            (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+                    String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE)) ? cursor.getString(COLUMN_INDEX_PROFILE) : null;
+                    String pseudo = cursor.getString(COLUMN_INDEX_PSEUDO);
+                    char type = cursor.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
+
+                    mListener.onSetNotify(type, !unread);
+                    mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, info);
+                    mListener.onSetDate(Constants.MAIN_SECTION_NOTIFICATIONS, false, cursor.getString(COLUMN_INDEX_DATE));
+                    mListener.onSetIcon(Constants.MAIN_SECTION_NOTIFICATIONS, female, profile, R.dimen.shortcut_content_height);
+
+                    // Fill notification list
+                    mNotifyAdapter = new NotifyRecyclerViewAdapter(R.layout.layout_notification_item, COLUMN_INDEX_NOTIFY_ID);
+                    mNotifyAdapter.getDataSource().fill(cursor);
+                    mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
+                            getNotifyMessage(type, Tools.getNotifyWallType(mNotifyAdapter.getDataSource(),
+                                    0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
+                    mNotifyList.setAdapter(mNotifyAdapter);
                 }
-                boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
-                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
-                String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE)) ? cursor.getString(COLUMN_INDEX_PROFILE) : null;
-                String pseudo = cursor.getString(COLUMN_INDEX_PSEUDO);
-                char type = cursor.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
+                break;
+            }
+            case Queries.MAIN_NOTIFICATION_MAX: {
 
-                mListener.onSetNotify(type, !unread);
-                mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, info);
-                mListener.onSetDate(Constants.MAIN_SECTION_NOTIFICATIONS, false, cursor.getString(COLUMN_INDEX_DATE));
-                mListener.onSetIcon(Constants.MAIN_SECTION_NOTIFICATIONS, female, profile, R.dimen.shortcut_content_height);
-
-                // Fill notification list
-                mNotifyAdapter = new NotifyRecyclerViewAdapter(R.layout.layout_notification_item, COLUMN_INDEX_NOTIFY_ID);
-                mNotifyAdapter.getDataSource().fill(cursor);
-                mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
-                        getNotifyMessage(type, Tools.getNotifyWallType(mNotifyAdapter.getDataSource(),
-                                0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
-                mNotifyList.setAdapter(mNotifyAdapter);
+                mQueryID = cursor.getShort(0);
+                break;
             }
         }
         cursor.close();
@@ -404,20 +411,20 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         short queryLimit = 0;
         String selection = NotificationsTable.COLUMN_PSEUDO + "='" +
                 getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) + '\'';
-        if (mQueryId != Constants.NO_DATA) {
+        if (mQueryID != Constants.NO_DATA) {
 
             queryLimit = mQueryCount;
-            queryLimit += (mQueryOld)? Queries.OLDER_NOTIFICATIONS:0;
+            queryLimit += mQueryOld;
             queryLimit += (short)Tools.getEntryCount(getContext().getContentResolver(),
                     NotificationsTable.TABLE_NAME, selection + " AND " +
-                            NotificationsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + '>' + mQueryId);
+                            IDataTable.DataField.COLUMN_ID + '>' + mQueryID);
             // NB: The new DB entry count query just above should be executed quickly (UI thread)
 
 
 
 
 
-            //mQueryOld = false;
+            //mQueryOld = Queries.OLDER_NOTIFICATIONS;
 
 
 
@@ -478,6 +485,11 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
                         " LIMIT " + queryLimit);
         mNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
+
+        queryData.putString(QueryLoader.DATA_KEY_SELECTION, selection);
+        queryData.putStringArray(QueryLoader.DATA_KEY_PROJECTION,
+                new String[]{"max(" + IDataTable.DataField.COLUMN_ID + ')'});
+        mNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATION_MAX, queryData);
     }
 
     @Override
