@@ -52,7 +52,7 @@ public final class Tools {
             Glider.with(activity)
                     .load(Storage.FOLDER_PROFILES +
                                     File.separator + profile,
-                            Constants.APP_URL_PROFILES + "/" + profile)
+                            Constants.APP_URL_PROFILES + '/' + profile)
                     .placeholder((female) ? R.drawable.woman : R.drawable.man)
                     .into(view, new Glider.OnLoadListener() {
 

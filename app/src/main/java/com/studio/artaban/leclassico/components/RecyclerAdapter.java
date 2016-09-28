@@ -73,10 +73,10 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             }
             cursor.moveToFirst();
         }
-        public void swap(RecyclerView view, Cursor cursor) {
+        public void swap(RecyclerView view, Cursor cursor, boolean below) {
             // Swap data with new cursor then notify recycler view accordingly
 
-            Logs.add(Logs.Type.V, "view: " + view + ";cursor: " + cursor);
+            Logs.add(Logs.Type.V, "view: " + view + ";cursor: " + cursor + ";below: " + below);
             if (cursor.moveToFirst()) {
                 do {
 

@@ -2,7 +2,6 @@ package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -99,9 +98,9 @@ public class MessagerieTable extends DataTable {
                                             DataProvider.Synchronized.DONE.getValue());
 
                                     // Check if entry already exists
-                                    String selection = COLUMN_PSEUDO + "=" + DatabaseUtils.sqlEscapeString(pseudo) +
-                                            " AND " + COLUMN_DATE + "='" + date + "'" +
-                                            " AND " + COLUMN_TIME + "='" + time + "'";
+                                    String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) +
+                                            " AND " + COLUMN_DATE + "='" + date + '\'' +
+                                            " AND " + COLUMN_TIME + "='" + time + '\'';
                                     if (Tools.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
 
                                         if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED) {

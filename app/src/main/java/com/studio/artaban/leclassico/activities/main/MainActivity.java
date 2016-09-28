@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements
                             Glider.with(MainActivity.this)
                                     .load(Storage.FOLDER_PROFILES +
                                                     File.separator + banner,
-                                            Constants.APP_URL_PROFILES + "/" + banner)
+                                            Constants.APP_URL_PROFILES + '/' + banner)
                                     .placeholder(R.drawable.banner)
                                     .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
                     }
@@ -399,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements
                 CamaradesTable.COLUMN_PROFILE, // COLUMN_INDEX_PROFILE
                 CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
         });
-        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + "'");
+        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
         mUserLoader.restart(this, Tables.ID_CAMARADES, userData);
 
         userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);

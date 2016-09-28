@@ -26,7 +26,7 @@ public class DataObserver extends ContentObserver {
         if (cursor.moveToFirst()) {
             do {
                 resolver.notifyChange(
-                        Uri.parse(DataProvider.CONTENT_URI + table + "/" + cursor.getInt(columnId)), this);
+                        Uri.parse(DataProvider.CONTENT_URI + table + '/' + cursor.getInt(columnId)), this);
 
             } while (cursor.moveToNext());
         }

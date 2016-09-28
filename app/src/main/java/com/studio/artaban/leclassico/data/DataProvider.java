@@ -45,12 +45,12 @@ public class DataProvider extends ContentProvider {
     }
 
     //////
-    public static final String CONTENT_URI = "content://" + Constants.DATA_CONTENT_URI + "/";
+    public static final String CONTENT_URI = "content://" + Constants.DATA_CONTENT_URI + '/';
 
     private static final String MIME_TYPE_SINGLE = "vnd.android.cursor.item/vnd." + Constants.APP_URI_COMPANY +
-            "." + Constants.APP_URI + ".";
+            '.' + Constants.APP_URI + '.';
     private static final String MIME_TYPE = "vnd.android.cursor.dir/vnd." + Constants.APP_URI_COMPANY +
-            "." + Constants.APP_URI + ".";
+            '.' + Constants.APP_URI + '.';
     public static final String SINGLE_ROW = "/#";
 
     private static final UriMatcher URI_MATCHER_SINGLE;
@@ -143,7 +143,7 @@ public class DataProvider extends ContentProvider {
 
         // Check single row request
         if (table != null)
-            builder.appendWhere(IDataTable.DataField.COLUMN_ID + "=" + uri.getPathSegments().get(1));
+            builder.appendWhere(IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1));
         else {
 
             table = getUriTable(URI_MATCHER, uri);
@@ -229,7 +229,7 @@ public class DataProvider extends ContentProvider {
 
         String table = getUriTable(URI_MATCHER_SINGLE, uri);
         if (table != null)
-            selection = IDataTable.DataField.COLUMN_ID + "=" + uri.getPathSegments().get(1) +
+            selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1) +
                     ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
         else {
 
@@ -270,7 +270,7 @@ public class DataProvider extends ContentProvider {
 
         String table = getUriTable(URI_MATCHER_SINGLE, uri);
         if (table != null)
-            selection = IDataTable.DataField.COLUMN_ID + "=" + uri.getPathSegments().get(1) +
+            selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1) +
                     ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
         else {
 

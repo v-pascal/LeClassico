@@ -55,7 +55,7 @@ public final class Storage {
             }
             catch (IOException e) {
 
-                Logs.add(Logs.Type.E, "Failed to move file from '" + src + "' to '" + dst + "'");
+                Logs.add(Logs.Type.E, "Failed to move file from '" + src + "' to '" + dst + '\'');
                 return false;
             }
         }

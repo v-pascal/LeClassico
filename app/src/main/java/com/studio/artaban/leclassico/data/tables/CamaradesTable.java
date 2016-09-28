@@ -141,7 +141,7 @@ public class CamaradesTable extends DataTable {
                             values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
 
                             // Check if entry already exists
-                            String selection = COLUMN_PSEUDO + "=" + DatabaseUtils.sqlEscapeString(pseudo);
+                            String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo);
                             Cursor cursor = resolver.query(tableUri, null, selection, null, null);
                             cursor.moveToFirst();
                             if (cursor.getCount() > 0) { // DB entry exists

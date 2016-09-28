@@ -62,7 +62,7 @@ public final class Constants {
     public static final String DATA_CONTENT_URI = "com." + APP_URI_COMPANY + ".provider." + APP_URI; // DB content provider URI
     public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field
 
-    public static final String DATA_DELETE_SELECTION = DATA_COLUMN_SYNCHRONIZED + "=" + DataProvider.Synchronized.TO_DELETE;
+    public static final String DATA_DELETE_SELECTION = DATA_COLUMN_SYNCHRONIZED + '=' + DataProvider.Synchronized.TO_DELETE;
     // Selection criteria to delete records from DB definitively
 
     public static final int DATA_UNREAD = 0;

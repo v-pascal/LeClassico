@@ -274,7 +274,7 @@ public class ConnectFragment extends RevealFragment {
                                 new String[]{CamaradesTable.COLUMN_PSEUDO},
                                 "UPPER(" + CamaradesTable.COLUMN_PSEUDO + ")=" +
                                         DatabaseUtils.sqlEscapeString(mPseudo.toUpperCase()) +
-                                        " AND " + CamaradesTable.COLUMN_CODE_CONF + "=" +
+                                        " AND " + CamaradesTable.COLUMN_CODE_CONF + '=' +
                                         DatabaseUtils.sqlEscapeString(password),
                                 null, null);
                         if (result.getCount() > 0) {

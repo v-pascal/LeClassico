@@ -91,14 +91,14 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
         Bundle shortcutData = new Bundle();
         shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")," +
-                        CamaradesTable.COLUMN_PSEUDO + "," + // COLUMN_INDEX_PSEUDO
-                        CamaradesTable.COLUMN_SEXE + "," + // COLUMN_INDEX_SEX
+                        CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
+                        CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
                         CamaradesTable.COLUMN_PROFILE + // COLUMN_INDEX_PROFILE
                         " FROM " + AbonnementsTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
-                        AbonnementsTable.COLUMN_CAMARADE + "=" + CamaradesTable.COLUMN_PSEUDO + " AND " +
-                        AbonnementsTable.COLUMN_CAMARADE + "<>'" + pseudo + "'" +
-                        " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "'");
+                        AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO + " AND " +
+                        AbonnementsTable.COLUMN_CAMARADE + "<>'" + pseudo + '\'' +
+                        " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
         mLastMemberLoader.restart(getActivity(), Queries.MAIN_LAST_FOLLOWED, shortcutData);
 
 

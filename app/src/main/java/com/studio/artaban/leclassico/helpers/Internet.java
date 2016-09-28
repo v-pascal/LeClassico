@@ -186,7 +186,7 @@ public final class Internet {
 
             try {
                 postContent.append(URLEncoder.encode(entry.getKey(), POST_CONTENT_ENCODING));
-                postContent.append("=");
+                postContent.append('=');
                 postContent.append(URLEncoder.encode(entry.getValue().toString(), POST_CONTENT_ENCODING));
 
             } catch (UnsupportedEncodingException e) {
