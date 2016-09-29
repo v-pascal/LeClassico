@@ -74,7 +74,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             cursor.moveToFirst();
         }
         private static boolean equal(Object a, Object b) { // Compare data values (with same type)
-            Logs.add(Logs.Type.V, "a: " + a + ";b: " + b);
+            //Logs.add(Logs.Type.V, "a: " + a + ";b: " + b);
             try {
                 if (((a instanceof Integer) && (((Integer) a).compareTo((Integer)b)) == 0) ||
                         ((a instanceof String) && (((String) a).compareTo((String)b)) == 0) ||

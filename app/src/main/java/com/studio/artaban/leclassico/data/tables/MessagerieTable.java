@@ -109,7 +109,8 @@ public class MessagerieTable extends DataTable {
                                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
                                                     DataProvider.Synchronized.TO_DELETE.getValue());
                                             resolver.update(tableUri, values, selection, null);
-                                            resolver.delete(tableUri, selection, null);
+                                            resolver.delete(tableUri,
+                                                    selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
                                         }
                                         else // Update entry
                                             resolver.update(tableUri, values, selection, null);

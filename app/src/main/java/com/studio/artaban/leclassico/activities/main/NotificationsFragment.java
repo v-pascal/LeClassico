@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -7,6 +8,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -21,6 +23,7 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
@@ -56,6 +59,35 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         Logs.add(Logs.Type.V, null);
 
 
+
+
+
+        ContentValues values = new ContentValues();
+        values.put(NotificationsTable.COLUMN_LU_FLAG, 1);
+        values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
+        values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
+        values.put(NotificationsTable.COLUMN_DATE, "2016-09-07 12:05:43");
+        values.put(NotificationsTable.COLUMN_OBJECT_TYPE, "W");
+        values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
+        values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
+        temp = getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
+
+
+
+
+    }
+
+
+    private Uri temp;
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Logs.add(Logs.Type.V, null);
+        ContentValues values = new ContentValues();
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.TO_DELETE.getValue());
+        getContext().getContentResolver().update(temp, values, null, null);
+        getContext().getContentResolver().delete(temp, Constants.DATA_DELETE_SELECTION, null);
     }
 
 
@@ -298,10 +330,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
                     // Update notification list
-
-
-
-
+                    mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor, true);
 
                 } else {
                     Logs.add(Logs.Type.I, "Initial query");
@@ -352,7 +381,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     }
 
     //////
-    private QueryLoader mNotifyLoader; // User notification query loader
+    private QueryLoader mListLoader; // User notification list query loader
+    private QueryLoader mMaxLoader; // Max notification Id query loader
 
     // Query column indexes
     private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
@@ -381,7 +411,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     public void onAttach(Context context) {
         super.onAttach(context);
         Logs.add(Logs.Type.V, "context: " + context);
-        mNotifyLoader = new QueryLoader(context, this);
+
+        mListLoader = new QueryLoader(context, this);
+        mMaxLoader = new QueryLoader(context, this);
     }
 
     @Override
@@ -392,6 +424,22 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         View rootView = inflater.inflate(R.layout.layout_notifications, container, false);
         rootView.setTag(Constants.MAIN_SECTION_NOTIFICATIONS);
         mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
+
+
+
+
+
+
+
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setAddDuration(1000);
+        itemAnimator.setRemoveDuration(1000);
+        mNotifyList.setItemAnimator(itemAnimator);
+
+
+
+
+
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));
@@ -415,10 +463,27 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
             queryLimit = mQueryCount;
             queryLimit += mQueryOld;
+
+
+
+
+
+            Logs.add(Logs.Type.E, "limit: " + queryLimit);
+
+
+
+
             queryLimit += (short)Tools.getEntryCount(getContext().getContentResolver(),
                     NotificationsTable.TABLE_NAME, selection + " AND " +
                             IDataTable.DataField.COLUMN_ID + '>' + mQueryID);
             // NB: The new DB entry count query just above should be executed quickly (UI thread)
+
+
+
+
+
+
+            Logs.add(Logs.Type.E, "newlimit: " + queryLimit);
 
 
 
@@ -485,12 +550,12 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         " WHERE " + selection +
                         " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
                         " LIMIT " + queryLimit);
-        mNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
+        mListLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
 
         queryData.putString(QueryLoader.DATA_KEY_SELECTION, selection);
         queryData.putStringArray(QueryLoader.DATA_KEY_PROJECTION,
                 new String[]{"max(" + IDataTable.DataField.COLUMN_ID + ')'});
-        mNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATION_MAX, queryData);
+        mMaxLoader.restart(getActivity(), Queries.MAIN_NOTIFICATION_MAX, queryData);
     }
 
     @Override
