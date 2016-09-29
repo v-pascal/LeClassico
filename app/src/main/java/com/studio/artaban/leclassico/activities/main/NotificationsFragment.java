@@ -425,6 +425,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
             //mQueryOld = Queries.OLDER_NOTIFICATIONS;
+            //mQueryOld = 0;
 
 
 
