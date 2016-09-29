@@ -253,12 +253,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
     //////
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mRootView; // Holder root view
-
         public ViewHolder(View view) {
             super(view);
-            //Logs.add(Logs.Type.V, "view: " + view);
-            mRootView = view;
         }
     }
 }
