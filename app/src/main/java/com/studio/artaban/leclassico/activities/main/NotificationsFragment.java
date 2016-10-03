@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
-import com.studio.artaban.leclassico.animations.FadeInRightAnimator;
+import com.studio.artaban.leclassico.animations.items.FadeInRightAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
