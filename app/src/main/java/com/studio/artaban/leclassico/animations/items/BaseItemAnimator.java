@@ -3,9 +3,8 @@ package com.studio.artaban.leclassico.animations.items;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
-import android.view.View;
 import android.view.animation.Interpolator;
-import android.view.animation.OvershootInterpolator;
+import android.view.animation.LinearInterpolator;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -33,7 +32,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         setChangeDuration(DEFAULT_DURATION_CHANGE);
         setRemoveDuration(DEFAULT_DURATION_REMOVE);
 
-        mInterpolator = new OvershootInterpolator(1f);
+        mInterpolator = new LinearInterpolator();
     }
     public BaseItemAnimator(int durationAdd, int durationChange, int durationRemove, Interpolator interpolator) {
 
@@ -44,7 +43,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         setAddDuration((durationChange != Constants.NO_DATA) ? durationChange : DEFAULT_DURATION_CHANGE);
         setAddDuration((durationRemove != Constants.NO_DATA) ? durationRemove : DEFAULT_DURATION_REMOVE);
 
-        mInterpolator = (interpolator != null)? interpolator:new OvershootInterpolator(1f);
+        mInterpolator = (interpolator != null)? interpolator:new LinearInterpolator();
     }
 
     private ArrayList<RemoveInfo> mPendingRemovals = new ArrayList<>();
@@ -88,19 +87,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
             oldItem = true;
         } else
             return false;
-
-
-
-
-
-        /*
-        ViewCompat.setAlpha(item.itemView, 1);
-        ViewCompat.setTranslationX(item.itemView, 0);
-        ViewCompat.setTranslationY(item.itemView, 0);
-        */
-
-
-
 
         cancelAnimation(changeInfo);
         dispatchChangeFinished(item, oldItem);
@@ -163,7 +149,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     @Override
     public boolean animateRemove(RecyclerView.ViewHolder holder) {
         //Logs.add(Logs.Type.V, "holder: " + holder);
-
         endAnimation(holder);
         mPendingRemovals.add(new RemoveInfo(holder));
         return true;
@@ -172,7 +157,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     @Override
     public boolean animateAdd(RecyclerView.ViewHolder holder) {
         //Logs.add(Logs.Type.V, "holder: " + holder);
-
         endAnimation(holder);
         mPendingAdditions.add((AddInfo)prepareAnimation(new AddInfo(holder)));
         return true;
@@ -182,31 +166,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     public boolean animateMove(RecyclerView.ViewHolder holder, int fromX, int fromY, int toX, int toY) {
         //Logs.add(Logs.Type.V, "holder: " + holder + ";fromX: " + fromX + ";fromY: " + fromY +
         //        ";toX: " + toX + ";toY: " + toY);
-
-
-
-
-
-
-        /*
-        fromX += ViewCompat.getTranslationX(holder.itemView);
-        fromY += ViewCompat.getTranslationY(holder.itemView);
-        endAnimation(holder);
-        int deltaX = toX - fromX;
-        int deltaY = toY - fromY;
-        if (deltaX == 0 && deltaY == 0) {
-            dispatchMoveFinished(holder);
-            return false;
-        }
-        if (deltaX != 0) ViewCompat.setTranslationX(holder.itemView, -deltaX);
-        if (deltaY != 0) ViewCompat.setTranslationY(holder.itemView, -deltaY);
-        return new MoveInfo(holder, fromX, fromY, toX, toY);
-        */
-
-
-
-
-
         mPendingMoves.add((MoveInfo)prepareAnimation(new MoveInfo(holder, fromX, fromY, toX, toY)));
         return true;
     }
@@ -217,33 +176,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         //Logs.add(Logs.Type.V, "oldHolder: " + oldHolder + ";newHolder: " + newHolder +
         //        ";fromLeft: " + fromLeft + ";fromTop: " + fromTop + ";toLeft: " + toLeft +
         //        ";toTop: " + toTop);
-
-
-
-
-        /*
-        final float prevTranslationX = ViewCompat.getTranslationX(oldHolder.itemView);
-        final float prevTranslationY = ViewCompat.getTranslationY(oldHolder.itemView);
-        final float prevAlpha = ViewCompat.getAlpha(oldHolder.itemView);
-        endAnimation(oldHolder);
-        int deltaX = (int) (toX - fromX - prevTranslationX);
-        int deltaY = (int) (toY - fromY - prevTranslationY);
-        // recover prev translation state after ending animation
-        ViewCompat.setTranslationX(oldHolder.itemView, prevTranslationX);
-        ViewCompat.setTranslationY(oldHolder.itemView, prevTranslationY);
-        ViewCompat.setAlpha(oldHolder.itemView, prevAlpha);
-        if (newHolder != null && newHolder.itemView != null) {
-            // carry over translation values
-            endAnimation(newHolder);
-            ViewCompat.setTranslationX(newHolder.itemView, -deltaX);
-            ViewCompat.setTranslationY(newHolder.itemView, -deltaY);
-            ViewCompat.setAlpha(newHolder.itemView, 0);
-        }
-        */
-
-
-
-
         mPendingChanges.add((ChangeInfo)prepareAnimation(new ChangeInfo(oldHolder, newHolder,
                 fromLeft, fromTop, toLeft, toTop)));
         return true;
@@ -412,106 +344,52 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     public void endAnimations() {
         Logs.add(Logs.Type.V, null);
 
-
-
-
-
-        /*
-        int count = mPendingMoves.size();
-        for (int i = count - 1; i >= 0; i--) {
-            MoveInfo item = mPendingMoves.get(i);
-            View view = item.holder.itemView;
-            ViewCompat.setTranslationY(view, 0);
-            ViewCompat.setTranslationX(view, 0);
-            dispatchMoveFinished(item.holder);
+        for (int i = mPendingMoves.size() - 1; i > Constants.NO_DATA; --i) {
+            cancelAnimation(mPendingMoves.get(i));
+            dispatchMoveFinished(mPendingMoves.get(i).mHolder);
             mPendingMoves.remove(i);
         }
-
-
-        count = mPendingRemovals.size();
-        for (int i = count - 1; i >= 0; i--) {
-            RecyclerView.ViewHolder item = mPendingRemovals.get(i);
-            dispatchRemoveFinished(item);
+        for (int i = mPendingRemovals.size() - 1; i > Constants.NO_DATA; --i) {
+            dispatchRemoveFinished(mPendingRemovals.get(i).mHolder);
             mPendingRemovals.remove(i);
         }
-
-
-
-        count = mPendingAdditions.size();
-        for (int i = count - 1; i >= 0; i--) {
-            RecyclerView.ViewHolder item = mPendingAdditions.get(i);
-            View view = item.itemView;
-            ViewCompat.setAlpha(view, 1);
-            dispatchAddFinished(item);
+        for (int i = mPendingAdditions.size() - 1; i > Constants.NO_DATA; --i) {
+            cancelAnimation(mPendingAdditions.get(i));
+            dispatchAddFinished(mPendingAdditions.get(i).mHolder);
             mPendingAdditions.remove(i);
         }
-
-
-        count = mPendingChanges.size();
-        for (int i = count - 1; i >= 0; i--) {
-            endChangeAnimationIfNecessary(mPendingChanges.get(i));
-        }
+        for (int i = mPendingChanges.size() - 1; i > Constants.NO_DATA; --i)
+            endChangeAnimationIfNeeded(mPendingChanges.get(i));
         mPendingChanges.clear();
 
-
-
-
-        //if (!isRunning()) {
-        //    return;
-        //}
-
-
-
-        int listCount = mMovesList.size();
-        for (int i = listCount - 1; i >= 0; i--) {
+        for (int i = mMovesList.size() - 1; i > Constants.NO_DATA; --i) {
             ArrayList<MoveInfo> moves = mMovesList.get(i);
-            count = moves.size();
-            for (int j = count - 1; j >= 0; j--) {
-                MoveInfo moveInfo = moves.get(j);
-                RecyclerView.ViewHolder item = moveInfo.holder;
-                View view = item.itemView;
-                ViewCompat.setTranslationY(view, 0);
-                ViewCompat.setTranslationX(view, 0);
-                dispatchMoveFinished(moveInfo.holder);
+            for (int j = moves.size() - 1; j > Constants.NO_DATA; --j) {
+                cancelAnimation(moves.get(j));
+                dispatchMoveFinished(moves.get(j).mHolder);
                 moves.remove(j);
-                if (moves.isEmpty()) {
+                if (moves.isEmpty())
                     mMovesList.remove(moves);
-                }
             }
         }
-        listCount = mAdditionsList.size();
-        for (int i = listCount - 1; i >= 0; i--) {
+        for (int i = mAdditionsList.size() - 1; i > Constants.NO_DATA; --i) {
             ArrayList<RecyclerView.ViewHolder> additions = mAdditionsList.get(i);
-            count = additions.size();
-            for (int j = count - 1; j >= 0; j--) {
-                RecyclerView.ViewHolder item = additions.get(j);
-                View view = item.itemView;
-                ViewCompat.setAlpha(view, 1);
-                dispatchAddFinished(item);
+            for (int j = additions.size() - 1; j > Constants.NO_DATA; --j) {
+                cancelAnimation(new AddInfo(additions.get(j)));
+                dispatchAddFinished(additions.get(j));
                 additions.remove(j);
-                if (additions.isEmpty()) {
+                if (additions.isEmpty())
                     mAdditionsList.remove(additions);
-                }
             }
         }
-        listCount = mChangesList.size();
-        for (int i = listCount - 1; i >= 0; i--) {
+        for (int i = mChangesList.size() - 1; i > Constants.NO_DATA; --i) {
             ArrayList<ChangeInfo> changes = mChangesList.get(i);
-            count = changes.size();
-            for (int j = count - 1; j >= 0; j--) {
-                endChangeAnimationIfNecessary(changes.get(j));
-                if (changes.isEmpty()) {
+            for (int j = changes.size() - 1; j > Constants.NO_DATA; --j) {
+                endChangeAnimationIfNeeded(changes.get(j));
+                if (changes.isEmpty())
                     mChangesList.remove(changes);
-                }
             }
         }
-        */
-
-
-
-
-
-
 
         for (RecyclerView.ViewHolder holder : mRemoveAnimations)
             ViewCompat.animate(holder.itemView).cancel();

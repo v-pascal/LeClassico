@@ -13,21 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FadeInRightAnimator extends SimpleItemAnimator {
-    private ArrayList<ViewHolder> mPendingRemovals = new ArrayList<ViewHolder>();
-    private ArrayList<ViewHolder> mPendingAdditions = new ArrayList<ViewHolder>();
-    private ArrayList<MoveInfo> mPendingMoves = new ArrayList<MoveInfo>();
-    private ArrayList<ChangeInfo> mPendingChanges = new ArrayList<ChangeInfo>();
+    private ArrayList<ViewHolder> mPendingRemovals = new ArrayList<>();
+    private ArrayList<ViewHolder> mPendingAdditions = new ArrayList<>();
+    private ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
+    private ArrayList<ChangeInfo> mPendingChanges = new ArrayList<>();
 
+    private ArrayList<ArrayList<ViewHolder>> mAdditionsList = new ArrayList<>();
+    private ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<>();
+    private ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
 
-    private ArrayList<ArrayList<ViewHolder>> mAdditionsList = new ArrayList<ArrayList<ViewHolder>>();
-    private ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<ArrayList<MoveInfo>>();
-    private ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<ArrayList<ChangeInfo>>();
-
-
-    private ArrayList<ViewHolder> mAddAnimations = new ArrayList<ViewHolder>();
-    private ArrayList<ViewHolder> mMoveAnimations = new ArrayList<ViewHolder>();
-    private ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<ViewHolder>();
-    private ArrayList<ViewHolder> mChangeAnimations = new ArrayList<ViewHolder>();
+    private ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
+    private ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
+    private ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
+    private ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
 
     private static class MoveInfo {
         public ViewHolder holder;
