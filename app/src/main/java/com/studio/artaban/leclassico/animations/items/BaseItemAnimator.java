@@ -10,6 +10,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,6 +25,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     // Default durations (in millisecond)
 
     private Interpolator mInterpolator; // Animation interpolator
+    public void setInterpolator(Interpolator interpolator) {
+        mInterpolator = interpolator;
+    }
 
     public BaseItemAnimator() {
         Logs.add(Logs.Type.V, null);
@@ -34,36 +38,17 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
         mInterpolator = new LinearInterpolator();
     }
-    public BaseItemAnimator(int durationAdd, int durationChange, int durationRemove, Interpolator interpolator) {
-
-        Logs.add(Logs.Type.V, "durationAdd: " + durationAdd + ";durationChange: " + durationChange +
-                ";durationRemove: " + durationRemove + ";interpolator: " + interpolator);
-
-        setAddDuration((durationAdd != Constants.NO_DATA) ? durationAdd : DEFAULT_DURATION_ADD);
-        setAddDuration((durationChange != Constants.NO_DATA) ? durationChange : DEFAULT_DURATION_CHANGE);
-        setAddDuration((durationRemove != Constants.NO_DATA) ? durationRemove : DEFAULT_DURATION_REMOVE);
-
-        mInterpolator = (interpolator != null)? interpolator:new LinearInterpolator();
-    }
 
     private ArrayList<RemoveInfo> mPendingRemovals = new ArrayList<>();
-    private ArrayList<AddInfo> mPendingAdditions = new ArrayList<>();
     private ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
     private ArrayList<ChangeInfo> mPendingChanges = new ArrayList<>();
+    private ArrayList<AddInfo> mPendingAdditions = new ArrayList<>();
     // Pending animation info
 
-    private ArrayList<ArrayList<ViewHolder>> mAdditionsList = new ArrayList<>();
-    private ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<>();
-    private ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
+    private ArrayList<ArrayList<MoveInfo>> mProcessingMoves = new ArrayList<>();
+    private ArrayList<ArrayList<ChangeInfo>> mProcessingChanges = new ArrayList<>();
+    private ArrayList<ArrayList<ViewHolder>> mProcessingAdditions = new ArrayList<>();
     // Processing animation info
-
-    /*
-    protected ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
-    protected ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
-    protected ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
-    protected ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
-    // Processing animation holder
-    */
 
     private void endChangeAnimation(List<ChangeInfo> changeList, ViewHolder item) {
         //Logs.add(Logs.Type.V, "changeList: " + changeList + ";item: " + item);
@@ -101,6 +86,12 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     protected abstract void implementAnimation(AnimInfo info);
 
     //
+    protected HashMap<ViewHolder, AnimInfo> mStartedRemovals = new HashMap<>();
+    protected HashMap<ViewHolder, AnimInfo> mStartedMoves = new HashMap<>();
+    protected HashMap<ViewHolder, AnimInfo> mStartedChanges = new HashMap<>();
+    protected HashMap<ViewHolder, AnimInfo> mStartedAdditions = new HashMap<>();
+    // Started animation holder
+
     protected static class AnimInfo {
         public ViewHolder mHolder;
         public static <T> int find(ArrayList<T> animList, ViewHolder holder) {
@@ -232,7 +223,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         if (movesPending) {
             final ArrayList<MoveInfo> moves = new ArrayList<MoveInfo>();
             moves.addAll(mPendingMoves);
-            mMovesList.add(moves);
+            mProcessingMoves.add(moves);
             mPendingMoves.clear();
             Runnable mover = new Runnable() {
                 @Override
@@ -240,7 +231,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
                     for (MoveInfo moveInfo : moves)
                         implementAnimation(moveInfo);
                     moves.clear();
-                    mMovesList.remove(moves);
+                    mProcessingMoves.remove(moves);
                 }
             };
             if (removalsPending) // Check if needed to wait previous remove stuff
@@ -253,7 +244,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         if (changesPending) {
             final ArrayList<ChangeInfo> changes = new ArrayList<>();
             changes.addAll(mPendingChanges);
-            mChangesList.add(changes);
+            mProcessingChanges.add(changes);
             mPendingChanges.clear();
             Runnable changer = new Runnable() {
                 @Override
@@ -261,7 +252,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
                     for (ChangeInfo change : changes)
                         implementAnimation(change);
                     changes.clear();
-                    mChangesList.remove(changes);
+                    mProcessingChanges.remove(changes);
                 }
             };
             if (removalsPending)
@@ -275,14 +266,14 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
             final ArrayList<ViewHolder> additions = new ArrayList<>();
             for (AddInfo addInfo : mPendingAdditions)
                 additions.add(addInfo.mHolder);
-            mAdditionsList.add(additions);
+            mProcessingAdditions.add(additions);
             mPendingAdditions.clear();
             Runnable adder = new Runnable() {
                 public void run() {
                     for (ViewHolder holder : additions)
                         implementAnimation(new AddInfo(holder));
                     additions.clear();
-                    mAdditionsList.remove(additions);
+                    mProcessingAdditions.remove(additions);
                 }
             };
             if ((removalsPending) || (movesPending) || (changesPending)) { // Check to wait previous stuff
@@ -332,14 +323,14 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         }
 
         ////// Terminate processing animation
-        for (int i = mChangesList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<ChangeInfo> changes = mChangesList.get(i);
+        for (int i = mProcessingChanges.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<ChangeInfo> changes = mProcessingChanges.get(i);
             endChangeAnimation(changes, item);
             if (changes.isEmpty())
-                mChangesList.remove(changes);
+                mProcessingChanges.remove(changes);
         }
-        for (int i = mMovesList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<MoveInfo> moves = mMovesList.get(i);
+        for (int i = mProcessingMoves.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<MoveInfo> moves = mProcessingMoves.get(i);
             for (int j = moves.size() - 1; j > Constants.NO_DATA; --j) {
                 MoveInfo moveInfo = moves.get(j);
                 if (moveInfo.mHolder == item) {
@@ -347,18 +338,18 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
                     dispatchMoveFinished(item);
                     moves.remove(j);
                     if (moves.isEmpty())
-                        mMovesList.remove(moves);
+                        mProcessingMoves.remove(moves);
                     break;
                 }
             }
         }
-        for (int i = mAdditionsList.size() - 1; i >= 0; i--) {
-            ArrayList<ViewHolder> additions = mAdditionsList.get(i);
+        for (int i = mProcessingAdditions.size() - 1; i >= 0; i--) {
+            ArrayList<ViewHolder> additions = mProcessingAdditions.get(i);
             if (additions.remove(item)) {
                 cancelAnimation(new AddInfo(item));
                 dispatchAddFinished(item);
                 if (additions.isEmpty())
-                    mAdditionsList.remove(additions);
+                    mProcessingAdditions.remove(additions);
             }
         }
 
@@ -371,6 +362,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     public void endAnimations() {
         Logs.add(Logs.Type.V, null);
 
+        // Remove pending animations
         for (int i = mPendingMoves.size() - 1; i > Constants.NO_DATA; --i) {
             cancelAnimation(mPendingMoves.get(i));
             dispatchMoveFinished(mPendingMoves.get(i).mHolder);
@@ -389,55 +381,55 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
             endChangeAnimationIfNeeded(mPendingChanges.get(i));
         mPendingChanges.clear();
 
-        for (int i = mMovesList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<MoveInfo> moves = mMovesList.get(i);
+        // Remove processing animations
+        for (int i = mProcessingMoves.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<MoveInfo> moves = mProcessingMoves.get(i);
             for (int j = moves.size() - 1; j > Constants.NO_DATA; --j) {
                 cancelAnimation(moves.get(j));
                 dispatchMoveFinished(moves.get(j).mHolder);
                 moves.remove(j);
                 if (moves.isEmpty())
-                    mMovesList.remove(moves);
+                    mProcessingMoves.remove(moves);
             }
         }
-        for (int i = mAdditionsList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<ViewHolder> additions = mAdditionsList.get(i);
+        for (int i = mProcessingAdditions.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<ViewHolder> additions = mProcessingAdditions.get(i);
             for (int j = additions.size() - 1; j > Constants.NO_DATA; --j) {
                 cancelAnimation(new AddInfo(additions.get(j)));
                 dispatchAddFinished(additions.get(j));
                 additions.remove(j);
                 if (additions.isEmpty())
-                    mAdditionsList.remove(additions);
+                    mProcessingAdditions.remove(additions);
             }
         }
-        for (int i = mChangesList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<ChangeInfo> changes = mChangesList.get(i);
+        for (int i = mProcessingChanges.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<ChangeInfo> changes = mProcessingChanges.get(i);
             for (int j = changes.size() - 1; j > Constants.NO_DATA; --j) {
                 endChangeAnimationIfNeeded(changes.get(j));
                 if (changes.isEmpty())
-                    mChangesList.remove(changes);
+                    mProcessingChanges.remove(changes);
             }
         }
 
-        /*
-        for (ViewHolder holder : mRemoveAnimations)
-            ViewCompat.animate(holder.itemView).cancel();
-        for (ViewHolder holder : mMoveAnimations)
-            ViewCompat.animate(holder.itemView).cancel();
-        for (ViewHolder holder : mAddAnimations)
-            ViewCompat.animate(holder.itemView).cancel();
-        for (ViewHolder holder : mChangeAnimations)
-            ViewCompat.animate(holder.itemView).cancel();
-            */
+        // Stop current animations (started)
+        for (HashMap.Entry<ViewHolder, AnimInfo> removals : mStartedRemovals.entrySet())
+            cancelAnimation(removals.getValue());
+        for (HashMap.Entry<ViewHolder, AnimInfo> moves : mStartedMoves.entrySet())
+            cancelAnimation(moves.getValue());
+        for (HashMap.Entry<ViewHolder, AnimInfo> changes : mStartedChanges.entrySet())
+            cancelAnimation(changes.getValue());
+        for (HashMap.Entry<ViewHolder, AnimInfo> additions : mStartedAdditions.entrySet())
+            cancelAnimation(additions.getValue());
 
         dispatchAnimationsFinished();
     }
 
     @Override
     public boolean isRunning() {
-        return ((!mPendingAdditions.isEmpty()) || (!mPendingChanges.isEmpty()) ||
-                (!mPendingMoves.isEmpty()) || (!mPendingRemovals.isEmpty()) ||
-                //(!mMoveAnimations.isEmpty()) || (!mRemoveAnimations.isEmpty()) ||
-                //(!mAddAnimations.isEmpty()) || (!mChangeAnimations.isEmpty()) ||
-                (!mMovesList.isEmpty()) || (!mAdditionsList.isEmpty()) || (!mChangesList.isEmpty()));
+        return ((!mPendingRemovals.isEmpty()) || (!mPendingMoves.isEmpty()) ||
+                (!mPendingChanges.isEmpty()) || (!mPendingAdditions.isEmpty()) ||
+                (!mProcessingMoves.isEmpty()) || (!mProcessingChanges.isEmpty()) || (!mProcessingAdditions.isEmpty()) ||
+                (!mStartedRemovals.isEmpty()) || (!mStartedMoves.isEmpty()) ||
+                (!mStartedChanges.isEmpty()) || (!mStartedAdditions.isEmpty()));
     }
 }

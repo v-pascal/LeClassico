@@ -1,5 +1,7 @@
 package com.studio.artaban.leclassico.animations;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -11,6 +13,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -57,14 +60,14 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
     }
 
     private ArrayList<RemoveInfo> mPendingRemovals = new ArrayList<>();
-    private ArrayList<AddInfo> mPendingAdditions = new ArrayList<>();
     private ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
     private ArrayList<ChangeInfo> mPendingChanges = new ArrayList<>();
+    private ArrayList<AddInfo> mPendingAdditions = new ArrayList<>();
     // Pending animation info
 
-    private ArrayList<ArrayList<ViewHolder>> mAdditionsList = new ArrayList<>();
-    private ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<>();
-    private ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
+    private ArrayList<ArrayList<MoveInfo>> mListMoves = new ArrayList<>();
+    private ArrayList<ArrayList<ChangeInfo>> mListChanges = new ArrayList<>();
+    private ArrayList<ArrayList<ViewHolder>> mListAdditions = new ArrayList<>();
     // Processing animation info
 
     private void endChangeAnimation(List<ChangeInfo> changeList, ViewHolder item) {
@@ -111,6 +114,25 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
 
     //////
+    private enum AnimType { REMOVE, MOVE, CHANGE, ADD };
+    private AnimType getAnimType(AnimInfo info) {
+        //Logs.add(Logs.Type.V, "info: " + info);
+        if (info instanceof RemoveInfo)
+            return AnimType.REMOVE;
+        else if (info instanceof MoveInfo)
+            return AnimType.MOVE;
+        else if (info instanceof ChangeInfo)
+            return AnimType.CHANGE;
+
+        return AnimType.ADD;
+    }
+
+    private HashMap<ViewHolder, AnimatorSet> mAnimRemovals = new HashMap<>();
+    private HashMap<ViewHolder, AnimatorSet> mAnimMoves = new HashMap<>();
+    private HashMap<ViewHolder, AnimatorSet> mAnimChanges = new HashMap<>();
+    private HashMap<ViewHolder, AnimatorSet> mAnimAdditions = new HashMap<>();
+
+    //
     private void cancelAnimation(AnimInfo info) {
 
 
@@ -126,12 +148,80 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         return info;
     }
     private void implementAnimation(AnimInfo info) {
+        //Logs.add(Logs.Type.V, "info: " + info);
 
+        final AnimType type = getAnimType(info);
+        final ViewHolder holder = info.mHolder;
 
+        AnimatorSet animator = null;
+        switch (type) {
 
+            case REMOVE: {
+                animator = mAnimatorRemove.clone();
+                animator.setDuration(getRemoveDuration());
+                mAnimRemovals.put(holder, animator);
+                break;
+            }
+            case MOVE: {
+                animator = mAnimatorMove.clone();
+                animator.setDuration(getMoveDuration());
+                mAnimMoves.put(holder, animator);
+                break;
+            }
+            case CHANGE: {
+                animator = mAnimatorChange.clone();
+                animator.setDuration(getChangeDuration());
+                mAnimChanges.put(holder, animator);
+                break;
+            }
+            case ADD: {
+                animator = mAnimatorAdd.clone();
+                animator.setDuration(getAddDuration());
+                mAnimAdditions.put(holder, animator);
+                break;
+            }
+        }
+        animator.setTarget(holder.itemView);
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                switch (type) {
+                    case REMOVE: dispatchRemoveStarting(holder); break;
+                    case MOVE: dispatchMoveStarting(holder); break;
+                    case CHANGE: dispatchChangeStarting(holder, true); break;
+                    case ADD: dispatchAddStarting(holder); break;
+                }
+            }
 
-
-
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                switch (type) {
+                    case REMOVE: {
+                        dispatchRemoveFinished(holder);
+                        mAnimRemovals.remove(holder);
+                        break;
+                    }
+                    case MOVE: {
+                        dispatchMoveFinished(holder);
+                        mAnimMoves.remove(holder);
+                        break;
+                    }
+                    case CHANGE: {
+                        dispatchChangeFinished(holder, true);
+                        mAnimAdditions.remove(holder);
+                        break;
+                    }
+                    case ADD: {
+                        dispatchAddFinished(holder);
+                        mAnimAdditions.remove(holder);
+                        break;
+                    }
+                }
+                if (!isRunning())
+                    dispatchAnimationsFinished();
+            }
+        });
+        animator.start();
     }
 
 
@@ -277,7 +367,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         if (movesPending) {
             final ArrayList<MoveInfo> moves = new ArrayList<MoveInfo>();
             moves.addAll(mPendingMoves);
-            mMovesList.add(moves);
+            mListMoves.add(moves);
             mPendingMoves.clear();
             Runnable mover = new Runnable() {
                 @Override
@@ -285,7 +375,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
                     for (MoveInfo moveInfo : moves)
                         implementAnimation(moveInfo);
                     moves.clear();
-                    mMovesList.remove(moves);
+                    mListMoves.remove(moves);
                 }
             };
             if (removalsPending) // Check if needed to wait previous remove stuff
@@ -298,7 +388,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         if (changesPending) {
             final ArrayList<ChangeInfo> changes = new ArrayList<>();
             changes.addAll(mPendingChanges);
-            mChangesList.add(changes);
+            mListChanges.add(changes);
             mPendingChanges.clear();
             Runnable changer = new Runnable() {
                 @Override
@@ -306,7 +396,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
                     for (ChangeInfo change : changes)
                         implementAnimation(change);
                     changes.clear();
-                    mChangesList.remove(changes);
+                    mListChanges.remove(changes);
                 }
             };
             if (removalsPending)
@@ -320,14 +410,14 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
             final ArrayList<ViewHolder> additions = new ArrayList<>();
             for (AddInfo addInfo : mPendingAdditions)
                 additions.add(addInfo.mHolder);
-            mAdditionsList.add(additions);
+            mListAdditions.add(additions);
             mPendingAdditions.clear();
             Runnable adder = new Runnable() {
                 public void run() {
                     for (ViewHolder holder : additions)
                         implementAnimation(new AddInfo(holder));
                     additions.clear();
-                    mAdditionsList.remove(additions);
+                    mListAdditions.remove(additions);
                 }
             };
             if ((removalsPending) || (movesPending) || (changesPending)) { // Check to wait previous stuff
@@ -377,14 +467,14 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         }
 
         ////// Terminate processing animation
-        for (int i = mChangesList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<ChangeInfo> changes = mChangesList.get(i);
+        for (int i = mListChanges.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<ChangeInfo> changes = mListChanges.get(i);
             endChangeAnimation(changes, item);
             if (changes.isEmpty())
-                mChangesList.remove(changes);
+                mListChanges.remove(changes);
         }
-        for (int i = mMovesList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<MoveInfo> moves = mMovesList.get(i);
+        for (int i = mListMoves.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<MoveInfo> moves = mListMoves.get(i);
             for (int j = moves.size() - 1; j > Constants.NO_DATA; --j) {
                 MoveInfo moveInfo = moves.get(j);
                 if (moveInfo.mHolder == item) {
@@ -392,18 +482,18 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
                     dispatchMoveFinished(item);
                     moves.remove(j);
                     if (moves.isEmpty())
-                        mMovesList.remove(moves);
+                        mListMoves.remove(moves);
                     break;
                 }
             }
         }
-        for (int i = mAdditionsList.size() - 1; i >= 0; i--) {
-            ArrayList<ViewHolder> additions = mAdditionsList.get(i);
+        for (int i = mListAdditions.size() - 1; i >= 0; i--) {
+            ArrayList<ViewHolder> additions = mListAdditions.get(i);
             if (additions.remove(item)) {
                 cancelAnimation(new AddInfo(item));
                 dispatchAddFinished(item);
                 if (additions.isEmpty())
-                    mAdditionsList.remove(additions);
+                    mListAdditions.remove(additions);
             }
         }
 
@@ -434,34 +524,45 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
             endChangeAnimationIfNeeded(mPendingChanges.get(i));
         mPendingChanges.clear();
 
-        for (int i = mMovesList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<MoveInfo> moves = mMovesList.get(i);
+        for (int i = mListMoves.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<MoveInfo> moves = mListMoves.get(i);
             for (int j = moves.size() - 1; j > Constants.NO_DATA; --j) {
                 cancelAnimation(moves.get(j));
                 dispatchMoveFinished(moves.get(j).mHolder);
                 moves.remove(j);
                 if (moves.isEmpty())
-                    mMovesList.remove(moves);
+                    mListMoves.remove(moves);
             }
         }
-        for (int i = mAdditionsList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<ViewHolder> additions = mAdditionsList.get(i);
+        for (int i = mListAdditions.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<ViewHolder> additions = mListAdditions.get(i);
             for (int j = additions.size() - 1; j > Constants.NO_DATA; --j) {
                 cancelAnimation(new AddInfo(additions.get(j)));
                 dispatchAddFinished(additions.get(j));
                 additions.remove(j);
                 if (additions.isEmpty())
-                    mAdditionsList.remove(additions);
+                    mListAdditions.remove(additions);
             }
         }
-        for (int i = mChangesList.size() - 1; i > Constants.NO_DATA; --i) {
-            ArrayList<ChangeInfo> changes = mChangesList.get(i);
+        for (int i = mListChanges.size() - 1; i > Constants.NO_DATA; --i) {
+            ArrayList<ChangeInfo> changes = mListChanges.get(i);
             for (int j = changes.size() - 1; j > Constants.NO_DATA; --j) {
                 endChangeAnimationIfNeeded(changes.get(j));
                 if (changes.isEmpty())
-                    mChangesList.remove(changes);
+                    mListChanges.remove(changes);
             }
         }
+
+
+
+
+
+
+
+
+
+
+
         dispatchAnimationsFinished();
     }
 
@@ -469,6 +570,8 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
     public boolean isRunning() {
         return ((!mPendingAdditions.isEmpty()) || (!mPendingChanges.isEmpty()) ||
                 (!mPendingMoves.isEmpty()) || (!mPendingRemovals.isEmpty()) ||
-                (!mMovesList.isEmpty()) || (!mAdditionsList.isEmpty()) || (!mChangesList.isEmpty()));
+                (!mAnimRemovals.isEmpty()) || (!mAnimMoves.isEmpty()) ||
+                (!mAnimChanges.isEmpty()) || (!mAnimAdditions.isEmpty()) ||
+                (!mListMoves.isEmpty()) || (!mListAdditions.isEmpty()) || (!mListChanges.isEmpty()));
     }
 }
