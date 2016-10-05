@@ -1,5 +1,6 @@
-package com.studio.artaban.leclassico.animations.items;
+package com.studio.artaban.leclassico.animations;
 
+import android.animation.AnimatorSet;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -14,9 +15,9 @@ import java.util.List;
 
 /**
  * Created by pascal on 03/10/16.
- * Base animator class for recycler list items
+ * Item animator for recycler view
  */
-public abstract class BaseItemAnimator extends SimpleItemAnimator {
+public class RecyclerItemAnimator extends SimpleItemAnimator {
 
     private static final int DEFAULT_DURATION_ADD = 500;
     private static final int DEFAULT_DURATION_CHANGE = 500;
@@ -24,8 +25,18 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     // Default durations (in millisecond)
 
     private Interpolator mInterpolator; // Animation interpolator
+    public void setInterpolator(Interpolator interpolator) {
+        mInterpolator = interpolator;
+    }
 
-    public BaseItemAnimator() {
+    private AnimatorSet mAnimatorRemove;
+    private AnimatorSet mAnimatorMove;
+    private AnimatorSet mAnimatorChange;
+    private AnimatorSet mAnimatorAdd;
+    private AnimatorSet mAnimatorAppear;
+    // Item animations
+
+    public RecyclerItemAnimator() {
         Logs.add(Logs.Type.V, null);
 
         setAddDuration(DEFAULT_DURATION_ADD);
@@ -33,17 +44,16 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         setRemoveDuration(DEFAULT_DURATION_REMOVE);
 
         mInterpolator = new LinearInterpolator();
-    }
-    public BaseItemAnimator(int durationAdd, int durationChange, int durationRemove, Interpolator interpolator) {
 
-        Logs.add(Logs.Type.V, "durationAdd: " + durationAdd + ";durationChange: " + durationChange +
-                ";durationRemove: " + durationRemove + ";interpolator: " + interpolator);
 
-        setAddDuration((durationAdd != Constants.NO_DATA) ? durationAdd : DEFAULT_DURATION_ADD);
-        setAddDuration((durationChange != Constants.NO_DATA) ? durationChange : DEFAULT_DURATION_CHANGE);
-        setAddDuration((durationRemove != Constants.NO_DATA) ? durationRemove : DEFAULT_DURATION_REMOVE);
 
-        mInterpolator = (interpolator != null)? interpolator:new LinearInterpolator();
+
+
+
+
+
+
+
     }
 
     private ArrayList<RemoveInfo> mPendingRemovals = new ArrayList<>();
@@ -56,14 +66,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     private ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<>();
     private ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
     // Processing animation info
-
-    /*
-    protected ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
-    protected ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
-    protected ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
-    protected ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
-    // Processing animation holder
-    */
 
     private void endChangeAnimation(List<ChangeInfo> changeList, ViewHolder item) {
         //Logs.add(Logs.Type.V, "changeList: " + changeList + ";item: " + item);
@@ -95,13 +97,56 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         return true;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     //////
-    protected abstract void cancelAnimation(AnimInfo info);
-    protected abstract AnimInfo prepareAnimation(AnimInfo info);
-    protected abstract void implementAnimation(AnimInfo info);
+    private void cancelAnimation(AnimInfo info) {
+
+
+
+
+    }
+    private AnimInfo prepareAnimation(AnimInfo info) {
+
+
+
+
+
+        return info;
+    }
+    private void implementAnimation(AnimInfo info) {
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     //
-    protected static class AnimInfo {
+    private static class AnimInfo {
         public ViewHolder mHolder;
         public static <T> int find(ArrayList<T> animList, ViewHolder holder) {
             for (int i = 0; i < animList.size(); ++i)
@@ -114,17 +159,17 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
             mHolder = holder;
         }
     }
-    protected static class RemoveInfo extends AnimInfo {
+    private static class RemoveInfo extends AnimInfo {
         private RemoveInfo(ViewHolder holder) {
             super(holder);
         }
     }
-    protected static class AddInfo extends AnimInfo {
+    private static class AddInfo extends AnimInfo {
         private AddInfo(ViewHolder holder) {
             super(holder);
         }
     }
-    protected static class MoveInfo extends AnimInfo {
+    private static class MoveInfo extends AnimInfo {
         public int mFromX, mFromY, mToX, mToY;
 
         private MoveInfo(ViewHolder holder, int fromX, int fromY, int toX, int toY) {
@@ -137,11 +182,10 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
             mToY = toY;
         }
     }
-    protected static class ChangeInfo extends MoveInfo {
+    private static class ChangeInfo extends MoveInfo {
 
         public ViewHolder mNewHolder;
-        private ChangeInfo(ViewHolder oldHolder, ViewHolder newHolder,
-                           int fromX, int fromY, int toX, int toY) {
+        private ChangeInfo(ViewHolder oldHolder, ViewHolder newHolder, int fromX, int fromY, int toX, int toY) {
             super(oldHolder, fromX, fromY, toX, toY);
             mNewHolder = newHolder;
         }
@@ -187,6 +231,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     public boolean animateAppearance (@NonNull ViewHolder holder, ItemHolderInfo preIHI,
                                       @NonNull ItemHolderInfo postIHI) {
         //Logs.add(Logs.Type.V, "holder: " + holder + ";preIHI: " + preIHI + ";postIHI: " + postIHI);
+
 
 
 
@@ -417,18 +462,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
                     mChangesList.remove(changes);
             }
         }
-
-        /*
-        for (ViewHolder holder : mRemoveAnimations)
-            ViewCompat.animate(holder.itemView).cancel();
-        for (ViewHolder holder : mMoveAnimations)
-            ViewCompat.animate(holder.itemView).cancel();
-        for (ViewHolder holder : mAddAnimations)
-            ViewCompat.animate(holder.itemView).cancel();
-        for (ViewHolder holder : mChangeAnimations)
-            ViewCompat.animate(holder.itemView).cancel();
-            */
-
         dispatchAnimationsFinished();
     }
 
@@ -436,8 +469,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     public boolean isRunning() {
         return ((!mPendingAdditions.isEmpty()) || (!mPendingChanges.isEmpty()) ||
                 (!mPendingMoves.isEmpty()) || (!mPendingRemovals.isEmpty()) ||
-                //(!mMoveAnimations.isEmpty()) || (!mRemoveAnimations.isEmpty()) ||
-                //(!mAddAnimations.isEmpty()) || (!mChangeAnimations.isEmpty()) ||
                 (!mMovesList.isEmpty()) || (!mAdditionsList.isEmpty()) || (!mChangesList.isEmpty()));
     }
 }
