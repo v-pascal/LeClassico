@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.animations.items;
 
+import android.animation.AnimatorSet;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -10,7 +11,6 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,12 +19,9 @@ import java.util.List;
  */
 public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
-    private static final int DEFAULT_DURATION_ADD = 500;
-    private static final int DEFAULT_DURATION_CHANGE = 500;
-    private static final int DEFAULT_DURATION_REMOVE = 500;
-    // Default durations (in millisecond)
+    private static final int DEFAULT_DURATION = 500; // Default animation duration (in millisecond)
 
-    private Interpolator mInterpolator; // Animation interpolator
+    protected Interpolator mInterpolator; // Animation interpolator
     public void setInterpolator(Interpolator interpolator) {
         mInterpolator = interpolator;
     }
@@ -32,9 +29,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     public BaseItemAnimator() {
         Logs.add(Logs.Type.V, null);
 
-        setAddDuration(DEFAULT_DURATION_ADD);
-        setChangeDuration(DEFAULT_DURATION_CHANGE);
-        setRemoveDuration(DEFAULT_DURATION_REMOVE);
+        setAddDuration(DEFAULT_DURATION);
+        setChangeDuration(DEFAULT_DURATION);
+        setRemoveDuration(DEFAULT_DURATION);
 
         mInterpolator = new LinearInterpolator();
     }
@@ -80,20 +77,38 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         return true;
     }
 
-    //////
+    ////// BaseItemAnimator ////////////////////////////////////////////////////////////////////////
+
     protected abstract void cancelAnimation(AnimInfo info);
-    protected abstract AnimInfo prepareAnimation(AnimInfo info);
+    protected abstract boolean prepareAnimation(AnimInfo info);
     protected abstract void implementAnimation(AnimInfo info);
 
-    //
-    protected HashMap<ViewHolder, AnimInfo> mStartedRemovals = new HashMap<>();
-    protected HashMap<ViewHolder, AnimInfo> mStartedMoves = new HashMap<>();
-    protected HashMap<ViewHolder, AnimInfo> mStartedChanges = new HashMap<>();
-    protected HashMap<ViewHolder, AnimInfo> mStartedAdditions = new HashMap<>();
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected enum AnimType { REMOVE, MOVE, CHANGE, ADD };
+    protected AnimType getAnimType(AnimInfo info) {
+        //Logs.add(Logs.Type.V, "info: " + info);
+        if (info instanceof RemoveInfo)
+            return AnimType.REMOVE;
+        else if (info instanceof MoveInfo)
+            return AnimType.MOVE;
+        else if (info instanceof ChangeInfo)
+            return AnimType.CHANGE;
+
+        return AnimType.ADD;
+    }
+
+    protected ArrayList<AnimInfo> mStartedRemovals = new ArrayList<>();
+    protected ArrayList<AnimInfo> mStartedMoves = new ArrayList<>();
+    protected ArrayList<AnimInfo> mStartedChanges = new ArrayList<>();
+    protected ArrayList<AnimInfo> mStartedAdditions = new ArrayList<>();
     // Started animation holder
 
     protected static class AnimInfo {
         public ViewHolder mHolder;
+        public final AnimatorSet mAnimation = new AnimatorSet();
+        public final AnimatorSet mNewAnimation = new AnimatorSet();
+
         public static <T> int find(ArrayList<T> animList, ViewHolder holder) {
             for (int i = 0; i < animList.size(); ++i)
                 if (((AnimInfo)animList.get(i)).mHolder == holder)
@@ -146,48 +161,38 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         mPendingRemovals.add(new RemoveInfo(holder));
         return true;
     }
-
     @Override
     public boolean animateAdd(ViewHolder holder) {
         //Logs.add(Logs.Type.V, "holder: " + holder);
         endAnimation(holder);
-        mPendingAdditions.add((AddInfo)prepareAnimation(new AddInfo(holder)));
+        AddInfo addInfo = new AddInfo(holder);
+        prepareAnimation(addInfo);
+        mPendingAdditions.add(addInfo);
         return true;
     }
-
     @Override
     public boolean animateMove(ViewHolder holder, int fromX, int fromY, int toX, int toY) {
         //Logs.add(Logs.Type.V, "holder: " + holder + ";fromX: " + fromX + ";fromY: " + fromY +
         //        ";toX: " + toX + ";toY: " + toY);
-        mPendingMoves.add((MoveInfo)prepareAnimation(new MoveInfo(holder, fromX, fromY, toX, toY)));
-        return true;
+        MoveInfo moveInfo = new MoveInfo(holder, fromX, fromY, toX, toY);
+        mPendingMoves.add(moveInfo);
+        return prepareAnimation(moveInfo);
     }
-
     @Override
     public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder,
                                  int fromLeft, int fromTop, int toLeft, int toTop) {
         //Logs.add(Logs.Type.V, "oldHolder: " + oldHolder + ";newHolder: " + newHolder +
         //        ";fromLeft: " + fromLeft + ";fromTop: " + fromTop + ";toLeft: " + toLeft +
         //        ";toTop: " + toTop);
-        mPendingChanges.add((ChangeInfo)prepareAnimation(new ChangeInfo(oldHolder, newHolder,
-                fromLeft, fromTop, toLeft, toTop)));
+        ChangeInfo chaneInfo = new ChangeInfo(oldHolder, newHolder, fromLeft, fromTop, toLeft, toTop);
+        prepareAnimation(chaneInfo);
+        mPendingChanges.add(chaneInfo);
         return true;
     }
-
     @Override
     public boolean animateAppearance (@NonNull ViewHolder holder, ItemHolderInfo preIHI,
                                       @NonNull ItemHolderInfo postIHI) {
-        //Logs.add(Logs.Type.V, "holder: " + holder + ";preIHI: " + preIHI + ";postIHI: " + postIHI);
-
-
-
-
-
-
-
-
-
-        return super.animateAppearance(holder, preIHI, postIHI);
+        Logs.add(Logs.Type.V, "holder: " + holder + ";preIHI: " + preIHI + ";postIHI: " + postIHI);
 
 
 
@@ -199,6 +204,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
 
 
+        return false;
     }
 
     @Override
@@ -291,7 +297,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
     @Override
     public void endAnimation(ViewHolder item) {
-        Logs.add(Logs.Type.V, "item: " + item);
+        //Logs.add(Logs.Type.V, "item: " + item);
 
         ////// Terminate pending animation
         // Move
@@ -412,14 +418,19 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         }
 
         // Stop current animations (started)
-        for (HashMap.Entry<ViewHolder, AnimInfo> removals : mStartedRemovals.entrySet())
-            cancelAnimation(removals.getValue());
-        for (HashMap.Entry<ViewHolder, AnimInfo> moves : mStartedMoves.entrySet())
-            cancelAnimation(moves.getValue());
-        for (HashMap.Entry<ViewHolder, AnimInfo> changes : mStartedChanges.entrySet())
-            cancelAnimation(changes.getValue());
-        for (HashMap.Entry<ViewHolder, AnimInfo> additions : mStartedAdditions.entrySet())
-            cancelAnimation(additions.getValue());
+        for (AnimInfo remove : mStartedRemovals)
+            cancelAnimation(remove);
+        for (AnimInfo move : mStartedMoves)
+            cancelAnimation(move);
+        for (AnimInfo change : mStartedChanges)
+            cancelAnimation(change);
+        for (AnimInfo add : mStartedAdditions)
+            cancelAnimation(add);
+
+        mStartedRemovals.clear();
+        mStartedMoves.clear();
+        mStartedChanges.clear();
+        mStartedAdditions.clear();
 
         dispatchAnimationsFinished();
     }
