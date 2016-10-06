@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
-import com.studio.artaban.leclassico.animations.ScaleInItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -58,9 +57,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
 
-    private int testage = 0;
     public void read() { // Mark unread notification(s) as read
         Logs.add(Logs.Type.V, null);
+
 
 
 
@@ -80,8 +79,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
         temp = getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
 
-
-
         /*
         ContentValues valuesA = new ContentValues();
         valuesA.put(NotificationsTable.COLUMN_LU_FLAG, testage);
@@ -93,9 +90,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         else
             testage = 0;
             */
-
-
-
 
 
 
@@ -114,14 +108,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
 
-
-
-
             //mQueryOld = Queries.OLDER_NOTIFICATIONS;
             //mQueryOld = 0;
-
-
-
 
 
 
@@ -186,9 +174,13 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         mMaxLoader.restart(getActivity(), Queries.MAIN_NOTIFICATION_MAX, queryData);
 
 
+
+
+
+
     }
 
-
+    private int testage = 0;
     private Uri temp;
     @Override
     public void onDestroy() {
@@ -201,6 +193,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             getContext().getContentResolver().delete(temp, Constants.DATA_DELETE_SELECTION, null);
         }
     }
+
+
+
+
 
 
 
@@ -536,102 +532,17 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         View rootView = inflater.inflate(R.layout.layout_notifications, container, false);
         rootView.setTag(Constants.MAIN_SECTION_NOTIFICATIONS);
 
-
-
-
-
-
-
-
-
-
-
         // Set recycler view
         mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
-
-        /*
-        final ScaleInItemAnimator itemAnimator = new ScaleInItemAnimator();
-        itemAnimator.setAnimationListener(new ScaleInItemAnimator.ItemAnimatorListener() {
-            @Override
-            public void onCancel(ScaleInItemAnimator.AnimType type, View item) {
-
-            }
-
-            @Override
-            public void onPrepare(ScaleInItemAnimator.AnimInfo info) {
-
-            }
-
-            @Override
-            public ViewPropertyAnimatorCompat onAnimate(ScaleInItemAnimator.AnimInfo info, boolean changeNew) {
-                Logs.add(Logs.Type.V, "info: " + info + ";changeNew: " + changeNew);
-                View itemView = info.mHolder.itemView;
-
-                //ScaleInItemAnimator.AnimType type = ScaleInItemAnimator.AnimType.CHANGE;
-                //switch (type) {
-                switch (ScaleInItemAnimator.getAnimType(info)) {
-
-                    case REMOVE: {
-                        ViewCompat.setPivotX(itemView, itemView.getWidth());
-                        ViewCompat.animate(itemView).scaleX(0);
-                        break;
-                    }
-                    case CHANGE: {
-
-
-
-
-                        ScaleInItemAnimator.ChangeInfo changeInfo = (ScaleInItemAnimator.ChangeInfo)info;
-                        if (!changeNew) {
-
-                            final ViewPropertyAnimatorCompat oldViewAnim = ViewCompat.animate(info.mHolder.itemView);
-                            oldViewAnim.translationX(changeInfo.mToX - changeInfo.mFromX);
-                            oldViewAnim.translationY(changeInfo.mToY - changeInfo.mFromY);
-
-                            // Same as remove animation
-                            ViewCompat.setPivotX(info.mHolder.itemView, info.mHolder.itemView.getWidth());
-                            return oldViewAnim.scaleX(0);
-
-                        } else {
-
-
-                            final ViewPropertyAnimatorCompat newViewAnimation = ViewCompat.animate(changeInfo.mNewHolder.itemView);
-
-                   // Same as add animation
-                            ViewCompat.setPivotX(changeInfo.mNewHolder.itemView, 0.0f);
-                            ViewCompat.setScaleX(changeInfo.mNewHolder.itemView, 0.0f);
-                            return newViewAnimation.translationX(0).translationY(0).scaleX(1.0f).alpha(1);
-
-
-                        }
-
-
-
-
-                    }
-                    case ADD: {
-                        ViewCompat.setPivotX(itemView, 0);
-                        ViewCompat.setScaleX(itemView, 0);
-                        ViewCompat.setAlpha(itemView, 1);
-
-                        ViewCompat.animate(itemView).scaleX(1);
-                        break;
-                    }
-                }
-                return ViewCompat.animate(itemView);
-            }
-        });
-        */
-
         final RecyclerItemAnimator itemAnimator = new RecyclerItemAnimator();
         itemAnimator.setAnimationListener(new RecyclerItemAnimator.ItemAnimatorListener() {
             @Override
             public void onCancel(RecyclerItemAnimator.AnimType type, View item) {
                 switch (type) {
 
-                    case REMOVE:
                     case ADD: {
                         ViewCompat.setAlpha(item, 1);
+                        ViewCompat.setScaleX(item, 1);
                         break;
                     }
                     case CHANGE: {
@@ -690,7 +601,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                     case REMOVE: {
                         ViewCompat.setPivotX(itemView, itemView.getWidth());
-                        ViewCompat.animate(itemView).scaleX(0);
+                        ViewCompat.animate(itemView).scaleX(0).alpha(0);
                         break;
                     }
                     case CHANGE: {
@@ -702,6 +613,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                             ViewCompat.animate(itemView)
                                     .translationX(changeInfo.mToX - changeInfo.mFromX)
                                     .translationY(changeInfo.mToY - changeInfo.mFromY)
+                                    .alpha(0)
                                     .scaleX(0);
 
                         } else {
@@ -721,9 +633,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     case ADD: {
                         ViewCompat.setPivotX(itemView, 0);
                         ViewCompat.setScaleX(itemView, 0);
-                        ViewCompat.setAlpha(itemView, 1);
+                        ViewCompat.setAlpha(itemView, 0);
 
-                        ViewCompat.animate(itemView).scaleX(1);
+                        ViewCompat.animate(itemView).scaleX(1).alpha(1);
                         break;
                     }
                 }
@@ -731,16 +643,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             }
         });
         mNotifyList.setItemAnimator(itemAnimator);
-
-
-
-
-
-
-
-
-
-
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));

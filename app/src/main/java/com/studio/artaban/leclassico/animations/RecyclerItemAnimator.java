@@ -34,6 +34,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         setAddDuration(DEFAULT_DURATION);
         setChangeDuration(DEFAULT_DURATION);
         setRemoveDuration(DEFAULT_DURATION);
+        setMoveDuration(DEFAULT_DURATION);
 
         mInterpolator = new LinearInterpolator();
     }
