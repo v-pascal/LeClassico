@@ -189,23 +189,6 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         mPendingChanges.add(chaneInfo);
         return true;
     }
-    @Override
-    public boolean animateAppearance (@NonNull ViewHolder holder, ItemHolderInfo preIHI,
-                                      @NonNull ItemHolderInfo postIHI) {
-        Logs.add(Logs.Type.V, "holder: " + holder + ";preIHI: " + preIHI + ";postIHI: " + postIHI);
-
-
-
-
-
-
-
-
-
-
-
-        return false;
-    }
 
     @Override
     public void runPendingAnimations() {
@@ -227,7 +210,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
         ////// Move
         if (movesPending) {
-            final ArrayList<MoveInfo> moves = new ArrayList<MoveInfo>();
+            final ArrayList<MoveInfo> moves = new ArrayList<>();
             moves.addAll(mPendingMoves);
             mProcessingMoves.add(moves);
             mPendingMoves.clear();

@@ -8,6 +8,8 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -20,7 +22,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
-import com.studio.artaban.leclassico.animations.items.FadeInRightAnimator;
+import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
+import com.studio.artaban.leclassico.animations.ScaleInItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -68,8 +71,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
         values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
 
-        //values.put(NotificationsTable.COLUMN_DATE, "2016-09-07 12:05:43");
-        values.put(NotificationsTable.COLUMN_DATE, "2016-09-08 12:05:43");
+        values.put(NotificationsTable.COLUMN_DATE, "2016-09-07 12:05:43");
+        //values.put(NotificationsTable.COLUMN_DATE, "2016-09-08 12:05:43");
 
         values.put(NotificationsTable.COLUMN_OBJECT_TYPE, "W");
         values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
@@ -512,8 +515,120 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 ";savedInstanceState: " + savedInstanceState);
         View rootView = inflater.inflate(R.layout.layout_notifications, container, false);
         rootView.setTag(Constants.MAIN_SECTION_NOTIFICATIONS);
+
+        // Set recycler view
         mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
-        mNotifyList.setItemAnimator(new FadeInRightAnimator());
+        mNotifyList.setItemAnimator(new ScaleInItemAnimator());
+
+        /*
+        final RecyclerItemAnimator itemAnimator = new RecyclerItemAnimator();
+        itemAnimator.setAnimationListener(new RecyclerItemAnimator.ItemAnimatorListener() {
+            @Override
+            public void onCancel(RecyclerItemAnimator.AnimType type, View item) {
+                switch (type) {
+
+                    case REMOVE:
+                    case ADD: {
+                        ViewCompat.setAlpha(item, 1);
+                        break;
+                    }
+                    case CHANGE: {
+                        ViewCompat.setAlpha(item, 1);
+                        ViewCompat.setTranslationX(item, 0);
+                        ViewCompat.setTranslationY(item, 0);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onPrepare(RecyclerItemAnimator.AnimInfo info) {
+                switch (RecyclerItemAnimator.getAnimType(info)) {
+
+                    case ADD: {
+                        ViewCompat.setAlpha(info.mHolder.itemView, 0);
+                        break;
+                    }
+                    case CHANGE: {
+
+                        ////// Previous holder
+                        float prevTransX = ViewCompat.getTranslationX(info.mHolder.itemView);
+                        float prevTransY = ViewCompat.getTranslationY(info.mHolder.itemView);
+                        float prevAlpha = ViewCompat.getAlpha(info.mHolder.itemView);
+                        itemAnimator.endAnimation(info.mHolder); // Clear any animation & settings
+
+                        RecyclerItemAnimator.ChangeInfo changeInfo = (RecyclerItemAnimator.ChangeInfo)info;
+                        int deltaX = (int)(changeInfo.mToX - changeInfo.mFromX - prevTransX);
+                        int deltaY = (int)(changeInfo.mToY - changeInfo.mFromY - prevTransY);
+
+                        // Restore previous settings
+                        ViewCompat.setTranslationX(info.mHolder.itemView, prevTransX);
+                        ViewCompat.setTranslationY(info.mHolder.itemView, prevTransY);
+                        ViewCompat.setAlpha(info.mHolder.itemView, prevAlpha);
+
+                        ////// New holder
+                        if ((changeInfo.mNewHolder != null) && (changeInfo.mNewHolder.itemView != null)) {
+                            itemAnimator.endAnimation(changeInfo.mNewHolder);
+
+                            ViewCompat.setTranslationX(changeInfo.mNewHolder.itemView, -deltaX);
+                            ViewCompat.setTranslationY(changeInfo.mNewHolder.itemView, -deltaY);
+                            ViewCompat.setAlpha(changeInfo.mNewHolder.itemView, 0);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public ViewPropertyAnimatorCompat onAnimate(RecyclerItemAnimator.AnimInfo info, boolean changeNew) {
+                View itemView = info.mHolder.itemView;
+                switch (RecyclerItemAnimator.getAnimType(info)) {
+
+                    case REMOVE: {
+                        ViewCompat.setPivotX(itemView, itemView.getWidth());
+                        ViewCompat.animate(itemView).scaleX(0);
+                        break;
+                    }
+                    case CHANGE: {
+                        RecyclerItemAnimator.ChangeInfo changeInfo = (RecyclerItemAnimator.ChangeInfo)info;
+                        if (!changeNew) {
+
+                            ViewCompat.animate(itemView)
+                                    .translationX(changeInfo.mToX - changeInfo.mFromX)
+                                    .translationY(changeInfo.mToY - changeInfo.mFromY)
+                                    .scaleX(0);
+
+                            // Same as remove animation
+                            ViewCompat.setPivotX(itemView, itemView.getWidth());
+
+                        } else {
+
+                            itemView = changeInfo.mNewHolder.itemView;
+                            ViewCompat.animate(itemView)
+                                    .translationX(0)
+                                    .translationY(0)
+                                    .scaleX(1);
+
+                            // Same as add animation
+                            ViewCompat.setPivotX(itemView, 0);
+                            ViewCompat.setScaleX(itemView, 0);
+                        }
+                        break;
+                    }
+                    case ADD: {
+                        ViewCompat.setPivotX(itemView, 0);
+                        ViewCompat.setScaleX(itemView, 0);
+                        ViewCompat.setAlpha(itemView, 1);
+
+                        ViewCompat.animate(itemView).scaleX(1);
+                        break;
+                    }
+                }
+                return ViewCompat.animate(itemView);
+            }
+        });
+        mNotifyList.setItemAnimator(itemAnimator);
+        */
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));
