@@ -142,7 +142,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                     adapter.notifyItemChanged(removedLast);
             }
 
-            ////// Insert entries (if needed)
+            ////// Add entries (if needed)
             toDo.clear();
             for (int i = 0; i < newData.size(); ++i) {
                 if (find(mData, mColumnKey, newData.get(i).get(mColumnKey)) == Constants.NO_DATA)

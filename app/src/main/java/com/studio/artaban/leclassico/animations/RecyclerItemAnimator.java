@@ -81,7 +81,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         }).start();
     }
     private void startChangeAnimation(ChangeInfo changeInfo, final boolean changeNew) {
-        //Logs.add(Logs.Type.V, "changeInfo: " + changeInfo + ";changeNew: " + changeNew);
+        Logs.add(Logs.Type.V, "changeInfo: " + changeInfo + ";changeNew: " + changeNew);
 
         final ViewPropertyAnimatorCompat animation = mListener.onAnimate(changeInfo, changeNew);
         final ViewHolder holder = (changeNew)? changeInfo.mNewHolder:changeInfo.mHolder;
@@ -158,11 +158,11 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
     public enum AnimType { REMOVE, MOVE, CHANGE, ADD };
     public static AnimType getAnimType(AnimInfo info) {
         //Logs.add(Logs.Type.V, "info: " + info);
-        if (RemoveInfo.class.isAssignableFrom(info.getClass()))
+        if (info.getClass().isAssignableFrom(RemoveInfo.class))
             return AnimType.REMOVE;
-        else if (MoveInfo.class.isAssignableFrom(info.getClass()))
+        if (info.getClass().isAssignableFrom(MoveInfo.class))
             return AnimType.MOVE;
-        else if (ChangeInfo.class.isAssignableFrom(info.getClass()))
+        if (info.getClass().isAssignableFrom(ChangeInfo.class))
             return AnimType.CHANGE;
 
         return AnimType.ADD;
@@ -261,13 +261,13 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
     @Override
     public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder,
                                  int fromLeft, int fromTop, int toLeft, int toTop) {
-        //Logs.add(Logs.Type.V, "oldHolder: " + oldHolder + ";newHolder: " + newHolder +
-        //        ";fromLeft: " + fromLeft + ";fromTop: " + fromTop + ";toLeft: " + toLeft +
-        //        ";toTop: " + toTop);
+        Logs.add(Logs.Type.V, "oldHolder: " + oldHolder + ";newHolder: " + newHolder +
+                ";fromLeft: " + fromLeft + ";fromTop: " + fromTop + ";toLeft: " + toLeft +
+                ";toTop: " + toTop);
 
-        ChangeInfo chaneInfo = new ChangeInfo(oldHolder, newHolder, fromLeft, fromTop, toLeft, toTop);
-        mListener.onPrepare(chaneInfo);
-        mPendingChanges.add(chaneInfo);
+        ChangeInfo changeInfo = new ChangeInfo(oldHolder, newHolder, fromLeft, fromTop, toLeft, toTop);
+        mListener.onPrepare(changeInfo);
+        mPendingChanges.add(changeInfo);
         return true;
     }
 
