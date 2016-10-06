@@ -2,7 +2,6 @@ package com.studio.artaban.leclassico.animations.items;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.view.View;
 
@@ -107,6 +106,7 @@ public class FadeInRightAnimator extends BaseItemAnimator {
         //Logs.add(Logs.Type.V, "info: " + info);
 
         final AnimType type = getAnimType(info);
+        long startDelay = 0;
         switch (type) {
 
             case REMOVE: {
@@ -120,8 +120,8 @@ public class FadeInRightAnimator extends BaseItemAnimator {
             }
             case MOVE: {
 
-                info.mAnimation.play(ObjectAnimator.ofFloat(info.mHolder.itemView, "translateX", 0))
-                        .with(ObjectAnimator.ofFloat(info.mHolder.itemView, "translateY", 0));
+                info.mAnimation.play(ObjectAnimator.ofFloat(info.mHolder.itemView, "translationX", 0))
+                        .with(ObjectAnimator.ofFloat(info.mHolder.itemView, "translationY", 0));
                 info.mAnimation.setDuration(getMoveDuration());
                 mStartedMoves.add(info);
                 break;
@@ -145,23 +145,34 @@ public class FadeInRightAnimator extends BaseItemAnimator {
             case ADD: {
 
                 info.mAnimation.play(ObjectAnimator.ofFloat(info.mHolder.itemView,
-                        "translateX", info.mHolder.itemView.getRootView().getWidth() * 0.25f, 0f))
+                        "translationX", info.mHolder.itemView.getRootView().getWidth() * 0.25f, 0f))
                         .with(ObjectAnimator.ofFloat(info.mHolder.itemView,
                                 "alpha", 0f, 1f));
                 info.mAnimation.setDuration(getAddDuration());
+                startDelay = Math.abs(info.mHolder.getAdapterPosition() * getAddDuration() / 4);
                 mStartedAdditions.add(info);
                 break;
             }
         }
         info.mAnimation.setTarget(info.mHolder.itemView);
         info.mAnimation.setInterpolator(mInterpolator);
+        info.mAnimation.setStartDelay(startDelay);
         info.mAnimation.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 switch (type) {
-                    case REMOVE: dispatchRemoveStarting(info.mHolder); break;
-                    case MOVE: dispatchMoveStarting(info.mHolder); break;
-                    case ADD: dispatchAddStarting(info.mHolder); break;
+                    case REMOVE: {
+                        dispatchRemoveStarting(info.mHolder);
+                        break;
+                    }
+                    case MOVE: {
+                        dispatchMoveStarting(info.mHolder);
+                        break;
+                    }
+                    case ADD: {
+                        dispatchAddStarting(info.mHolder);
+                        break;
+                    }
                 }
             }
 

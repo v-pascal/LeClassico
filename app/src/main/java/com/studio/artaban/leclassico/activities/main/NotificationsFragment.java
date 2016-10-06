@@ -67,7 +67,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
         values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
         values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
-        values.put(NotificationsTable.COLUMN_DATE, "2016-09-07 12:05:43");
+
+        //values.put(NotificationsTable.COLUMN_DATE, "2016-09-07 12:05:43");
+        values.put(NotificationsTable.COLUMN_DATE, "2016-09-08 12:05:43");
+
         values.put(NotificationsTable.COLUMN_OBJECT_TYPE, "W");
         values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
         values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
