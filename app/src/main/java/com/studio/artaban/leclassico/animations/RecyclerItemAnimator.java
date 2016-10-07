@@ -84,7 +84,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
     private void startChangeAnimation(ChangeInfo changeInfo, final boolean changeNew) {
         Logs.add(Logs.Type.V, "changeInfo: " + changeInfo + ";changeNew: " + changeNew);
 
-        final ViewPropertyAnimatorCompat animation = mListener.onAnimate(changeInfo, changeNew);
+        final ViewPropertyAnimatorCompat animation = mMaker.onAnimate(changeInfo, changeNew);
         final ViewHolder holder = (changeNew)? changeInfo.mNewHolder:changeInfo.mHolder;
         mStartedChanges.add(holder);
         animation.setDuration(getChangeDuration());
@@ -105,7 +105,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
             @Override
             public void onAnimationCancel(View view) {
-                mListener.onCancel(AnimType.CHANGE, view);
+                mMaker.onCancel(AnimType.CHANGE, view);
             }
         }).start();
     }
@@ -136,22 +136,22 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         } else
             return false;
 
-        mListener.onCancel(AnimType.CHANGE, item.itemView);
+        mMaker.onCancel(AnimType.CHANGE, item.itemView);
         dispatchChangeFinished(item, oldItem);
         return true;
     }
 
-    ////// ItemAnimatorListener ////////////////////////////////////////////////////////////////////
+    ////// ItemAnimatorMaker ///////////////////////////////////////////////////////////////////////
 
-    public interface ItemAnimatorListener {
+    public interface ItemAnimatorMaker {
 
         void onCancel(AnimType type, View item);
         void onPrepare(AnimInfo info);
         ViewPropertyAnimatorCompat onAnimate(AnimInfo info, boolean changeNew);
     }
-    private ItemAnimatorListener mListener; // Item animator listener
-    public void setAnimationListener(ItemAnimatorListener listener) {
-        mListener = listener;
+    private ItemAnimatorMaker mMaker; // Item animator maker
+    public void setAnimationMaker(ItemAnimatorMaker maker) {
+        mMaker = maker;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -236,7 +236,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
         endAnimation(holder);
         AddInfo addInfo = new AddInfo(holder);
-        mListener.onPrepare(addInfo);
+        mMaker.onPrepare(addInfo);
         mPendingAdditions.add(addInfo);
         return true;
     }
@@ -267,7 +267,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
                 ";toTop: " + toTop);
 
         ChangeInfo changeInfo = new ChangeInfo(oldHolder, newHolder, fromLeft, fromTop, toLeft, toTop);
-        mListener.onPrepare(changeInfo);
+        mMaker.onPrepare(changeInfo);
         mPendingChanges.add(changeInfo);
         return true;
     }
@@ -288,7 +288,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
             for (RemoveInfo removeInfo : mPendingRemovals) {
 
                 final ViewHolder holder = removeInfo.mHolder;
-                final ViewPropertyAnimatorCompat animation = mListener.onAnimate(removeInfo, false);
+                final ViewPropertyAnimatorCompat animation = mMaker.onAnimate(removeInfo, false);
                 mStartedRemovals.add(holder);
                 animation.setDuration(getRemoveDuration());
                 animation.setListener(new ViewPropertyAnimatorListener() {
@@ -308,7 +308,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
                     @Override
                     public void onAnimationCancel(View view) {
-                        mListener.onCancel(AnimType.REMOVE, view);
+                        mMaker.onCancel(AnimType.REMOVE, view);
                     }
                 }).start();
             }
@@ -374,7 +374,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
                     for (final ViewHolder holder : additions) {
 
                         final ViewPropertyAnimatorCompat animation =
-                                mListener.onAnimate(new AddInfo(holder), false);
+                                mMaker.onAnimate(new AddInfo(holder), false);
                         mStartedAdditions.add(holder);
                         animation.setDuration(getRemoveDuration());
                         animation.setListener(new ViewPropertyAnimatorListener() {
@@ -394,7 +394,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
                             @Override
                             public void onAnimationCancel(View view) {
-                                mListener.onCancel(AnimType.ADD, view);
+                                mMaker.onCancel(AnimType.ADD, view);
                             }
                         }).start();
                     }
@@ -437,7 +437,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         // Remove
         int itemIdx = AnimInfo.find(mPendingRemovals, item);
         if (itemIdx != Constants.NO_DATA) {
-            mListener.onCancel(AnimType.REMOVE, item.itemView);
+            mMaker.onCancel(AnimType.REMOVE, item.itemView);
             mPendingMoves.remove(itemIdx);
             dispatchRemoveFinished(item);
         }
@@ -445,7 +445,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         // Add
         itemIdx = AnimInfo.find(mPendingAdditions, item);
         if (itemIdx != Constants.NO_DATA) {
-            mListener.onCancel(AnimType.ADD, item.itemView);
+            mMaker.onCancel(AnimType.ADD, item.itemView);
             mPendingAdditions.remove(itemIdx);
             dispatchAddFinished(item);
         }
@@ -475,7 +475,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         for (int i = mProcessingAdditions.size() - 1; i >= 0; i--) {
             ArrayList<ViewHolder> additions = mProcessingAdditions.get(i);
             if (additions.remove(item)) {
-                mListener.onCancel(AnimType.ADD, item.itemView);
+                mMaker.onCancel(AnimType.ADD, item.itemView);
                 dispatchAddFinished(item);
                 if (additions.isEmpty())
                     mProcessingAdditions.remove(additions);
@@ -501,13 +501,13 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         }
         for (int i = mPendingRemovals.size() - 1; i > Constants.NO_DATA; --i) {
             ViewHolder holder = mPendingRemovals.get(i).mHolder;
-            mListener.onCancel(AnimType.REMOVE, holder.itemView);
+            mMaker.onCancel(AnimType.REMOVE, holder.itemView);
             dispatchRemoveFinished(holder);
             mPendingRemovals.remove(i);
         }
         for (int i = mPendingAdditions.size() - 1; i > Constants.NO_DATA; --i) {
             ViewHolder holder = mPendingAdditions.get(i).mHolder;
-            mListener.onCancel(AnimType.ADD, holder.itemView);
+            mMaker.onCancel(AnimType.ADD, holder.itemView);
             dispatchAddFinished(holder);
             mPendingAdditions.remove(i);
         }
@@ -531,7 +531,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         for (int i = mProcessingAdditions.size() - 1; i > Constants.NO_DATA; --i) {
             ArrayList<ViewHolder> additions = mProcessingAdditions.get(i);
             for (int j = additions.size() - 1; j > Constants.NO_DATA; --j) {
-                mListener.onCancel(AnimType.ADD, additions.get(j).itemView);
+                mMaker.onCancel(AnimType.ADD, additions.get(j).itemView);
                 dispatchAddFinished(additions.get(j));
                 additions.remove(j);
                 if (additions.isEmpty())
@@ -549,13 +549,13 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
         // Stop current animations (started)
         for (ViewHolder holder : mStartedRemovals)
-            mListener.onCancel(AnimType.REMOVE, holder.itemView);
+            mMaker.onCancel(AnimType.REMOVE, holder.itemView);
         for (ViewHolder holder : mStartedMoves)
             ViewCompat.animate(holder.itemView).cancel();
         for (ViewHolder holder : mStartedChanges)
-            mListener.onCancel(AnimType.CHANGE, holder.itemView);
+            mMaker.onCancel(AnimType.CHANGE, holder.itemView);
         for (ViewHolder holder : mStartedAdditions)
-            mListener.onCancel(AnimType.ADD, holder.itemView);
+            mMaker.onCancel(AnimType.ADD, holder.itemView);
 
         mStartedRemovals.clear();
         mStartedMoves.clear();

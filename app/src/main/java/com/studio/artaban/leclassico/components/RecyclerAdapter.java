@@ -15,7 +15,7 @@ import java.util.Collections;
 
 /**
  * Created by pascal on 26/09/16.
- * Recycler adapter class (with DB cursor a data source)
+ * Recycler adapter class with DB cursor a data source
  */
 public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
@@ -169,6 +169,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 int insertedLast = toDo.get(i) + count;
                 if ((below) && (mData.size() > insertedLast))
                     adapter.notifyItemChanged(insertedLast);
+
+                i = i + count - 1;
             }
 
             ////// Move entries (if needed)
