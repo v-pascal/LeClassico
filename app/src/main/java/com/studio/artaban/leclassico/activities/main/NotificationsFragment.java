@@ -25,7 +25,6 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
-import com.studio.artaban.leclassico.components.RecyclerAnimatorAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
@@ -288,8 +287,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         private int displayReadFlag(boolean unread, View root, ImageView type, TextView time) {
             //Logs.add(Logs.Type.V, "unread: " + unread + ";root: " + root + ";type: " + type +
             //        ";time: " + time);
-            if (unread) { // Unread notification
+            if (unread) {
 
+                // Unread notification
                 root.findViewById(R.id.layout_data)
                         .setBackground(getResources().getDrawable(R.drawable.notify_unread_background));
                 type.setColorFilter(Color.RED);
@@ -297,17 +297,16 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 time.setTypeface(Typeface.DEFAULT_BOLD);
                 time.setTextColor(Color.RED);
                 return R.color.red;
-
-            } else { // Read notification
-
-                root.findViewById(R.id.layout_data)
-                        .setBackground(getResources().getDrawable(R.drawable.notify_read_background));
-                type.setColorFilter(Color.BLACK);
-                ((TextView) root.findViewById(R.id.text_message)).setTypeface(Typeface.DEFAULT);
-                time.setTypeface(Typeface.DEFAULT);
-                time.setTextColor(Color.BLACK);
-                return R.color.colorPrimaryProfile;
             }
+
+            // Read notification
+            root.findViewById(R.id.layout_data)
+                    .setBackground(getResources().getDrawable(R.drawable.notify_read_background));
+            type.setColorFilter(Color.BLACK);
+            ((TextView) root.findViewById(R.id.text_message)).setTypeface(Typeface.DEFAULT);
+            time.setTypeface(Typeface.DEFAULT);
+            time.setTextColor(getResources().getColor(R.color.orange));
+            return R.color.colorPrimaryProfile;
         }
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
@@ -332,7 +331,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         //////
         @Override
         public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
-            Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
+            //Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
 
             // Set notification date
             if (position == 0) {
@@ -420,21 +419,30 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             holder.itemView.findViewById(R.id.layout_data).setOnClickListener(this);
             holder.itemView.findViewById(R.id.image_pseudo).setOnClickListener(this);
 
+            // Add margin bottom at last item position
+            ((RecyclerView.LayoutParams)holder.itemView.getLayoutParams()).bottomMargin =
+                    (position == (mDataSource.getCount() - 1))?
+                            getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin):0;
 
+            ////// Animate item appearance
+            if (position > mLastPosition) {
+                mLastPosition = position;
 
+                ViewCompat.animate(holder.itemView).cancel();
+                ViewCompat.setScaleX(holder.itemView, 0.7f);
+                ViewCompat.setScaleY(holder.itemView, 0.7f);
+                ViewCompat.animate(holder.itemView)
+                        .setDuration(500)
+                        .scaleX(1)
+                        .scaleY(1)
+                        .start();
+            }
+        }
 
-
-
-
-
-            // Last: Bottom margin TO activity_vertical_margin
-            // Otherwise: Bottom margin TO 0
-
-
-
-
-
-
+        @Override
+        public void onViewDetachedFromWindow(ViewHolder holder) {
+            ViewCompat.animate(holder.itemView).cancel();
+            super.onViewDetachedFromWindow(holder);
         }
     }
 
@@ -477,6 +485,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                     // Update notification list
                     mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor, true);
+                    mNotifyList.setAdapter(mNotifyAdapter);
 
                 } else {
                     Logs.add(Logs.Type.I, "Initial query");
@@ -508,35 +517,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
                             getNotifyMessage(type, Tools.getNotifyWallType(mNotifyAdapter.getDataSource(),
                                     0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
-
-
-
-
-
-
-
-
                     mNotifyList.setAdapter(mNotifyAdapter);
-                    /*
-                    mNotifyList.setAdapter(new RecyclerAnimatorAdapter(mNotifyAdapter,
-                            new RecyclerAnimatorAdapter.RecyclerAnimationMaker() {
-                                @Override
-                                public void onAppearance(View item) {
-
-                                }
-
-                                @Override
-                                public void onCancel(View item) {
-
-                                }
-                            }));
-                            */
-
-
-
-
-
-
                 }
                 break;
             }

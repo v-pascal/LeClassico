@@ -22,6 +22,9 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     @LayoutRes private final int mItemLayout; // Holder view layout Id
     protected final DataView mDataSource; // Data source
 
+    // Last display item position (used to animate item appearance)
+    protected int mLastPosition = Constants.NO_DATA;
+
     public RecyclerAdapter(@LayoutRes int layout, int key) {
         Logs.add(Logs.Type.V, "layout: " + layout);
 
@@ -90,7 +93,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         private static int find(ArrayList<ArrayList<Object>> data, int columnValue, Object value) {
         // Find key into data array and return its index (NO_DATA is returned if not found)
 
-            Logs.add(Logs.Type.V, "data: " + data + ";columnValue: " + columnValue + ";value: " + value);
+            //Logs.add(Logs.Type.V, "data: " + data + ";columnValue: " + columnValue + ";value: " + value);
             for (int i = 0; i < data.size(); ++i) {
                 if (equal(data.get(i).get(columnValue), value))
                     return i;
