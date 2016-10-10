@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
+import android.support.v4.view.ViewPropertyAnimatorListener;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -67,12 +69,12 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
         ContentValues values = new ContentValues();
-        //for (int i = 0; i < 15; ++i) {
+        for (int i = 0; i < 15; ++i) {
 
             values.put(NotificationsTable.COLUMN_LU_FLAG, 1);
 
-            values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
-            //values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:" + String.format("%02d", i) + ":00");
+            //values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
+            values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:" + String.format("%02d", i) + ":00");
 
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
             values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
@@ -83,8 +85,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             values.put(NotificationsTable.COLUMN_OBJECT_TYPE, "W");
             values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
             values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
-            temp = getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
-        //}
+            //temp =
+            getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
+        }
 
         /*
         ContentValues valuesA = new ContentValues();
@@ -315,14 +318,20 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         @Override
         public void onClick(View sender) {
             Logs.add(Logs.Type.V, "sender: " + sender);
+
+            int position = (int)sender.getTag(R.id.tag_position);
             switch (sender.getId()) {
 
                 case R.id.layout_data: {
+                    Logs.add(Logs.Type.I, "Notification #" + position + " selected");
+
 
 
                     break;
                 }
                 case R.id.image_pseudo: {
+                    Logs.add(Logs.Type.I, "Pseudo #" + position + " selected");
+
 
 
                     break;
@@ -418,8 +427,13 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     (byte) mDataSource.getInt(position, COLUMN_INDEX_SYNC));
 
             // Events
-            holder.itemView.findViewById(R.id.layout_data).setOnClickListener(this);
-            holder.itemView.findViewById(R.id.image_pseudo).setOnClickListener(this);
+            View layoutData = holder.itemView.findViewById(R.id.layout_data);
+            View imagePseudo = holder.itemView.findViewById(R.id.image_pseudo);
+
+            layoutData.setTag(R.id.tag_position, position);
+            layoutData.setOnClickListener(this);
+            imagePseudo.setTag(R.id.tag_position, position);
+            imagePseudo.setOnClickListener(this);
 
             // Add margin bottom at last item position
             ((RecyclerView.LayoutParams)holder.itemView.getLayoutParams()).bottomMargin =
@@ -432,17 +446,37 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                 if (!(Boolean)holder.itemView.getTag()) {
                     ViewCompat.animate(holder.itemView).cancel();
-                    ViewCompat.setScaleX(holder.itemView, 0.7f);
-                    ViewCompat.setScaleY(holder.itemView, 0.7f);
-                    ViewCompat.animate(holder.itemView)
-                            .setDuration(500)
-                            .scaleX(1)
-                            .scaleY(1)
-                            .start();
+                    ViewCompat.setPivotX(holder.itemView, holder.itemView.getWidth());
+                    ViewCompat.setScaleX(holder.itemView, 0);
+                    ViewCompat.setAlpha(holder.itemView, 0);
 
-                } else
-                    holder.itemView.setTag(Boolean.FALSE);
+                    final ViewPropertyAnimatorCompat animation = ViewCompat.animate(holder.itemView);
+                    animation.setDuration(500)
+                            .scaleX(1)
+                            .alpha(1)
+                            .setListener(new ViewPropertyAnimatorListener() {
+                                @Override
+                                public void onAnimationStart(View view) {
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(View view) {
+                                    animation.setListener(null);
+                                    ViewCompat.setScaleX(view, 1);
+                                    ViewCompat.setAlpha(view, 1);
+                                }
+
+                                @Override
+                                public void onAnimationCancel(View view) {
+
+                                }
+                            })
+                            .start();
+                }
             }
+            if ((Boolean)holder.itemView.getTag())
+                holder.itemView.setTag(Boolean.FALSE);
         }
 
         @Override
@@ -595,13 +629,14 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 switch (type) {
 
                     case ADD: {
-                        ViewCompat.setAlpha(item, 1);
                         ViewCompat.setScaleX(item, 1);
+                        ViewCompat.setAlpha(item, 1);
                         break;
                     }
                     case CHANGE: {
                         ViewCompat.setTranslationX(item, 0);
                         ViewCompat.setTranslationY(item, 0);
+                        ViewCompat.setScaleX(item, 1);
                         ViewCompat.setAlpha(item, 1);
                         break;
                     }
@@ -614,6 +649,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 switch (RecyclerItemAnimator.getAnimType(info)) {
 
                     case ADD: {
+                        ViewCompat.setScaleX(info.mHolder.itemView, 0);
                         ViewCompat.setAlpha(info.mHolder.itemView, 0);
                         break;
                     }
@@ -655,14 +691,14 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 switch (RecyclerItemAnimator.getAnimType(info)) {
 
                     case REMOVE: {
-                        ViewCompat.setPivotX(itemView, itemView.getWidth());
+                        ViewCompat.setPivotX(itemView, 0);
                         ViewCompat.animate(itemView).scaleX(0).alpha(0);
                         break;
                     }
                     case CHANGE: {
                         RecyclerItemAnimator.ChangeInfo changeInfo = (RecyclerItemAnimator.ChangeInfo) info;
                         if (!changeNew) {
-                            ViewCompat.setPivotX(itemView, itemView.getWidth());
+                            ViewCompat.setPivotX(itemView, 0);
 
                             // Same as remove animation
                             ViewCompat.animate(itemView)
@@ -673,7 +709,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                         } else {
                             itemView = changeInfo.mNewHolder.itemView;
-                            ViewCompat.setPivotX(itemView, 0);
+                            ViewCompat.setPivotX(itemView, itemView.getWidth());
                             ViewCompat.setScaleX(itemView, 0);
 
                             // Same as add animation
@@ -686,10 +722,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         break;
                     }
                     case ADD: {
-                        ViewCompat.setPivotX(itemView, 0);
-                        ViewCompat.setScaleX(itemView, 0);
-                        ViewCompat.setAlpha(itemView, 0);
-
+                        ViewCompat.setPivotX(itemView, itemView.getWidth());
                         ViewCompat.animate(itemView).scaleX(1).alpha(1);
                         break;
                     }

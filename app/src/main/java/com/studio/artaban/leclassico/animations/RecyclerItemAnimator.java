@@ -68,6 +68,8 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
             @Override
             public void onAnimationEnd(View view) {
                 animation.setListener(null);
+                ViewCompat.setTranslationX(view, 0);
+                ViewCompat.setTranslationY(view, 0);
                 dispatchMoveFinished(info.mHolder);
                 mStartedMoves.remove(info.mHolder);
                 if (!isRunning())
@@ -76,8 +78,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
             @Override
             public void onAnimationCancel(View view) {
-                ViewCompat.setTranslationX(view, 0);
-                ViewCompat.setTranslationY(view, 0);
+
             }
         }).start();
     }
@@ -97,6 +98,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
             @Override
             public void onAnimationEnd(View view) {
                 animation.setListener(null);
+                mMaker.onCancel(AnimType.CHANGE, view);
                 dispatchChangeFinished(holder, !changeNew);
                 mStartedChanges.remove(holder);
                 if (!isRunning())
@@ -105,7 +107,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
             @Override
             public void onAnimationCancel(View view) {
-                mMaker.onCancel(AnimType.CHANGE, view);
+
             }
         }).start();
     }
@@ -300,6 +302,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
                     @Override
                     public void onAnimationEnd(View view) {
                         animation.setListener(null);
+                        //mMaker.onCancel(AnimType.REMOVE, view); // Not needed (will be removed)
                         dispatchRemoveFinished(holder);
                         mStartedRemovals.remove(holder);
                         if (!isRunning())
@@ -308,7 +311,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
                     @Override
                     public void onAnimationCancel(View view) {
-                        mMaker.onCancel(AnimType.REMOVE, view);
+
                     }
                 }).start();
             }
@@ -386,6 +389,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
                             @Override
                             public void onAnimationEnd(View view) {
                                 animation.setListener(null);
+                                mMaker.onCancel(AnimType.ADD, view);
                                 dispatchAddFinished(holder);
                                 mStartedAdditions.remove(holder);
                                 if (!isRunning())
@@ -394,7 +398,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
 
                             @Override
                             public void onAnimationCancel(View view) {
-                                mMaker.onCancel(AnimType.ADD, view);
+
                             }
                         }).start();
                     }
