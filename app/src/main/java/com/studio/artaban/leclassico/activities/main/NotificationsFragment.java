@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -67,24 +66,18 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
         ContentValues values = new ContentValues();
-        //for (int i = 0; i < 15; ++i) {
+        values.put(NotificationsTable.COLUMN_LU_FLAG, 1);
+        values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
+        values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
 
-            values.put(NotificationsTable.COLUMN_LU_FLAG, 1);
+        values.put(NotificationsTable.COLUMN_DATE, "2016-09-07 12:05:43");
+        //values.put(NotificationsTable.COLUMN_DATE, "2016-09-08 12:05:43");
 
-            values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
-            //values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:" + String.format("%02d", i) + ":00");
-
-            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
-            values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
-
-            values.put(NotificationsTable.COLUMN_DATE, "2016-09-07 12:05:43");
-            //values.put(NotificationsTable.COLUMN_DATE, "2016-09-08 12:05:43");
-
-            values.put(NotificationsTable.COLUMN_OBJECT_TYPE, "W");
-            values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
-            values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
-            temp = getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
-        //}
+        values.put(NotificationsTable.COLUMN_OBJECT_TYPE, "W");
+        values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
+        values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
+        temp = getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
 
         /*
         ContentValues valuesA = new ContentValues();
@@ -97,7 +90,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         else
             testage = 0;
             */
-
 
 
 
@@ -266,14 +258,15 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
 
     private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
+
         public NotifyRecyclerViewAdapter(@LayoutRes int layout, int key) {
             super(layout, key);
         }
 
         private void displayDate(TextView viewDate, String date) {
-        // Display the notification date separator (with notification date formatted as locale user)
+            // Display the notification date separator (with notification date formatted as locale user)
 
-            //Logs.add(Logs.Type.V, "viewDate: " + viewDate + ";date: " + date);
+            Logs.add(Logs.Type.V, "viewDate: " + viewDate + ";date: " + date);
             SimpleDateFormat dateFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
             try {
                 Date notifyDate = dateFormat.parse(date);
@@ -285,30 +278,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             } catch (ParseException e) {
                 Logs.add(Logs.Type.E, "Wrong notification date: " + date);
             }
-        }
-        private int displayReadFlag(boolean unread, View root, ImageView type, TextView time) {
-            //Logs.add(Logs.Type.V, "unread: " + unread + ";root: " + root + ";type: " + type +
-            //        ";time: " + time);
-            if (unread) {
-
-                // Unread notification
-                root.findViewById(R.id.layout_data)
-                        .setBackground(getResources().getDrawable(R.drawable.notify_unread_background));
-                type.setColorFilter(Color.RED);
-                ((TextView) root.findViewById(R.id.text_message)).setTypeface(Typeface.DEFAULT_BOLD);
-                time.setTypeface(Typeface.DEFAULT_BOLD);
-                time.setTextColor(Color.RED);
-                return R.color.red;
-            }
-
-            // Read notification
-            root.findViewById(R.id.layout_data)
-                    .setBackground(getResources().getDrawable(R.drawable.notify_read_background));
-            type.setColorFilter(Color.BLACK);
-            ((TextView) root.findViewById(R.id.text_message)).setTypeface(Typeface.DEFAULT);
-            time.setTypeface(Typeface.DEFAULT);
-            time.setTextColor(getResources().getColor(R.color.orange));
-            return R.color.colorPrimaryProfile;
         }
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
@@ -333,7 +302,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         //////
         @Override
         public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
-            //Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
+            Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
 
             // Set notification date
             if (position == 0) {
@@ -348,16 +317,24 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 if (prevDate.compareTo(curDate.substring(0, 10)) != 0) { // Display the different date (separator)
                     displayDate((TextView) holder.itemView.findViewById(R.id.text_date), curDate);
                     holder.itemView.findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
-                } else
-                    holder.itemView.findViewById(R.id.date_separator).setVisibility(View.GONE);
+                }
             }
 
             // Set unread notification display (if the case)
+            int pseudoColor = R.color.colorPrimaryProfile;
             ImageView notifyType = (ImageView) holder.itemView.findViewById(R.id.image_type);
             TextView textTime = (TextView) holder.itemView.findViewById(R.id.text_time);
-            int pseudoColor = displayReadFlag(
-                    mDataSource.getInt(position, COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD,
-                    holder.itemView, notifyType, textTime);
+            if (mDataSource.getInt(position, COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
+
+                holder.itemView.findViewById(R.id.layout_data)
+                        .setBackground(getResources().getDrawable(R.drawable.notify_unread_background));
+                notifyType.setImageTintList(null);
+                notifyType.setColorFilter(Color.RED);
+                ((TextView) holder.itemView.findViewById(R.id.text_message)).setTypeface(Typeface.DEFAULT_BOLD);
+                textTime.setTypeface(Typeface.DEFAULT_BOLD);
+                textTime.setTextColor(Color.RED);
+                pseudoColor = R.color.red;
+            }
 
             // Set from pseudo icon
             boolean female = (!mDataSource.isNull(position, COLUMN_INDEX_SEX)) &&
@@ -420,35 +397,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             // Events
             holder.itemView.findViewById(R.id.layout_data).setOnClickListener(this);
             holder.itemView.findViewById(R.id.image_pseudo).setOnClickListener(this);
-
-            // Add margin bottom at last item position
-            ((RecyclerView.LayoutParams)holder.itemView.getLayoutParams()).bottomMargin =
-                    (position == (mDataSource.getCount() - 1))?
-                            getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin):0;
-
-            ////// Animate item appearance
-            if (position > mLastPosition) {
-                mLastPosition = position;
-
-                if (!(Boolean)holder.itemView.getTag()) {
-                    ViewCompat.animate(holder.itemView).cancel();
-                    ViewCompat.setScaleX(holder.itemView, 0.7f);
-                    ViewCompat.setScaleY(holder.itemView, 0.7f);
-                    ViewCompat.animate(holder.itemView)
-                            .setDuration(500)
-                            .scaleX(1)
-                            .scaleY(1)
-                            .start();
-
-                } else
-                    holder.itemView.setTag(Boolean.FALSE);
-            }
-        }
-
-        @Override
-        public void onViewDetachedFromWindow(ViewHolder holder) {
-            ViewCompat.animate(holder.itemView).cancel();
-            super.onViewDetachedFromWindow(holder);
         }
     }
 
@@ -491,7 +439,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                     // Update notification list
                     mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor, true);
-                    mNotifyList.setAdapter(mNotifyAdapter);
 
                 } else {
                     Logs.add(Logs.Type.I, "Initial query");
@@ -586,11 +533,11 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         rootView.setTag(Constants.MAIN_SECTION_NOTIFICATIONS);
 
         // Set recycler view
+        mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
         final RecyclerItemAnimator itemAnimator = new RecyclerItemAnimator();
-        itemAnimator.setAnimationMaker(new RecyclerItemAnimator.ItemAnimatorMaker() {
+        itemAnimator.setAnimationListener(new RecyclerItemAnimator.ItemAnimatorListener() {
             @Override
             public void onCancel(RecyclerItemAnimator.AnimType type, View item) {
-                Logs.add(Logs.Type.V, "type: " + type + ";item: " + item);
                 switch (type) {
 
                     case ADD: {
@@ -599,9 +546,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         break;
                     }
                     case CHANGE: {
+                        ViewCompat.setAlpha(item, 1);
                         ViewCompat.setTranslationX(item, 0);
                         ViewCompat.setTranslationY(item, 0);
-                        ViewCompat.setAlpha(item, 1);
                         break;
                     }
                 }
@@ -609,7 +556,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
             @Override
             public void onPrepare(RecyclerItemAnimator.AnimInfo info) {
-                Logs.add(Logs.Type.V, "info: " + info);
                 switch (RecyclerItemAnimator.getAnimType(info)) {
 
                     case ADD: {
@@ -624,9 +570,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         float prevAlpha = ViewCompat.getAlpha(info.mHolder.itemView);
                         itemAnimator.endAnimation(info.mHolder); // Clear any animation & settings
 
-                        RecyclerItemAnimator.ChangeInfo changeInfo = (RecyclerItemAnimator.ChangeInfo) info;
-                        int deltaX = (int) (changeInfo.mToX - changeInfo.mFromX - prevTransX);
-                        int deltaY = (int) (changeInfo.mToY - changeInfo.mFromY - prevTransY);
+                        RecyclerItemAnimator.ChangeInfo changeInfo = (RecyclerItemAnimator.ChangeInfo)info;
+                        int deltaX = (int)(changeInfo.mToX - changeInfo.mFromX - prevTransX);
+                        int deltaY = (int)(changeInfo.mToY - changeInfo.mFromY - prevTransY);
 
                         // Restore previous settings
                         ViewCompat.setTranslationX(info.mHolder.itemView, prevTransX);
@@ -659,7 +605,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         break;
                     }
                     case CHANGE: {
-                        RecyclerItemAnimator.ChangeInfo changeInfo = (RecyclerItemAnimator.ChangeInfo) info;
+                        RecyclerItemAnimator.ChangeInfo changeInfo = (RecyclerItemAnimator.ChangeInfo)info;
                         if (!changeNew) {
                             ViewCompat.setPivotX(itemView, itemView.getWidth());
 
@@ -696,11 +642,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 return ViewCompat.animate(itemView);
             }
         });
-        LinearLayoutManager linearManager = new LinearLayoutManager(getContext());
-        linearManager.setOrientation(LinearLayoutManager.VERTICAL);
-
-        mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
-        mNotifyList.setLayoutManager(linearManager);
         mNotifyList.setItemAnimator(itemAnimator);
 
         // Set shortcut data (default)

@@ -15,15 +15,12 @@ import java.util.Collections;
 
 /**
  * Created by pascal on 26/09/16.
- * Recycler adapter class with DB cursor a data source
+ * Recycler adapter class (with DB cursor a data source)
  */
 public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
     @LayoutRes private final int mItemLayout; // Holder view layout Id
     protected final DataView mDataSource; // Data source
-
-    // Last display item position (used to animate item appearance)
-    protected int mLastPosition = Constants.NO_DATA;
 
     public RecyclerAdapter(@LayoutRes int layout, int key) {
         Logs.add(Logs.Type.V, "layout: " + layout);
@@ -93,7 +90,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         private static int find(ArrayList<ArrayList<Object>> data, int columnValue, Object value) {
         // Find key into data array and return its index (NO_DATA is returned if not found)
 
-            //Logs.add(Logs.Type.V, "data: " + data + ";columnValue: " + columnValue + ";value: " + value);
+            Logs.add(Logs.Type.V, "data: " + data + ";columnValue: " + columnValue + ";value: " + value);
             for (int i = 0; i < data.size(); ++i) {
                 if (equal(data.get(i).get(columnValue), value))
                     return i;
@@ -172,8 +169,6 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 int insertedLast = toDo.get(i) + count;
                 if ((below) && (mData.size() > insertedLast))
                     adapter.notifyItemChanged(insertedLast);
-
-                i = i + count - 1;
             }
 
             ////// Move entries (if needed)
@@ -248,7 +243,6 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Logs.add(Logs.Type.V, "parent: " + parent + ";viewType: " + viewType);
         View view = LayoutInflater.from(parent.getContext()).inflate(mItemLayout, parent, false);
-        view.setTag(Boolean.TRUE); // Needed to avoid first display animation
         return new ViewHolder(view);
     }
 

@@ -150,7 +150,7 @@ public final class Tools {
 
         if (status == DataProvider.Synchronized.TODO.getValue()) { // To synchronize
             text.setText(context.getString(R.string.to_synchronize));
-            icon.setImageDrawable(context.getDrawable(R.drawable.ic_sync_white_18dp));
+            //icon.setImageDrawable(context.getDrawable(R.drawable.ic_sync_white_18dp));
 
         } else if (status == DataProvider.Synchronized.IN_PROGRESS.getValue()) { // Synchronizing
             text.setText(context.getString(R.string.synchronizing));
@@ -178,7 +178,7 @@ public final class Tools {
             } catch (ParseException e) {
                 Logs.add(Logs.Type.E, "Wrong status date format: " + date);
             }
-            icon.setImageDrawable(context.getDrawable(R.drawable.ic_check_white_18dp));
+            //icon.setImageDrawable(context.getDrawable(R.drawable.ic_check_white_18dp));
         }
         //else // status == DataProvider.Synchronized.TO_DELETE.getValue()
         //        NB: Should not happen coz nothing to display!
