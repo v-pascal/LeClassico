@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -72,7 +74,6 @@
             android:id="@+id/image_type"
             android:layout_below="@id/text_message"
             android:scaleType="center"
-            android:tint="@android:color/black"
             android:layout_marginStart="@dimen/notify_text_margin"
             android:layout_width="@dimen/notify_info_height"
             android:layout_height="@dimen/notify_info_height"/>
