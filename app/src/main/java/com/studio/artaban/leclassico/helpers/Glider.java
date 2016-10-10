@@ -40,7 +40,7 @@ public class Glider {
     private String mImageUrl;
 
     public Glider load(String filePath, String url) {
-        Logs.add(Logs.Type.V, "filePath: " + filePath + ";url: " + url);
+        //Logs.add(Logs.Type.V, "filePath: " + filePath + ";url: " + url);
 
         mImageFile = filePath;
         mImageUrl = url;
@@ -51,7 +51,7 @@ public class Glider {
     @DrawableRes private int mPlaceholderId;
 
     public Glider placeholder(@DrawableRes int id) {
-        Logs.add(Logs.Type.V, "id: " + id);
+        //Logs.add(Logs.Type.V, "id: " + id);
 
         mPlaceholderId = id;
         return this;
@@ -65,7 +65,7 @@ public class Glider {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void into(final ImageView imageView, final OnLoadListener listener) {
-        Logs.add(Logs.Type.V, "view: " + imageView + ";listener: " + listener);
+        //Logs.add(Logs.Type.V, "view: " + imageView + ";listener: " + listener);
 
         // Define image URI according if already downloaded
         File imageFile = new File(Storage.get() + mImageFile);

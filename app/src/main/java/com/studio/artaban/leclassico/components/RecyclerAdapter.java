@@ -248,6 +248,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Logs.add(Logs.Type.V, "parent: " + parent + ";viewType: " + viewType);
         View view = LayoutInflater.from(parent.getContext()).inflate(mItemLayout, parent, false);
+        view.setTag(Boolean.TRUE); // Needed to avoid first display animation
         return new ViewHolder(view);
     }
 

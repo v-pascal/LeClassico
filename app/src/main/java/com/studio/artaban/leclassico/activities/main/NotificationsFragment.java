@@ -428,14 +428,18 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             if (position > mLastPosition) {
                 mLastPosition = position;
 
-                ViewCompat.animate(holder.itemView).cancel();
-                ViewCompat.setScaleX(holder.itemView, 0.7f);
-                ViewCompat.setScaleY(holder.itemView, 0.7f);
-                ViewCompat.animate(holder.itemView)
-                        .setDuration(500)
-                        .scaleX(1)
-                        .scaleY(1)
-                        .start();
+                if (!(Boolean)holder.itemView.getTag()) {
+                    ViewCompat.animate(holder.itemView).cancel();
+                    ViewCompat.setScaleX(holder.itemView, 0.7f);
+                    ViewCompat.setScaleY(holder.itemView, 0.7f);
+                    ViewCompat.animate(holder.itemView)
+                            .setDuration(500)
+                            .scaleX(1)
+                            .scaleY(1)
+                            .start();
+
+                } else
+                    holder.itemView.setTag(Boolean.FALSE);
             }
         }
 
