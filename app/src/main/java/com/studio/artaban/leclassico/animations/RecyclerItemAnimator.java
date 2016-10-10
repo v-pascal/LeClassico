@@ -82,7 +82,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         }).start();
     }
     private void startChangeAnimation(ChangeInfo changeInfo, final boolean changeNew) {
-        Logs.add(Logs.Type.V, "changeInfo: " + changeInfo + ";changeNew: " + changeNew);
+        //Logs.add(Logs.Type.V, "changeInfo: " + changeInfo + ";changeNew: " + changeNew);
 
         final ViewPropertyAnimatorCompat animation = mMaker.onAnimate(changeInfo, changeNew);
         final ViewHolder holder = (changeNew)? changeInfo.mNewHolder:changeInfo.mHolder;
@@ -262,9 +262,9 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
     @Override
     public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder,
                                  int fromLeft, int fromTop, int toLeft, int toTop) {
-        Logs.add(Logs.Type.V, "oldHolder: " + oldHolder + ";newHolder: " + newHolder +
-                ";fromLeft: " + fromLeft + ";fromTop: " + fromTop + ";toLeft: " + toLeft +
-                ";toTop: " + toTop);
+        //Logs.add(Logs.Type.V, "oldHolder: " + oldHolder + ";newHolder: " + newHolder +
+        //        ";fromLeft: " + fromLeft + ";fromTop: " + fromTop + ";toLeft: " + toLeft +
+        //        ";toTop: " + toTop);
 
         ChangeInfo changeInfo = new ChangeInfo(oldHolder, newHolder, fromLeft, fromTop, toLeft, toTop);
         mMaker.onPrepare(changeInfo);

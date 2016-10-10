@@ -67,11 +67,13 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
         ContentValues values = new ContentValues();
-        for (int i = 0; i < 15; ++i) {
+        //for (int i = 0; i < 15; ++i) {
 
             values.put(NotificationsTable.COLUMN_LU_FLAG, 1);
-            //values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
-            values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:" + String.format("%02d", i) + ":00");
+
+            values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
+            //values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:" + String.format("%02d", i) + ":00");
+
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
             values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
 
@@ -82,7 +84,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
             values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
             temp = getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
-        }
+        //}
 
         /*
         ContentValues valuesA = new ContentValues();
@@ -588,6 +590,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         itemAnimator.setAnimationMaker(new RecyclerItemAnimator.ItemAnimatorMaker() {
             @Override
             public void onCancel(RecyclerItemAnimator.AnimType type, View item) {
+                Logs.add(Logs.Type.V, "type: " + type + ";item: " + item);
                 switch (type) {
 
                     case ADD: {
@@ -606,6 +609,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
             @Override
             public void onPrepare(RecyclerItemAnimator.AnimInfo info) {
+                Logs.add(Logs.Type.V, "info: " + info);
                 switch (RecyclerItemAnimator.getAnimType(info)) {
 
                     case ADD: {
@@ -692,12 +696,12 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 return ViewCompat.animate(itemView);
             }
         });
-        mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
-        mNotifyList.setItemAnimator(itemAnimator);
-
         LinearLayoutManager linearManager = new LinearLayoutManager(getContext());
         linearManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        mNotifyList = (RecyclerView) rootView.findViewById(R.id.list_notification);
         mNotifyList.setLayoutManager(linearManager);
+        mNotifyList.setItemAnimator(itemAnimator);
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));
