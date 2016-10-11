@@ -22,8 +22,27 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     @LayoutRes private final int mItemLayout; // Holder view layout Id
     protected final DataView mDataSource; // Data source
 
-    // Last display item position (used to animate item appearance)
-    protected int mLastPosition = Constants.NO_DATA;
+    ////// AppearanceAnimatorMaker /////////////////////////////////////////////////////////////////
+
+    private int mLastPosition = Constants.NO_DATA; // Last display item position
+    public interface AppearanceAnimatorMaker {
+        void onAnimate(View item);
+    }
+    public void animateAppearance(RecyclerAdapter.ViewHolder holder, AppearanceAnimatorMaker maker) {
+    // Animate item appearance
+
+        Logs.add(Logs.Type.V, "holder: " + holder);
+        if (holder.getAdapterPosition() > mLastPosition) {
+
+            mLastPosition = holder.getAdapterPosition();
+            if (!(Boolean)holder.itemView.getTag())
+                maker.onAnimate(holder.itemView);
+        }
+        if ((Boolean)holder.itemView.getTag())
+            holder.itemView.setTag(Boolean.FALSE);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     public RecyclerAdapter(@LayoutRes int layout, int key) {
         Logs.add(Logs.Type.V, "layout: " + layout);

@@ -441,17 +441,18 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                             getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin):0;
 
             ////// Animate item appearance
-            if (position > mLastPosition) {
-                mLastPosition = position;
+            animateAppearance(holder, new AppearanceAnimatorMaker() {
+                @Override
+                public void onAnimate(View item) {
+                    //Logs.add(Logs.Type.V, "item: " + item);
 
-                if (!(Boolean)holder.itemView.getTag()) {
-                    ViewCompat.animate(holder.itemView).cancel();
-                    ViewCompat.setPivotX(holder.itemView, holder.itemView.getWidth());
-                    ViewCompat.setScaleX(holder.itemView, 0);
-                    ViewCompat.setAlpha(holder.itemView, 0);
+                    ViewCompat.animate(item).cancel();
+                    ViewCompat.setPivotX(item, item.getWidth());
+                    ViewCompat.setScaleX(item, 0.5f);
+                    ViewCompat.setAlpha(item, 0.5f);
 
-                    final ViewPropertyAnimatorCompat animation = ViewCompat.animate(holder.itemView);
-                    animation.setDuration(500)
+                    final ViewPropertyAnimatorCompat animation = ViewCompat.animate(item);
+                    animation.setDuration(250)
                             .scaleX(1)
                             .alpha(1)
                             .setListener(new ViewPropertyAnimatorListener() {
@@ -474,9 +475,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                             })
                             .start();
                 }
-            }
-            if ((Boolean)holder.itemView.getTag())
-                holder.itemView.setTag(Boolean.FALSE);
+            });
         }
 
         @Override

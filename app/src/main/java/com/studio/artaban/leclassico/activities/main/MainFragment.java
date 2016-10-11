@@ -50,7 +50,8 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
         return (reference != null)? reference.get():null;
     }
 
-    //
+    ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
+
     public interface OnFragmentListener {
 
         ////// Shortcut
@@ -63,6 +64,8 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     }
     protected OnFragmentListener mListener; // Activity listener
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     // Data observer to notify DB changes
     protected DataObserver mDataObserver;
 
@@ -70,7 +73,7 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     protected int mQueryID = Constants.NO_DATA; // Max record Id (used to check if new entries)
     protected short mQueryOld; // DB old entries requested
 
-    //////
+    ////// Fragment ////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
