@@ -45,7 +45,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), mailPos, mailPos + mailsLen, 0);
         infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), notifyPos, notifyPos +
                 String.valueOf(mNewNotification).length(), 0);
-        mListener.onSetInfo(Constants.MAIN_SECTION_HOME, infoBuilder);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_HOME).setInfo(infoBuilder);
     }
 
     private QueryLoader mMailLoader; // Shortcut new mail query loader
@@ -109,7 +109,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         msgBuilder.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
                 pseudoPos, pseudoPos + pseudo.length(), 0);
 
-        mListener.onSetMessage(Constants.MAIN_SECTION_HOME, msgBuilder);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_HOME).setMessage(msgBuilder);
         setShortcutInfo();
 
         // Load shortcut info (using query loaders)

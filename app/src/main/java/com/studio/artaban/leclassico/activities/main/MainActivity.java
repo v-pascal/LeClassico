@@ -75,36 +75,9 @@ public class MainActivity extends AppCompatActivity implements
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
     @Override
-    public void onSetMessage(int section, SpannableStringBuilder message) {
-        //Logs.add(Logs.Type.V, "section: " + section + ";message: " + message);
-        ((ShortcutFragment) getSupportFragmentManager()
-                .findFragmentById(getShortcutID(section))).setMessage(message);
-    }
-    @Override
-    public void onSetInfo(int section, SpannableStringBuilder info) {
-        //Logs.add(Logs.Type.V, "section: " + section + ";info: " + info);
-        ((ShortcutFragment) getSupportFragmentManager()
-                .findFragmentById(getShortcutID(section))).setInfo(info);
-    }
-    @Override
-    public void onSetIcon(int section, boolean female, String profile, int size) {
-        //Logs.add(Logs.Type.V, "section: " + section + ";female: " + female + ";profile: " + profile);
-        ((ShortcutFragment) getSupportFragmentManager()
-                .findFragmentById(getShortcutID(section))).setIcon(female, profile, size);
-    }
-    @Override
-    public void onSetDate(int section, boolean start, String dateTime) {
-        //Logs.add(Logs.Type.V, "section: " + section + ";start: " + start + ";dateTime: " + dateTime);
-        ((ShortcutFragment) getSupportFragmentManager()
-                .findFragmentById(getShortcutID(section))).setDate(start, dateTime);
-    }
-
-    @Override
-    public void onSetNotify(char type, boolean read) {
-        //Logs.add(Logs.Type.V, "type: " + type + ";read: " + read);
-        ((ShortcutFragment) getSupportFragmentManager()
-                .findFragmentById(getShortcutID(Constants.MAIN_SECTION_NOTIFICATIONS)))
-                .setNotify(type, read);
+    public ShortcutFragment onGetShortcut(int section) {
+        //Logs.add(Logs.Type.V, "section: " + section);
+        return ((ShortcutFragment) getSupportFragmentManager().findFragmentById(getShortcutID(section)));
     }
 
     //

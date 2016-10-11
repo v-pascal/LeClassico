@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.v4.app.Fragment;
-import android.text.SpannableStringBuilder;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
@@ -53,14 +52,7 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
 
     public interface OnFragmentListener {
-
-        ////// Shortcut
-        void onSetMessage(int section, SpannableStringBuilder message);
-        void onSetInfo(int section, SpannableStringBuilder info);
-        void onSetIcon(int section, boolean female, String profile, int size);
-        void onSetDate(int section, boolean start, String dateTime);
-
-        void onSetNotify(char type, boolean read);
+        ShortcutFragment onGetShortcut(int section);
     }
     protected OnFragmentListener mListener; // Activity listener
 

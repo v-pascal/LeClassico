@@ -11,7 +11,6 @@ import android.support.annotation.LayoutRes;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -546,17 +545,17 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     String pseudo = cursor.getString(COLUMN_INDEX_PSEUDO);
                     char type = cursor.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
 
-                    mListener.onSetNotify(type, !unread);
-                    mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, info);
-                    mListener.onSetDate(Constants.MAIN_SECTION_NOTIFICATIONS, false, cursor.getString(COLUMN_INDEX_DATE));
-                    mListener.onSetIcon(Constants.MAIN_SECTION_NOTIFICATIONS, female, profile, R.dimen.shortcut_content_height);
+                    ShortcutFragment shortcut = mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS);
+                    shortcut.setNotify(type, !unread);
+                    shortcut.setInfo(info);
+                    shortcut.setIcon(female, profile, R.dimen.shortcut_content_height);
+                    shortcut.setDate(false, cursor.getString(COLUMN_INDEX_DATE));
 
                     // Fill notification list
                     mNotifyAdapter = new NotifyRecyclerViewAdapter(R.layout.layout_notification_item, COLUMN_INDEX_NOTIFY_ID);
                     mNotifyAdapter.getDataSource().fill(cursor);
-                    mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS,
-                            getNotifyMessage(type, Tools.getNotifyWallType(mNotifyAdapter.getDataSource(),
-                                    0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
+                    shortcut.setMessage(getNotifyMessage(type, Tools.getNotifyWallType(mNotifyAdapter.getDataSource(),
+                            0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
                     mNotifyList.setAdapter(mNotifyAdapter);
                 }
                 break;
@@ -738,9 +737,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));
-        mListener.onSetMessage(Constants.MAIN_SECTION_NOTIFICATIONS, data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS).setMessage(data);
         data = new SpannableStringBuilder(getString(R.string.no_notification_info));
-        mListener.onSetInfo(Constants.MAIN_SECTION_NOTIFICATIONS, data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS).setInfo(data);
 
         return rootView;
     }

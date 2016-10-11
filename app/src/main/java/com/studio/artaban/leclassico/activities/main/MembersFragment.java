@@ -49,14 +49,14 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
 
             // Set message
             SpannableStringBuilder member = new SpannableStringBuilder(cursor.getString(COLUMN_INDEX_PSEUDO));
-            mListener.onSetMessage(Constants.MAIN_SECTION_MEMBERS, member);
+            mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS).setMessage(member);
 
             // Set profile icon
             boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
                     (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
             String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
                     cursor.getString(COLUMN_INDEX_PROFILE) : null;
-            mListener.onSetIcon(Constants.MAIN_SECTION_MEMBERS, female, profile, R.dimen.shortcut_content_height);
+            mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS).setIcon(female, profile, R.dimen.shortcut_content_height);
         }
         cursor.close();
     }
@@ -84,7 +84,7 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
 
         // Set shortcut data
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.last_followed_info));
-        mListener.onSetInfo(Constants.MAIN_SECTION_MEMBERS, data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS).setInfo(data);
 
         // Load shortcut info (using query loaders)
         String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO);
