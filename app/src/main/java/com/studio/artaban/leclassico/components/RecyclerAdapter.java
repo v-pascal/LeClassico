@@ -25,18 +25,22 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     ////// AppearanceAnimatorMaker /////////////////////////////////////////////////////////////////
 
     private int mLastPosition = Constants.NO_DATA; // Last display item position
+    private AppearanceAnimatorMaker mMaker; // Appearance animator maker
+
     public interface AppearanceAnimatorMaker {
         void onAnimate(View item);
+        void onCancel(View item);
     }
     public void animateAppearance(RecyclerAdapter.ViewHolder holder, AppearanceAnimatorMaker maker) {
     // Animate item appearance
 
         Logs.add(Logs.Type.V, "holder: " + holder);
+        mMaker = maker;
         if (holder.getAdapterPosition() > mLastPosition) {
 
             mLastPosition = holder.getAdapterPosition();
             if (!(Boolean)holder.itemView.getTag())
-                maker.onAnimate(holder.itemView);
+                mMaker.onAnimate(holder.itemView);
         }
         if ((Boolean)holder.itemView.getTag())
             holder.itemView.setTag(Boolean.FALSE);
@@ -127,18 +131,23 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             clear();
             fill(cursor, mData);
         }
-        public void swap(RecyclerAdapter adapter, Cursor cursor, boolean below) {
-        // Swap data with new cursor then notify recycler adapter accordingly
+        public boolean swap(RecyclerAdapter adapter, Cursor cursor, boolean below) {
+        // Swap data with new cursor then notify recycler adapter accordingly (return first item change)
 
             Logs.add(Logs.Type.V, "adapter: " + adapter + ";cursor: " + cursor + ";below: " + below);
             ArrayList<ArrayList<Object>> newData = new ArrayList<>();
             fill(cursor, newData);
 
+            boolean firstChanged = false; // First item changed flag (result)
+
             ////// Remove entries (if needed)
             ArrayList<Integer> toDo = new ArrayList<>();
             for (int i = 0; i < mData.size(); ++i) {
-                if (find(newData, mColumnKey, mData.get(i).get(mColumnKey)) == Constants.NO_DATA)
+                if (find(newData, mColumnKey, mData.get(i).get(mColumnKey)) == Constants.NO_DATA) {
                     toDo.add(i);
+                    if (i == 0)
+                        firstChanged = true;
+                }
             }
             for (int i = 0; i < toDo.size(); ++i) {
                 int j = i + 1;
@@ -167,8 +176,11 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             ////// Add entries (if needed)
             toDo.clear();
             for (int i = 0; i < newData.size(); ++i) {
-                if (find(mData, mColumnKey, newData.get(i).get(mColumnKey)) == Constants.NO_DATA)
+                if (find(mData, mColumnKey, newData.get(i).get(mColumnKey)) == Constants.NO_DATA) {
                     toDo.add(i);
+                    if (i == 0)
+                        firstChanged = true;
+                }
             }
             for (int i = 0; i < toDo.size(); ++i) {
 
@@ -211,6 +223,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                         if (mData.size() > ++newPosition)
                             adapter.notifyItemChanged(newPosition);
                     }
+                    if (i == 0)
+                        firstChanged = true;
                 }
             }
 
@@ -221,6 +235,9 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
                     // Check if entry has changed
                     if (!equal(mData.get(i).get(j), newData.get(i).get(j))) {
+                        if (i == 0)
+                            firstChanged = true;
+
                         mData.get(i).set(j, newData.get(i).get(j));
                         toDo.add(i);
                     }
@@ -241,6 +258,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 else // Single
                     adapter.notifyItemChanged(toDo.get(i));
             }
+            return firstChanged;
         }
 
         public boolean isNull(int rank, int column) {
@@ -274,6 +292,13 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     @Override
     public int getItemCount() {
         return mDataSource.getCount();
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        if (!(Boolean)holder.itemView.getTag())
+            mMaker.onCancel(holder.itemView);
+        super.onViewDetachedFromWindow(holder);
     }
 
     //////

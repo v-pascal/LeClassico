@@ -35,9 +35,9 @@ public class EventsFragment extends MainFragment {
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_event));
-        mListener.onGetShortcut(Constants.MAIN_SECTION_EVENTS).setMessage(data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_EVENTS, false).setMessage(data);
         data = new SpannableStringBuilder(getString(R.string.no_event_info));
-        mListener.onGetShortcut(Constants.MAIN_SECTION_EVENTS).setInfo(data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_EVENTS, false).setInfo(data);
 
 
 

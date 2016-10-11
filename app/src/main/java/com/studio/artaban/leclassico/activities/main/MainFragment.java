@@ -52,7 +52,13 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
 
     public interface OnFragmentListener {
-        ShortcutFragment onGetShortcut(int section);
+
+        ////// Shortcut
+        interface OnAnimationListener {
+            void onCopyNewToPrevious(ShortcutFragment previous);
+        }
+        ShortcutFragment onGetShortcut(int section, boolean newItem);
+        void onAnimateShortcut(int section, OnAnimationListener listener);
     }
     protected OnFragmentListener mListener; // Activity listener
 

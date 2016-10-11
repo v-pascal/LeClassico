@@ -68,12 +68,12 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
         ContentValues values = new ContentValues();
-        for (int i = 0; i < 15; ++i) {
+        //for (int i = 0; i < 15; ++i) {
 
             values.put(NotificationsTable.COLUMN_LU_FLAG, 1);
 
-            //values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
-            values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:" + String.format("%02d", i) + ":00");
+            values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
+            //values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:" + String.format("%02d", i) + ":00");
 
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
             values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
@@ -84,9 +84,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             values.put(NotificationsTable.COLUMN_OBJECT_TYPE, "W");
             values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
             values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
-            //temp =
-            getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
-        }
+            temp = getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
+        //}
 
         /*
         ContentValues valuesA = new ContentValues();
@@ -217,8 +216,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
 
+
+
     private SpannableStringBuilder getNotifyMessage(char type, short wallType, String pseudo, int color) {
-        // Return notification message formatted according its type
+    // Return notification message formatted according its type
 
         Logs.add(Logs.Type.V, "type: " + type + ";wallType: " + wallType + ";pseudo: " + pseudo +
                 ";color: " + color);
@@ -262,6 +263,33 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             }
         }
         return message;
+    }
+    private void fillShortcut(Cursor cursor, boolean newItem) {
+    // Fill notification shortcut according data contained in cursor (first record)
+
+        Logs.add(Logs.Type.V, "cursor: " + cursor + ";newItem: " + newItem);
+        boolean unread = cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD;
+        SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.notification_info));
+        if (unread) {
+
+            int unreadPos = info.length() + 2; // ' ' + '(' = 2
+            String notRead = getString(R.string.unread);
+            info.append(" (" + notRead + ")");
+            info.setSpan(new StyleSpan(Typeface.BOLD), unreadPos, unreadPos + notRead.length(), 0);
+        }
+        boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
+                (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+        String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE)) ? cursor.getString(COLUMN_INDEX_PROFILE) : null;
+        char type = cursor.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
+
+        ShortcutFragment shortcut = mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS, newItem);
+        shortcut.setNotify(type, !unread);
+        shortcut.setInfo(info);
+        shortcut.setIcon(female, profile, R.dimen.shortcut_content_height);
+        shortcut.setDate(false, cursor.getString(COLUMN_INDEX_DATE));
+        shortcut.setMessage(getNotifyMessage(type,
+                Tools.getNotifyWallType(mNotifyAdapter.getDataSource(), 0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER),
+                cursor.getString(COLUMN_INDEX_PSEUDO), R.color.colorPrimaryProfile));
     }
 
     private RecyclerView mNotifyList; // Recycler view containing notification list
@@ -451,7 +479,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     ViewCompat.setAlpha(item, 0.5f);
 
                     final ViewPropertyAnimatorCompat animation = ViewCompat.animate(item);
-                    animation.setDuration(250)
+                    animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION >> 1)
                             .scaleX(1)
                             .alpha(1)
                             .setListener(new ViewPropertyAnimatorListener() {
@@ -474,13 +502,13 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                             })
                             .start();
                 }
-            });
-        }
 
-        @Override
-        public void onViewDetachedFromWindow(ViewHolder holder) {
-            ViewCompat.animate(holder.itemView).cancel();
-            super.onViewDetachedFromWindow(holder);
+                @Override
+                public void onCancel(View item) {
+                    Logs.add(Logs.Type.V, "item: " + item);
+                    ViewCompat.animate(item).cancel();
+                }
+            });
         }
     }
 
@@ -499,7 +527,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
-    public void onLoadFinished(int id, Cursor cursor) {
+    public void onLoadFinished(int id, final Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
 
         cursor.moveToFirst();
@@ -516,57 +544,51 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 if (mNotifyAdapter != null) {
                     Logs.add(Logs.Type.I, "Query update");
 
-                    // Update shortcut
-
-
-
-
-                    // Update notification list
                     if (mNotifyList.getAdapter() == null)
                         mNotifyList.setAdapter(mNotifyAdapter);
-                    mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor, true);
+
+                    // Update notification list
+                    if (mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor, true)) { // First changed
+
+                        // Update shortcut (new)
+                        fillShortcut(cursor, true);
+                        mListener.onAnimateShortcut(Constants.MAIN_SECTION_NOTIFICATIONS,
+                                new OnFragmentListener.OnAnimationListener() {
+                            @Override
+                            public void onCopyNewToPrevious(ShortcutFragment previous) {
+                            // Replace new shortcut data into previous fragment
+
+                                Logs.add(Logs.Type.V, "previous: " + previous);
+                                fillShortcut(cursor, false);
+                                cursor.close();
+                            }
+                        });
+
+                    } else
+                        cursor.close();
 
                 } else {
                     Logs.add(Logs.Type.I, "Initial query");
 
-                    // Fill shortcut
-                    boolean unread = cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD;
-                    SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.notification_info));
-                    if (unread) {
-
-                        int unreadPos = info.length() + 2; // ' ' + '(' = 2
-                        String notRead = getString(R.string.unread);
-                        info.append(" (" + notRead + ")");
-                        info.setSpan(new StyleSpan(Typeface.BOLD), unreadPos, unreadPos + notRead.length(), 0);
-                    }
-                    boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
-                            (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
-                    String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE)) ? cursor.getString(COLUMN_INDEX_PROFILE) : null;
-                    String pseudo = cursor.getString(COLUMN_INDEX_PSEUDO);
-                    char type = cursor.getString(COLUMN_INDEX_OBJECT_TYPE).charAt(0);
-
-                    ShortcutFragment shortcut = mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS);
-                    shortcut.setNotify(type, !unread);
-                    shortcut.setInfo(info);
-                    shortcut.setIcon(female, profile, R.dimen.shortcut_content_height);
-                    shortcut.setDate(false, cursor.getString(COLUMN_INDEX_DATE));
-
                     // Fill notification list
-                    mNotifyAdapter = new NotifyRecyclerViewAdapter(R.layout.layout_notification_item, COLUMN_INDEX_NOTIFY_ID);
+                    mNotifyAdapter =
+                            new NotifyRecyclerViewAdapter(R.layout.layout_notification_item, COLUMN_INDEX_NOTIFY_ID);
                     mNotifyAdapter.getDataSource().fill(cursor);
-                    shortcut.setMessage(getNotifyMessage(type, Tools.getNotifyWallType(mNotifyAdapter.getDataSource(),
-                            0, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER), pseudo, R.color.colorPrimaryProfile));
                     mNotifyList.setAdapter(mNotifyAdapter);
+
+                    // Fill shortcut
+                    fillShortcut(cursor, false);
+                    cursor.close();
                 }
                 break;
             }
             case Queries.MAIN_NOTIFICATION_MAX: {
 
                 mQueryID = cursor.getShort(0);
+                cursor.close();
                 break;
             }
         }
-        cursor.close();
     }
 
     @Override
@@ -737,9 +759,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_notification));
-        mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS).setMessage(data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS, false).setMessage(data);
         data = new SpannableStringBuilder(getString(R.string.no_notification_info));
-        mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS).setInfo(data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS, false).setInfo(data);
 
         return rootView;
     }

@@ -35,9 +35,9 @@ public class PublicationsFragment extends MainFragment {
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_publication));
-        mListener.onGetShortcut(Constants.MAIN_SECTION_PUBLICATIONS).setMessage(data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_PUBLICATIONS, false).setMessage(data);
         data = new SpannableStringBuilder(getString(R.string.no_publication_info));
-        mListener.onGetShortcut(Constants.MAIN_SECTION_PUBLICATIONS).setInfo(data);
+        mListener.onGetShortcut(Constants.MAIN_SECTION_PUBLICATIONS, false).setInfo(data);
 
 
 

@@ -58,6 +58,7 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                     .getDrawable(R.drawable.notify_read_date_background));
     }
 
+    //////
     private View mRootView; // Fragment root view
     private boolean mSearching; // Search flag (search edit box display)
 
@@ -101,14 +102,15 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                 ";savedInstanceState: " + savedInstanceState);
         mRootView = inflater.inflate(R.layout.fragment_shortcut, container, false);
 
-        // Set UI components according section displayed
+        // Set UI components according section displayed (id)
         switch (getId()) {
             case R.id.shortcut_home: { ////// Home
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 mRootView.findViewById(R.id.layout_end_date).setVisibility(View.GONE);
                 break;
             }
-            case R.id.shortcut_publications: { ////// Publications
+            case R.id.shortcut_new_publication:
+            case R.id.shortcut_publications: { ////// Publications (+new)
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 mRootView.findViewById(R.id.layout_data).setBackground(getResources()
                         .getDrawable(R.drawable.publication_background));
@@ -116,7 +118,8 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                 ((TextView)mRootView.findViewById(R.id.text_info)).setTextColor(Color.WHITE);
                 break;
             }
-            case R.id.shortcut_events: { ////// Events
+            case R.id.shortcut_new_event:
+            case R.id.shortcut_events: { ////// Events (+new)
                 mRootView.findViewById(R.id.image_icon).setVisibility(View.GONE);
                 mRootView.findViewById(R.id.layout_start_date).setBackground(getResources()
                         .getDrawable(R.drawable.event_date_background));
@@ -140,7 +143,8 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                 mRootView.findViewById(R.id.layout_search).setOnClickListener(this);
                 break;
             }
-            case R.id.shortcut_notifications: { ////// Notifications
+            case R.id.shortcut_new_notification:
+            case R.id.shortcut_notifications: { ////// Notifications (+new)
                 mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
                 mRootView.findViewById(R.id.layout_end_date).setBackground(getResources()
                         .getDrawable(R.drawable.notify_unread_date_background));

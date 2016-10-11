@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class RecyclerItemAnimator extends SimpleItemAnimator {
 
-    private static final int DEFAULT_DURATION = 500; // Default animation duration (in millisecond)
+    public static final int DEFAULT_DURATION = 500; // Default animation duration (in millisecond)
 
     protected Interpolator mInterpolator; // Animation interpolator
     public void setInterpolator(Interpolator interpolator) {

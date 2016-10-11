@@ -11,6 +11,9 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorCompat;
+import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -21,16 +24,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import android.view.ViewTreeObserver;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
@@ -58,16 +62,21 @@ public class MainActivity extends AppCompatActivity implements
     public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
     // Extra data keys
 
-    private static int getShortcutID(int section) {
+    private static int getShortcutID(int section, boolean newItem) {
     // Return shortcut fragment container ID according selected section
 
-        Logs.add(Logs.Type.V, null);
+        //Logs.add(Logs.Type.V, "section: " + section + ";newItem: " + newItem);
         switch (section) {
-            case Constants.MAIN_SECTION_HOME: return R.id.shortcut_home;
-            case Constants.MAIN_SECTION_PUBLICATIONS: return R.id.shortcut_publications;
-            case Constants.MAIN_SECTION_EVENTS: return R.id.shortcut_events;
-            case Constants.MAIN_SECTION_MEMBERS: return R.id.shortcut_members;
-            case Constants.MAIN_SECTION_NOTIFICATIONS: return R.id.shortcut_notifications;
+            case Constants.MAIN_SECTION_HOME:
+                return R.id.shortcut_home;
+            case Constants.MAIN_SECTION_PUBLICATIONS:
+                return (newItem)? R.id.shortcut_new_publication:R.id.shortcut_publications;
+            case Constants.MAIN_SECTION_EVENTS:
+                return (newItem)? R.id.shortcut_new_event:R.id.shortcut_events;
+            case Constants.MAIN_SECTION_MEMBERS:
+                return R.id.shortcut_members;
+            case Constants.MAIN_SECTION_NOTIFICATIONS:
+                return (newItem)? R.id.shortcut_new_notification:R.id.shortcut_notifications;
             default:
                 throw new IllegalArgumentException("Unexpected section");
         }
@@ -75,12 +84,68 @@ public class MainActivity extends AppCompatActivity implements
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
     @Override
-    public ShortcutFragment onGetShortcut(int section) {
-        //Logs.add(Logs.Type.V, "section: " + section);
-        return ((ShortcutFragment) getSupportFragmentManager().findFragmentById(getShortcutID(section)));
+    public ShortcutFragment onGetShortcut(final int section, boolean newItem) {
+        //Logs.add(Logs.Type.V, "section: " + section + ";newItem: " + newItem);
+        return ((ShortcutFragment) getSupportFragmentManager().findFragmentById(getShortcutID(section, newItem)));
+    }
+
+    @Override
+    public void onAnimateShortcut(final int section, final OnAnimationListener listener) {
+    // Display the new fragment (using an animation)
+
+        Logs.add(Logs.Type.V, "section: " + section);
+        final ViewPropertyAnimatorCompat prevAnim = ViewCompat.animate(findViewById(getShortcutID(section, false)));
+        final ViewPropertyAnimatorCompat newAnim = ViewCompat.animate(findViewById(getShortcutID(section, true)));
+
+        prevAnim.setDuration(RecyclerItemAnimator.DEFAULT_DURATION << 1) // x2 coz move + add/change
+                .translationY(mShortcutHeight)
+                .setListener(new ViewPropertyAnimatorListener() {
+                    @Override
+                    public void onAnimationStart(View view) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(View view) {
+                        prevAnim.setListener(null);
+
+                        // Place new shortcut fragment into previous shortcut
+                        listener.onCopyNewToPrevious(onGetShortcut(section, false));
+                        ViewCompat.setTranslationY(view, 0);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(View view) {
+
+                    }
+                });
+        newAnim.setDuration(RecyclerItemAnimator.DEFAULT_DURATION << 1)
+                .translationY(0)
+                .setListener(new ViewPropertyAnimatorListener() {
+                    @Override
+                    public void onAnimationStart(View view) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(View view) {
+                        newAnim.setListener(null);
+                        ViewCompat.setTranslationY(view, -mShortcutHeight);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(View view) {
+
+                    }
+                });
+        newAnim.start();
+        prevAnim.start();
     }
 
     //
+    private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
+    private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
+
     private boolean mNewNotification; // New notification flag
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
@@ -392,11 +457,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
-
         //viewPager.setOffscreenPageLimit(2);
-
-
 
 
 
@@ -425,9 +486,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
         mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
-
-            private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
-            private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
 
             private int mShortcut; // Selected shortcut index
 
@@ -529,6 +587,17 @@ public class MainActivity extends AppCompatActivity implements
                 } else
                     translateShortcut(section);
             }
+            private void cancelShortcutAnimation() { // Cancel any animation (new)
+                //Logs.add(Logs.Type.V, null);
+
+                ViewCompat.animate(findViewById(R.id.shortcut_new_publication)).cancel();
+                ViewCompat.animate(findViewById(R.id.shortcut_new_event)).cancel();
+                ViewCompat.animate(findViewById(R.id.shortcut_new_notification)).cancel();
+
+                ViewCompat.animate(findViewById(R.id.shortcut_publications)).cancel();
+                ViewCompat.animate(findViewById(R.id.shortcut_events)).cancel();
+                ViewCompat.animate(findViewById(R.id.shortcut_notifications)).cancel();
+            }
 
             //////
             @Override
@@ -541,6 +610,8 @@ public class MainActivity extends AppCompatActivity implements
                     positionShortcut(mViewPager.getCurrentItem());
 
                 if (mShortcut == (int)page.getTag()) {
+                    cancelShortcutAnimation();
+
                     findViewById(R.id.shortcut_home).setTranslationX(mPositionHome +
                             (position * mShortcutWidth));
                     findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications +
