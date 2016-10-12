@@ -51,89 +51,20 @@ import java.util.Date;
  */
 public class NotificationsFragment extends MainFragment implements QueryLoader.OnResultListener {
 
-
-
-
-
-
-
-
-
     public void read() { // Mark unread notification(s) as read
         Logs.add(Logs.Type.V, null);
 
-
-
-
-
-
         ContentValues values = new ContentValues();
-        //for (int i = 0; i < 15; ++i) {
-
-            values.put(NotificationsTable.COLUMN_LU_FLAG, 1);
-
-            values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:35:38");
-            //values.put(NotificationsTable.COLUMN_STATUS_DATE, "2016-09-08 08:" + String.format("%02d", i) + ":00");
-
-            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.DONE.getValue());
-            values.put(NotificationsTable.COLUMN_PSEUDO, "Testers");
-
-            values.put(NotificationsTable.COLUMN_DATE, "2016-09-07 12:05:43");
-            //values.put(NotificationsTable.COLUMN_DATE, "2016-09-08 12:05:43");
-
-            values.put(NotificationsTable.COLUMN_OBJECT_TYPE, "W");
-            values.put(NotificationsTable.COLUMN_OBJECT_ID, 63);
-            values.put(NotificationsTable.COLUMN_OBJECT_FROM, "Julie");
-            temp = getContext().getContentResolver().insert(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), values);
-        //}
-
-        /*
-        ContentValues valuesA = new ContentValues();
-        valuesA.put(NotificationsTable.COLUMN_LU_FLAG, testage);
-        int res =getContext().getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME), valuesA,
-                "_id=2", null);
-        //Logs.add(Logs.Type.E, "res: " + res);
-        if (testage == 0)
-            testage = 1;
-        else
-            testage = 0;
-            */
-
-        refresh();
-
-
-
+        values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
+        getContext().getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
+                values, NotificationsTable.COLUMN_PSEUDO + "='" +
+                        getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) +
+                        "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
+                null);
+        // NB: Let's the content observer refresh notification list (see mDataObserver use)
     }
 
-    private int testage = 0;
-    private Uri temp;
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Logs.add(Logs.Type.V, null);
-        if (temp != null) {
-            ContentValues values = new ContentValues();
-            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.TO_DELETE.getValue());
-            getContext().getContentResolver().update(temp, values, null, null);
-            getContext().getContentResolver().delete(temp, Constants.DATA_DELETE_SELECTION, null);
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //////
     private SpannableStringBuilder getNotifyMessage(char type, short wallType, String pseudo, int color) {
     // Return notification message formatted according its type
 
@@ -431,14 +362,16 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     ////// OnContentListener ///////////////////////////////////////////////////////////////////////
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        // WARNING: Not in UI thread
+    // WARNING: Not in UI thread
 
-
-
-
-
-
-
+        // Refresh notification list
+        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                refresh();
+            }
+        });
     }
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
@@ -451,10 +384,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
             case Queries.MAIN_NOTIFICATIONS: {
                 mQueryCount = (short)cursor.getCount();
-
-                // Register content observer on each notification
-                mDataObserver.register(getContext().getContentResolver(), cursor,
-                        NotificationsTable.TABLE_NAME, COLUMN_INDEX_NOTIFY_ID);
 
                 // Check if not the initial query
                 if (mNotifyAdapter != null) {
@@ -776,9 +705,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     public void onResume() {
         super.onResume();
         Logs.add(Logs.Type.V, null);
+        refresh(); // Refresh notification list
 
-        // Refresh notification list
-        refresh();
+        // Register content observer on notifications table
+        mDataObserver.register(getContext().getContentResolver(), NotificationsTable.TABLE_NAME);
     }
 
     @Override

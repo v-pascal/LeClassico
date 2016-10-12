@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements
     private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
 
     private boolean mNewNotification; // New notification flag (unread)
+    private int mFabTransY = Constants.NO_DATA; // Vertical floating action button translation
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -184,11 +185,8 @@ public class MainActivity extends AppCompatActivity implements
             case Queries.MAIN_NOTIFICATION_FLAG: {
 
                 Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
-                if (cursor.getInt(0) > 0) {
-
-                    mNewNotification = true; // New notification(s)
-                    invalidateOptionsMenu();
-                }
+                mNewNotification = cursor.getInt(0) > 0;
+                invalidateOptionsMenu();
                 break;
             }
         }
@@ -207,6 +205,30 @@ public class MainActivity extends AppCompatActivity implements
 
     private final QueryLoader mUserLoader = new QueryLoader(this, this); // User data query loader
     private final QueryLoader mNewNotifyLoader = new QueryLoader(this, this); // New notification query loader
+
+    private void refresh() { // Set or refresh activity info (starting or restarting queries)
+        Logs.add(Logs.Type.V, null);
+        String pseudo = getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO);
+
+        // Load user & notification data (using query loaders)
+        Bundle userData = new Bundle();
+        userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
+        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
+
+                CamaradesTable.COLUMN_SEXE, // COLUMN_INDEX_SEX
+                CamaradesTable.COLUMN_PROFILE, // COLUMN_INDEX_PROFILE
+                CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
+        });
+        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
+        mUserLoader.restart(this, Tables.ID_CAMARADES, userData);
+
+        userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
+        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
+        userData.putString(QueryLoader.DATA_KEY_SELECTION,
+                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        NotificationsTable.COLUMN_LU_FLAG + "=0");
+        mNewNotifyLoader.restart(this, Queries.MAIN_NOTIFICATION_FLAG, userData);
+    }
 
     ////// OnNavigationItemSelectedListener ////////////////////////////////////////////////////////
     @Override
@@ -319,14 +341,38 @@ public class MainActivity extends AppCompatActivity implements
         switch (mViewPager.getCurrentItem()) {
 
             case Constants.MAIN_SECTION_NOTIFICATIONS: { ////// Mark notifications as read
+                Logs.add(Logs.Type.I, "Mark notification(s) as read");
 
-                Logs.add(Logs.Type.I, "Mark notification as read");
-                ((NotificationsFragment) MainFragment
-                        .getBySection(Constants.MAIN_SECTION_NOTIFICATIONS)).read();
+                ((NotificationsFragment) MainFragment.getBySection(Constants.MAIN_SECTION_NOTIFICATIONS))
+                        .read();
+                ((HomeFragment) MainFragment.getBySection(Constants.MAIN_SECTION_HOME))
+                        .refresh(getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO));
+                refresh();
+
+                // Hide floating action button
+                final ViewPropertyAnimatorCompat animation = ViewCompat.animate(findViewById(R.id.fab));
+                animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
+                        .translationY(mFabTransY)
+                        .setListener(new ViewPropertyAnimatorListener() {
+                            @Override
+                            public void onAnimationStart(View view) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(View view) {
+                                animation.setListener(null);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(View view) {
+                                ViewCompat.setTranslationY(view, mFabTransY);
+                            }
+                        })
+                        .start();
                 break;
             }
             case Constants.MAIN_SECTION_PUBLICATIONS: { ////// Add publication
-
                 Logs.add(Logs.Type.I, "Add publication");
 
 
@@ -425,27 +471,9 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.fab).setVisibility(View.GONE);
 
         // Display user pseudo, profile icon & banner
-        String pseudo = getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO);
-        ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
-
-        // Load user & notification data (using query loaders)
-        Bundle userData = new Bundle();
-        userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
-
-                CamaradesTable.COLUMN_SEXE, // COLUMN_INDEX_SEX
-                CamaradesTable.COLUMN_PROFILE, // COLUMN_INDEX_PROFILE
-                CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
-        });
-        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
-        mUserLoader.restart(this, Tables.ID_CAMARADES, userData);
-
-        userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
-        userData.putString(QueryLoader.DATA_KEY_SELECTION,
-                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        NotificationsTable.COLUMN_LU_FLAG + "=0");
-        mNewNotifyLoader.restart(this, Queries.MAIN_NOTIFICATION_FLAG, userData);
+        ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo))
+                .setText(getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO));
+        refresh();
 
         // Set content view pager
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -470,7 +498,6 @@ public class MainActivity extends AppCompatActivity implements
         mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
             private int mShortcut; // Selected shortcut index
-            private int mFabTransY = Constants.NO_DATA; // Vertical floating action button translation
 
             private int mPositionHome;
             private int mPositionPublications;

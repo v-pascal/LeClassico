@@ -26,8 +26,27 @@ import com.studio.artaban.leclassico.helpers.QueryLoader;
  */
 public class HomeFragment extends MainFragment implements QueryLoader.OnResultListener {
 
-    public static final String TAG = "home";
+    public void refresh(String pseudo) { // Set or refresh home info displayed (shortcut as well)
+        Logs.add(Logs.Type.V, "pseudo: " + pseudo);
 
+        // Load shortcut info (using query loaders)
+        Bundle shortcutData = new Bundle();
+        shortcutData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
+        shortcutData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
+        shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
+                MessagerieTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        MessagerieTable.COLUMN_LU_FLAG + "=0");
+        mMailLoader.restart(getActivity(), Tables.ID_MESSAGERIE, shortcutData);
+
+        shortcutData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
+        shortcutData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
+        shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
+                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        NotificationsTable.COLUMN_LU_FLAG + "=0");
+        mNewNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATION_COUNT, shortcutData);
+    }
+
+    //
     private int mNewMail; // New mail count
     private int mNewNotification; // New notification count
 
@@ -50,7 +69,6 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
 
     private QueryLoader mMailLoader; // Shortcut new mail query loader
     private QueryLoader mNewNotifyLoader; // Shortcut new notification query loader
-
 
     ////// OnContentListener ///////////////////////////////////////////////////////////////////////
     @Override
@@ -89,6 +107,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
     public void onAttach(Context context) {
         super.onAttach(context);
         Logs.add(Logs.Type.V, "context: " + context);
+
         mMailLoader = new QueryLoader(context, this);
         mNewNotifyLoader = new QueryLoader(context, this);
     }
@@ -112,21 +131,6 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         mListener.onGetShortcut(Constants.MAIN_SECTION_HOME, false).setMessage(msgBuilder);
         setShortcutInfo();
 
-        // Load shortcut info (using query loaders)
-        Bundle shortcutData = new Bundle();
-        shortcutData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        shortcutData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
-        shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
-                MessagerieTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        MessagerieTable.COLUMN_LU_FLAG + "=0");
-        mMailLoader.restart(getActivity(), Tables.ID_MESSAGERIE, shortcutData);
-
-        shortcutData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        shortcutData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
-        shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
-                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        NotificationsTable.COLUMN_LU_FLAG + "=0");
-        mNewNotifyLoader.restart(getActivity(), Queries.MAIN_NOTIFICATION_COUNT, shortcutData);
 
 
 
@@ -140,6 +144,8 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
 
 
 
+        // Set home info
+        refresh(pseudo);
 
         return rootView;
     }

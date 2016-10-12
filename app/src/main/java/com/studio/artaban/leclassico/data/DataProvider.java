@@ -284,7 +284,8 @@ public class DataProvider extends ContentProvider {
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TODO.getValue());
 
         int result = mDB.getDB().update(table, values, selection, selectionArgs);
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (result > 0)
+            getContext().getContentResolver().notifyChange(uri, null);
 
         return result; // Return updated entries count
     }

@@ -76,8 +76,8 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     public void onAttach(Context context) {
         super.onAttach(context);
         Logs.add(Logs.Type.V, "context: " + context);
-        if (context instanceof OnFragmentListener) {
 
+        if (context instanceof OnFragmentListener) {
             mListener = (OnFragmentListener) context;
 
             HandlerThread observerThread = new HandlerThread("mainDataObserverThread");
