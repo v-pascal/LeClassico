@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -29,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.view.ViewTreeObserver;
-import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements
     private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
     private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
 
-    private boolean mNewNotification; // New notification flag
+    private boolean mNewNotification; // New notification flag (unread)
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -158,35 +158,27 @@ public class MainActivity extends AppCompatActivity implements
             case Tables.ID_CAMARADES: { ////// User info
 
                 // Get DB data
-                final boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
+                boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
                         (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
-                final String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
+                String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
                         cursor.getString(COLUMN_INDEX_PROFILE) : null;
-                final String banner = (!cursor.isNull(COLUMN_INDEX_BANNER))?
+                String banner = (!cursor.isNull(COLUMN_INDEX_BANNER))?
                         cursor.getString(COLUMN_INDEX_BANNER) : null;
+                View navHeader = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                // Profile
+                Tools.setProfile(MainActivity.this,
+                        (ImageView)navHeader.findViewById(R.id.image_profile),
+                        female, profile, R.dimen.profile_size, false);
 
-                        Logs.add(Logs.Type.V, null);
-                        View navHeader = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
-
-                        // Profile
-                        Tools.setProfile(MainActivity.this,
-                                (ImageView)navHeader.findViewById(R.id.image_profile),
-                                female, profile, R.dimen.profile_size, false);
-                        // Banner
-                        if (banner != null)
-                            Glider.with(MainActivity.this)
-                                    .load(Storage.FOLDER_PROFILES +
-                                                    File.separator + banner,
-                                            Constants.APP_URL_PROFILES + '/' + banner)
-                                    .placeholder(R.drawable.banner)
-                                    .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
-                    }
-
-                });
+                // Banner
+                if (banner != null)
+                    Glider.with(MainActivity.this)
+                            .load(Storage.FOLDER_PROFILES +
+                                            File.separator + banner,
+                                    Constants.APP_URL_PROFILES + '/' + banner)
+                            .placeholder(R.drawable.banner)
+                            .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
                 break;
             }
             case Queries.MAIN_NOTIFICATION_FLAG: {
@@ -195,12 +187,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (cursor.getInt(0) > 0) {
 
                     mNewNotification = true; // New notification(s)
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            invalidateOptionsMenu();
-                        }
-                    });
+                    invalidateOptionsMenu();
                 }
                 break;
             }
@@ -242,7 +229,9 @@ public class MainActivity extends AppCompatActivity implements
 
         Logs.add(Logs.Type.V, "mNavItemSelected: " + mNavItemSelected);
         switch (mNavItemSelected) {
+
             case R.id.navig_profile: { // Display user profile
+                Logs.add(Logs.Type.I, "Display profile");
 
 
 
@@ -251,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
             case R.id.navig_location: { // Display location activity
+                Logs.add(Logs.Type.I, "Display location");
 
 
 
@@ -259,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
             case R.id.navig_settings: { // Display settings
+                Logs.add(Logs.Type.I, "Display settings");
 
 
 
@@ -267,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
             case R.id.navig_logout: { // Logout
+                Logs.add(Logs.Type.I, "Logout");
 
                 // Confirm logout
                 new AlertDialog.Builder(this)
@@ -291,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
             case R.id.navig_quit: { // Quit application
+                Logs.add(Logs.Type.I, "Quit application");
 
                 // Confirm quit
                 new AlertDialog.Builder(this)
@@ -322,16 +315,20 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPager mViewPager; // Content view pager
 
     public void onAction(View sender) { // Floating action button click event
-
         Logs.add(Logs.Type.V, "sender: " + sender);
         switch (mViewPager.getCurrentItem()) {
+
             case Constants.MAIN_SECTION_NOTIFICATIONS: { ////// Mark notifications as read
 
-                ((NotificationsFragment)MainFragment
+                Logs.add(Logs.Type.I, "Mark notification as read");
+                ((NotificationsFragment) MainFragment
                         .getBySection(Constants.MAIN_SECTION_NOTIFICATIONS)).read();
                 break;
             }
             case Constants.MAIN_SECTION_PUBLICATIONS: { ////// Add publication
+
+                Logs.add(Logs.Type.I, "Add publication");
+
 
 
 
@@ -424,6 +421,9 @@ public class MainActivity extends AppCompatActivity implements
         navigation.getMenu().findItem(R.id.navig_quit).getIcon()
                 .setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 
+        // Hide floating action button (only available with publications & notifications)
+        findViewById(R.id.fab).setVisibility(View.GONE);
+
         // Display user pseudo, profile icon & banner
         String pseudo = getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO);
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
@@ -449,24 +449,6 @@ public class MainActivity extends AppCompatActivity implements
 
         // Set content view pager
         mViewPager = (ViewPager) findViewById(R.id.container);
-
-
-
-
-
-
-
-
-        //viewPager.setOffscreenPageLimit(2);
-
-
-
-
-
-
-
-
-
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int section) {
@@ -488,6 +470,7 @@ public class MainActivity extends AppCompatActivity implements
         mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
             private int mShortcut; // Selected shortcut index
+            private int mFabTransY = Constants.NO_DATA; // Vertical floating action button translation
 
             private int mPositionHome;
             private int mPositionPublications;
@@ -502,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements
                 mShortcut = section;
 
                 switch (section) {
-                    case 0: { ////// Home
+                    case Constants.MAIN_SECTION_HOME: { ////// Home
 
                         mPositionHome = 0;
                         mPositionPublications = mShortcutWidth;
@@ -511,7 +494,7 @@ public class MainActivity extends AppCompatActivity implements
                         mPositionNotifications = mShortcutWidth * 4;
                         break;
                     }
-                    case 1: { ////// Publications
+                    case Constants.MAIN_SECTION_PUBLICATIONS: { ////// Publications
 
                         mPositionHome = -mShortcutWidth;
                         mPositionPublications = 0;
@@ -520,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements
                         mPositionNotifications = mShortcutWidth * 3;
                         break;
                     }
-                    case 2: { ////// Events
+                    case Constants.MAIN_SECTION_EVENTS: { ////// Events
 
                         mPositionHome = mShortcutWidth * -2;
                         mPositionPublications = -mShortcutWidth;
@@ -529,7 +512,7 @@ public class MainActivity extends AppCompatActivity implements
                         mPositionNotifications = mShortcutWidth * 2;
                         break;
                     }
-                    case 3: { ////// Members
+                    case Constants.MAIN_SECTION_MEMBERS: { ////// Members
 
                         mPositionHome = mShortcutWidth * -3;
                         mPositionPublications = mShortcutWidth * -2;
@@ -538,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements
                         mPositionNotifications = mShortcutWidth;
                         break;
                     }
-                    case 4: { ////// Notifications
+                    case Constants.MAIN_SECTION_NOTIFICATIONS: { ////// Notifications
 
                         mPositionHome = mShortcutWidth * -4;
                         mPositionPublications = mShortcutWidth * -3;
@@ -587,16 +570,35 @@ public class MainActivity extends AppCompatActivity implements
                 } else
                     translateShortcut(section);
             }
-            private void cancelShortcutAnimation() { // Cancel any animation (new)
-                //Logs.add(Logs.Type.V, null);
+            private void translateFab(final int section, final float factor) {
+             // Show/Hide & translate floating action button according section and display factor
 
-                ViewCompat.animate(findViewById(R.id.shortcut_new_publication)).cancel();
-                ViewCompat.animate(findViewById(R.id.shortcut_new_event)).cancel();
-                ViewCompat.animate(findViewById(R.id.shortcut_new_notification)).cancel();
+                //Logs.add(Logs.Type.V, "section: " + section + ";factor: " + factor);
+                final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+                fab.setImageDrawable(getDrawable((section == Constants.MAIN_SECTION_PUBLICATIONS)?
+                        R.drawable.ic_add_white_36dp:R.drawable.ic_check_white_36dp));
+                fab.setVisibility(((section == Constants.MAIN_SECTION_PUBLICATIONS) || (mNewNotification))?
+                        View.VISIBLE:View.GONE);
 
-                ViewCompat.animate(findViewById(R.id.shortcut_publications)).cancel();
-                ViewCompat.animate(findViewById(R.id.shortcut_events)).cancel();
-                ViewCompat.animate(findViewById(R.id.shortcut_notifications)).cancel();
+                if (mFabTransY == Constants.NO_DATA)
+                    fab.getViewTreeObserver()
+                            .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                                @Override
+                                public void onGlobalLayout() {
+                                    Logs.add(Logs.Type.V, null);
+
+                                    mFabTransY = fab.getHeight() +
+                                            (getResources().getDimensionPixelSize(R.dimen.fab_margin) << 1);
+
+                                    fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                    fab.setTranslationY(factor * mFabTransY);
+                                    fab.setVisibility(((section == Constants.MAIN_SECTION_PUBLICATIONS) ||
+                                            (mNewNotification))? View.VISIBLE:View.GONE);
+                                }
+                            });
+                else
+                    fab.setTranslationY(factor * mFabTransY);
             }
 
             //////
@@ -605,29 +607,51 @@ public class MainActivity extends AppCompatActivity implements
 
                 //Logs.add(Logs.Type.V, "page: " + page.getTag() + ";position: " + position +
                 //        ";current: " + mViewPager.getCurrentItem());
+                if ((position >= 0) && (position <= 1)) {
+
+                    // Translate floating action button accordingly (for publications & notifications)
+                    switch ((int)page.getTag()) {
+
+                        case Constants.MAIN_SECTION_PUBLICATIONS:
+                        case Constants.MAIN_SECTION_NOTIFICATIONS: {
+                            translateFab((int)page.getTag(), position);
+                            break;
+                        }
+                        case (Constants.MAIN_SECTION_PUBLICATIONS + 1): {
+                            translateFab(Constants.MAIN_SECTION_PUBLICATIONS, 1 - position);
+                            break;
+                        }
+                    }
+                }
                 if ((position == 1) || (position == 0) || (position == -1) ||
                         ((mShortcut + 2) == (int)page.getTag()) || ((mShortcut - 2) == (int)page.getTag()))
                     positionShortcut(mViewPager.getCurrentItem());
 
                 if (mShortcut == (int)page.getTag()) {
-                    cancelShortcutAnimation();
+                    View newPub = findViewById(R.id.shortcut_new_publication);
+                    View newEvent = findViewById(R.id.shortcut_new_event);
+                    View newNotify = findViewById(R.id.shortcut_new_notification);
+                    View publications = findViewById(R.id.shortcut_publications);
+                    View events = findViewById(R.id.shortcut_events);
+                    View notifications = findViewById(R.id.shortcut_notifications);
+
+                    ViewCompat.animate(newPub).cancel();
+                    ViewCompat.animate(newEvent).cancel();
+                    ViewCompat.animate(newNotify).cancel();
+                    ViewCompat.animate(publications).cancel();
+                    ViewCompat.animate(events).cancel();
+                    ViewCompat.animate(notifications).cancel();
 
                     findViewById(R.id.shortcut_home).setTranslationX(mPositionHome +
                             (position * mShortcutWidth));
-                    findViewById(R.id.shortcut_publications).setTranslationX(mPositionPublications +
-                            (position * mShortcutWidth));
-                    findViewById(R.id.shortcut_new_publication).setTranslationX(mPositionPublications +
-                            (position * mShortcutWidth));
-                    findViewById(R.id.shortcut_events).setTranslationX(mPositionEvents +
-                            (position * mShortcutWidth));
-                    findViewById(R.id.shortcut_new_event).setTranslationX(mPositionEvents +
-                            (position * mShortcutWidth));
+                    publications.setTranslationX(mPositionPublications + (position * mShortcutWidth));
+                    newPub.setTranslationX(mPositionPublications + (position * mShortcutWidth));
+                    events.setTranslationX(mPositionEvents + (position * mShortcutWidth));
+                    newEvent.setTranslationX(mPositionEvents + (position * mShortcutWidth));
                     findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers +
                             (position * mShortcutWidth));
-                    findViewById(R.id.shortcut_notifications).setTranslationX(mPositionNotifications +
-                            (position * mShortcutWidth));
-                    findViewById(R.id.shortcut_new_notification).setTranslationX(mPositionNotifications +
-                            (position * mShortcutWidth));
+                    notifications.setTranslationX(mPositionNotifications + (position * mShortcutWidth));
+                    newNotify.setTranslationX(mPositionNotifications + (position * mShortcutWidth));
                 }
             }
         });
@@ -643,6 +667,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Logs.add(Logs.Type.V, null);
+
         getMenuInflater().inflate(R.menu.options_menu, menu);
         if (mNewNotification)
             menu.findItem(R.id.mnu_notification).setIcon(getDrawable(R.drawable.ic_notifications_info_24dp));

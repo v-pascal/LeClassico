@@ -551,122 +551,118 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
             private static final float TRANSLATE_RATIO_RED_MARKER_Y = 20f;
             // Translation ratio of the location representation elements (markers): follow map.
 
-            private void anim(View page, float position) {
+            @Override
+            public void transformPage(View page, float position) {
             // Apply animation to the representation images
 
                 //Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
-                float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
+                if (position < 1) {
+                    float sizeRatio = IntroFragment.getSizeRatio(IntroActivity.this);
 
-                ////// Album photos: flip photos!
-                ImageView girls = (ImageView) page.findViewById(R.id.image_girls);
-                if (girls != null)
-                    girls.setRotationY(IntroFragment.INTRO_GIRLS_ROTATION_Y +
-                            (position * ROTATION_RATIO_GIRLS_Y));
-                ImageView couple = (ImageView) page.findViewById(R.id.image_couple);
-                if (couple != null)
-                    couple.setRotationY(IntroFragment.INTRO_COUPLE_ROTATION_Y +
-                            (position * ROTATION_RATIO_COUPLE_Y));
-                ImageView indoor = (ImageView) page.findViewById(R.id.image_indoor);
-                if (indoor != null)
-                    indoor.setRotationY(IntroFragment.INTRO_INDOOR_ROTATION_Y +
-                            (position * ROTATION_RATIO_INDOOR_Y));
-                ImageView outdoor = (ImageView) page.findViewById(R.id.image_outdoor);
-                if (outdoor != null)
-                    outdoor.setRotationY(position * ROTATION_RATIO_OUTDOOR_Y);
-                ImageView dj = (ImageView) page.findViewById(R.id.image_dj);
-                if (dj != null)
-                    dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
+                    ////// Album photos: flip photos!
+                    ImageView girls = (ImageView) page.findViewById(R.id.image_girls);
+                    if (girls != null)
+                        girls.setRotationY(IntroFragment.INTRO_GIRLS_ROTATION_Y +
+                                (position * ROTATION_RATIO_GIRLS_Y));
+                    ImageView couple = (ImageView) page.findViewById(R.id.image_couple);
+                    if (couple != null)
+                        couple.setRotationY(IntroFragment.INTRO_COUPLE_ROTATION_Y +
+                                (position * ROTATION_RATIO_COUPLE_Y));
+                    ImageView indoor = (ImageView) page.findViewById(R.id.image_indoor);
+                    if (indoor != null)
+                        indoor.setRotationY(IntroFragment.INTRO_INDOOR_ROTATION_Y +
+                                (position * ROTATION_RATIO_INDOOR_Y));
+                    ImageView outdoor = (ImageView) page.findViewById(R.id.image_outdoor);
+                    if (outdoor != null)
+                        outdoor.setRotationY(position * ROTATION_RATIO_OUTDOOR_Y);
+                    ImageView dj = (ImageView) page.findViewById(R.id.image_dj);
+                    if (dj != null)
+                        dj.setRotationY(position * ROTATION_RATIO_DJ_Y);
 
-                TypedValue translateRatio = new TypedValue();
-                getResources().getValue(R.dimen.translation_ratio, translateRatio, true);
-                position *= translateRatio.getFloat();
+                    TypedValue translateRatio = new TypedValue();
+                    getResources().getValue(R.dimen.translation_ratio, translateRatio, true);
+                    position *= translateRatio.getFloat();
 
-                ////// Welcome: scroll elements!
-                ImageView light1 = (ImageView) page.findViewById(R.id.image_light1);
-                if (light1 != null)
-                    light1.setTranslationX((IntroFragment.INTRO_LIGHT_1_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_LIGHT_1));
-                ImageView ball = (ImageView) page.findViewById(R.id.image_ball);
-                if (ball != null)
-                    ball.setTranslationX(position * TRANSLATE_RATIO_BALL);
-                ImageView light2 = (ImageView) page.findViewById(R.id.image_light2);
-                if (light2 != null)
-                    light2.setTranslationX((IntroFragment.INTRO_LIGHT_2_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_LIGHT_2));
-                ImageView diskTray = (ImageView) page.findViewById(R.id.image_disk_tray);
-                if (diskTray != null)
-                    diskTray.setTranslationX((IntroFragment.INTRO_DISK_TRAY_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_DISK_TRAY));
-                ImageView speaker = (ImageView) page.findViewById(R.id.image_sound_speaker);
-                if (speaker != null)
-                    speaker.setTranslationX((IntroFragment.INTRO_SOUND_SPEAKER_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_SOUND_SPEAKER));
-                ImageView smiley = (ImageView) page.findViewById(R.id.image_smiley);
-                if (smiley != null)
-                    smiley.setTranslationX((IntroFragment.INTRO_SMILEY_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_SMILEY));
-                ImageView unSmiley = (ImageView) page.findViewById(R.id.image_un_smiley);
-                if (unSmiley != null)
-                    unSmiley.setTranslationX((IntroFragment.INTRO_UN_SMILEY_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_UN_SMILEY));
+                    ////// Welcome: scroll elements!
+                    ImageView light1 = (ImageView) page.findViewById(R.id.image_light1);
+                    if (light1 != null)
+                        light1.setTranslationX((IntroFragment.INTRO_LIGHT_1_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_LIGHT_1));
+                    ImageView ball = (ImageView) page.findViewById(R.id.image_ball);
+                    if (ball != null)
+                        ball.setTranslationX(position * TRANSLATE_RATIO_BALL);
+                    ImageView light2 = (ImageView) page.findViewById(R.id.image_light2);
+                    if (light2 != null)
+                        light2.setTranslationX((IntroFragment.INTRO_LIGHT_2_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_LIGHT_2));
+                    ImageView diskTray = (ImageView) page.findViewById(R.id.image_disk_tray);
+                    if (diskTray != null)
+                        diskTray.setTranslationX((IntroFragment.INTRO_DISK_TRAY_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_DISK_TRAY));
+                    ImageView speaker = (ImageView) page.findViewById(R.id.image_sound_speaker);
+                    if (speaker != null)
+                        speaker.setTranslationX((IntroFragment.INTRO_SOUND_SPEAKER_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_SOUND_SPEAKER));
+                    ImageView smiley = (ImageView) page.findViewById(R.id.image_smiley);
+                    if (smiley != null)
+                        smiley.setTranslationX((IntroFragment.INTRO_SMILEY_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_SMILEY));
+                    ImageView unSmiley = (ImageView) page.findViewById(R.id.image_un_smiley);
+                    if (unSmiley != null)
+                        unSmiley.setTranslationX((IntroFragment.INTRO_UN_SMILEY_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_UN_SMILEY));
 
-                ////// Publications: move publications!
-                ImageView link = (ImageView) page.findViewById(R.id.image_link);
-                if (link != null) {
-                    link.setTranslationX((IntroFragment.INTRO_LINK_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_LINK_X));
-                    link.setTranslationY((IntroFragment.INTRO_LINK_TRANS_Y * sizeRatio) +
-                            (position * TRANSLATE_RATIO_LINK_Y));
+                    ////// Publications: move publications!
+                    ImageView link = (ImageView) page.findViewById(R.id.image_link);
+                    if (link != null) {
+                        link.setTranslationX((IntroFragment.INTRO_LINK_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_LINK_X));
+                        link.setTranslationY((IntroFragment.INTRO_LINK_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_LINK_Y));
+                    }
+                    ImageView photo = (ImageView) page.findViewById(R.id.image_photo);
+                    if (photo != null) {
+                        photo.setTranslationX((IntroFragment.INTRO_PHOTO_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_PHOTO_X));
+                        photo.setTranslationY((IntroFragment.INTRO_PHOTO_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_PHOTO_Y));
+                    }
+                    ImageView friend = (ImageView) page.findViewById(R.id.image_friend);
+                    if (friend != null) {
+                        friend.setTranslationX((IntroFragment.INTRO_FRIEND_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_FRIEND_X));
+                        friend.setTranslationY((IntroFragment.INTRO_FRIEND_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_FRIEND_Y));
+                    }
+
+                    ////// Location: follow the map!
+                    ImageView greenMark = (ImageView) page.findViewById(R.id.image_green_marker);
+                    if (greenMark != null)
+                        greenMark.setTranslationY((IntroFragment.INTRO_GREEN_MARKER_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_GREEN_MARKER_Y));
+                    ImageView yellowMark = (ImageView) page.findViewById(R.id.image_yellow_marker);
+                    if (yellowMark != null)
+                        yellowMark.setTranslationX((IntroFragment.INTRO_YELLOW_MARKER_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_YELLOW_MARKER_X));
+                    ImageView blueMark = (ImageView) page.findViewById(R.id.image_blue_marker);
+                    if (blueMark != null) {
+                        blueMark.setTranslationX((IntroFragment.INTRO_BLUE_MARKER_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_BLUE_MARKER_X));
+                        blueMark.setTranslationY((IntroFragment.INTRO_BLUE_MARKER_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_BLUE_MARKER_Y));
+                    }
+                    ImageView redMark = (ImageView) page.findViewById(R.id.image_red_marker);
+                    if (redMark != null) {
+
+                        redMark.setTranslationX((IntroFragment.INTRO_RED_MARKER_TRANS_X * sizeRatio) +
+                                (position * TRANSLATE_RATIO_RED_MARKER_X));
+                        redMark.setTranslationY((IntroFragment.INTRO_RED_MARKER_TRANS_Y * sizeRatio) +
+                                (position * TRANSLATE_RATIO_RED_MARKER_Y));
+                    }
+
+                    ////// Events: scale calendar!
+                    animEvents(page, position);
                 }
-                ImageView photo = (ImageView) page.findViewById(R.id.image_photo);
-                if (photo != null) {
-                    photo.setTranslationX((IntroFragment.INTRO_PHOTO_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_PHOTO_X));
-                    photo.setTranslationY((IntroFragment.INTRO_PHOTO_TRANS_Y * sizeRatio) +
-                            (position * TRANSLATE_RATIO_PHOTO_Y));
-                }
-                ImageView friend = (ImageView) page.findViewById(R.id.image_friend);
-                if (friend != null) {
-                    friend.setTranslationX((IntroFragment.INTRO_FRIEND_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_FRIEND_X));
-                    friend.setTranslationY((IntroFragment.INTRO_FRIEND_TRANS_Y * sizeRatio) +
-                            (position * TRANSLATE_RATIO_FRIEND_Y));
-                }
-
-                ////// Location: follow the map!
-                ImageView greenMark = (ImageView) page.findViewById(R.id.image_green_marker);
-                if (greenMark != null)
-                    greenMark.setTranslationY((IntroFragment.INTRO_GREEN_MARKER_TRANS_Y * sizeRatio) +
-                            (position * TRANSLATE_RATIO_GREEN_MARKER_Y));
-                ImageView yellowMark = (ImageView) page.findViewById(R.id.image_yellow_marker);
-                if (yellowMark != null)
-                    yellowMark.setTranslationX((IntroFragment.INTRO_YELLOW_MARKER_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_YELLOW_MARKER_X));
-                ImageView blueMark = (ImageView) page.findViewById(R.id.image_blue_marker);
-                if (blueMark != null) {
-                    blueMark.setTranslationX((IntroFragment.INTRO_BLUE_MARKER_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_BLUE_MARKER_X));
-                    blueMark.setTranslationY((IntroFragment.INTRO_BLUE_MARKER_TRANS_Y * sizeRatio) +
-                            (position * TRANSLATE_RATIO_BLUE_MARKER_Y));
-                }
-                ImageView redMark = (ImageView) page.findViewById(R.id.image_red_marker);
-                if (redMark != null) {
-
-                    redMark.setTranslationX((IntroFragment.INTRO_RED_MARKER_TRANS_X * sizeRatio) +
-                            (position * TRANSLATE_RATIO_RED_MARKER_X));
-                    redMark.setTranslationY((IntroFragment.INTRO_RED_MARKER_TRANS_Y * sizeRatio) +
-                            (position * TRANSLATE_RATIO_RED_MARKER_Y));
-                }
-
-                ////// Events: scale calendar!
-                animEvents(page, position);
-            }
-
-            @Override
-            public void transformPage(View page, float position) {
-                //Logs.add(Logs.Type.V, "page: " + page + ";position: " + position);
-                if (position < 1)
-                    anim(page, position);
             }
         });
         mViewPager.setOnLimitlessListener(new LimitlessViewPager.OnLimitCrossedListener() {
