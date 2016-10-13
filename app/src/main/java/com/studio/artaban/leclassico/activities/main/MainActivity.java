@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public static final String EXTRA_DATA_KEY_ONLINE = "online";
     public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
+    public static final String EXTRA_DATA_KEY_PSEUDO_ID = "pseudoId";
     // Extra data keys
 
     private static int getShortcutID(int section, boolean newItem) {

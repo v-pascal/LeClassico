@@ -196,26 +196,31 @@ public class DataProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         Logs.add(Logs.Type.V, null);
+        boolean particularUri = false;
 
         // Open database (if not already opened)
         if (!mDB.isOpened())
             mDB.open(true);
 
         String table = getUriTable(URI_MATCHER, uri);
-        if (table == null)
-            table = Uris.getTable(uri);
+        if (table == null) { // Check particular URI
+
+            particularUri = true;
+            table = Uris.getUriTable(uri);
+        }
         if (table == null)
             throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
-        // NB: No need to check exiting synchronized field value (not null field)
+        // NB: No need to check exiting synchronized field value (not a null field)
         long id = mDB.getDB().insert(table, null, values);
         if (id > Constants.NO_DATA) {
 
-            // Make URI to return
-            Uri result = ContentUris.withAppendedId(uri, id);
+            // Notify observers with URI passed in parameter
+            getContext().getContentResolver().notifyChange(uri, null);
+            if (particularUri) // Notify observers with common table URI (particular URI parameter)
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + table), null);
 
-            getContext().getContentResolver().notifyChange(result, null); // To notify observers
-            return result;
+            return ContentUris.withAppendedId(uri, id);
         }
         return null;
     }
@@ -223,6 +228,7 @@ public class DataProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         Logs.add(Logs.Type.V, null);
+        boolean particularUri = false;
 
         // Open database (if not already opened)
         if (!mDB.isOpened())
@@ -235,8 +241,11 @@ public class DataProvider extends ContentProvider {
         else {
 
             table = getUriTable(URI_MATCHER, uri);
-            if (table == null)
-                table = Uris.getTable(uri);
+            if (table == null) {
+
+                particularUri = true;
+                table = Uris.getUriTable(uri);
+            }
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
@@ -254,6 +263,8 @@ public class DataProvider extends ContentProvider {
             result = mDB.getDB().update(table, values, selection, selectionArgs);
 
             getContext().getContentResolver().notifyChange(uri, null);
+            if (particularUri)
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + table), null);
 
         } else
             result = mDB.getDB().delete(table, selection, selectionArgs);
@@ -265,6 +276,7 @@ public class DataProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Logs.add(Logs.Type.V, null);
+        boolean particularUri = false;
 
         // Open database (if not already opened)
         if (!mDB.isOpened())
@@ -277,8 +289,11 @@ public class DataProvider extends ContentProvider {
         else {
 
             table = getUriTable(URI_MATCHER, uri);
-            if (table == null)
-                table = Uris.getTable(uri);
+            if (table == null) {
+
+                particularUri = true;
+                table = Uris.getUriTable(uri);
+            }
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
         }
@@ -288,9 +303,12 @@ public class DataProvider extends ContentProvider {
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TODO.getValue());
 
         int result = mDB.getDB().update(table, values, selection, selectionArgs);
-        if (result > 0)
-            getContext().getContentResolver().notifyChange(uri, null);
+        if (result > 0) {
 
+            getContext().getContentResolver().notifyChange(uri, null);
+            if (particularUri)
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + table), null);
+        }
         return result; // Return updated entries count
     }
 }

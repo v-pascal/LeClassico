@@ -30,6 +30,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
@@ -56,7 +57,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         ContentValues values = new ContentValues();
         values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
-        getContext().getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
+        getContext().getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + mNotifyUri),
                 values, NotificationsTable.COLUMN_PSEUDO + "='" +
                         getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) +
                         "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
@@ -361,18 +362,26 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
     ////// OnContentListener ///////////////////////////////////////////////////////////////////////
     @Override
-    public void onChange(boolean selfChange, Uri uri) {
+    public void onChange(boolean selfChange, final Uri uri) {
     // WARNING: Not in UI thread
 
-        // Refresh notification list
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
+                // Enable or disable item change animation according if only synchronization flag has changed
+                ((RecyclerItemAnimator)mNotifyList.getItemAnimator()) // Single URI only used in this case
+                        .setSupportsChangeAnimations(Uris.getUriTableId(uri) != Uris.ID_MAIN_NOTIFY_SINGLE);
+
+                // Refresh notification list
                 refresh();
             }
         });
     }
+
+    //
+    private String mNotifyUri; // Notification URI path (see Uris.PATH_MAIN_NOTIFICATIONS)
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -384,6 +393,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
             case Queries.MAIN_NOTIFICATIONS: {
                 mQueryCount = (short)cursor.getCount();
+
+                // Register content observer on each notification
+                mDataObserver.register(getContext().getContentResolver(), cursor, mNotifyUri, COLUMN_INDEX_NOTIFY_ID);
 
                 // Check if not the initial query
                 if (mNotifyAdapter != null) {
@@ -411,6 +423,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                     } else
                         cursor.close();
+
+                    // Enable item change animation
+                    ((RecyclerItemAnimator)mNotifyList.getItemAnimator()).setSupportsChangeAnimations(true);
 
                 } else {
                     Logs.add(Logs.Type.I, "Initial query");
@@ -563,6 +578,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         super.onAttach(context);
         Logs.add(Logs.Type.V, "context: " + context);
 
+        mNotifyUri = Uris.PATH_PSEUDO +
+                getActivity().getIntent().getIntExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO_ID, 0) + '/' +
+                NotificationsTable.TABLE_NAME;
+
         mListLoader = new QueryLoader(context, this);
         mMaxLoader = new QueryLoader(context, this);
     }
@@ -705,18 +724,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     public void onResume() {
         super.onResume();
         Logs.add(Logs.Type.V, null);
-        refresh(); // Refresh notification list
 
-
-
-
-
-        // Register content observer on notifications table
-        mDataObserver.register(getContext().getContentResolver(), NotificationsTable.TABLE_NAME);
-
-
-
-
+        // Refresh notification list
+        refresh();
     }
 
     @Override

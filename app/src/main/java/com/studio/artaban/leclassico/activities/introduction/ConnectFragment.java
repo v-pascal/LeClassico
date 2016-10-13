@@ -22,6 +22,7 @@ import com.studio.artaban.leclassico.components.RevealFragment;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Errors;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -65,7 +66,7 @@ public class ConnectFragment extends RevealFragment {
     public interface OnConnectListener { ///////////////////////////////////////////////////////////
 
         void onError(byte error);
-        void onConnected(String pseudo, boolean online);
+        void onConnected(String pseudo, int pseudoId, boolean online);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,6 +240,7 @@ public class ConnectFragment extends RevealFragment {
 
         //
         private String mPseudo; // User pseudo used to connect with
+        private int mPseudoId; // User pseudo Id defined into local DB
         private String mToken; // Token provided by the web service to identify user
         private long mTimeLag; // Time laps between remote server & current OS (in sec)
 
@@ -251,6 +253,8 @@ public class ConnectFragment extends RevealFragment {
             String password = params[1];
 
             try {
+                ContentResolver resolver = getWaitActivity().getContentResolver();
+
                 ////// Check Internet connection
                 if (!publishWaitProgress(STEP_CHECK_INTERNET, true)) return Boolean.FALSE;
                 boolean online = Internet.isOnline(getWaitActivity());
@@ -260,8 +264,7 @@ public class ConnectFragment extends RevealFragment {
                 if (!online) {
 
                     // No Internet connection so check existing DB to work offline
-                    ContentResolver cr = getWaitActivity().getContentResolver();
-                    int membersCount = Tools.getEntryCount(cr, CamaradesTable.TABLE_NAME, null);
+                    int membersCount = Tools.getEntryCount(resolver, CamaradesTable.TABLE_NAME, null);
 
                     if (isStopped()) return Boolean.FALSE;
                     if (membersCount > 0) { // Found existing DB (try to work offline)
@@ -270,8 +273,8 @@ public class ConnectFragment extends RevealFragment {
                         String pseudo = null;
 
                         // Offline identification
-                        Cursor result = cr.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                                new String[]{CamaradesTable.COLUMN_PSEUDO},
+                        Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                                new String[]{CamaradesTable.COLUMN_PSEUDO, IDataTable.DataField.COLUMN_ID},
                                 "UPPER(" + CamaradesTable.COLUMN_PSEUDO + ")=" +
                                         DatabaseUtils.sqlEscapeString(mPseudo.toUpperCase()) +
                                         " AND " + CamaradesTable.COLUMN_CODE_CONF + '=' +
@@ -280,6 +283,7 @@ public class ConnectFragment extends RevealFragment {
                         if (result.getCount() > 0) {
                             result.moveToFirst();
                             pseudo = result.getString(0);
+                            mPseudoId = result.getInt(1);
                         }
                         result.close();
 
@@ -386,14 +390,17 @@ public class ConnectFragment extends RevealFragment {
                         if (isStopped()) return Boolean.FALSE;
                         publishProgress(tableId);
 
-                        if (!Database.synchronize(tableId, getWaitActivity().getContentResolver(),
-                                mToken, mPseudo)) {
+                        if (!Database.synchronize(tableId, resolver, mToken, mPseudo)) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
                             publishProgress(STEP_ERROR);
                             return Boolean.FALSE;
                         }
                     }
+
+                    // Get pseudo Id (from local DB)
+                    mPseudoId = Tools.getEntryId(resolver, CamaradesTable.TABLE_NAME,
+                            CamaradesTable.COLUMN_PSEUDO + "='" + mPseudo + '\'');
                 }
 
                 ////// Wait activity resumed (needed to avoid to start main activity when paused)
@@ -473,7 +480,7 @@ public class ConnectFragment extends RevealFragment {
 
             Logs.add(Logs.Type.V, "aBoolean: " + aBoolean);
             if ((aBoolean) && (mListener != null))
-                mListener.onConnected(mPseudo, (mToken != null));
+                mListener.onConnected(mPseudo, mPseudoId, (mToken != null));
         }
     }
 

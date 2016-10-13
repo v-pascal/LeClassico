@@ -23,6 +23,7 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
@@ -216,5 +217,20 @@ public final class Tools {
         result.close();
 
         return count;
+    }
+    public static int getEntryId(ContentResolver resolver, String table, String selection) {
+    // Get entry Id on specific table and according selection criteria
+    // NB: Returns NO_DATA if more than one record is found with selection criteria
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";table: " + table + ";selection: " + selection);
+        Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + table),
+                new String[]{IDataTable.DataField.COLUMN_ID}, selection, null, null);
+        result.moveToFirst();
+        int id = result.getInt(0);
+        if (result.getCount() > 1)
+            id = Constants.NO_DATA;
+        result.close();
+
+        return id;
     }
 }

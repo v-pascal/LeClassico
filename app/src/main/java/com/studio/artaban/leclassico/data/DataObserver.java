@@ -20,9 +20,9 @@ public class DataObserver extends ContentObserver {
     private OnContentListener mListener; // Registered content listener
 
     //////
-    public void register(ContentResolver resolver, String table) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";table: " + table);
-        resolver.registerContentObserver(Uri.parse(DataProvider.CONTENT_URI + table), true, this);
+    public void register(ContentResolver resolver, String path) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";path: " + path);
+        resolver.registerContentObserver(Uri.parse(DataProvider.CONTENT_URI + path), true, this);
     }
     public void register(ContentResolver resolver, Cursor cursor, String path, int columnId) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";cursor: " + cursor + ";path: " + path +

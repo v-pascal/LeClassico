@@ -308,9 +308,9 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
     }
 
     @Override
-    public void onConnected(String pseudo, boolean online) {
+    public void onConnected(String pseudo, int pseudoId, boolean online) {
 
-        Logs.add(Logs.Type.V, "online: " + online);
+        Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";pseudoId: " + pseudoId + ";online: " + online);
         if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) == null)
             return; // Connection task stopped
 
@@ -330,6 +330,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
         intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
+        intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO_ID, pseudoId);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
