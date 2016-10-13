@@ -24,13 +24,14 @@ public class DataObserver extends ContentObserver {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";table: " + table);
         resolver.registerContentObserver(Uri.parse(DataProvider.CONTENT_URI + table), true, this);
     }
-    public void register(ContentResolver resolver, Cursor cursor, String table, int columnId) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";cursor: " + cursor + ";columnId: " + columnId);
+    public void register(ContentResolver resolver, Cursor cursor, String path, int columnId) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";cursor: " + cursor + ";path: " + path +
+                ";columnId: " + columnId);
         if (cursor.moveToFirst()) {
             do {
                 resolver.registerContentObserver(
-                        Uri.parse(DataProvider.CONTENT_URI + table + '/' + cursor.getInt(columnId)),
-                        true, this);
+                        Uri.parse(DataProvider.CONTENT_URI + path + '/' + cursor.getInt(columnId)),
+                        false, this);
 
             } while (cursor.moveToNext());
         }

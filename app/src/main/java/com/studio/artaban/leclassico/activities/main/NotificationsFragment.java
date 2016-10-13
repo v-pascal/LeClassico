@@ -707,8 +707,16 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         Logs.add(Logs.Type.V, null);
         refresh(); // Refresh notification list
 
+
+
+
+
         // Register content observer on notifications table
         mDataObserver.register(getContext().getContentResolver(), NotificationsTable.TABLE_NAME);
+
+
+
+
     }
 
     @Override

@@ -17,7 +17,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
  * Created by pascal on 07/09/16.
- * Query ID & limit
+ * Query ID & limit (see QueryLoader class)
  */
 public class Queries {
 

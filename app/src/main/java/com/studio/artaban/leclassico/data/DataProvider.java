@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
@@ -194,7 +195,6 @@ public class DataProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-
         Logs.add(Logs.Type.V, null);
 
         // Open database (if not already opened)
@@ -202,6 +202,8 @@ public class DataProvider extends ContentProvider {
             mDB.open(true);
 
         String table = getUriTable(URI_MATCHER, uri);
+        if (table == null)
+            table = Uris.getTable(uri);
         if (table == null)
             throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
@@ -220,7 +222,6 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-
         Logs.add(Logs.Type.V, null);
 
         // Open database (if not already opened)
@@ -234,6 +235,8 @@ public class DataProvider extends ContentProvider {
         else {
 
             table = getUriTable(URI_MATCHER, uri);
+            if (table == null)
+                table = Uris.getTable(uri);
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
@@ -261,7 +264,6 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-
         Logs.add(Logs.Type.V, null);
 
         // Open database (if not already opened)
@@ -275,6 +277,8 @@ public class DataProvider extends ContentProvider {
         else {
 
             table = getUriTable(URI_MATCHER, uri);
+            if (table == null)
+                table = Uris.getTable(uri);
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
         }
