@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.tools;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -10,8 +11,10 @@ import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.AlertDialog;
 import android.util.TypedValue;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -40,7 +43,7 @@ import java.util.Date;
  * Created by pascal on 10/09/16.
  * Tools class containing tool methods
  */
-public final class Tools {
+public final class Tools { /////////////////////////////////////////////////////////////////////////
 
     private static float PROFILE_SIZE_RADIUS_FACTOR = 80f;
     public static void setProfile(final Activity activity, ImageView view, final boolean female,
@@ -106,6 +109,49 @@ public final class Tools {
                     activity.getDrawable(R.drawable.man)));
     }
 
+    public static void setDateTime(Context context, TextView date, TextView time, String dateTime) {
+    // Fill date & time text views according a date & time parameter (in query date & time format)
+    // i.e: --/-- for the date & --:-- for the time
+
+        Logs.add(Logs.Type.V, "context: " + context + ";date: " + date + ";time: " + time);
+        DateFormat paramFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
+        try {
+            Date paramDate = paramFormat.parse(dateTime);
+            DateFormat dateFormat = new SimpleDateFormat(context.getString(R.string.format_date));
+            DateFormat timeFormat = new SimpleDateFormat(context.getString(R.string.format_time));
+
+            String dateText = dateFormat.format(paramDate);
+            date.setText((dateText.compareTo(dateFormat.format(new Date())) != 0)?
+                    dateText : context.getString(R.string.today));
+            time.setText(timeFormat.format(paramDate));
+
+        } catch (ParseException e) {
+            Logs.add(Logs.Type.E, "Wrong query date & time format: " + dateTime);
+        }
+    }
+
+    public static void criticalError(final Activity activity, @StringRes int error) {
+    // Display a critical error message B4 application close
+
+        Logs.add(Logs.Type.V, "activity: " + activity + ";error: " + error);
+        new AlertDialog.Builder(activity)
+                .setIcon(R.drawable.error_red)
+                .setTitle(R.string.error)
+                .setMessage(error)
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+
+                        Logs.add(Logs.Type.V, "dialog: " + dialog);
+                        activity.finishAffinity();
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////// Notifications
+
     public static @DrawableRes int getNotifyIcon(char type) {
     // Return the drawable ID of the notification icon type passed as parameter
 
@@ -140,6 +186,8 @@ public final class Tools {
 
         return NOTIFY_WALL_TYPE_TEXT;
     }
+
+    //////////////////////////////////////////////////////////////////////////////// Synchronization
 
     public static void setSyncView(Context context, TextView text, ImageView icon, String date, byte status) {
     // Fill synchronization UI components according its status
@@ -185,26 +233,7 @@ public final class Tools {
         //        NB: Should not happen coz nothing to display!
     }
 
-    public static void setDateTime(Context context, TextView date, TextView time, String dateTime) {
-    // Fill date & time text views according a date & time parameter (in query date & time format)
-    // i.e: --/-- for the date & --:-- for the time
-
-        Logs.add(Logs.Type.V, "context: " + context + ";date: " + date + ";time: " + time);
-        DateFormat paramFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
-        try {
-            Date paramDate = paramFormat.parse(dateTime);
-            DateFormat dateFormat = new SimpleDateFormat(context.getString(R.string.format_date));
-            DateFormat timeFormat = new SimpleDateFormat(context.getString(R.string.format_time));
-
-            String dateText = dateFormat.format(paramDate);
-            date.setText((dateText.compareTo(dateFormat.format(new Date())) != 0)?
-                    dateText : context.getString(R.string.today));
-            time.setText(timeFormat.format(paramDate));
-
-        } catch (ParseException e) {
-            Logs.add(Logs.Type.E, "Wrong query date & time format: " + dateTime);
-        }
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////////// DB
 
     public static int getEntryCount(ContentResolver resolver, String table, String selection) {
     // Get entry count on specific table and according selection criteria
@@ -233,4 +262,10 @@ public final class Tools {
 
         return id;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////// Listeners
+
+    public interface OnDoneListener {
+        void onDone();
+    } // Useful to execute code after another thread has done a process
 }

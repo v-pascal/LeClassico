@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.content.DialogInterface;
+import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -36,6 +37,7 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -89,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements
         //Logs.add(Logs.Type.V, "section: " + section + ";newItem: " + newItem);
         return ((ShortcutFragment) getSupportFragmentManager().findFragmentById(getShortcutID(section, newItem)));
     }
-
     @Override
     public void onAnimateShortcut(final int section, final OnAnimationListener listener) {
     // Display the new fragment (using an animation)
@@ -141,6 +142,11 @@ public class MainActivity extends AppCompatActivity implements
                 });
         newAnim.start();
         prevAnim.start();
+    }
+
+    @Override
+    public DataService onGetService() {
+        return mDataService.get();
     }
 
     //
@@ -336,6 +342,7 @@ public class MainActivity extends AppCompatActivity implements
 
     //////
     private ViewPager mViewPager; // Content view pager
+    private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
 
     public void onAction(View sender) { // Floating action button click event
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -693,6 +700,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+
+        // Bind data service
+        if (!mDataService.bind(this, null))
+            Tools.criticalError(this, R.string.error_service_unavailable);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Logs.add(Logs.Type.V, null);
 
@@ -722,5 +739,14 @@ public class MainActivity extends AppCompatActivity implements
             drawer.closeDrawer(GravityCompat.START); // Close drawer
         else
             moveTaskToBack(true); // Put application in pause
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+
+        // Unbind data service
+        mDataService.unbind(this);
     }
 }

@@ -19,8 +19,8 @@
     <string name="confirm">Confirmation</string>
 
     <!-- Errors -->
-    <string name="error_no_storage">ERREUR CRITIQUE: Espace de stockage indisponible! Veuillez redémarrer l\'application plus tard.</string>
-    <string name="error_service_unavailable">ERREUR CRITIQUE: Service indisponible! Veuillez redémarrer l\'application.</string>
+    <string name="error_no_storage">Espace de stockage indisponible!\nL\'application va se terminer. Veuillez la redémarrer une fois votre gestionnaire de stockage vérifié.</string>
+    <string name="error_service_unavailable">Service indisponible!\nL\'application va se terminer. Veuillez la redémarrer ultérieurement.</string>
 
     <!-- Confirmation -->
     <string name="confirm_logout">Souhaitez-vous vraiment vous déconnecter?</string>

@@ -24,8 +24,8 @@
     <string name="confirm">Confirm</string>
 
     <!-- Errors -->
-    <string name="error_no_storage">CRITICAL ERROR: Storage unavailable! Please to restart application later.</string>
-    <string name="error_service_unavailable">CRITICAL ERROR: Service unavailable! Please to restart application.</string>
+    <string name="error_no_storage">Storage unavailable!\nThe application will shutdown. Please to restart it after having check you storage management.</string>
+    <string name="error_service_unavailable">Service unavailable!\nThe application will shutdown. Please to restart it later.</string>
 
     <!-- Confirmation -->
     <string name="confirm_logout">Do you really want to logout?</string>

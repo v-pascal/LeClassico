@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.v4.app.Fragment;
 
+import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -59,6 +60,9 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
         }
         ShortcutFragment onGetShortcut(int section, boolean newItem);
         void onAnimateShortcut(int section, OnAnimationListener listener);
+
+        ////// Service
+        DataService onGetService();
     }
     protected OnFragmentListener mListener; // Activity listener
 

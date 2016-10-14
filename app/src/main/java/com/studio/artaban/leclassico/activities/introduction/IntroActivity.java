@@ -45,6 +45,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.animations.InOutScreen;
 import com.studio.artaban.leclassico.tools.SizeUtils;
+import com.studio.artaban.leclassico.tools.Tools;
 
 /**
  * Created by pascal on 15/07/16.
@@ -477,15 +478,6 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Create working sub folders
-        if (!Storage.createWorkingFolders(this)) {
-
-            // Quit application if shared storage is not currently available
-            Toast.makeText(this, R.string.error_no_storage, Toast.LENGTH_LONG);
-            finish();
-            return;
-        }
-
         // Check to display intro
         if (mIntroDone)
             displayConnection(true);
@@ -854,6 +846,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
             }
         });
+
+        // Create working sub folders
+        if (!Storage.createWorkingFolders(this))
+            Tools.criticalError(this, R.string.error_no_storage);
     }
 
     @Override
