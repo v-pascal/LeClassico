@@ -27,11 +27,15 @@ import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
-import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Errors;
+import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -45,6 +49,58 @@ import java.util.Date;
  */
 public final class Tools { /////////////////////////////////////////////////////////////////////////
 
+    public static class LoginReply {
+
+        public String pseudo; // Pseudo of the login
+        public String token; // Login token
+        public long timeLag; // Time lag between remote & local DB
+    }
+    public static boolean receiveLogin(String response, LoginReply loginRes) { // Receive login reply
+
+        Logs.add(Logs.Type.V, "response: " + response + ";loginRes: " + loginRes);
+        boolean result = false; ////// Reply error
+        try {
+
+            JSONObject reply = new JSONObject(response);
+            if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
+
+                // Login succeeded
+                JSONObject logged = reply.getJSONObject(WebServices.JSON_KEY_LOGGED);
+                loginRes.pseudo = logged.getString(WebServices.JSON_KEY_PSEUDO);
+                loginRes.token = logged.getString(WebServices.JSON_KEY_TOKEN);
+                loginRes.timeLag = logged.getLong(WebServices.JSON_KEY_TIME_LAG);
+
+                Logs.add(Logs.Type.I, "Logged with time lag: " + loginRes.timeLag);
+                result = true; ////// Reply succeeded
+
+            } else switch ((byte)reply.getInt(WebServices.JSON_KEY_ERROR)) {
+
+                case Errors.WEBSERVICE_TOKEN_EXPIRED:
+                case Errors.WEBSERVICE_LOGIN_FAILED: {
+
+                    Logs.add(Logs.Type.W, "Invalid login/token");
+                    loginRes.token = null; // Login failed or token expired (invalid)
+                    result = true; ////// Reply succeeded
+                    break;
+                }
+                // Error
+                case Errors.WEBSERVICE_SERVER_UNAVAILABLE:
+                case Errors.WEBSERVICE_INVALID_LOGIN:
+                case Errors.WEBSERVICE_SYSTEM_DATE: {
+
+                    Logs.add(Logs.Type.E, "Connection error: #" +
+                            reply.getInt(WebServices.JSON_KEY_ERROR));
+                    break;
+                }
+            }
+
+        } catch (JSONException e) {
+            Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+        }
+        return result;
+    }
+
+    //////
     private static float PROFILE_SIZE_RADIUS_FACTOR = 80f;
     public static void setProfile(final Activity activity, ImageView view, final boolean female,
                                   String profile, final int size, final boolean clickable) {
@@ -114,7 +170,7 @@ public final class Tools { /////////////////////////////////////////////////////
     // i.e: --/-- for the date & --:-- for the time
 
         Logs.add(Logs.Type.V, "context: " + context + ";date: " + date + ";time: " + time);
-        DateFormat paramFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
+        DateFormat paramFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
         try {
             Date paramDate = paramFormat.parse(dateTime);
             DateFormat dateFormat = new SimpleDateFormat(context.getString(R.string.format_date));
@@ -169,6 +225,7 @@ public final class Tools { /////////////////////////////////////////////////////
         }
     }
 
+    //////
     private static final short NOTIFY_WALL_TYPE_TEXT = 0;
     private static final short NOTIFY_WALL_TYPE_LINK = 1;
     private static final short NOTIFY_WALL_TYPE_IMAGE = 2;
@@ -216,7 +273,7 @@ public final class Tools { /////////////////////////////////////////////////////
 
         } else if (status == DataProvider.Synchronized.DONE.getValue()) { // Synchronized
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
             try {
                 Date syncDate = dateFormat.parse(date);
                 DateFormat userDate = android.text.format.DateFormat.getMediumDateFormat(context);
@@ -247,6 +304,7 @@ public final class Tools { /////////////////////////////////////////////////////
 
         return count;
     }
+
     public static int getEntryId(ContentResolver resolver, String table, String selection) {
     // Get entry Id on specific table and according selection criteria
     // NB: Returns NO_DATA if more than one record is found with selection criteria

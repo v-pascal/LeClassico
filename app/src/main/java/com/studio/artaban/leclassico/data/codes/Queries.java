@@ -21,8 +21,6 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class Queries {
 
-    public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss"; // Query date & time format
-
     ////// ID //////////////////////////////////////////////////////////////////////////////////////
 
     private static final int MAX_TABLE_ID = 255;

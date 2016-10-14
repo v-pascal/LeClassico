@@ -23,7 +23,6 @@ import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
-import com.studio.artaban.leclassico.data.codes.Errors;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.WebServices;
@@ -33,9 +32,6 @@ import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SyncValue;
 import com.studio.artaban.leclassico.tools.Tools;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -240,9 +236,10 @@ public class ConnectFragment extends RevealFragment {
 
         //
         private String mPseudo; // User pseudo used to connect with
-        private int mPseudoId; // User pseudo Id defined into local DB
         private String mToken; // Token provided by the web service to identify user
         private long mTimeLag; // Time laps between remote server & current OS (in sec)
+
+        private int mPseudoId; // User pseudo Id defined into local DB
 
         //////
         @Override
@@ -308,63 +305,28 @@ public class ConnectFragment extends RevealFragment {
                     if (!publishWaitProgress(STEP_LOGIN_ONLINE, true)) return Boolean.FALSE;
 
                     Date now = new Date();
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
 
                     ContentValues data = new ContentValues();
                     data.put(WebServices.CONNECTION_DATA_PSEUDO, mPseudo);
                     data.put(WebServices.CONNECTION_DATA_PASSWORD, password);
                     data.put(WebServices.CONNECTION_DATA_DATETIME, dateFormat.format(now));
 
+                    final Tools.LoginReply loginRes = new Tools.LoginReply();
                     Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
                             WebServices.URL_CONNECTION, data, new Internet.OnRequestListener() {
+
                         @Override
                         public boolean onReceiveReply(String response) {
-
                             Logs.add(Logs.Type.V, "response: " + response);
+
                             if (isStopped()) return Boolean.FALSE;
-                            boolean result = false; ////// Reply error
-                            try {
-
-                                JSONObject reply = new JSONObject(response);
-                                if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
-
-                                    // Login succeeded
-                                    JSONObject logged = reply.getJSONObject(WebServices.JSON_KEY_LOGGED);
-                                    mPseudo = logged.getString(WebServices.JSON_KEY_PSEUDO);
-                                    mToken = logged.getString(WebServices.JSON_KEY_TOKEN);
-                                    mTimeLag = logged.getLong(WebServices.JSON_KEY_TIME_LAG);
-
-                                    Logs.add(Logs.Type.I, "Logged with time lag: " + mTimeLag);
-                                    result = true; ////// Reply succeeded
-
-                                } else switch ((byte)reply.getInt(WebServices.JSON_KEY_ERROR)) {
-
-                                    case Errors.WEBSERVICE_LOGIN_FAILED: {
-
-                                        Logs.add(Logs.Type.W, "Login failed");
-                                        mToken = null; // Login failed
-                                        result = true; ////// Reply succeeded
-                                        break;
-                                    }
-                                    // Error
-                                    case Errors.WEBSERVICE_SERVER_UNAVAILABLE:
-                                    case Errors.WEBSERVICE_INVALID_LOGIN:
-                                    case Errors.WEBSERVICE_SYSTEM_DATE: {
-
-                                        Logs.add(Logs.Type.E, "Connection error: #" +
-                                                reply.getInt(WebServices.JSON_KEY_ERROR));
-                                        break;
-                                    }
-                                }
-
-                            } catch (JSONException e) {
-                                Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
-                            }
-                            return result; // Manage method reply (below)
+                            return Tools.receiveLogin(response, loginRes); // Manage method reply below
                         }
                     });
                     if (isStopped()) return Boolean.FALSE;
                     switch (result) {
+
                         case WRONG_URL:
                         case CONNECTION_FAILED:
                         case REPLY_ERROR: {
@@ -373,7 +335,12 @@ public class ConnectFragment extends RevealFragment {
                             publishProgress(STEP_ERROR);
                             return Boolean.FALSE;
                         }
-                        default: { ////// Reply succeeded
+                        default: { ////// Reply succeeded (check it)
+
+                            // Assign login result
+                            mPseudo = loginRes.pseudo;
+                            mToken = loginRes.token;
+                            mTimeLag = loginRes.timeLag;
 
                             // Check login result
                             if (mToken == null) { // Login failed
@@ -434,7 +401,10 @@ public class ConnectFragment extends RevealFragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
             Logs.add(Logs.Type.V, null);
+            mToken = null;
+            mTimeLag = 0;
 
             synchronized (stopped) { // Own cancel connection task management
                 stopped.set(false);

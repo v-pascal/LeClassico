@@ -153,7 +153,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         // Display the notification date separator (with notification date formatted as locale user)
 
             //Logs.add(Logs.Type.V, "viewDate: " + viewDate + ";date: " + date);
-            SimpleDateFormat dateFormat = new SimpleDateFormat(Queries.FORMAT_DATE_TIME);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
             try {
                 Date notifyDate = dateFormat.parse(date);
                 DateFormat user = android.text.format.DateFormat.getMediumDateFormat(getContext());
@@ -731,6 +731,18 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         Logs.add(Logs.Type.V, null);
 
         refresh(); // Refresh notification list
+
+
+
+
+
+
+        //mListener.onGetService()
+        // NullPointerException
+
+
+
+
 
         // Register content observer on user notification(s)
         mDataObserver.register(getContext().getContentResolver(), mNotifyUri);

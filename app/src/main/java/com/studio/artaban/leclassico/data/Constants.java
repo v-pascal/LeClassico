@@ -8,7 +8,8 @@ public final class Constants {
 
     public static final int NO_DATA = -1; // No value (integer)
 
-    ////// Application
+    ////// Application /////////////////////////////////////////////////////////////////////////////
+
     public static final String APP_NAME = "LeClassico"; // Application name
     public static final String APP_WEBSITE = "http://www.leclassico.fr/"; // Social network application web site
     public static final String APP_URI_COMPANY = "studio.artaban"; // Application company URI
@@ -20,8 +21,12 @@ public final class Constants {
     // Preference keys
     public static final String APP_PREFERENCE = APP_NAME + "Preferences"; // Application preference
 
+    ////// Format //////////////////////////////////////////////////////////////////////////////////
 
-    ////// Images
+    public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss"; // Date & time format
+
+    ////// Images //////////////////////////////////////////////////////////////////////////////////
+
     public static final int IMAGE_JPEG_QUALITY = 80; // Default stored JPEG file quality
     public static final int IMAGE_PNG_QUALITY = 80; // Default stored PNG file quality
 
@@ -29,8 +34,26 @@ public final class Constants {
     public static final String IMAGE_JPEG_EXTENSION = ".JPG";
     public static final String IMAGE_PNG_EXTENSION = ".PNG";
 
+    ////// Database ////////////////////////////////////////////////////////////////////////////////
 
-    ////// Introduction
+    public static final String DATA_CONTENT_URI = "com." + APP_URI_COMPANY + ".provider." + APP_URI; // DB content provider URI
+    public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field
+
+    public static final String DATA_DELETE_SELECTION = DATA_COLUMN_SYNCHRONIZED + '=' + DataProvider.Synchronized.TO_DELETE.getValue();
+    // Selection criteria to delete records from DB definitively
+
+    public static final int DATA_UNREAD = 0;
+    public static final int DATA_READ = 1;
+    // Read flags
+
+    ////// Service /////////////////////////////////////////////////////////////////////////////////
+
+    public static final int SERVICE_DELAY_TOKEN_UPDATE = 3600000; // Token update delay (in ms)
+
+
+
+    ////// Introduction ////////////////////////////////////////////////////////////////////////////
+
     public static final int INTRO_PAGE_COUNT = 5; // Introduction page count
 
     public static final int INTRO_BACKGROUND_IMAGE_HEIGHT = 507; // Fixed background image height (in pixel)
@@ -57,19 +80,8 @@ public final class Constants {
 
     public static final int INTRO_MARKER_IMAGE_HEIGHT = 100; // Fixed location marker image height (in pixel)
 
+    ////// Main ////////////////////////////////////////////////////////////////////////////////////
 
-    ////// Database
-    public static final String DATA_CONTENT_URI = "com." + APP_URI_COMPANY + ".provider." + APP_URI; // DB content provider URI
-    public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field
-
-    public static final String DATA_DELETE_SELECTION = DATA_COLUMN_SYNCHRONIZED + '=' + DataProvider.Synchronized.TO_DELETE.getValue();
-    // Selection criteria to delete records from DB definitively
-
-    public static final int DATA_UNREAD = 0;
-    public static final int DATA_READ = 1;
-    // Read flags
-
-    ////// Main
     public static final int MAIN_SECTION_HOME = 0;
     public static final int MAIN_SECTION_PUBLICATIONS = 1;
     public static final int MAIN_SECTION_EVENTS = 2;

@@ -1,17 +1,30 @@
 package com.studio.artaban.leclassico.connection;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Notify;
+import com.studio.artaban.leclassico.tools.Tools;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by pascal on 14/08/16.
@@ -55,45 +68,171 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         return true;
     }
 
-    ////// Broadcast actions
-    public static final String NEW_NOTIFICATIONS = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.NEW_NOTIFICATIONS";
-
-    public static final String NEW_PUBLICATIONS = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.NEW_PUBLICATIONS";
-    public static final String NEW_COMMENTS = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.NEW_COMMENTS";
-    public static final String NEW_MESSAGES = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.NEW_MESSAGES";
-    public static final String NEW_LOCATIONS = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.NEW_LOCATIONS";
-    public static final String NEW_EVENTS = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.NEW_EVENTS";
-
     ////// OnConnectivityListener //////////////////////////////////////////////////////////////////
     @Override
     public void onConnection() {
+        Logs.add(Logs.Type.V, null);
 
-
-
-
-
-        //if (mToken == null) // Working offline
-        //  use mPseudo to get CAM_CodeConf then connect
-
-
-
-
-
+        // Restart connection supervisor
+        stopConnectionSupervisor();
+        startConnectionSupervisor(true);
     }
     @Override
     public void onDisconnection() {
+        Logs.add(Logs.Type.V, null);
+        stopConnectionSupervisor();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void updateToken() { // Update token to keep connection active (or get token if null)
+
+        Logs.add(Logs.Type.V, null);
+        if (!Internet.isConnected())
+            return;
+
+        synchronized (mToken) {
+
+            Date now = new Date();
+            DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+            ContentValues data = new ContentValues();
+            data.put(WebServices.CONNECTION_DATA_DATETIME, dateFormat.format(now));
+
+            final Tools.LoginReply replyRes = new Tools.LoginReply();
+            Internet.OnRequestListener receiveListener = new Internet.OnRequestListener() {
+                @Override
+                public boolean onReceiveReply(String response) {
+
+                    Logs.add(Logs.Type.V, "response: " + response);
+                    return Tools.receiveLogin(response, replyRes); // Manage method reply below
+                }
+            };
+            if (mToken != null) {
+
+                ////// Update token
+                Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
+                                WebServices.URL_CONNECTION + '?' + WebServices.DATA_TOKEN + '=' + mToken,
+                        data, receiveListener);
+                switch (result) {
+
+                    case WRONG_URL:
+                    case CONNECTION_FAILED:
+                    case REPLY_ERROR: {
 
 
 
 
 
 
+                        Logs.add(Logs.Type.W, "Connection request failed");
+                        stopSelf(); // NB: This will close the application (at service binding)
+                        return;
+
+
+
+
+
+
+                    }
+                    default: { ////// Reply succeeded (check it)
+
+                        // Assign update result
+                        mPseudo = replyRes.pseudo;
+                        mToken = replyRes.token;
+                        mTimeLag = replyRes.timeLag;
+
+                        // Check update result
+                        if (mToken != null) {
+
+                            Logs.add(Logs.Type.I, "Token updated");
+                            return;
+                        }
+                        Logs.add(Logs.Type.W, "Token expired");
+                        break; // Try to get a new one (below)
+                    }
+                }
+            }
+            Cursor cursor = getContentResolver().query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                    new String[]{CamaradesTable.COLUMN_CODE_CONF}, CamaradesTable.COLUMN_PSEUDO + "='" +
+                            mPseudo + '\'', null, null);
+            cursor.moveToFirst();
+            String password = cursor.getString(0);
+            cursor.close();
+
+            data.put(WebServices.CONNECTION_DATA_PSEUDO, mPseudo);
+            data.put(WebServices.CONNECTION_DATA_PASSWORD, password);
+
+            ////// Get token (or new token)
+            Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
+                    WebServices.URL_CONNECTION, data, receiveListener);
+            switch (result) {
+
+                case WRONG_URL:
+                case CONNECTION_FAILED:
+                case REPLY_ERROR: {
+
+
+
+
+
+
+                    Logs.add(Logs.Type.W, "Connection request failed");
+                    stopSelf(); // NB: This will close the application (at service binding)
+                    return;
+
+
+
+
+                }
+                default: { ////// Reply succeeded (check it)
+
+                    // Assign login result
+                    mPseudo = replyRes.pseudo;
+                    mToken = replyRes.token;
+                    mTimeLag = replyRes.timeLag;
+
+                    // Check login result
+
+
+
+
+
+                    if (mToken != null) {
+
+                        Logs.add(Logs.Type.I, "Token updated");
+                        return;
+                    }
+                    Logs.add(Logs.Type.W, "Token expired");
+                    break; // Try to get a new one (below)
+
+
+
+
+
+
+                }
+            }
+        }
+    }
+
+    //
+    private void startConnectionSupervisor(boolean now) {
+
+        Logs.add(Logs.Type.V, "now: " + now);
+        mTokenTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+
+                    Logs.add(Logs.Type.V, null);
+                    updateToken();
+                }
+            }, (now)? 0 : Constants.SERVICE_DELAY_TOKEN_UPDATE,
+                Constants.SERVICE_DELAY_TOKEN_UPDATE);
+    }
+    private void stopConnectionSupervisor() {
+        Logs.add(Logs.Type.V, null);
+        mTokenTimer.cancel();
+        mTokenTimer.purge();
     }
 
     //////
@@ -106,7 +245,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     //
     private String mToken; // Token used to identify the user when requesting remote DB
-    private long mTimeLag; // Time lag between remote DB & current OS (in milliseconds)
+    private final Timer mTokenTimer = new Timer(); // Timer used to update token (connection supervisor)
+    private long mTimeLag; // Time lag between remote DB & current OS (in ms)
                            // NB: Will be updated at every remote requests coz OS date & time can changed
 
     private String mPseudo;
@@ -141,16 +281,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
         Notify.update(this, Notify.Type.EVENT, null, notifyData);
 
-
-
-
-
-
-
-
-
-
-
+        // Start connection supervisor (if connected)
+        if (Internet.isConnected())
+            startConnectionSupervisor(false);
 
         return START_NOT_STICKY;
     }
@@ -163,12 +296,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         isRunning = false;
 
         Notify.cancel(this); // Remove notification
-
-
-
-
-
-
-
+        stopConnectionSupervisor(); // Cancel token update
     }
 }
