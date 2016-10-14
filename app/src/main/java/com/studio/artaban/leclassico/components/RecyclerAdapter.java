@@ -59,6 +59,14 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         return mDataSource;
     }
 
+    ////// SwapResult //////////////////////////////////////////////////////////////////////////////
+    public static class SwapResult {
+
+        public boolean firstChanged = false; // First item change flag
+        public int countChanged = 0; // Item change only count (NO_DATA when item added or removed)
+        public final ArrayList<Integer> columnChanged = new ArrayList<>(); // Item column change indexes
+    }
+
     ////// DataView ////////////////////////////////////////////////////////////////////////////////
     public static class DataView {
 
@@ -131,22 +139,24 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             clear();
             fill(cursor, mData);
         }
-        public boolean swap(RecyclerAdapter adapter, Cursor cursor, boolean below) {
-        // Swap data with new cursor then notify recycler adapter accordingly (return first item change)
+        public SwapResult swap(RecyclerAdapter adapter, Cursor cursor, boolean below) {
+        // Swap data with new cursor then notify recycler adapter accordingly
 
             Logs.add(Logs.Type.V, "adapter: " + adapter + ";cursor: " + cursor + ";below: " + below);
             ArrayList<ArrayList<Object>> newData = new ArrayList<>();
             fill(cursor, newData);
 
-            boolean firstChanged = false; // First item changed flag (result)
+            SwapResult swapResult = new SwapResult();
 
             ////// Remove entries (if needed)
             ArrayList<Integer> toDo = new ArrayList<>();
             for (int i = 0; i < mData.size(); ++i) {
                 if (find(newData, mColumnKey, mData.get(i).get(mColumnKey)) == Constants.NO_DATA) {
-                    toDo.add(i);
+                    swapResult.countChanged = Constants.NO_DATA;
                     if (i == 0)
-                        firstChanged = true;
+                        swapResult.firstChanged = true;
+
+                    toDo.add(i);
                 }
             }
             for (int i = 0; i < toDo.size(); ++i) {
@@ -177,9 +187,11 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             toDo.clear();
             for (int i = 0; i < newData.size(); ++i) {
                 if (find(mData, mColumnKey, newData.get(i).get(mColumnKey)) == Constants.NO_DATA) {
-                    toDo.add(i);
+                    swapResult.countChanged = Constants.NO_DATA;
                     if (i == 0)
-                        firstChanged = true;
+                        swapResult.firstChanged = true;
+
+                    toDo.add(i);
                 }
             }
             for (int i = 0; i < toDo.size(); ++i) {
@@ -212,6 +224,10 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 if (!equal(mData.get(i).get(mColumnKey), newData.get(i).get(mColumnKey))) {
                     // Entry not in same position
 
+                    swapResult.countChanged = Constants.NO_DATA;
+                    if (i == 0)
+                        swapResult.firstChanged = true;
+
                     int newPosition = find(newData, mColumnKey, mData.get(i).get(mColumnKey));
                     Collections.swap(mData, i, newPosition);
                     adapter.notifyItemMoved(i, newPosition);
@@ -223,8 +239,6 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                         if (mData.size() > ++newPosition)
                             adapter.notifyItemChanged(newPosition);
                     }
-                    if (i == 0)
-                        firstChanged = true;
                 }
             }
 
@@ -235,11 +249,19 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
                     // Check if entry has changed
                     if (!equal(mData.get(i).get(j), newData.get(i).get(j))) {
+                        if ((swapResult.countChanged > Constants.NO_DATA) &&
+                                (!swapResult.columnChanged.contains(j)))
+                            swapResult.columnChanged.add(j);
                         if (i == 0)
-                            firstChanged = true;
+                            swapResult.firstChanged = true;
 
                         mData.get(i).set(j, newData.get(i).get(j));
-                        toDo.add(i);
+                        if (!toDo.contains(i)) {
+                            if (swapResult.countChanged > Constants.NO_DATA)
+                                ++swapResult.countChanged;
+
+                            toDo.add(i);
+                        }
                     }
                 }
             }
@@ -258,7 +280,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 else // Single
                     adapter.notifyItemChanged(toDo.get(i));
             }
-            return firstChanged;
+            return swapResult;
         }
 
         public boolean isNull(int rank, int column) {

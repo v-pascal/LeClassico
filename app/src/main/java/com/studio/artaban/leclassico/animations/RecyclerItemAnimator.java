@@ -223,6 +223,25 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         }
     }
 
+    //////
+    private int mDisableCount = 0; // Change animation count to disable
+    public void setDisableChangeAnimations(int count) {
+
+        Logs.add(Logs.Type.V, "count: " + count);
+        if (count > 0)
+            mDisableCount = count;
+        else
+            throw new IllegalArgumentException("Disable change animation count must be > 0");
+    }
+
+    private boolean decreaseDisableChangeAnimations() {
+        //Logs.add(Logs.Type.V, null);
+        if (mDisableCount == 0)
+            return false; // Enable
+
+        return (mDisableCount-- > 0);
+    }
+
     ////// SimpleItemAnimator //////////////////////////////////////////////////////////////////////
     @Override
     public boolean animateRemove(ViewHolder holder) {
@@ -267,7 +286,17 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         //Logs.add(Logs.Type.V, "oldHolder: " + oldHolder + ";newHolder: " + newHolder +
         //        ";fromLeft: " + fromLeft + ";fromTop: " + fromTop + ";toLeft: " + toLeft +
         //        ";toTop: " + toTop);
+        if (decreaseDisableChangeAnimations()) {
 
+            dispatchChangeStarting(oldHolder, true);
+            dispatchChangeStarting(newHolder, false);
+            dispatchChangeFinished(oldHolder, true);
+            dispatchChangeFinished(newHolder, false);
+            if (mDisableCount == 0)
+                dispatchAnimationsFinished();
+
+            return false;
+        }
         ChangeInfo changeInfo = new ChangeInfo(oldHolder, newHolder, fromLeft, fromTop, toLeft, toTop);
         mMaker.onPrepare(changeInfo);
         mPendingChanges.add(changeInfo);
@@ -517,6 +546,10 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
         }
         for (int i = mPendingChanges.size() - 1; i > Constants.NO_DATA; --i)
             endChangeAnimationIfNeeded(mPendingChanges.get(i));
+
+        mPendingMoves.clear();
+        mPendingRemovals.clear();
+        mPendingAdditions.clear();
         mPendingChanges.clear();
 
         // Remove processing animations
@@ -550,6 +583,9 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
                     mProcessingChanges.remove(changes);
             }
         }
+        mProcessingMoves.clear();
+        mProcessingAdditions.clear();
+        mProcessingChanges.clear();
 
         // Stop current animations (started)
         for (ViewHolder holder : mStartedRemovals)

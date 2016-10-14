@@ -63,6 +63,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
                 null);
         // NB: Let's the content observer refresh notification list (see mDataObserver use)
+        // WARNING: This code above is in UI thread!
     }
 
     //////
@@ -362,19 +363,13 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
     ////// OnContentListener ///////////////////////////////////////////////////////////////////////
     @Override
-    public void onChange(boolean selfChange, final Uri uri) {
+    public void onChange(boolean selfChange, Uri uri) {
     // WARNING: Not in UI thread
 
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
-                // Enable or disable item change animation according if only synchronization flag has changed
-                ((RecyclerItemAnimator)mNotifyList.getItemAnimator()) // Single URI only used in this case
-                        .setSupportsChangeAnimations(Uris.getUriTableId(uri) != Uris.ID_MAIN_NOTIFY_SINGLE);
-
-                // Refresh notification list
                 refresh();
             }
         });
@@ -394,20 +389,33 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             case Queries.MAIN_NOTIFICATIONS: {
                 mQueryCount = (short)cursor.getCount();
 
-                // Register content observer on each notification
-                mDataObserver.register(getContext().getContentResolver(), cursor, mNotifyUri, COLUMN_INDEX_NOTIFY_ID);
-
                 // Check if not the initial query
                 if (mNotifyAdapter != null) {
                     Logs.add(Logs.Type.I, "Query update");
 
+                    ////// Update notification list
                     if (mNotifyList.getAdapter() == null)
                         mNotifyList.setAdapter(mNotifyAdapter);
+                    RecyclerAdapter.SwapResult swapResult =
+                            mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor, true);
 
-                    // Update notification list
-                    if (mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor, true)) { // First changed
+                    // Check if only change notification(s) on synchronization fields
+                    boolean syncFieldsOnly = swapResult.countChanged > 0;
+                    for (int i = 0; i < swapResult.columnChanged.size(); ++i) {
+                        if ((swapResult.columnChanged.get(i) != COLUMN_INDEX_SYNC) &&
+                                (swapResult.columnChanged.get(i) != COLUMN_INDEX_STATUS_DATE)) {
 
-                        // Update shortcut (new)
+                            syncFieldsOnly = false;
+                            break;
+                        }
+                    }
+                    if (syncFieldsOnly) // Disable change animations (only sync fields have changed)
+                        ((RecyclerItemAnimator)mNotifyList.getItemAnimator())
+                                .setDisableChangeAnimations(swapResult.countChanged);
+
+                    if ((!syncFieldsOnly) && (swapResult.firstChanged)) { // First notification has changed
+
+                        ////// Update shortcut (the new one)
                         fillShortcut(cursor, true);
                         mListener.onAnimateShortcut(Constants.MAIN_SECTION_NOTIFICATIONS,
                                 new OnFragmentListener.OnAnimationListener() {
@@ -424,19 +432,16 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                     } else
                         cursor.close();
 
-                    // Enable item change animation
-                    ((RecyclerItemAnimator)mNotifyList.getItemAnimator()).setSupportsChangeAnimations(true);
-
                 } else {
                     Logs.add(Logs.Type.I, "Initial query");
 
-                    // Fill notification list
-                    mNotifyAdapter =
-                            new NotifyRecyclerViewAdapter(R.layout.layout_notification_item, COLUMN_INDEX_NOTIFY_ID);
+                    ////// Fill notification list
+                    mNotifyAdapter = new NotifyRecyclerViewAdapter(R.layout.layout_notification_item,
+                            COLUMN_INDEX_NOTIFY_ID);
                     mNotifyAdapter.getDataSource().fill(cursor);
                     mNotifyList.setAdapter(mNotifyAdapter);
 
-                    // Fill shortcut
+                    ////// Fill shortcut
                     fillShortcut(cursor, false);
                     cursor.close();
                 }
@@ -725,8 +730,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         super.onResume();
         Logs.add(Logs.Type.V, null);
 
-        // Refresh notification list
-        refresh();
+        refresh(); // Refresh notification list
+
+        // Register content observer on user notification(s)
+        mDataObserver.register(getContext().getContentResolver(), mNotifyUri);
     }
 
     @Override

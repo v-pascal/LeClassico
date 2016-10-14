@@ -215,12 +215,14 @@ public class DataProvider extends ContentProvider {
         long id = mDB.getDB().insert(table, null, values);
         if (id > Constants.NO_DATA) {
 
-            // Notify observers with URI passed in parameter
-            getContext().getContentResolver().notifyChange(uri, null);
-            if (particularUri) // Notify observers with common table URI (particular URI parameter)
-                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + table), null);
+            Uri result = ContentUris.withAppendedId(uri, id); // Add new Id into URI result
 
-            return ContentUris.withAppendedId(uri, id);
+            // Notify observers with URI passed in parameter
+            getContext().getContentResolver().notifyChange(result, null);
+            if (particularUri) // Notify observers with common table URI (particular URI parameter)
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + table + '/' + id), null);
+
+            return result;
         }
         return null;
     }

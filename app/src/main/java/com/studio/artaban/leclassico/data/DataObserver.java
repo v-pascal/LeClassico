@@ -2,7 +2,6 @@ package com.studio.artaban.leclassico.data;
 
 import android.content.ContentResolver;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 
@@ -24,20 +23,6 @@ public class DataObserver extends ContentObserver {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";path: " + path);
         resolver.registerContentObserver(Uri.parse(DataProvider.CONTENT_URI + path), true, this);
     }
-    public void register(ContentResolver resolver, Cursor cursor, String path, int columnId) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";cursor: " + cursor + ";path: " + path +
-                ";columnId: " + columnId);
-        if (cursor.moveToFirst()) {
-            do {
-                resolver.registerContentObserver(
-                        Uri.parse(DataProvider.CONTENT_URI + path + '/' + cursor.getInt(columnId)),
-                        false, this);
-
-            } while (cursor.moveToNext());
-        }
-        cursor.moveToFirst();
-    }
-
     public void unregister(ContentResolver resolver) {
         Logs.add(Logs.Type.V, "resolver: " + resolver);
         resolver.unregisterContentObserver(this);
