@@ -336,11 +336,7 @@ public class ConnectFragment extends RevealFragment {
                             return Boolean.FALSE;
                         }
                         default: { ////// Reply succeeded (check it)
-
-                            // Assign login result
-                            mPseudo = loginRes.pseudo;
                             mToken = loginRes.token;
-                            mTimeLag = loginRes.timeLag;
 
                             // Check login result
                             if (mToken == null) { // Login failed
@@ -348,6 +344,9 @@ public class ConnectFragment extends RevealFragment {
                                 return Boolean.FALSE;
                             }
                             //else ////// Login succeeded
+
+                            mPseudo = loginRes.pseudo;
+                            mTimeLag = loginRes.timeLag;
                             break;
                         }
                     }

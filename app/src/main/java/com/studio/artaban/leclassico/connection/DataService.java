@@ -85,7 +85,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void updateToken() { // Update token to keep connection active (or get token if null)
+    private void updateToken() { // Update token to keep connection active (or get it if null)
 
         Logs.add(Logs.Type.V, null);
         if (!Internet.isConnected())
@@ -104,10 +104,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 public boolean onReceiveReply(String response) {
 
                     Logs.add(Logs.Type.V, "response: " + response);
-                    return Tools.receiveLogin(response, replyRes); // Manage method reply below
+                    return Tools.receiveLogin(response, replyRes); // Manage method reply (below use)
                 }
             };
             if (mToken != null) {
+                Logs.add(Logs.Type.I, "Update token (" + mToken + ")");
 
                 ////// Update token
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
@@ -119,39 +120,26 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     case CONNECTION_FAILED:
                     case REPLY_ERROR: {
 
-
-
-
-
-
-                        Logs.add(Logs.Type.W, "Connection request failed");
-                        stopSelf(); // NB: This will close the application (at service binding)
-                        return;
-
-
-
-
-
-
+                        Logs.add(Logs.Type.E, "Token request failed");
+                        return; // Nothing to do...
                     }
                     default: { ////// Reply succeeded (check it)
-
-                        // Assign update result
-                        mPseudo = replyRes.pseudo;
                         mToken = replyRes.token;
-                        mTimeLag = replyRes.timeLag;
 
                         // Check update result
                         if (mToken != null) {
+                            Logs.add(Logs.Type.I, "Token updated (" + mToken + ")");
 
-                            Logs.add(Logs.Type.I, "Token updated");
-                            return;
+                            mPseudo = replyRes.pseudo;
+                            mTimeLag = replyRes.timeLag;
+                            return; ////// OK
                         }
-                        Logs.add(Logs.Type.W, "Token expired");
+                        Logs.add(Logs.Type.W, "Token expired/invalid");
                         break; // Try to get a new one (below)
                     }
                 }
             }
+            Logs.add(Logs.Type.I, "Get new token");
             Cursor cursor = getContentResolver().query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                     new String[]{CamaradesTable.COLUMN_CODE_CONF}, CamaradesTable.COLUMN_PSEUDO + "='" +
                             mPseudo + '\'', null, null);
@@ -162,7 +150,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             data.put(WebServices.CONNECTION_DATA_PSEUDO, mPseudo);
             data.put(WebServices.CONNECTION_DATA_PASSWORD, password);
 
-            ////// Get token (or new token)
+            ////// Get new token
             Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
                     WebServices.URL_CONNECTION, data, receiveListener);
             switch (result) {
@@ -171,45 +159,29 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 case CONNECTION_FAILED:
                 case REPLY_ERROR: {
 
-
-
-
-
-
-                    Logs.add(Logs.Type.W, "Connection request failed");
-                    stopSelf(); // NB: This will close the application (at service binding)
+                    Logs.add(Logs.Type.W, "Login request failed");
                     return;
-
-
-
-
                 }
                 default: { ////// Reply succeeded (check it)
-
-                    // Assign login result
-                    mPseudo = replyRes.pseudo;
                     mToken = replyRes.token;
-                    mTimeLag = replyRes.timeLag;
 
                     // Check login result
-
-
-
-
-
                     if (mToken != null) {
+                        Logs.add(Logs.Type.I, "Token created");
 
-                        Logs.add(Logs.Type.I, "Token updated");
-                        return;
+                        mPseudo = replyRes.pseudo;
+                        mTimeLag = replyRes.timeLag;
+                        ////// OK
+
+                    } else {
+                        Logs.add(Logs.Type.F, "Login failed");
+
+                        stopSelf();
+                        // NB: This will close the application (at service binding). The user has been
+                        //     connected offline using local DB but not exist in remote DB. Let's the
+                        //     user to reconnect by entering new login (if any).
                     }
-                    Logs.add(Logs.Type.W, "Token expired");
-                    break; // Try to get a new one (below)
-
-
-
-
-
-
+                    break;
                 }
             }
         }

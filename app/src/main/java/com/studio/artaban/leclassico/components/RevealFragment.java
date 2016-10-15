@@ -82,23 +82,33 @@ public class RevealFragment extends Fragment {
                     Logs.add(Logs.Type.V, null);
                     int deltaX = mRootView.getWidth() >> 1;
                     int deltaY = mRootView.getHeight() >> 1;
+                    try {
 
-                    Animator anim = ViewAnimationUtils.createCircularReveal(mRootView, deltaX, deltaY,
-                            0, (float) Math.hypot(deltaX, deltaY));
-                    if (mListener != null)
-                        anim.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
+                        Animator anim = ViewAnimationUtils.createCircularReveal(mRootView, deltaX, deltaY,
+                                0, (float) Math.hypot(deltaX, deltaY));
+                        if (mListener != null)
+                            anim.addListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
 
-                                Logs.add(Logs.Type.V, "animation: " + animation);
-                                mListener.onRevealEnd();
-                            }
-                        });
+                                    Logs.add(Logs.Type.V, "animation: " + animation);
+                                    mListener.onRevealEnd();
+                                }
+                            });
 
-                    anim.setDuration(mDuration);
-                    mRootView.setVisibility(View.VISIBLE);
-                    anim.start();
+                        anim.setDuration(mDuration);
+                        mRootView.setVisibility(View.VISIBLE);
+                        anim.start();
+
+                    } catch (IllegalStateException e) {
+                        Logs.add(Logs.Type.W, "Fragment root view is not attached yet");
+
+                        // Display fragment without animation
+                        mRootView.setVisibility(View.VISIBLE);
+                        if (mListener != null)
+                            mListener.onRevealEnd();
+                    }
                 }
             });
             mReveal = false;

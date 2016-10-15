@@ -48,7 +48,7 @@ public final class Constants {
 
     ////// Service /////////////////////////////////////////////////////////////////////////////////
 
-    public static final int SERVICE_DELAY_TOKEN_UPDATE = 3600000; // Token update delay (in ms)
+    public static final int SERVICE_DELAY_TOKEN_UPDATE = 3600000; // Token update delay < 3 hours (in ms)
 
 
 
