@@ -68,6 +68,38 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         return true;
     }
 
+
+
+
+
+
+
+    /*
+    ////// Broadcast actions
+    public static final String NEW_NOTIFICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.NEW_NOTIFICATIONS";
+    public static final String NEW_PUBLICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.NEW_PUBLICATIONS";
+    public static final String NEW_COMMENTS = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.NEW_COMMENTS";
+    public static final String NEW_MESSAGES = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.NEW_MESSAGES";
+    public static final String NEW_LOCATIONS = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.NEW_LOCATIONS";
+    public static final String NEW_EVENTS = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.NEW_EVENTS";
+
+    ////// Broadcast extra data
+    public static final String EXTRA_BROADCAST_URI = "uri";
+    */
+
+
+
+
+
+
+
+
     ////// OnConnectivityListener //////////////////////////////////////////////////////////////////
     @Override
     public void onConnection() {

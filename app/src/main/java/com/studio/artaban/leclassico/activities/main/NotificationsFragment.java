@@ -53,17 +53,20 @@ import java.util.Date;
 public class NotificationsFragment extends MainFragment implements QueryLoader.OnResultListener {
 
     public void read() { // Mark unread notification(s) as read
+
+        // WARNING: Code below is in UI thread!
         Logs.add(Logs.Type.V, null);
 
         ContentValues values = new ContentValues();
         values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
-        getContext().getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + mNotifyUri),
+        getContext().getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
                 values, NotificationsTable.COLUMN_PSEUDO + "='" +
                         getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) +
                         "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
                 null);
-        // NB: Let's the content observer refresh notification list (see mDataObserver use)
-        // WARNING: This code above is in UI thread!
+
+        // Notify notifications URI to refresh notification list
+        getContext().getContentResolver().notifyChange(mNotifyUri, null);
     }
 
     //////
@@ -376,7 +379,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     }
 
     //
-    private String mNotifyUri; // Notification URI path (see Uris.PATH_MAIN_NOTIFICATIONS)
+    private Uri mNotifyUri; // Notifications URI
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -583,12 +586,10 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         super.onAttach(context);
         Logs.add(Logs.Type.V, "context: " + context);
 
-        mNotifyUri = Uris.PATH_PSEUDO +
-                getActivity().getIntent().getIntExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO_ID, 0) + '/' +
-                NotificationsTable.TABLE_NAME;
-
         mListLoader = new QueryLoader(context, this);
         mMaxLoader = new QueryLoader(context, this);
+        mNotifyUri = Uris.getUri(Uris.URI_USER_NOTIFICATIONS, String.valueOf(getActivity().getIntent()
+                .getIntExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO_ID, 0)));
     }
 
     @Override
@@ -732,20 +733,27 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         refresh(); // Refresh notification list
 
-
-
-
-
-
-        //mListener.onGetService()
-        // NullPointerException
-
-
-
-
-
         // Register content observer on user notification(s)
         mDataObserver.register(getContext().getContentResolver(), mNotifyUri);
+
+
+
+
+
+
+
+
+
+        //Intent notifyIntent = new Intent(DataService.);
+        //getContext().sendBroadcast(notifyIntent);
+
+
+
+
+
+
+
+
     }
 
     @Override

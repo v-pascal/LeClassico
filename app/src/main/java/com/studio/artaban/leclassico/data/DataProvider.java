@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.studio.artaban.leclassico.data.codes.Tables;
-import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
@@ -196,18 +195,12 @@ public class DataProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         Logs.add(Logs.Type.V, null);
-        boolean particularUri = false;
 
         // Open database (if not already opened)
         if (!mDB.isOpened())
             mDB.open(true);
 
         String table = getUriTable(URI_MATCHER, uri);
-        if (table == null) { // Check particular URI
-
-            particularUri = true;
-            table = Uris.getUriTable(uri);
-        }
         if (table == null)
             throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
@@ -217,11 +210,8 @@ public class DataProvider extends ContentProvider {
 
             Uri result = ContentUris.withAppendedId(uri, id); // Add new Id into URI result
 
-            // Notify observers with URI passed in parameter
+            // Notify observers
             getContext().getContentResolver().notifyChange(result, null);
-            if (particularUri) // Notify observers with common table URI (particular URI parameter)
-                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + table + '/' + id), null);
-
             return result;
         }
         return null;
@@ -230,7 +220,6 @@ public class DataProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         Logs.add(Logs.Type.V, null);
-        boolean particularUri = false;
 
         // Open database (if not already opened)
         if (!mDB.isOpened())
@@ -243,11 +232,6 @@ public class DataProvider extends ContentProvider {
         else {
 
             table = getUriTable(URI_MATCHER, uri);
-            if (table == null) {
-
-                particularUri = true;
-                table = Uris.getUriTable(uri);
-            }
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
@@ -265,8 +249,6 @@ public class DataProvider extends ContentProvider {
             result = mDB.getDB().update(table, values, selection, selectionArgs);
 
             getContext().getContentResolver().notifyChange(uri, null);
-            if (particularUri)
-                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + table), null);
 
         } else
             result = mDB.getDB().delete(table, selection, selectionArgs);
@@ -278,7 +260,6 @@ public class DataProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Logs.add(Logs.Type.V, null);
-        boolean particularUri = false;
 
         // Open database (if not already opened)
         if (!mDB.isOpened())
@@ -291,11 +272,6 @@ public class DataProvider extends ContentProvider {
         else {
 
             table = getUriTable(URI_MATCHER, uri);
-            if (table == null) {
-
-                particularUri = true;
-                table = Uris.getUriTable(uri);
-            }
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
         }
@@ -308,8 +284,6 @@ public class DataProvider extends ContentProvider {
         if (result > 0) {
 
             getContext().getContentResolver().notifyChange(uri, null);
-            if (particularUri)
-                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + table), null);
         }
         return result; // Return updated entries count
     }

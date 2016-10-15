@@ -13,20 +13,25 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class DataObserver extends ContentObserver {
 
-    public interface OnContentListener {
-        void onChange(boolean selfChange, Uri uri);
+    public void register(ContentResolver resolver, Uri uri) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";uri: " + uri);
+        resolver.registerContentObserver(uri, true, this);
     }
-    private OnContentListener mListener; // Registered content listener
-
-    //////
     public void register(ContentResolver resolver, String path) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";path: " + path);
         resolver.registerContentObserver(Uri.parse(DataProvider.CONTENT_URI + path), true, this);
     }
+
     public void unregister(ContentResolver resolver) {
         Logs.add(Logs.Type.V, "resolver: " + resolver);
         resolver.unregisterContentObserver(this);
     }
+
+    //////
+    public interface OnContentListener {
+        void onChange(boolean selfChange, Uri uri);
+    }
+    private OnContentListener mListener; // Registered content listener
 
     //
     public DataObserver(Handler handler, OnContentListener listener) {
