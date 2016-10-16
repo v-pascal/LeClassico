@@ -1,9 +1,11 @@
 package com.studio.artaban.leclassico.connection;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
@@ -68,13 +70,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         return true;
     }
 
-
-
-
-
-
-
-    /*
     ////// Broadcast actions
     public static final String NEW_NOTIFICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
             Constants.APP_URI + ".action.NEW_NOTIFICATIONS";
@@ -89,16 +84,21 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final String NEW_EVENTS = "com." + Constants.APP_URI_COMPANY + "." +
             Constants.APP_URI + ".action.NEW_EVENTS";
 
-    ////// Broadcast extra data
-    public static final String EXTRA_BROADCAST_URI = "uri";
-    */
+    //
+    private final DataReceiver mDataReceiver = new DataReceiver(); // Data broadcast receiver
+    private class DataReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
 
 
 
 
 
 
-
+        }
+    }
 
     ////// OnConnectivityListener //////////////////////////////////////////////////////////////////
     @Override
@@ -288,6 +288,14 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         // Start connection supervisor (if connected)
         if (Internet.isConnected())
             startConnectionSupervisor(false);
+
+        // Set broadcast receiver
+        registerReceiver(mDataReceiver, new IntentFilter(NEW_NOTIFICATIONS));
+        registerReceiver(mDataReceiver, new IntentFilter(NEW_PUBLICATIONS));
+        registerReceiver(mDataReceiver, new IntentFilter(NEW_COMMENTS));
+        registerReceiver(mDataReceiver, new IntentFilter(NEW_MESSAGES));
+        registerReceiver(mDataReceiver, new IntentFilter(NEW_LOCATIONS));
+        registerReceiver(mDataReceiver, new IntentFilter(NEW_EVENTS));
 
         return START_NOT_STICKY;
     }

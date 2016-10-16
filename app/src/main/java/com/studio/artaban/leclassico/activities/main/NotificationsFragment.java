@@ -588,7 +588,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         mListLoader = new QueryLoader(context, this);
         mMaxLoader = new QueryLoader(context, this);
-        mNotifyUri = Uris.getUri(Uris.URI_USER_NOTIFICATIONS, String.valueOf(getActivity().getIntent()
+        mNotifyUri = Uris.getUri(Uris.USER_NOTIFICATIONS.URI_ID, String.valueOf(getActivity().getIntent()
                 .getIntExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO_ID, 0)));
     }
 
