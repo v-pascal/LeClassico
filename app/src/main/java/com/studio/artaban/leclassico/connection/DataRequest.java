@@ -17,6 +17,7 @@ public abstract class DataRequest extends TimerTask {
 
     // Extra data keys
     public static final String EXTRA_DATA_URI = "uri";
+    public static final String EXTRA_DATA_DATE = "date";
 
     //////
     protected DataService mService; // Data service
@@ -33,7 +34,7 @@ public abstract class DataRequest extends TimerTask {
     public boolean register(Intent intent) { // Register URI observer (if not already done)
         Logs.add(Logs.Type.V, "intent: " + intent);
 
-        Uri uri = Uri.parse(intent.getStringExtra(EXTRA_DATA_URI));
+        Uri uri = intent.getParcelableExtra(EXTRA_DATA_URI);
         synchronized (mRegister) {
             if (!mRegister.contains(uri)) {
                 boolean stopped = mRegister.isEmpty();
@@ -41,21 +42,25 @@ public abstract class DataRequest extends TimerTask {
                 mRegister.add(uri);
                 register(intent.getExtras());
                 return stopped; // Schedule request timer (if not already the case)
-            }
+
+            } else
+                Logs.add(Logs.Type.W, "Data request already registered: " + uri);
         }
         return false;
     }
     public void unregister(Intent intent) { // Unregister URI observer
         Logs.add(Logs.Type.V, "intent: " + intent);
 
-        Uri uri = Uri.parse(intent.getStringExtra(EXTRA_DATA_URI));
+        Uri uri = intent.getParcelableExtra(EXTRA_DATA_URI);
         synchronized (mRegister) {
             if (mRegister.remove(uri)) {
 
                 unregister(uri);
                 if (mRegister.isEmpty())
                     cancel();
-            }
+
+            } else
+                Logs.add(Logs.Type.W, "Failed to unregister data request: " + uri);
         }
     }
 

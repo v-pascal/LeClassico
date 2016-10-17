@@ -87,7 +87,7 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
         mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setInfo(data);
 
         // Load shortcut info (using query loaders)
-        String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO);
+        String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO);
         Bundle shortcutData = new Bundle();
         shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")," +

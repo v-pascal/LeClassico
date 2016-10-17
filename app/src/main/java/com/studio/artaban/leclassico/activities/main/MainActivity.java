@@ -1,7 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.content.DialogInterface;
-import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -60,9 +59,9 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
         MainFragment.OnFragmentListener {
 
-    public static final String EXTRA_DATA_KEY_ONLINE = "online";
-    public static final String EXTRA_DATA_KEY_PSEUDO = "pseudo";
-    public static final String EXTRA_DATA_KEY_PSEUDO_ID = "pseudoId";
+    public static final String EXTRA_DATA_ONLINE = "online";
+    public static final String EXTRA_DATA_PSEUDO = "pseudo";
+    public static final String EXTRA_DATA_PSEUDO_ID = "pseudoId";
     // Extra data keys
 
     private static int getShortcutID(int section, boolean newItem) {
@@ -215,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void refresh() { // Set or refresh activity info (starting or restarting queries)
         Logs.add(Logs.Type.V, null);
-        String pseudo = getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO);
+        String pseudo = getIntent().getStringExtra(EXTRA_DATA_PSEUDO);
 
         // Load user & notification data (using query loaders)
         Bundle userData = new Bundle();
@@ -354,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements
                 ((NotificationsFragment) MainFragment.getBySection(Constants.MAIN_SECTION_NOTIFICATIONS))
                         .read();
                 ((HomeFragment) MainFragment.getBySection(Constants.MAIN_SECTION_HOME))
-                        .refresh(getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO));
+                        .refresh(getIntent().getStringExtra(EXTRA_DATA_PSEUDO));
                 refresh();
 
                 // Hide floating action button
@@ -480,7 +479,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Display user pseudo, profile icon & banner
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo))
-                .setText(getIntent().getStringExtra(EXTRA_DATA_KEY_PSEUDO));
+                .setText(getIntent().getStringExtra(EXTRA_DATA_PSEUDO));
         refresh();
 
         // Set content view pager

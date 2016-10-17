@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -37,24 +38,31 @@ public class NotificationsRequest extends DataRequest {
 
     @Override
     public void request(Bundle data) {
+
         Logs.add(Logs.Type.V, "data: " + data);
+        if (!Internet.isConnected())
+            return; // Nothing to do (without connection)
 
 
 
 
 
-        //if (data != null) {
+
+
+        //if (data != null) { ////// OLD
         //  Old entries requested
         //  mService.getContentResolver()
         //         .notifyChange(Uri.parse(intent.getStringExtra(EXTRA_DATA_URI), null);
-        //}
+        //} else { ////// NEW
 
-
-
+        //DataRequest.EXTRA_DATA_DATE can be null!
 
         // Notify change to observer URI
         //for (Uri observerUri : mRegister)
         //    mService.getContentResolver().notifyChange(observerUri, null);
+
+        // }
+
 
 
 

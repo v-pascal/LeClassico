@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.connection.requests.NotificationsRequest;
@@ -85,6 +86,20 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             Constants.APP_URI + ".action.REQUEST_OLD_DATA";
 
     //
+    public static Intent getIntent(@Nullable Boolean newRegister, byte tableId, Uri uri) {
+    // Return intent for data request according the newRegister parameter:
+        // true -> Register new data request
+        // false -> Unregister new data request
+        // null -> Old data request
+
+        Logs.add(Logs.Type.V, "newRegister: " + newRegister + ";tableId: " + tableId + ";uri: " + uri);
+        Intent dataIntent = new Intent((newRegister != null)?
+                ((newRegister)? REGISTER_NEW_DATA:UNREGISTER_NEW_DATA):REQUEST_OLD_DATA);
+
+        dataIntent.putExtra(DataService.EXTRA_DATA_TABLE_ID, tableId);
+        dataIntent.putExtra(DataRequest.EXTRA_DATA_URI, uri);
+        return dataIntent;
+    }
     private final DataReceiver mDataReceiver = new DataReceiver(); // Data broadcast receiver
     private final ArrayList<DataRequest> mDataRequests = new ArrayList<>(); // Data request task list
     private final Timer mRequestTimer = new Timer(); // Timer to manage data request tasks
@@ -102,16 +117,17 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 throw new IllegalArgumentException("Unexpected request table ID");
 
             if (mDataRequests.get(tableIdx) == null)
-                throw new RuntimeException("Not implemented yet");
+                throw new RuntimeException("Table request not implemented");
 
+            //////
             if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
-                if (mDataRequests.get(tableIdx).register(intent))
+                if ((mDataRequests.get(tableIdx).register(intent)) && (Internet.isConnected()))
                     mRequestTimer.schedule(mDataRequests.get(tableIdx), DELAY_REQUEST, DELAY_REQUEST);
             }
             else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
 
                 mDataRequests.get(tableIdx).unregister(intent);
-                mRequestTimer.purge(); // Purge cancelled request task (if needed)
+                mRequestTimer.purge(); // Purge cancelled request task (if any)
 
             } else if (intent.getAction().equals(REQUEST_OLD_DATA)) // Request old data
                 mDataRequests.get(tableIdx).request(intent.getExtras());
@@ -123,14 +139,20 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public void onConnection() {
         Logs.add(Logs.Type.V, null);
 
-        // Restart connection supervisor
+        // Restart/Start connection supervisor
         stopConnectionSupervisor();
         startConnectionSupervisor(true);
+
+        // Restart/Start data requests
+        stopDataRequests(false);
+        startDataRequests();
     }
     @Override
     public void onDisconnection() {
         Logs.add(Logs.Type.V, null);
-        stopConnectionSupervisor();
+
+        stopConnectionSupervisor(); // Stop connection supervisor
+        stopDataRequests(false); // Stop data requests
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,10 +273,32 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                              }, (now) ? 0 : Constants.SERVICE_DELAY_TOKEN_UPDATE,
                 Constants.SERVICE_DELAY_TOKEN_UPDATE);
     }
+    private void startDataRequests() { // Schedule data requests
+        Logs.add(Logs.Type.V, null);
+
+        for (DataRequest request : mDataRequests) {
+            if (request != null)
+                mRequestTimer.schedule(request, DataReceiver.DELAY_REQUEST, DataReceiver.DELAY_REQUEST);
+        }
+    }
+
     private void stopConnectionSupervisor() {
         Logs.add(Logs.Type.V, null);
         mTokenTimer.cancel();
         mTokenTimer.purge();
+    }
+    private void stopDataRequests(boolean clear) { // Cancel & clear data requests (clear if required)
+
+        Logs.add(Logs.Type.V, "clear: " + clear);
+        for (TimerTask request : mDataRequests) {
+            if (request != null)
+                request.cancel();
+        }
+        if (clear)
+            mDataRequests.clear();
+
+        mRequestTimer.cancel();
+        mRequestTimer.purge();
     }
 
     //////
@@ -313,8 +357,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             startConnectionSupervisor(false);
 
         // Set broadcast receiver
-        for (int i = 0; i < Tables.ID_LAST; ++i) {
-            switch ((byte)i) {
+        for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
+            switch (tableId) {
 
                 case Tables.ID_NOTIFICATIONS: {
                     mDataRequests.add(new NotificationsRequest(this, NotificationsTable.TABLE_NAME));
@@ -355,12 +399,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
         // Remove broadcast receiver
         unregisterReceiver(mDataReceiver);
-
-        for (TimerTask request : mDataRequests)
-            request.cancel();
-        mDataRequests.clear();
-
-        mRequestTimer.cancel();
-        mRequestTimer.purge();
+        stopDataRequests(true);
     }
 }

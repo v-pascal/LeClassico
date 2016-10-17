@@ -329,9 +329,9 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
         ////// Start main activity
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(MainActivity.EXTRA_DATA_KEY_ONLINE, online);
-        intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO, pseudo);
-        intent.putExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO_ID, pseudoId);
+        intent.putExtra(MainActivity.EXTRA_DATA_ONLINE, online);
+        intent.putExtra(MainActivity.EXTRA_DATA_PSEUDO, pseudo);
+        intent.putExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, pseudoId);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 

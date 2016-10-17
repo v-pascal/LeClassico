@@ -31,6 +31,7 @@ import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -65,7 +66,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
         getContext().getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
                 values, NotificationsTable.COLUMN_PSEUDO + "='" +
-                        getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) +
+                        getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO) +
                         "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
                 null);
 
@@ -500,7 +501,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         // Get query limit
         short queryLimit = 0;
         String selection = NotificationsTable.COLUMN_PSEUDO + "='" +
-                getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO) + '\'';
+                getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO) + '\'';
         if (mQueryID != Constants.NO_DATA) {
 
             queryLimit = mQueryCount;
@@ -593,7 +594,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         mListLoader = new QueryLoader(context, this);
         mMaxLoader = new QueryLoader(context, this);
         mNotifyUri = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getActivity().getIntent()
-                .getIntExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO_ID, 0)));
+                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, 0)));
     }
 
     @Override
@@ -740,23 +741,28 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         // Register content observer on user notification(s)
         mDataObserver.register(getContext().getContentResolver(), mNotifyUri);
 
-        Intent notifyIntent = new Intent(DataService.REGISTER_NEW_DATA);
-        notifyIntent.putExtra(DataService.EXTRA_DATA_TABLE_ID, Tables.ID_NOTIFICATIONS);
-        notifyIntent.putExtra(DataRequest.EXTRA_DATA_URI, mNotifyUri.toString());
+        //////
+        Bundle data = new Bundle();
+        data.putString(DataTable.DATA_KEY_TABLE_NAME, NotificationsTable.TABLE_NAME);
+        data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, NotificationsTable.COLUMN_STATUS_DATE);
+        data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, NotificationsTable.COLUMN_PSEUDO);
+        data.putString(DataTable.DATA_KEY_PSEUDO,
+                getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO));
 
-
-
-
-
-
-
-        getContext().sendBroadcast(notifyIntent);
+        Intent notifyIntent = DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mNotifyUri);
+        notifyIntent.putExtra(DataRequest.EXTRA_DATA_DATE,
+                DataTable.getMaxStatusDate(getContext().getContentResolver(), data)); // NB: UI thread!
+        getContext().sendBroadcast(notifyIntent); // Register new data
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Logs.add(Logs.Type.V, null);
+
+        //////
+        Intent notifyIntent = DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mNotifyUri);
+        getContext().sendBroadcast(notifyIntent); // Unregister new data
 
         // Unregister all content observer
         mDataObserver.unregister(getContext().getContentResolver());
