@@ -13,10 +13,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.connection.requests.NotificationsRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Notify;
@@ -24,6 +27,7 @@ import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,6 +41,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private static final String EXTRA_DATA_PSEUDO = "pseudo";
     private static final String EXTRA_DATA_TOKEN = "token";
     private static final String EXTRA_DATA_TIME_LAG = "timeLag";
+
+    public static final String EXTRA_DATA_TABLE_ID = "tableId";
     // Extra data keys
 
     private static boolean isRunning; // Service running flag
@@ -71,32 +77,45 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     }
 
     ////// Broadcast actions
-    public static final String NEW_NOTIFICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.NEW_NOTIFICATIONS";
-    public static final String NEW_PUBLICATIONS = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.NEW_PUBLICATIONS";
-    public static final String NEW_COMMENTS = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.NEW_COMMENTS";
-    public static final String NEW_MESSAGES = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.NEW_MESSAGES";
-    public static final String NEW_LOCATIONS = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.NEW_LOCATIONS";
-    public static final String NEW_EVENTS = "com." + Constants.APP_URI_COMPANY + "." +
-            Constants.APP_URI + ".action.NEW_EVENTS";
+    public static final String REGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.REGISTER_NEW_DATA";
+    public static final String UNREGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.UNREGISTER_NEW_DATA";
 
     //
     private final DataReceiver mDataReceiver = new DataReceiver(); // Data broadcast receiver
-    private class DataReceiver extends BroadcastReceiver {
+    private final ArrayList<DataRequest> mDataRequests = new ArrayList<>(); // Data request task list
+    private final Timer mDataTimer = new Timer(); // Timer to manage data request tasks
+
+    private class DataReceiver extends BroadcastReceiver { /////////////////////////////////////////
+
+        private static final long DELAY_REQUEST = 30000; // DB request task delay (in ms)
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
+            boolean register = intent.getAction().equals(REGISTER_NEW_DATA);
+            boolean unregister = intent.getAction().equals(UNREGISTER_NEW_DATA);
 
+            if ((register) || (unregister)) {
+                int tableIdx = intent.getByteExtra(EXTRA_DATA_TABLE_ID, (byte)0) - 1;
+                if (tableIdx == Constants.NO_DATA)
+                    throw new IllegalArgumentException("Unexpected request table ID");
 
+                if (mDataRequests.get(tableIdx) == null)
+                    throw new RuntimeException("Not implemented yet");
 
+                if (register) { // Register
+                    if (mDataRequests.get(tableIdx).register(intent))
+                        mDataTimer.scheduleAtFixedRate(mDataRequests.get(tableIdx), DELAY_REQUEST, DELAY_REQUEST);
+                }
+                else { // Unregister
 
-
-
+                    mDataRequests.get(tableIdx).unregister(intent);
+                    mDataTimer.purge(); // Purge cancelled request task (if needed)
+                }
+            }
         }
     }
 
@@ -211,7 +230,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         stopSelf();
                         // NB: This will close the application (at service binding). The user has been
                         //     connected offline using local DB but not exist in remote DB. Let's the
-                        //     user to reconnect by entering new login (if any).
+                        //     user to reconnect by entering new login.
                     }
                     break;
                 }
@@ -249,6 +268,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     //
     private String mToken; // Token used to identify the user when requesting remote DB
+    public String getToken() {
+        synchronized(mToken) {
+            return mToken;
+        }
+    }
     private final Timer mTokenTimer = new Timer(); // Timer used to update token (connection supervisor)
     private long mTimeLag; // Time lag between remote DB & current OS (in ms)
                            // NB: Will be updated at every remote requests coz OS date & time can changed
@@ -290,12 +314,31 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             startConnectionSupervisor(false);
 
         // Set broadcast receiver
-        registerReceiver(mDataReceiver, new IntentFilter(NEW_NOTIFICATIONS));
-        registerReceiver(mDataReceiver, new IntentFilter(NEW_PUBLICATIONS));
-        registerReceiver(mDataReceiver, new IntentFilter(NEW_COMMENTS));
-        registerReceiver(mDataReceiver, new IntentFilter(NEW_MESSAGES));
-        registerReceiver(mDataReceiver, new IntentFilter(NEW_LOCATIONS));
-        registerReceiver(mDataReceiver, new IntentFilter(NEW_EVENTS));
+        for (int i = 0; i < Tables.ID_LAST; ++i) {
+            switch ((byte)i) {
+
+                case Tables.ID_NOTIFICATIONS: {
+                    mDataRequests.add(new NotificationsRequest(this, NotificationsTable.TABLE_NAME));
+                    break;
+                }
+                case Tables.ID_CAMARADES:
+                case Tables.ID_ABONNEMENTS:
+                case Tables.ID_ACTUALITES:
+                case Tables.ID_ALBUMS:
+                case Tables.ID_COMMENTAIRES:
+                case Tables.ID_EVENEMENTS:
+                case Tables.ID_MESSAGERIE:
+                case Tables.ID_MUSIC:
+                case Tables.ID_PHOTOS:
+                case Tables.ID_PRESENTS:
+                case Tables.ID_VOTES: {
+                    mDataRequests.add(null);
+                    break; // Not implemented yet
+                }
+            }
+        }
+        registerReceiver(mDataReceiver, new IntentFilter(REGISTER_NEW_DATA));
+        registerReceiver(mDataReceiver, new IntentFilter(UNREGISTER_NEW_DATA));
 
         return START_NOT_STICKY;
     }
@@ -309,5 +352,15 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
         Notify.cancel(this); // Remove notification
         stopConnectionSupervisor(); // Cancel token update
+
+        // Remove broadcast receiver
+        unregisterReceiver(mDataReceiver);
+
+        for (TimerTask request : mDataRequests)
+            request.cancel();
+        mDataRequests.clear();
+
+        mDataTimer.cancel();
+        mDataTimer.purge();
     }
 }

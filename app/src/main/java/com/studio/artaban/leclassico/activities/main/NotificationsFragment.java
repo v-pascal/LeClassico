@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.activities.main;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -26,10 +27,13 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
+import com.studio.artaban.leclassico.connection.DataRequest;
+import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -588,7 +592,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         mListLoader = new QueryLoader(context, this);
         mMaxLoader = new QueryLoader(context, this);
-        mNotifyUri = Uris.getUri(Uris.USER_NOTIFICATIONS.URI_ID, String.valueOf(getActivity().getIntent()
+        mNotifyUri = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getActivity().getIntent()
                 .getIntExtra(MainActivity.EXTRA_DATA_KEY_PSEUDO_ID, 0)));
     }
 
@@ -736,6 +740,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         // Register content observer on user notification(s)
         mDataObserver.register(getContext().getContentResolver(), mNotifyUri);
 
+        Intent notifyIntent = new Intent(DataService.REGISTER_NEW_DATA);
+        notifyIntent.putExtra(DataService.EXTRA_DATA_TABLE_ID, Tables.ID_NOTIFICATIONS);
+        notifyIntent.putExtra(DataRequest.EXTRA_DATA_URI, mNotifyUri.toString());
 
 
 
@@ -743,17 +750,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
 
-
-        //Intent notifyIntent = new Intent(DataService.);
-        //getContext().sendBroadcast(notifyIntent);
-
-
-
-
-
-
-
-
+        getContext().sendBroadcast(notifyIntent);
     }
 
     @Override
