@@ -81,11 +81,13 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             Constants.APP_URI + ".action.REGISTER_NEW_DATA";
     public static final String UNREGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + "." +
             Constants.APP_URI + ".action.UNREGISTER_NEW_DATA";
+    public static final String REQUEST_OLD_DATA = "com." + Constants.APP_URI_COMPANY + "." +
+            Constants.APP_URI + ".action.REQUEST_OLD_DATA";
 
     //
     private final DataReceiver mDataReceiver = new DataReceiver(); // Data broadcast receiver
     private final ArrayList<DataRequest> mDataRequests = new ArrayList<>(); // Data request task list
-    private final Timer mDataTimer = new Timer(); // Timer to manage data request tasks
+    private final Timer mRequestTimer = new Timer(); // Timer to manage data request tasks
 
     private class DataReceiver extends BroadcastReceiver { /////////////////////////////////////////
 
@@ -95,27 +97,24 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         public void onReceive(Context context, Intent intent) {
 
             Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
-            boolean register = intent.getAction().equals(REGISTER_NEW_DATA);
-            boolean unregister = intent.getAction().equals(UNREGISTER_NEW_DATA);
+            int tableIdx = intent.getByteExtra(EXTRA_DATA_TABLE_ID, (byte)0) - 1;
+            if (tableIdx == Constants.NO_DATA)
+                throw new IllegalArgumentException("Unexpected request table ID");
 
-            if ((register) || (unregister)) {
-                int tableIdx = intent.getByteExtra(EXTRA_DATA_TABLE_ID, (byte)0) - 1;
-                if (tableIdx == Constants.NO_DATA)
-                    throw new IllegalArgumentException("Unexpected request table ID");
+            if (mDataRequests.get(tableIdx) == null)
+                throw new RuntimeException("Not implemented yet");
 
-                if (mDataRequests.get(tableIdx) == null)
-                    throw new RuntimeException("Not implemented yet");
-
-                if (register) { // Register
-                    if (mDataRequests.get(tableIdx).register(intent))
-                        mDataTimer.scheduleAtFixedRate(mDataRequests.get(tableIdx), DELAY_REQUEST, DELAY_REQUEST);
-                }
-                else { // Unregister
-
-                    mDataRequests.get(tableIdx).unregister(intent);
-                    mDataTimer.purge(); // Purge cancelled request task (if needed)
-                }
+            if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
+                if (mDataRequests.get(tableIdx).register(intent))
+                    mRequestTimer.schedule(mDataRequests.get(tableIdx), DELAY_REQUEST, DELAY_REQUEST);
             }
+            else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
+
+                mDataRequests.get(tableIdx).unregister(intent);
+                mRequestTimer.purge(); // Purge cancelled request task (if needed)
+
+            } else if (intent.getAction().equals(REQUEST_OLD_DATA)) // Request old data
+                mDataRequests.get(tableIdx).request(intent.getExtras());
         }
     }
 
@@ -242,14 +241,14 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private void startConnectionSupervisor(boolean now) {
 
         Logs.add(Logs.Type.V, "now: " + now);
-        mTokenTimer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
+        mTokenTimer.schedule(new TimerTask() {
+                                 @Override
+                                 public void run() {
 
-                    Logs.add(Logs.Type.V, null);
-                    updateToken();
-                }
-            }, (now)? 0 : Constants.SERVICE_DELAY_TOKEN_UPDATE,
+                                     Logs.add(Logs.Type.V, null);
+                                     updateToken();
+                                 }
+                             }, (now) ? 0 : Constants.SERVICE_DELAY_TOKEN_UPDATE,
                 Constants.SERVICE_DELAY_TOKEN_UPDATE);
     }
     private void stopConnectionSupervisor() {
@@ -339,6 +338,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         }
         registerReceiver(mDataReceiver, new IntentFilter(REGISTER_NEW_DATA));
         registerReceiver(mDataReceiver, new IntentFilter(UNREGISTER_NEW_DATA));
+        registerReceiver(mDataReceiver, new IntentFilter(REQUEST_OLD_DATA));
 
         return START_NOT_STICKY;
     }
@@ -360,7 +360,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             request.cancel();
         mDataRequests.clear();
 
-        mDataTimer.cancel();
-        mDataTimer.purge();
+        mRequestTimer.cancel();
+        mRequestTimer.purge();
     }
 }

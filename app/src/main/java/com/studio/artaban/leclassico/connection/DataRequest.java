@@ -64,4 +64,6 @@ public abstract class DataRequest extends TimerTask {
 
     public abstract void register(Bundle data);
     public abstract void unregister(Uri uri);
+
+    public abstract void request(Bundle data);
 }

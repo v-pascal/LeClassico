@@ -35,13 +35,19 @@ public class NotificationsRequest extends DataRequest {
 
     }
 
-    ////// TimerTask ///////////////////////////////////////////////////////////////////////////////
     @Override
-    public void run() {
-        Logs.add(Logs.Type.V, null);
+    public void request(Bundle data) {
+        Logs.add(Logs.Type.V, "data: " + data);
 
 
 
+
+
+        //if (data != null) {
+        //  Old entries requested
+        //  mService.getContentResolver()
+        //         .notifyChange(Uri.parse(intent.getStringExtra(EXTRA_DATA_URI), null);
+        //}
 
 
 
@@ -54,6 +60,13 @@ public class NotificationsRequest extends DataRequest {
 
 
 
+    }
 
+    ////// TimerTask ///////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void run() {
+
+        Logs.add(Logs.Type.V, null);
+        request(null);
     }
 }
