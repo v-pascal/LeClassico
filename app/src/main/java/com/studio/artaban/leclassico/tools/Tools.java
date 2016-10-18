@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -324,6 +325,6 @@ public final class Tools { /////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////// Listeners
 
     public interface OnDoneListener {
-        void onDone();
-    } // Useful to execute code after another thread has done a process
+        void onDone(Bundle data);
+    } // Useful to execute code after another thread has been proceeded
 }

@@ -33,6 +33,11 @@ public class DataObserver extends ContentObserver {
     }
     private OnContentListener mListener; // Registered content listener
 
+    private boolean mSelfChange = false; // Self change flag
+    public void setSelfChange(boolean selfChange) {
+        mSelfChange = selfChange;
+    }
+
     //
     public DataObserver(Handler handler, OnContentListener listener) {
         super(handler);
@@ -49,6 +54,6 @@ public class DataObserver extends ContentObserver {
 
     @Override
     public boolean deliverSelfNotifications() {
-        return true;
+        return mSelfChange;
     }
 }

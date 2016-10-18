@@ -87,7 +87,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     //
     public static Intent getIntent(@Nullable Boolean newRegister, byte tableId, Uri uri) {
-    // Return intent for data request according the newRegister parameter:
+    // Return intent for data request according the 'newRegister' parameter:
         // true -> Register new data request
         // false -> Unregister new data request
         // null -> Old data request

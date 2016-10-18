@@ -21,18 +21,10 @@ public class NotificationsRequest extends DataRequest {
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     @Override
     public void register(Bundle data) {
-        Logs.add(Logs.Type.V, "data: " + data);
-
-
-
 
     }
     @Override
     public void unregister(Uri uri) {
-        Logs.add(Logs.Type.V, "uri: " + uri);
-
-
-
 
     }
 
@@ -43,37 +35,41 @@ public class NotificationsRequest extends DataRequest {
         if (!Internet.isConnected())
             return; // Nothing to do (without connection)
 
+        if (data != null) { ////// Old data requested
+            Logs.add(Logs.Type.I, "Old notifications requested");
+
+
+
+            //mService.getContentResolver()
+            //         .notifyChange(Uri.parse(intent.getStringExtra(EXTRA_DATA_URI), null);
 
 
 
 
-
-
-        //if (data != null) { ////// OLD
-        //  Old entries requested
-        //  mService.getContentResolver()
-        //         .notifyChange(Uri.parse(intent.getStringExtra(EXTRA_DATA_URI), null);
-        //} else { ////// NEW
-
-        //DataRequest.EXTRA_DATA_DATE can be null!
-
-        // Notify change to observer URI
-        //for (Uri observerUri : mRegister)
-        //    mService.getContentResolver().notifyChange(observerUri, null);
-
-        // }
+        } else { ////// New or data updates requested
 
 
 
 
+            // boolean changed;
+            // DataRequest.EXTRA_DATA_DATE can be null!
+
+            // if (mToSynchronize)
+            //   From local to remote DB
+            //   mToSynchronize = false;
+
+            // Notify change to URI observer
+            //for (Uri observerUri : mRegister)
+            //    mService.getContentResolver().notifyChange(observerUri, null);
 
 
+
+        }
     }
 
     ////// TimerTask ///////////////////////////////////////////////////////////////////////////////
     @Override
     public void run() {
-
         Logs.add(Logs.Type.V, null);
         request(null);
     }
