@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -14,8 +16,8 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class NotificationsRequest extends DataRequest {
 
-    public NotificationsRequest(DataService service, String table) {
-        super(service, table);
+    public NotificationsRequest(DataService service) {
+        super(service, NotificationsTable.TABLE_NAME, Tables.ID_NOTIFICATIONS);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
@@ -29,7 +31,7 @@ public class NotificationsRequest extends DataRequest {
     }
 
     @Override
-    public void request(Bundle data) {
+    public void request(Bundle data) { // Update data from remote to local DB
 
         Logs.add(Logs.Type.V, "data: " + data);
         if (!Internet.isConnected())
@@ -37,6 +39,7 @@ public class NotificationsRequest extends DataRequest {
 
         if (data != null) { ////// Old data requested
             Logs.add(Logs.Type.I, "Old notifications requested");
+
 
 
 
@@ -51,9 +54,6 @@ public class NotificationsRequest extends DataRequest {
 
 
 
-            // boolean changed;
-            // DataRequest.EXTRA_DATA_DATE can be null!
-
             // Notify change to URI observer
             //for (Uri observerUri : mRegister)
             //    mService.getContentResolver().notifyChange(observerUri, null);
@@ -64,7 +64,7 @@ public class NotificationsRequest extends DataRequest {
     }
 
     @Override
-    public void synchronize() {
+    public void synchronize() { // Update data from local to remote DB
         Logs.add(Logs.Type.V, null);
 
 

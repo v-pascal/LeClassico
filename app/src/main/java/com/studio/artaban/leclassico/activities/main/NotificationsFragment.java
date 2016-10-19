@@ -524,8 +524,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
         }
-        if (queryLimit < Queries.LIMIT_NOTIFICATIONS)
-            queryLimit = Queries.LIMIT_NOTIFICATIONS;
+        if (queryLimit < Queries.LIMIT_MAIN_NOTIFICATIONS)
+            queryLimit = Queries.LIMIT_MAIN_NOTIFICATIONS;
 
         // Load notification data (using query loader)
         Bundle queryData = new Bundle();
@@ -749,10 +749,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO));
 
         Intent notifyIntent = DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mNotifyUri);
-        notifyIntent.putExtra(DataRequest.EXTRA_DATA_DATE,
-                DataTable.getMaxStatusDate(getContext().getContentResolver(), data));
-        // NB: DB use in UI thread!
-
         getContext().sendBroadcast(notifyIntent); // Register new data
     }
 

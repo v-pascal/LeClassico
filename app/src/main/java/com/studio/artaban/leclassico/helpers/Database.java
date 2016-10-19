@@ -1,11 +1,14 @@
 package com.studio.artaban.leclassico.helpers;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
@@ -38,7 +41,7 @@ public class Database extends SQLiteOpenHelper {
 
     protected SQLiteDatabase mDatabase;
 
-    protected static Map<String, IDataTable> mTableMap = new HashMap<>();
+    protected static Map<String, DataTable> mTableMap = new HashMap<>();
     static {
         mTableMap.put(CamaradesTable.TABLE_NAME, CamaradesTable.newInstance());
         mTableMap.put(AbonnementsTable.TABLE_NAME, AbonnementsTable.newInstance());
@@ -55,38 +58,39 @@ public class Database extends SQLiteOpenHelper {
     }
 
     //
-    public static boolean synchronize(byte tableId, ContentResolver resolver, String token, String pseudo) {
+    public static int synchronize(byte tableId, ContentResolver resolver, String token, String pseudo,
+                                  @Nullable Short limit, @Nullable ContentValues postData) {
 
-        // Synchronize database table with remote DB according its ID
-        Logs.add(Logs.Type.V, "tableId: " + tableId + ";resolver: " + resolver +
-                ";token: " + token + ";pseudo: " + pseudo);
+        // Synchronize data from remote to local DB (return inserted, deleted or
+        // updated entry count & NO_DATA if error)
+        Logs.add(Logs.Type.V, "tableId: " + tableId + ";resolver: " + resolver + ";token: " + token +
+                ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
 
         switch (tableId) {
-
             case Tables.ID_CAMARADES:
-                return ((CamaradesTable)Database.getTable(CamaradesTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(CamaradesTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_ABONNEMENTS:
-                return ((AbonnementsTable)Database.getTable(AbonnementsTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(AbonnementsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_ACTUALITES:
-                return ((ActualitesTable)Database.getTable(ActualitesTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(ActualitesTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_ALBUMS:
-                return ((AlbumsTable)Database.getTable(AlbumsTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(AlbumsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_COMMENTAIRES:
-                return ((CommentairesTable)Database.getTable(CommentairesTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(CommentairesTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_EVENEMENTS:
-                return ((EvenementsTable)Database.getTable(EvenementsTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(EvenementsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_MESSAGERIE:
-                return ((MessagerieTable)Database.getTable(MessagerieTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(MessagerieTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_MUSIC:
-                return ((MusicTable)Database.getTable(MusicTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(MusicTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_PHOTOS:
-                return ((PhotosTable)Database.getTable(PhotosTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(PhotosTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_PRESENTS:
-                return ((PresentsTable)Database.getTable(PresentsTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(PresentsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_VOTES:
-                return ((VotesTable)Database.getTable(VotesTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(VotesTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             case Tables.ID_NOTIFICATIONS:
-                return ((NotificationsTable)Database.getTable(NotificationsTable.TABLE_NAME)).synchronize(resolver, token, pseudo);
+                return Database.getTable(NotificationsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
             default:
                 throw new IllegalArgumentException("Unexpected table ID: " + tableId);
         }
@@ -125,7 +129,7 @@ public class Database extends SQLiteOpenHelper {
     }
 
     //
-    public static IDataTable getTable(String name) { return mTableMap.get(name); }
+    public static DataTable getTable(String name) { return mTableMap.get(name); }
     public int insert(String table, Object[] data) {
 
         Logs.add(Logs.Type.V, "table: " + table + ", data: " + ((data != null)? data.length:"null"));

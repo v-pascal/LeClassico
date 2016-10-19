@@ -1,9 +1,11 @@
 package com.studio.artaban.leclassico.data;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -43,7 +45,7 @@ public abstract class DataTable implements IDataTable {
 
     //////
     protected static String getUrlSynchroRequest(ContentResolver resolver, Bundle data) {
-    // Return URL of synchronization request according table data
+        // Return URL of synchronization request according table data
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
         String url = Constants.APP_WEBSERVICES + data.getString(DATA_KEY_WEB_SERVICE) + '?' +
@@ -61,4 +63,9 @@ public abstract class DataTable implements IDataTable {
 
         return url;
     }
+
+    ////// DataTable ///////////////////////////////////////////////////////////////////////////////
+
+    public abstract int synchronize(ContentResolver resolver, String token, String pseudo,
+                                    @Nullable Short limit, @Nullable ContentValues postData);
 }

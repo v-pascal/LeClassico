@@ -1,12 +1,14 @@
 package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.List;
  * Created by pascal on 28/07/16.
  * Presents database table class
  */
-public class PresentsTable implements IDataTable {
+public class PresentsTable extends DataTable {
 
     public static class Reveler extends DataField { ///////////////////////////////// Presents entry
 
@@ -34,8 +36,14 @@ public class PresentsTable implements IDataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(ContentResolver resolver, String token, String pseudo) {
-    // Synchronize data with remote DB
+    @Override
+    public int synchronize(final ContentResolver resolver, String token, String pseudo,
+                           @Nullable Short limit, @Nullable ContentValues postData) {
+
+        // Synchronize data from remote to local DB (return inserted, deleted or
+        // updated entry count & NO_DATA if error)
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo +
+                ";limit: " + limit + ";postData: " + postData);
 
 
 
@@ -46,7 +54,8 @@ public class PresentsTable implements IDataTable {
 
 
 
-        return true;
+
+        return 0;
     }
 
     //

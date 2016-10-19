@@ -3,7 +3,8 @@ package com.studio.artaban.leclassico.tools;
 /**
  * Created by pascal on 23/08/16.
  * Synchronization value class
- * Used to manage synchronization properly and without resource need
+ * _ Used to manage synchronization properly and without resource need
+ * _ Used to manage primitive type to be able to update its value when defined as final
  */
 public final class SyncValue<Type> {
 

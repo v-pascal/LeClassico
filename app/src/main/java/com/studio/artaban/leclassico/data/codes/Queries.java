@@ -76,11 +76,11 @@ public class Queries {
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////
     // Max entry count to display into a list view at start
 
-    public static final short LIMIT_NOTIFICATIONS = 20;
+    public static final short LIMIT_MAIN_NOTIFICATIONS = 20;
 
     ////// Older ///////////////////////////////////////////////////////////////////////////////////
-    // Max entry count to display into a list after the last element (when older entry is requested)
+    // Max entry count to display into a list after the last element (when older entries is requested)
 
-    public static final short OLDER_NOTIFICATIONS = 5;
+    public static final short OLDER_MAIN_NOTIFICATIONS = 5;
 
 }

@@ -21,13 +21,13 @@ public abstract class DataRequest extends TimerTask implements DataObserver.OnCo
 
     // Extra data keys (common)
     public static final String EXTRA_DATA_URI = "uri";
-    public static final String EXTRA_DATA_DATE = "date";
 
     //////
     protected DataService mService; // Data service
     protected String mTable; // DB table name
+    protected byte mTableId; // DB table ID
 
-    public DataRequest(DataService service, String table) {
+    public DataRequest(DataService service, String table, byte tableId) {
 
         Logs.add(Logs.Type.V, "service: " + service + ";table: " + table);
         HandlerThread observerThread = new HandlerThread("requestDataObserverThread");
@@ -36,6 +36,7 @@ public abstract class DataRequest extends TimerTask implements DataObserver.OnCo
         mSyncObserver = new DataObserver(new Handler(observerThread.getLooper()), this);
         mService = service;
         mTable = table;
+        mTableId = tableId;
     }
 
     //
@@ -91,14 +92,12 @@ public abstract class DataRequest extends TimerTask implements DataObserver.OnCo
     }
     private final DataObserver mSyncObserver; // Data update observer
 
-    //
-    public abstract void synchronize();
-
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     protected final ArrayList<Uri> mRegister = new ArrayList<>(); // Register URI list
 
     public abstract void register(Bundle data);
     public abstract void unregister(Uri uri);
 
-    public abstract void request(Bundle data);
+    public abstract void request(Bundle data); // Update data from remote to local DB
+    public abstract void synchronize(); // Update data from local to remote DB
 }

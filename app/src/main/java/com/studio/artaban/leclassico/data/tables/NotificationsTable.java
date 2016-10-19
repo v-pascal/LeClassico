@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -15,6 +16,7 @@ import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.tools.SyncValue;
 import com.studio.artaban.leclassico.tools.Tools;
 
 import org.json.JSONArray;
@@ -38,9 +40,6 @@ public class NotificationsTable extends DataTable {
 
     public static final short DEFAULT_LIMIT = 25; // Default remote DB query limit
 
-    public static final short DISPLAY_INITIAL_COUNT = 20; // Notification count to display initially
-    public static final short DISPLAY_INCREASE_COUNT = 5; // Default remote DB query limit
-
     public static class Pin extends DataField { //////////////////////////////// Notifications entry
 
         public Pin(short count, long id) { super(count, id); }
@@ -58,23 +57,29 @@ public class NotificationsTable extends DataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(final ContentResolver resolver, String token, String pseudo) {
-    // Synchronize data with remote DB
+    @Override
+    public int synchronize(final ContentResolver resolver, String token, String pseudo,
+                           @Nullable Short limit, @Nullable ContentValues postData) {
 
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+        // Synchronize data from remote to local DB (return inserted, deleted or
+        // updated entry count & NO_DATA if error)
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo +
+                ";limit: " + limit + ";postData: " + postData);
+
+        final SyncValue<Integer> entryCount = new SyncValue(0);
         Bundle data = new Bundle();
 
         data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_NOTIFICATIONS);
         data.putString(DataTable.DATA_KEY_TOKEN, token);
         data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
-        data.putShort(DataTable.DATA_KEY_LIMIT, DEFAULT_LIMIT);
+        data.putShort(DataTable.DATA_KEY_LIMIT, (limit != null)? limit:DEFAULT_LIMIT);
         data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
         data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, COLUMN_STATUS_DATE);
         data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getUrlSynchroRequest(resolver, data);
 
         // Send remote DB request
-        Internet.DownloadResult result = Internet.downloadHttpRequest(url, null,
+        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
                 new Internet.OnRequestListener() {
 
                     @Override
@@ -90,6 +95,7 @@ public class NotificationsTable extends DataTable {
 
                                 Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
                                 JSONArray entries = reply.getJSONArray(TABLE_NAME);
+                                int entryUpdated = 0;
                                 for (int i = 0; i < entries.length(); ++i) {
 
                                     JSONObject entry = (JSONObject) entries.get(i);
@@ -133,6 +139,8 @@ public class NotificationsTable extends DataTable {
                                         else // Update entry
                                             resolver.update(tableUri, values, selection, null);
 
+                                        ++entryUpdated;
+
                                     } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != WebServices.STATUS_FIELD_DELETED) {
 
                                         // Insert entry into DB
@@ -143,9 +151,12 @@ public class NotificationsTable extends DataTable {
                                         values.put(COLUMN_OBJECT_FROM, objFrom);
                                         values.put(COLUMN_OBJECT_DATE, objDate);
                                         resolver.insert(tableUri, values);
+
+                                        ++entryUpdated;
                                     }
                                     //else // Do not add a deleted entry
                                 }
+                                entryCount.set(entryUpdated);
 
                             } else {
                                 Logs.add(Logs.Type.E, "Synchronization error: #" +
@@ -162,9 +173,9 @@ public class NotificationsTable extends DataTable {
                 });
         if (result != Internet.DownloadResult.SUCCEEDED) {
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            return false;
+            return Constants.NO_DATA;
         }
-        return true;
+        return entryCount.get();
     }
 
     //

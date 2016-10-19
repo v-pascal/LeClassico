@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -15,6 +16,7 @@ import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.tools.SyncValue;
 import com.studio.artaban.leclassico.tools.Tools;
 
 import org.json.JSONArray;
@@ -46,10 +48,16 @@ public class AbonnementsTable extends DataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean synchronize(final ContentResolver resolver, String token, String pseudo) {
-    // Synchronize data with remote DB
+    @Override
+    public int synchronize(final ContentResolver resolver, String token, String pseudo,
+                           @Nullable Short limit, @Nullable ContentValues postData) {
 
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+        // Synchronize data from remote to local DB (return inserted, deleted or
+        // updated entry count & NO_DATA if error)
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo +
+                ";limit: " + limit + ";postData: " + postData);
+
+        final SyncValue<Integer> entryCount = new SyncValue(0);
         Bundle data = new Bundle();
 
         data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_FOLLOWERS);
@@ -61,7 +69,7 @@ public class AbonnementsTable extends DataTable {
         String url = getUrlSynchroRequest(resolver, data);
 
         // Send remote DB request
-        Internet.DownloadResult result = Internet.downloadHttpRequest(url, null,
+        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
                 new Internet.OnRequestListener() {
 
             @Override
@@ -77,6 +85,7 @@ public class AbonnementsTable extends DataTable {
 
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
                         JSONArray entries = reply.getJSONArray(TABLE_NAME);
+                        int entryUpdated = 0;
                         for (int i = 0; i < entries.length(); ++i) {
 
                             JSONObject entry = (JSONObject) entries.get(i);
@@ -106,15 +115,20 @@ public class AbonnementsTable extends DataTable {
                                 else // Update entry
                                     resolver.update(tableUri, values, selection, null);
 
+                                ++entryUpdated;
+
                             } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != WebServices.STATUS_FIELD_DELETED) {
 
                                 // Insert entry into DB
                                 values.put(COLUMN_PSEUDO, pseudo);
                                 values.put(COLUMN_CAMARADE, camarade);
                                 resolver.insert(tableUri, values);
+
+                                ++entryUpdated;
                             }
                             //else // Do not add a deleted entry
                         }
+                        entryCount.set(entryUpdated);
 
                     } else {
                         Logs.add(Logs.Type.E, "Synchronization error: #" +
@@ -131,9 +145,9 @@ public class AbonnementsTable extends DataTable {
         });
         if (result != Internet.DownloadResult.SUCCEEDED) {
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            return false;
+            return Constants.NO_DATA;
         }
-        return true;
+        return entryCount.get();
     }
 
     //

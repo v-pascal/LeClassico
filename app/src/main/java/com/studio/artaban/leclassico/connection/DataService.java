@@ -20,7 +20,6 @@ import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
-import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Notify;
@@ -365,7 +364,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             switch (tableId) {
 
                 case Tables.ID_NOTIFICATIONS: {
-                    mDataRequests.add(new NotificationsRequest(this, NotificationsTable.TABLE_NAME));
+                    mDataRequests.add(new NotificationsRequest(this));
                     break;
                 }
                 case Tables.ID_CAMARADES:
