@@ -54,10 +54,6 @@ public class NotificationsRequest extends DataRequest {
             // boolean changed;
             // DataRequest.EXTRA_DATA_DATE can be null!
 
-            // if (mToSynchronize)
-            //   From local to remote DB
-            //   mToSynchronize = false;
-
             // Notify change to URI observer
             //for (Uri observerUri : mRegister)
             //    mService.getContentResolver().notifyChange(observerUri, null);
@@ -65,6 +61,22 @@ public class NotificationsRequest extends DataRequest {
 
 
         }
+    }
+
+    @Override
+    public void synchronize() {
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+        //mToSynchronize = false;
+
+
+
+
+
     }
 
     ////// TimerTask ///////////////////////////////////////////////////////////////////////////////

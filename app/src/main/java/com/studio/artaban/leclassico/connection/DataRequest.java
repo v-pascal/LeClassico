@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 
 import com.studio.artaban.leclassico.data.DataObserver;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.ArrayList;
@@ -49,7 +50,9 @@ public abstract class DataRequest extends TimerTask implements DataObserver.OnCo
                 mRegister.add(uri);
                 register(intent.getExtras());
                 mSyncObserver.register(mService.getContentResolver(), uri);
-                return stopped; // Schedule current request timer task (if not already the case)
+
+                return ((stopped) && (Internet.isConnected()));
+                // Return flag to schedule current request timer task (if not already done)
 
             } else
                 Logs.add(Logs.Type.W, "Data request already registered: " + uri);
@@ -76,12 +79,20 @@ public abstract class DataRequest extends TimerTask implements DataObserver.OnCo
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
-        mToSynchronize = true;
+        if (Internet.isConnected())
+            synchronize();
+        else
+            mToSynchronize = true;
     }
 
-    //
-    protected boolean mToSynchronize; // Data to update flag (from local to remote DB)
+    protected boolean mToSynchronize; // Flag to synchronize data (from local to remote DB)
+    public boolean toSynchronize() {
+        return mToSynchronize;
+    }
     private final DataObserver mSyncObserver; // Data update observer
+
+    //
+    public abstract void synchronize();
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     protected final ArrayList<Uri> mRegister = new ArrayList<>(); // Register URI list

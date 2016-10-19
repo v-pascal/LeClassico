@@ -321,10 +321,4 @@ public final class Tools { /////////////////////////////////////////////////////
 
         return id;
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////// Listeners
-
-    public interface OnDoneListener {
-        void onDone(Bundle data);
-    } // Useful to execute code after another thread has been proceeded
 }

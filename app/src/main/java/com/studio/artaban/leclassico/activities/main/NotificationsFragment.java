@@ -58,8 +58,6 @@ import java.util.Date;
 public class NotificationsFragment extends MainFragment implements QueryLoader.OnResultListener {
 
     public void read() { // Mark unread notification(s) as read
-
-        // WARNING: Code below is in UI thread!
         Logs.add(Logs.Type.V, null);
 
         ContentValues values = new ContentValues();
@@ -69,6 +67,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO) +
                         "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
                 null);
+        // NB: DB use in UI thread!
 
         // Notify notifications URI to refresh notification list
         getContext().getContentResolver().notifyChange(mNotifyUri, null);
@@ -509,7 +508,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             queryLimit += (short)Tools.getEntryCount(getContext().getContentResolver(),
                     NotificationsTable.TABLE_NAME, selection + " AND " +
                             IDataTable.DataField.COLUMN_ID + '>' + mQueryID);
-            // NB: The new DB entry count query just above should be executed quickly (UI thread)
+            // NB: DB use in UI thread!
 
 
 
@@ -751,7 +750,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         Intent notifyIntent = DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mNotifyUri);
         notifyIntent.putExtra(DataRequest.EXTRA_DATA_DATE,
-                DataTable.getMaxStatusDate(getContext().getContentResolver(), data)); // NB: UI thread!
+                DataTable.getMaxStatusDate(getContext().getContentResolver(), data));
+        // NB: DB use in UI thread!
+
         getContext().sendBroadcast(notifyIntent); // Register new data
     }
 

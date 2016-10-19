@@ -121,7 +121,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
             //////
             if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
-                if ((mDataRequests.get(tableIdx).register(intent)) && (Internet.isConnected()))
+                if (mDataRequests.get(tableIdx).register(intent))
                     mRequestTimer.schedule(mDataRequests.get(tableIdx), DELAY_REQUEST, DELAY_REQUEST);
             }
             else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
@@ -277,8 +277,12 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         Logs.add(Logs.Type.V, null);
 
         for (DataRequest request : mDataRequests) {
-            if (request != null)
+            if (request != null) {
+                if (request.toSynchronize())
+                    request.synchronize(); // Synchronize from local to remote DB
+
                 mRequestTimer.schedule(request, DataReceiver.DELAY_REQUEST, DataReceiver.DELAY_REQUEST);
+            }
         }
     }
 
