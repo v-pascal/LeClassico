@@ -14,7 +14,18 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.connection.requests.AbonnementsRequest;
+import com.studio.artaban.leclassico.connection.requests.ActualitesRequest;
+import com.studio.artaban.leclassico.connection.requests.AlbumsRequest;
+import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
+import com.studio.artaban.leclassico.connection.requests.CommentairesRequest;
+import com.studio.artaban.leclassico.connection.requests.EvenementsRequest;
+import com.studio.artaban.leclassico.connection.requests.MessagerieRequest;
+import com.studio.artaban.leclassico.connection.requests.MusicRequest;
 import com.studio.artaban.leclassico.connection.requests.NotificationsRequest;
+import com.studio.artaban.leclassico.connection.requests.PhotosRequest;
+import com.studio.artaban.leclassico.connection.requests.PresentsRequest;
+import com.studio.artaban.leclassico.connection.requests.VotesRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -114,9 +125,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             int tableIdx = intent.getByteExtra(EXTRA_DATA_TABLE_ID, (byte)0) - 1;
             if (tableIdx == Constants.NO_DATA)
                 throw new IllegalArgumentException("Unexpected request table ID");
-
-            if (mDataRequests.get(tableIdx) == null)
-                throw new RuntimeException("Table request not implemented");
 
             //////
             if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
@@ -358,24 +366,18 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
             switch (tableId) {
 
-                case Tables.ID_NOTIFICATIONS: {
-                    mDataRequests.add(new NotificationsRequest(this));
-                    break;
-                }
-                case Tables.ID_CAMARADES:
-                case Tables.ID_ABONNEMENTS:
-                case Tables.ID_ACTUALITES:
-                case Tables.ID_ALBUMS:
-                case Tables.ID_COMMENTAIRES:
-                case Tables.ID_EVENEMENTS:
-                case Tables.ID_MESSAGERIE:
-                case Tables.ID_MUSIC:
-                case Tables.ID_PHOTOS:
-                case Tables.ID_PRESENTS:
-                case Tables.ID_VOTES: {
-                    mDataRequests.add(null);
-                    break; // Not implemented yet
-                }
+                case Tables.ID_NOTIFICATIONS: mDataRequests.add(new NotificationsRequest(this)); break;
+                case Tables.ID_CAMARADES: mDataRequests.add(new CamaradesRequest(this)); break;
+                case Tables.ID_ABONNEMENTS: mDataRequests.add(new AbonnementsRequest(this)); break;
+                case Tables.ID_ACTUALITES: mDataRequests.add(new ActualitesRequest(this)); break;
+                case Tables.ID_ALBUMS: mDataRequests.add(new AlbumsRequest(this)); break;
+                case Tables.ID_COMMENTAIRES: mDataRequests.add(new CommentairesRequest(this)); break;
+                case Tables.ID_EVENEMENTS: mDataRequests.add(new EvenementsRequest(this)); break;
+                case Tables.ID_MESSAGERIE: mDataRequests.add(new MessagerieRequest(this)); break;
+                case Tables.ID_MUSIC: mDataRequests.add(new MusicRequest(this)); break;
+                case Tables.ID_PHOTOS: mDataRequests.add(new PhotosRequest(this)); break;
+                case Tables.ID_PRESENTS: mDataRequests.add(new PresentsRequest(this)); break;
+                case Tables.ID_VOTES: mDataRequests.add(new VotesRequest(this)); break;
             }
         }
         registerReceiver(mDataReceiver, new IntentFilter(REGISTER_NEW_DATA));

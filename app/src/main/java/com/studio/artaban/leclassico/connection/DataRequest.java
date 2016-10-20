@@ -76,6 +76,13 @@ public abstract class DataRequest extends TimerTask implements DataObserver.OnCo
         }
     }
 
+    ////// TimerTask ///////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void run() {
+        Logs.add(Logs.Type.V, null);
+        request(null);
+    }
+
     ////// OnContentListener ///////////////////////////////////////////////////////////////////////
     @Override
     public void onChange(boolean selfChange, Uri uri) {

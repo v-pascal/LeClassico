@@ -15,7 +15,7 @@ import com.studio.artaban.leclassico.tools.Tools;
 
 /**
  * Created by pascal on 17/10/16.
- * Notification DB exchange request
+ * Notifications table exchange request (web service consumption)
  */
 public class NotificationsRequest extends DataRequest {
 
@@ -78,12 +78,5 @@ public class NotificationsRequest extends DataRequest {
 
 
 
-    }
-
-    ////// TimerTask ///////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void run() {
-        Logs.add(Logs.Type.V, null);
-        request(null);
     }
 }
