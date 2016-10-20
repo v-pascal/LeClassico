@@ -5,10 +5,13 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.tools.Tools;
 
 /**
  * Created by pascal on 17/10/16.
@@ -51,15 +54,13 @@ public class NotificationsRequest extends DataRequest {
 
         } else { ////// New or data updates requested
 
+            Tools.LoginReply dataLogin = mService.getLoginData();
+            int entryUpdated = Database.synchronize(mTableId, mService.getContentResolver(),
+                    dataLogin.token, dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFICATIONS, null);
 
-
-
-            // Notify change to URI observer
-            //for (Uri observerUri : mRegister)
-            //    mService.getContentResolver().notifyChange(observerUri, null);
-
-
-
+            if (entryUpdated > 0) // Check to notify DB change to observer URI
+                for (Uri observerUri : mRegister)
+                    mService.getContentResolver().notifyChange(observerUri, null);
         }
     }
 

@@ -162,7 +162,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         if (!Internet.isConnected())
             return;
 
-        synchronized (mToken) {
+        synchronized (mDataLogin.token) {
 
             Date now = new Date();
             DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
@@ -178,12 +178,12 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     return Tools.receiveLogin(response, replyRes); // Manage method reply (below use)
                 }
             };
-            if (mToken != null) {
-                Logs.add(Logs.Type.I, "Update token (" + mToken + ")");
+            if (mDataLogin.token != null) {
+                Logs.add(Logs.Type.I, "Update token (" + mDataLogin.token + ")");
 
                 ////// Update token
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
-                                WebServices.URL_CONNECTION + '?' + WebServices.DATA_TOKEN + '=' + mToken,
+                                WebServices.URL_CONNECTION + '?' + WebServices.DATA_TOKEN + '=' + mDataLogin.token,
                         data, receiveListener);
                 switch (result) {
 
@@ -195,14 +195,14 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         return; // Nothing to do...
                     }
                     default: { ////// Reply succeeded (check it)
-                        mToken = replyRes.token;
+                        mDataLogin.token = replyRes.token;
 
                         // Check update result
-                        if (mToken != null) {
-                            Logs.add(Logs.Type.I, "Token updated (" + mToken + ")");
+                        if (mDataLogin.token != null) {
+                            Logs.add(Logs.Type.I, "Token updated (" + mDataLogin.token + ")");
 
-                            mPseudo = replyRes.pseudo;
-                            mTimeLag = replyRes.timeLag;
+                            mDataLogin.pseudo = replyRes.pseudo;
+                            mDataLogin.timeLag = replyRes.timeLag;
                             return; ////// OK
                         }
                         Logs.add(Logs.Type.W, "Token expired/invalid");
@@ -213,12 +213,12 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             Logs.add(Logs.Type.I, "Get new token");
             Cursor cursor = getContentResolver().query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                     new String[]{CamaradesTable.COLUMN_CODE_CONF}, CamaradesTable.COLUMN_PSEUDO + "='" +
-                            mPseudo + '\'', null, null);
+                            mDataLogin.pseudo + '\'', null, null);
             cursor.moveToFirst();
             String password = cursor.getString(0);
             cursor.close();
 
-            data.put(WebServices.CONNECTION_DATA_PSEUDO, mPseudo);
+            data.put(WebServices.CONNECTION_DATA_PSEUDO, mDataLogin.pseudo);
             data.put(WebServices.CONNECTION_DATA_PASSWORD, password);
 
             ////// Get new token
@@ -234,14 +234,14 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     return;
                 }
                 default: { ////// Reply succeeded (check it)
-                    mToken = replyRes.token;
+                    mDataLogin.token = replyRes.token;
 
                     // Check login result
-                    if (mToken != null) {
+                    if (mDataLogin.token != null) {
                         Logs.add(Logs.Type.I, "Token created");
 
-                        mPseudo = replyRes.pseudo;
-                        mTimeLag = replyRes.timeLag;
+                        mDataLogin.pseudo = replyRes.pseudo;
+                        mDataLogin.timeLag = replyRes.timeLag;
                         ////// OK
 
                     } else {
@@ -313,18 +313,13 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private final Binder mBinder = new DataBinder();
 
     //
-    private String mToken; // Token used to identify the user when requesting remote DB
-    public String getToken() {
-        synchronized(mToken) {
-            return mToken;
+    private final Tools.LoginReply mDataLogin = new Tools.LoginReply(); // Login info (token, pseudo & time lag)
+    public Tools.LoginReply getLoginData() {
+        synchronized (mDataLogin.token) {
+            return mDataLogin;
         }
     }
     private final Timer mTokenTimer = new Timer(); // Timer used to update token (connection supervisor)
-    private long mTimeLag; // Time lag between remote DB & current OS (in ms)
-                           // NB: Will be updated at every remote requests coz OS date & time can changed
-
-    private String mPseudo;
-    // Login pseudo (used to get a token if working offline and an Internet connection is established)
 
     ////// Service /////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -343,15 +338,15 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Logs.add(Logs.Type.V, "intent: " + intent + ";flags: " + flags + ";startId: " + startId);
-        mPseudo = intent.getStringExtra(EXTRA_DATA_PSEUDO);
-        mToken = intent.getStringExtra(EXTRA_DATA_TOKEN);
-        mTimeLag = intent.getLongExtra(EXTRA_DATA_TIME_LAG, 0);
+        mDataLogin.pseudo = intent.getStringExtra(EXTRA_DATA_PSEUDO);
+        mDataLogin.token = intent.getStringExtra(EXTRA_DATA_TOKEN);
+        mDataLogin.timeLag = intent.getLongExtra(EXTRA_DATA_TIME_LAG, 0);
 
         // Add notification
         Bundle notifyData = new Bundle();
         notifyData.putInt(Notify.DATA_KEY_ICON, R.drawable.notification);
         notifyData.putString(Notify.DATA_KEY_TITLE, getString(R.string.app_name));
-        notifyData.putString(Notify.DATA_KEY_TEXT, getString(R.string.pseudo_connected, mPseudo));
+        notifyData.putString(Notify.DATA_KEY_TEXT, getString(R.string.pseudo_connected, mDataLogin.pseudo));
 
         Notify.update(this, Notify.Type.EVENT, null, notifyData);
 

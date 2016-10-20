@@ -741,13 +741,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         mDataObserver.register(getContext().getContentResolver(), mNotifyUri);
 
         //////
-        Bundle data = new Bundle();
-        data.putString(DataTable.DATA_KEY_TABLE_NAME, NotificationsTable.TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, NotificationsTable.COLUMN_STATUS_DATE);
-        data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, NotificationsTable.COLUMN_PSEUDO);
-        data.putString(DataTable.DATA_KEY_PSEUDO,
-                getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO));
-
         Intent notifyIntent = DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mNotifyUri);
         getContext().sendBroadcast(notifyIntent); // Register new data
     }
