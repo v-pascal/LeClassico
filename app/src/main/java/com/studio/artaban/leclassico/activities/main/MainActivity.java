@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -38,8 +39,10 @@ import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
@@ -57,7 +60,7 @@ import java.io.File;
  */
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
-        MainFragment.OnFragmentListener {
+        MainFragment.OnFragmentListener, DataObserver.OnContentListener {
 
     public static final String EXTRA_DATA_ONLINE = "online";
     public static final String EXTRA_DATA_PSEUDO = "pseudo";
@@ -82,6 +85,20 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 throw new IllegalArgumentException("Unexpected section");
         }
+    }
+
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        // WARNING: Not in UI thread
+
+        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                refresh();
+            }
+        });
     }
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
@@ -191,8 +208,59 @@ public class MainActivity extends AppCompatActivity implements
             case Queries.MAIN_NOTIFICATION_FLAG: {
 
                 Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
+                boolean prevNewFlag = mNewNotification;
+
                 mNewNotification = cursor.getInt(0) > 0;
-                invalidateOptionsMenu();
+                if (prevNewFlag != mNewNotification) {
+                    invalidateOptionsMenu();
+
+                    if (mViewPager.getCurrentItem() == Constants.MAIN_SECTION_NOTIFICATIONS) {
+                        Logs.add(Logs.Type.I, "Display/Hide floating action button");
+                        final ViewPropertyAnimatorCompat animation = ViewCompat.animate(findViewById(R.id.fab));
+
+                        if (mNewNotification) // Display floating action button
+                            animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
+                                    .translationY(0)
+                                    .setListener(new ViewPropertyAnimatorListener() {
+                                        @Override
+                                        public void onAnimationStart(View view) {
+
+                                        }
+
+                                        @Override
+                                        public void onAnimationEnd(View view) {
+                                            animation.setListener(null);
+                                        }
+
+                                        @Override
+                                        public void onAnimationCancel(View view) {
+                                            ViewCompat.setTranslationY(view, 0);
+                                        }
+                                    })
+                                    .start();
+
+                        else // Hide floating action button
+                            animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
+                                    .translationY(mFabTransY)
+                                    .setListener(new ViewPropertyAnimatorListener() {
+                                        @Override
+                                        public void onAnimationStart(View view) {
+
+                                        }
+
+                                        @Override
+                                        public void onAnimationEnd(View view) {
+                                            animation.setListener(null);
+                                        }
+
+                                        @Override
+                                        public void onAnimationCancel(View view) {
+                                            ViewCompat.setTranslationY(view, mFabTransY);
+                                        }
+                                    })
+                                    .start();
+                    }
+                }
                 break;
             }
         }
@@ -343,6 +411,9 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPager mViewPager; // Content view pager
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
 
+    private Uri mShortcutUri; // Shortcut URI (new notifications)
+    private final DataObserver mShortcutObserver = new DataObserver(getClass().getName(), this);
+
     public void onAction(View sender) { // Floating action button click event
         Logs.add(Logs.Type.V, "sender: " + sender);
         switch (mViewPager.getCurrentItem()) {
@@ -355,28 +426,6 @@ public class MainActivity extends AppCompatActivity implements
                 ((HomeFragment) MainFragment.getBySection(Constants.MAIN_SECTION_HOME))
                         .refresh(getIntent().getStringExtra(EXTRA_DATA_PSEUDO));
                 refresh();
-
-                // Hide floating action button
-                final ViewPropertyAnimatorCompat animation = ViewCompat.animate(findViewById(R.id.fab));
-                animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
-                        .translationY(mFabTransY)
-                        .setListener(new ViewPropertyAnimatorListener() {
-                            @Override
-                            public void onAnimationStart(View view) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(View view) {
-                                animation.setListener(null);
-                            }
-
-                            @Override
-                            public void onAnimationCancel(View view) {
-                                ViewCompat.setTranslationY(view, mFabTransY);
-                            }
-                        })
-                        .start();
                 break;
             }
             case Constants.MAIN_SECTION_PUBLICATIONS: { ////// Add publication
@@ -477,7 +526,8 @@ public class MainActivity extends AppCompatActivity implements
         // Display user pseudo, profile icon & banner
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo))
                 .setText(getIntent().getStringExtra(EXTRA_DATA_PSEUDO));
-        refresh();
+        mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT, String.valueOf(getIntent()
+                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, 0)));
 
         // Set content view pager
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -608,9 +658,10 @@ public class MainActivity extends AppCompatActivity implements
                 final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
                 fab.setImageDrawable(getDrawable((section == Constants.MAIN_SECTION_PUBLICATIONS)?
                         R.drawable.ic_add_white_36dp:R.drawable.ic_check_white_36dp));
-                fab.setVisibility(((section == Constants.MAIN_SECTION_PUBLICATIONS) || (mNewNotification))?
-                        View.VISIBLE:View.GONE);
+                fab.setVisibility(((section == Constants.MAIN_SECTION_PUBLICATIONS) || (mNewNotification)) ?
+                        View.VISIBLE : View.GONE);
 
+                ViewCompat.animate(fab).cancel();
                 if (mFabTransY == Constants.NO_DATA)
                     fab.getViewTreeObserver()
                             .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -700,9 +751,18 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         Logs.add(Logs.Type.V, null);
 
+        refresh(); // Refresh shortcut info (notification icon)
+
         // Bind data service
         if (!mDataService.bind(this, null))
             Tools.criticalError(this, R.string.error_service_unavailable);
+
+        // Register content observer for shortcut data
+        mShortcutObserver.register(getContentResolver(), mShortcutUri);
+
+        //////
+        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mShortcutUri));
+        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_MESSAGERIE, mShortcutUri));
     }
 
     @Override
@@ -742,7 +802,14 @@ public class MainActivity extends AppCompatActivity implements
         super.onPause();
         Logs.add(Logs.Type.V, null);
 
+        //////
+        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mShortcutUri));
+        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_MESSAGERIE, mShortcutUri));
+
         // Unbind data service
         mDataService.unbind(this);
+
+        // Unregister all content observer
+        mShortcutObserver.unregister(getContentResolver());
     }
 }

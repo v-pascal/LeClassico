@@ -69,7 +69,7 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Data observer to notify DB changes
-    protected DataObserver mDataObserver;
+    protected final DataObserver mDataObserver = new DataObserver(getClass().getName(), this);
 
     protected short mQueryCount; // DB query result count
     protected int mQueryID = Constants.NO_DATA; // Max record Id (used to check if new entries)
@@ -79,16 +79,11 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         Logs.add(Logs.Type.V, "context: " + context);
-
-        if (context instanceof OnFragmentListener) {
+        if (context instanceof OnFragmentListener)
             mListener = (OnFragmentListener) context;
-
-            HandlerThread observerThread = new HandlerThread("mainDataObserverThread");
-            observerThread.start();
-            mDataObserver = new DataObserver(new Handler(observerThread.getLooper()), this);
-
-        } else
+        else
             throw new RuntimeException(context.toString() + " must implement 'OnFragmentListener'");
     }
 

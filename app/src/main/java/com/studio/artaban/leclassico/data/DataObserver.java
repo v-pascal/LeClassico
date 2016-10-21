@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.HandlerThread;
 
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -38,10 +39,21 @@ public class DataObserver extends ContentObserver {
         mSelfChange = selfChange;
     }
 
+    private static Handler createHandler(String name) { // Create thread handler for current observer
+        HandlerThread observerThread = new HandlerThread(name + "-DataObserver");
+        observerThread.start();
+        return new Handler(observerThread.getLooper());
+    }
+
     //
     public DataObserver(Handler handler, OnContentListener listener) {
         super(handler);
         Logs.add(Logs.Type.V, "handler: " + handler + ";listener: " + listener);
+        mListener = listener;
+    }
+    public DataObserver(String thread, OnContentListener listener) {
+        super(createHandler(thread));
+        Logs.add(Logs.Type.V, "thread: " + thread + ";listener: " + listener);
         mListener = listener;
     }
 

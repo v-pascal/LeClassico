@@ -369,7 +369,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     ////// OnContentListener ///////////////////////////////////////////////////////////////////////
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-    // WARNING: Not in UI thread
+        // WARNING: Not in UI thread
 
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
         getActivity().runOnUiThread(new Runnable() {
@@ -739,8 +739,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         mDataObserver.register(getContext().getContentResolver(), mNotifyUri);
 
         //////
-        Intent notifyIntent = DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mNotifyUri);
-        getContext().sendBroadcast(notifyIntent); // Register new data
+        getContext().sendBroadcast(DataService.getIntent(Boolean.TRUE,
+                Tables.ID_NOTIFICATIONS, mNotifyUri)); // Register new data
     }
 
     @Override
@@ -749,8 +749,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         Logs.add(Logs.Type.V, null);
 
         //////
-        Intent notifyIntent = DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mNotifyUri);
-        getContext().sendBroadcast(notifyIntent); // Unregister new data
+        getContext().sendBroadcast(DataService.getIntent(Boolean.FALSE,
+                Tables.ID_NOTIFICATIONS, mNotifyUri)); // Unregister new data
 
         // Unregister all content observer
         mDataObserver.unregister(getContext().getContentResolver());

@@ -21,6 +21,9 @@ public class Uris {
             case ID_USER_NOTIFICATIONS: // User/#/Notifications
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME);
+            case ID_MAIN_SHORTCUT: // User/#/Shortcut
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_USER + arguments[0] + PATH_SHORTCUT);
 
             default:
                 throw new IllegalArgumentException("Unexpected URI id: " + id);
@@ -30,8 +33,10 @@ public class Uris {
     ////// Path ////////////////////////////////////////////////////////////////////////////////////
 
     private static final String PATH_USER = "User/"; // User URI path following with member ID
+    private static final String PATH_SHORTCUT = "/Shortcut"; // Shortcut URI path
 
     ////// URI /////////////////////////////////////////////////////////////////////////////////////
 
     public static final int ID_USER_NOTIFICATIONS = 0; // User/#/Notifications
+    public static final int ID_MAIN_SHORTCUT = 1;      // User/#/Shortcut
 }
