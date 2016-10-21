@@ -58,9 +58,10 @@ public class NotificationsRequest extends DataRequest {
             int entryUpdated = Database.synchronize(mTableId, mService.getContentResolver(),
                     dataLogin.token, dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFICATIONS, null);
 
-            if (entryUpdated > 0) // Check to notify DB change to observer URI
+            if (entryUpdated > 0) { // Check to notify DB change to observer URI
                 for (Uri observerUri : mRegister)
                     mService.getContentResolver().notifyChange(observerUri, null);
+            }
         }
     }
 

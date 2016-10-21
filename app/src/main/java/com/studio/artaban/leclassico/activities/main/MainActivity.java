@@ -474,9 +474,6 @@ public class MainActivity extends AppCompatActivity implements
         navigation.getMenu().findItem(R.id.navig_quit).getIcon()
                 .setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 
-        // Hide floating action button (only available with publications & notifications)
-        findViewById(R.id.fab).setVisibility(View.GONE);
-
         // Display user pseudo, profile icon & banner
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo))
                 .setText(getIntent().getStringExtra(EXTRA_DATA_PSEUDO));
@@ -628,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements
                                     fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                                     fab.setTranslationY(factor * mFabTransY);
                                     fab.setVisibility(((section == Constants.MAIN_SECTION_PUBLICATIONS) ||
-                                            (mNewNotification))? View.VISIBLE:View.GONE);
+                                            (mNewNotification)) ? View.VISIBLE : View.GONE);
                                 }
                             });
                 else

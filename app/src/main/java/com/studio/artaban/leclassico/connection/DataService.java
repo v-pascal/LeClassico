@@ -128,8 +128,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
             //////
             if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
-                if (mDataRequests.get(tableIdx).register(intent))
+                if (mDataRequests.get(tableIdx).register(intent)) {
+
+                    Logs.add(Logs.Type.I, "Schedule request table ID #" + (tableIdx + 1));
                     mRequestTimer.schedule(mDataRequests.get(tableIdx), DELAY_REQUEST, DELAY_REQUEST);
+                }
             }
             else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
 
