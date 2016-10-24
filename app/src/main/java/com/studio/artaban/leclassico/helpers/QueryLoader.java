@@ -97,13 +97,14 @@ public class QueryLoader {
 
     //////
     public void init(Activity activity, int id, Bundle args) {
-    // Initialize or resend loader with same query parameters
+        // Initialize a new cursor loader (destroy previous one if any)
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";id: " + id + ";args: " + args);
+        activity.getLoaderManager().destroyLoader(id);
         activity.getLoaderManager().initLoader(id, args, mLoaderCallbacks);
     }
     public void restart(Activity activity, int id, Bundle args) {
-    // Restart a loader with new query parameters
+        // Restart a loader with new query parameters
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";id: " + id + ";args: " + args);
         activity.getLoaderManager().restartLoader(id, args, mLoaderCallbacks);
