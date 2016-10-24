@@ -39,7 +39,6 @@ import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
@@ -60,7 +59,7 @@ import java.io.File;
  */
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
-        MainFragment.OnFragmentListener, DataObserver.OnContentListener {
+        MainFragment.OnFragmentListener {
 
     public static final String EXTRA_DATA_ONLINE = "online";
     public static final String EXTRA_DATA_PSEUDO = "pseudo";
@@ -85,20 +84,6 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 throw new IllegalArgumentException("Unexpected section");
         }
-    }
-
-    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
-    @Override
-    public void onChange(boolean selfChange, Uri uri) {
-        // WARNING: Not in UI thread
-
-        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                refresh();
-            }
-        });
     }
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
@@ -159,6 +144,10 @@ public class MainActivity extends AppCompatActivity implements
         newAnim.start();
         prevAnim.start();
     }
+    @Override
+    public Uri onGetShortcutURI() {
+        return mShortcutUri;
+    }
 
     @Override
     public DataService onGetService() {
@@ -205,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements
                             .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
                 break;
             }
-            case Queries.MAIN_NOTIFICATION_FLAG: {
+            case Queries.MAIN_NEW_NOTIFY_FLAG: {
 
                 Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
                 boolean prevNewFlag = mNewNotification;
@@ -216,7 +205,10 @@ public class MainActivity extends AppCompatActivity implements
 
                     if (mViewPager.getCurrentItem() == Constants.MAIN_SECTION_NOTIFICATIONS) {
                         Logs.add(Logs.Type.I, "Display/Hide floating action button");
-                        final ViewPropertyAnimatorCompat animation = ViewCompat.animate(findViewById(R.id.fab));
+
+                        View fab = findViewById(R.id.fab);
+                        fab.setVisibility(View.VISIBLE);
+                        final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
 
                         if (mNewNotification) // Display floating action button
                             animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
@@ -264,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
         }
-        cursor.close();
     }
 
     @Override
@@ -279,30 +270,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private final QueryLoader mUserLoader = new QueryLoader(this, this); // User data query loader
     private final QueryLoader mNewNotifyLoader = new QueryLoader(this, this); // New notification query loader
-
-    private void refresh() { // Set or refresh activity info (starting or restarting queries)
-        Logs.add(Logs.Type.V, null);
-        String pseudo = getIntent().getStringExtra(EXTRA_DATA_PSEUDO);
-
-        // Load user & notification data (using query loaders)
-        Bundle userData = new Bundle();
-        userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
-
-                CamaradesTable.COLUMN_SEXE, // COLUMN_INDEX_SEX
-                CamaradesTable.COLUMN_PROFILE, // COLUMN_INDEX_PROFILE
-                CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
-        });
-        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
-        mUserLoader.restart(this, Tables.ID_CAMARADES, userData);
-
-        userData.putBoolean(QueryLoader.DATA_KEY_URI_SINGLE, false);
-        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
-        userData.putString(QueryLoader.DATA_KEY_SELECTION,
-                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        NotificationsTable.COLUMN_LU_FLAG + "=0");
-        mNewNotifyLoader.restart(this, Queries.MAIN_NOTIFICATION_FLAG, userData);
-    }
 
     ////// OnNavigationItemSelectedListener ////////////////////////////////////////////////////////
     @Override
@@ -410,22 +377,17 @@ public class MainActivity extends AppCompatActivity implements
     //////
     private ViewPager mViewPager; // Content view pager
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
-
-    private Uri mShortcutUri; // Shortcut URI (new notifications)
-    private final DataObserver mShortcutObserver = new DataObserver(getClass().getName(), this);
+    private Uri mShortcutUri; // Shortcut URI (new mail & notifications)
 
     public void onAction(View sender) { // Floating action button click event
         Logs.add(Logs.Type.V, "sender: " + sender);
         switch (mViewPager.getCurrentItem()) {
 
             case Constants.MAIN_SECTION_NOTIFICATIONS: { ////// Mark notifications as read
-                Logs.add(Logs.Type.I, "Mark notification(s) as read");
 
+                Logs.add(Logs.Type.I, "Mark notification(s) as read");
                 ((NotificationsFragment) MainFragment.getBySection(Constants.MAIN_SECTION_NOTIFICATIONS))
                         .read();
-                ((HomeFragment) MainFragment.getBySection(Constants.MAIN_SECTION_HOME))
-                        .refresh(getIntent().getStringExtra(EXTRA_DATA_PSEUDO));
-                refresh();
                 break;
             }
             case Constants.MAIN_SECTION_PUBLICATIONS: { ////// Add publication
@@ -524,8 +486,8 @@ public class MainActivity extends AppCompatActivity implements
                 .setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 
         // Display user pseudo, profile icon & banner
-        ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo))
-                .setText(getIntent().getStringExtra(EXTRA_DATA_PSEUDO));
+        String pseudo = getIntent().getStringExtra(EXTRA_DATA_PSEUDO);
+        ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
         mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT, String.valueOf(getIntent()
                 .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, 0)));
 
@@ -744,6 +706,26 @@ public class MainActivity extends AppCompatActivity implements
                 (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ?
                         TabLayout.MODE_SCROLLABLE : TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(mViewPager);
+
+        // Load user & notification data (using query loaders)
+        Bundle userData = new Bundle();
+        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
+
+                CamaradesTable.COLUMN_SEXE, // COLUMN_INDEX_SEX
+                CamaradesTable.COLUMN_PROFILE, // COLUMN_INDEX_PROFILE
+                CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
+        });
+        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
+        mUserLoader.init(this, Tables.ID_CAMARADES, userData);
+
+        Bundle notifyData = new Bundle();
+        notifyData.putParcelable(QueryLoader.DATA_KEY_URI, mShortcutUri);
+        notifyData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_NEW_NOTIFY_FLAG);
+        notifyData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
+        notifyData.putString(QueryLoader.DATA_KEY_SELECTION,
+                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        NotificationsTable.COLUMN_LU_FLAG + "=0");
+        mNewNotifyLoader.init(this, Queries.MAIN_NEW_NOTIFY_FLAG, notifyData);
     }
 
     @Override
@@ -751,14 +733,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         Logs.add(Logs.Type.V, null);
 
-        refresh(); // Refresh shortcut info (notification icon)
-
         // Bind data service
         if (!mDataService.bind(this, null))
             Tools.criticalError(this, R.string.error_service_unavailable);
-
-        // Register content observer for shortcut data
-        mShortcutObserver.register(getContentResolver(), mShortcutUri);
 
         //////
         sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mShortcutUri));
@@ -808,8 +785,5 @@ public class MainActivity extends AppCompatActivity implements
 
         // Unbind data service
         mDataService.unbind(this);
-
-        // Unregister all content observer
-        mShortcutObserver.unregister(getContentResolver());
     }
 }

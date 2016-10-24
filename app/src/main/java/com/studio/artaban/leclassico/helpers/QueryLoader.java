@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.helpers;
 
 import android.app.Activity;
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -9,9 +10,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Tables;
 
 /**
  * Created by pascal on 14/08/16.
@@ -25,7 +25,7 @@ public class QueryLoader {
     public static final String DATA_KEY_SELECTION_ARGS = "selectionArgs";
     public static final String DATA_KEY_SORT_ORDER = "sortOrder";
 
-    public static final String DATA_KEY_URI_SINGLE = "single";
+    public static final String DATA_KEY_URI = "uri";
     public static final String DATA_KEY_ROW_ID = "rowId";
 
     //////
@@ -52,18 +52,22 @@ public class QueryLoader {
         //////
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
             Logs.add(Logs.Type.V, "id: " + id + ";args: " + args);
-            String contentUri = DataProvider.CONTENT_URI;
             mLoaderId = id;
 
-            contentUri += Queries.getTableUri(id); // Add table URI
+            Uri queryURI;
+            if ((id > 0) && (id <= Tables.ID_LAST) && (!args.containsKey(DATA_KEY_URI))) // Table query
+                queryURI = Uri.parse(DataProvider.CONTENT_URI + Tables.getName((byte) id));
+            else if (args.containsKey(DATA_KEY_URI)) // Particular query
+                queryURI = args.getParcelable(DATA_KEY_URI);
+            else
+                throw new IllegalArgumentException("Missing URI (not a table query)");
 
-            // Check single row query
-            if (args.getBoolean(DATA_KEY_URI_SINGLE, false))
-                contentUri += '/' + args.getLong(DATA_KEY_ROW_ID, Constants.NO_DATA);
+            // Check to add row or query ID into the URI
+            if (args.containsKey(DATA_KEY_ROW_ID))
+                queryURI = ContentUris.withAppendedId(queryURI, args.getLong(DATA_KEY_ROW_ID));
 
-            return new CursorLoader(mContext, Uri.parse(contentUri),
+            return new CursorLoader(mContext, queryURI,
                     args.getStringArray(DATA_KEY_PROJECTION),
                     args.getString(DATA_KEY_SELECTION, null),
                     args.getStringArray(DATA_KEY_SELECTION_ARGS),

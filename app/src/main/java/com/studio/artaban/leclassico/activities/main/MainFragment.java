@@ -1,14 +1,12 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.support.v4.app.Fragment;
 
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.lang.ref.WeakReference;
@@ -18,7 +16,7 @@ import java.util.Hashtable;
  * Created by pascal on 05/09/16.
  * Main fragment class (MainActivity parent fragment)
  */
-public abstract class MainFragment extends Fragment implements DataObserver.OnContentListener {
+public abstract class MainFragment extends Fragment {
 
     private static final String DATA_KEY_QUERY_COUNT = "queryCount";
     private static final String DATA_KEY_QUERY_ID = "queryID";
@@ -60,6 +58,7 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
         }
         ShortcutFragment onGetShortcut(int section, boolean newItem);
         void onAnimateShortcut(int section, OnAnimationListener listener);
+        Uri onGetShortcutURI();
 
         ////// Service
         DataService onGetService();
@@ -67,9 +66,6 @@ public abstract class MainFragment extends Fragment implements DataObserver.OnCo
     protected OnFragmentListener mListener; // Activity listener
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Data observer to notify DB changes
-    protected final DataObserver mDataObserver = new DataObserver(getClass().getName(), this);
 
     protected short mQueryCount; // DB query result count
     protected int mQueryID = Constants.NO_DATA; // Max record Id (used to check if new entries)

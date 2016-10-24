@@ -2,7 +2,6 @@ package com.studio.artaban.leclassico.activities.main;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -366,23 +365,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         }
     }
 
-    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
-    @Override
-    public void onChange(boolean selfChange, Uri uri) {
-        // WARNING: Not in UI thread
-
-        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                refresh();
-            }
-        });
-    }
-
-    //
-    private Uri mNotifyUri; // Notifications URI
-
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, final Cursor cursor) {
@@ -430,12 +412,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                                 Logs.add(Logs.Type.V, "previous: " + previous);
                                 fillShortcut(cursor, false);
-                                cursor.close();
                             }
                         });
-
-                    } else
-                        cursor.close();
+                    }
 
                 } else {
                     Logs.add(Logs.Type.I, "Initial query");
@@ -448,14 +427,12 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
                     ////// Fill shortcut
                     fillShortcut(cursor, false);
-                    cursor.close();
                 }
                 break;
             }
             case Queries.MAIN_NOTIFICATION_MAX: {
 
                 mQueryID = cursor.getShort(0);
-                cursor.close();
                 break;
             }
         }
@@ -492,7 +469,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     private static final int COLUMN_INDEX_COM_TEXT = 18;
     private static final int COLUMN_INDEX_COMMENT_ID = 19;
 
-    private void refresh() { // Refresh notification list by restarting queries
+    private void setLoaders() { // Initialize or update queries loaders
         Logs.add(Logs.Type.V, null);
 
         // Get query limit
@@ -527,6 +504,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         // Load notification data (using query loader)
         Bundle queryData = new Bundle();
+        queryData.putParcelable(QueryLoader.DATA_KEY_URI, mNotifyUri);
+        queryData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_NOTIFICATIONS);
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
@@ -574,13 +553,21 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         " WHERE " + selection +
                         " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
                         " LIMIT " + queryLimit);
-        mListLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
+        if (mQueryID != Constants.NO_DATA)
+            mListLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
+        else {
+            mListLoader.init(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
 
-        queryData.putString(QueryLoader.DATA_KEY_SELECTION, selection);
-        queryData.putStringArray(QueryLoader.DATA_KEY_PROJECTION,
-                new String[]{"max(" + IDataTable.DataField.COLUMN_ID + ')'});
-        mMaxLoader.restart(getActivity(), Queries.MAIN_NOTIFICATION_MAX, queryData);
+            queryData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_NOTIFICATION_MAX);
+            queryData.putString(QueryLoader.DATA_KEY_SELECTION, selection);
+            queryData.putStringArray(QueryLoader.DATA_KEY_PROJECTION,
+                    new String[]{"max(" + IDataTable.DataField.COLUMN_ID + ')'});
+            mMaxLoader.init(getActivity(), Queries.MAIN_NOTIFICATION_MAX, queryData);
+        }
     }
+
+    //
+    private Uri mNotifyUri; // Notifications URI
 
     ////// MainFragment ////////////////////////////////////////////////////////////////////////////
     @Override
@@ -725,6 +712,9 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         data = new SpannableStringBuilder(getString(R.string.no_notification_info));
         mListener.onGetShortcut(Constants.MAIN_SECTION_NOTIFICATIONS, false).setInfo(data);
 
+        // Initialize notification list (set query loaders)
+        setLoaders();
+
         return rootView;
     }
 
@@ -732,11 +722,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
     public void onResume() {
         super.onResume();
         Logs.add(Logs.Type.V, null);
-
-        refresh(); // Refresh notification list
-
-        // Register content observer on user notification(s)
-        mDataObserver.register(getContext().getContentResolver(), mNotifyUri);
 
         //////
         getContext().sendBroadcast(DataService.getIntent(Boolean.TRUE,
@@ -751,8 +736,5 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         //////
         getContext().sendBroadcast(DataService.getIntent(Boolean.FALSE,
                 Tables.ID_NOTIFICATIONS, mNotifyUri)); // Unregister new data
-
-        // Unregister all content observer
-        mDataObserver.unregister(getContext().getContentResolver());
     }
 }

@@ -2,7 +2,6 @@ package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
@@ -30,20 +29,13 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
     private static final int COLUMN_INDEX_SEX = 2;
     private static final int COLUMN_INDEX_PROFILE = 3;
 
-    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
-    @Override
-    public void onChange(boolean selfChange, Uri uri) {
-        // WARNING: Not in UI thread
-
-    }
-
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
         cursor.moveToFirst();
 
-        if (id == Queries.MAIN_LAST_FOLLOWED) {
+        if (id == Queries.MAIN_SHORTCUT_LAST_FOLLOWED) {
             if (cursor.getString(COLUMN_INDEX_PSEUDO) == null)
                 return; // No data found yet
 
@@ -58,7 +50,6 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
                     cursor.getString(COLUMN_INDEX_PROFILE) : null;
             mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setIcon(female, profile, R.dimen.shortcut_content_height);
         }
-        cursor.close();
     }
 
     @Override
@@ -88,7 +79,10 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
 
         // Load shortcut info (using query loaders)
         String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO);
+
         Bundle shortcutData = new Bundle();
+        shortcutData.putParcelable(QueryLoader.DATA_KEY_URI, mListener.onGetShortcutURI());
+        shortcutData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_SHORTCUT_LAST_FOLLOWED);
         shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")," +
                         CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
@@ -99,7 +93,7 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
                         AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO + " AND " +
                         AbonnementsTable.COLUMN_CAMARADE + "<>'" + pseudo + '\'' +
                         " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
-        mLastMemberLoader.restart(getActivity(), Queries.MAIN_LAST_FOLLOWED, shortcutData);
+        mLastMemberLoader.init(getActivity(), Queries.MAIN_SHORTCUT_LAST_FOLLOWED, shortcutData);
 
 
 

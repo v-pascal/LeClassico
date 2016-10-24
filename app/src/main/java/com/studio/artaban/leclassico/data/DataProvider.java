@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
@@ -55,9 +56,8 @@ public class DataProvider extends ContentProvider {
 
     private static final UriMatcher URI_MATCHER_SINGLE;
     private static final UriMatcher URI_MATCHER;
-    static {
+    static { // DB tables URI
 
-        ////// Tables URI
         URI_MATCHER_SINGLE = new UriMatcher(UriMatcher.NO_MATCH);
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME + SINGLE_ROW, Tables.ID_CAMARADES);
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, AbonnementsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_ABONNEMENTS);
@@ -85,9 +85,6 @@ public class DataProvider extends ContentProvider {
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME, Tables.ID_PRESENTS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME, Tables.ID_VOTES);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME, Tables.ID_NOTIFICATIONS);
-
-        ////// Reserved URI
-        // * DataTable.SQL_QUERY_URI: for multiple table queries
     }
 
     //
@@ -98,28 +95,6 @@ public class DataProvider extends ContentProvider {
         public boolean isOpened() { return isReady(); };
     }
     private DB mDB;
-
-    private String getUriTable(UriMatcher matcher, Uri uri) {
-     // Return DB table request according the URI
-
-        Logs.add(Logs.Type.V, "matcher: " + matcher + " uri: " + uri);
-        switch (matcher.match(uri)) {
-
-            case Tables.ID_CAMARADES: return CamaradesTable.TABLE_NAME;
-            case Tables.ID_ABONNEMENTS: return AbonnementsTable.TABLE_NAME;
-            case Tables.ID_ACTUALITES: return ActualitesTable.TABLE_NAME;
-            case Tables.ID_ALBUMS: return AlbumsTable.TABLE_NAME;
-            case Tables.ID_COMMENTAIRES: return CommentairesTable.TABLE_NAME;
-            case Tables.ID_EVENEMENTS: return EvenementsTable.TABLE_NAME;
-            case Tables.ID_MESSAGERIE: return MessagerieTable.TABLE_NAME;
-            case Tables.ID_MUSIC: return MusicTable.TABLE_NAME;
-            case Tables.ID_PHOTOS: return PhotosTable.TABLE_NAME;
-            case Tables.ID_PRESENTS: return PresentsTable.TABLE_NAME;
-            case Tables.ID_VOTES: return VotesTable.TABLE_NAME;
-            case Tables.ID_NOTIFICATIONS: return NotificationsTable.TABLE_NAME;
-        }
-        return null;
-    }
 
     //////
     @Override
@@ -139,15 +114,17 @@ public class DataProvider extends ContentProvider {
             mDB.open(true); // Always open DB in writable mode
 
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-        String table = getUriTable(URI_MATCHER_SINGLE, uri);
+        String table = Tables.getName((byte) URI_MATCHER_SINGLE.match(uri));
 
         // Check single row request
         if (table != null)
             builder.appendWhere(IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1));
         else {
 
-            table = getUriTable(URI_MATCHER, uri);
-            if (table == null) // SQL query (for multiple table queries)
+            table = Tables.getName((byte) URI_MATCHER.match(uri));
+            if (table == null)
+                table = Uris.getUriTable(uri);
+            if (table == null) // Raw query (for multiple table queries)
                 return mDB.getDB().rawQuery(selection, selectionArgs);
         }
         builder.setTables(table);
@@ -200,7 +177,7 @@ public class DataProvider extends ContentProvider {
         if (!mDB.isOpened())
             mDB.open(true);
 
-        String table = getUriTable(URI_MATCHER, uri);
+        String table = Tables.getName((byte) URI_MATCHER.match(uri));
         if (table == null)
             throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
@@ -225,13 +202,13 @@ public class DataProvider extends ContentProvider {
         if (!mDB.isOpened())
             mDB.open(true);
 
-        String table = getUriTable(URI_MATCHER_SINGLE, uri);
+        String table = Tables.getName((byte) URI_MATCHER_SINGLE.match(uri));
         if (table != null)
             selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1) +
                     ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
         else {
 
-            table = getUriTable(URI_MATCHER, uri);
+            table = Tables.getName((byte) URI_MATCHER.match(uri));
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
 
@@ -265,13 +242,13 @@ public class DataProvider extends ContentProvider {
         if (!mDB.isOpened())
             mDB.open(true);
 
-        String table = getUriTable(URI_MATCHER_SINGLE, uri);
+        String table = Tables.getName((byte) URI_MATCHER_SINGLE.match(uri));
         if (table != null)
             selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1) +
                     ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
         else {
 
-            table = getUriTable(URI_MATCHER, uri);
+            table = Tables.getName((byte) URI_MATCHER.match(uri));
             if (table == null)
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
         }
@@ -281,10 +258,9 @@ public class DataProvider extends ContentProvider {
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TODO.getValue());
 
         int result = mDB.getDB().update(table, values, selection, selectionArgs);
-        if (result > 0) {
-
+        if (result > 0)
             getContext().getContentResolver().notifyChange(uri, null);
-        }
+
         return result; // Return updated entries count
     }
 }
