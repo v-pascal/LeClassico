@@ -88,11 +88,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     }
 
     ////// Broadcast actions
-    public static final String REGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + "." +
+    public static final String REGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REGISTER_NEW_DATA";
-    public static final String UNREGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + "." +
+    public static final String UNREGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.UNREGISTER_NEW_DATA";
-    public static final String REQUEST_OLD_DATA = "com." + Constants.APP_URI_COMPANY + "." +
+    public static final String REQUEST_OLD_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REQUEST_OLD_DATA";
 
     //
@@ -288,8 +288,10 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 Constants.SERVICE_DELAY_TOKEN_UPDATE);
     }
     private void stopConnectionSupervisor() {
+
         Logs.add(Logs.Type.V, null);
-        mTokenTimer.cancel();
+        if (mTokenTimer != null) // Can be cancelled without having started (offline)
+            mTokenTimer.cancel();
     }
 
     private void startDataRequests() { // Schedule data requests

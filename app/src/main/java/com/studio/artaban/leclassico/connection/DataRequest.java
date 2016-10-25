@@ -68,8 +68,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                 unregister(uri);
                 if (mRegister.isEmpty()) {
 
-                    mTask.cancel();
-                    mCancelled = true;
+                    cancel();
                     mSyncObserver.unregister(mService.getContentResolver());
                     return true;
                     // Returns timer task cancel flag
@@ -103,7 +102,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     public void cancel() { // Cancel request task
 
         Logs.add(Logs.Type.V, null);
-        if (mTask != null)
+        if (mTask != null) // Can be cancelled without having started (offline)
             mTask.cancel();
 
         mCancelled = true;

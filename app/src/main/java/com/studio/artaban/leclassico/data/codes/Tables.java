@@ -36,6 +36,8 @@ public final class Tables {
     public static final byte ID_LAST = ID_NOTIFICATIONS;
 
     //////
+    public static final int ID_MAX = 255;
+
     public static String getName(byte id) { // Return DB table name according its ID
         //Logs.add(Logs.Type.V, "id: " + id);
         switch (id) {

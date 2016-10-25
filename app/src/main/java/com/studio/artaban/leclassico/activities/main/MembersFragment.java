@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -81,8 +82,8 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
         String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO);
 
         Bundle shortcutData = new Bundle();
-        shortcutData.putParcelable(QueryLoader.DATA_KEY_URI, mListener.onGetShortcutURI());
-        shortcutData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_SHORTCUT_LAST_FOLLOWED);
+        shortcutData.putParcelable(QueryLoader.DATA_KEY_URI,
+                Uris.getUri(Uris.ID_RAW_QUERY)); // To allow raw query without any notification
         shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")," +
                         CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO

@@ -56,7 +56,7 @@ public class NotificationsRequest extends DataRequest {
 
             Tools.LoginReply dataLogin = mService.getLoginData();
             int entryUpdated = Database.synchronize(mTableId, mService.getContentResolver(),
-                    dataLogin.token.get(), dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFICATIONS, null);
+                    dataLogin.token.get(), dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
 
             if (entryUpdated > 0) { // Check to notify DB change to observer URI
                 for (Uri observerUri : mRegister)

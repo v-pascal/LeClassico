@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements
 
         cursor.moveToFirst();
         switch (id) {
-            case Tables.ID_CAMARADES: { ////// User info
+            case Queries.MAIN_DATA_USER: { ////// User info
 
                 // Get DB data
                 boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements
                             .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
                 break;
             }
-            case Queries.MAIN_NEW_NOTIFY_FLAG: {
+            case Queries.MAIN_DATA_NEW_NOTIFY: {
 
                 Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
                 boolean prevNewFlag = mNewNotification;
@@ -716,16 +716,15 @@ public class MainActivity extends AppCompatActivity implements
                 CamaradesTable.COLUMN_BANNER // COLUMN_INDEX_BANNER
         });
         userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
-        mUserLoader.init(this, Tables.ID_CAMARADES, userData);
+        mUserLoader.init(this, Queries.MAIN_DATA_USER, userData);
 
         Bundle notifyData = new Bundle();
         notifyData.putParcelable(QueryLoader.DATA_KEY_URI, mShortcutUri);
-        notifyData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_NEW_NOTIFY_FLAG);
-        notifyData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
         notifyData.putString(QueryLoader.DATA_KEY_SELECTION,
-                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        NotificationsTable.COLUMN_LU_FLAG + "=0");
-        mNewNotifyLoader.init(this, Queries.MAIN_NEW_NOTIFY_FLAG, notifyData);
+                "SELECT count(*) FROM " + NotificationsTable.TABLE_NAME +
+                        " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" + pseudo +
+                        "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD);
+        mNewNotifyLoader.init(this, Queries.MAIN_DATA_NEW_NOTIFY, notifyData);
     }
 
     @Override

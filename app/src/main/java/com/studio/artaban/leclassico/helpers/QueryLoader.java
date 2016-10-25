@@ -20,10 +20,10 @@ import com.studio.artaban.leclassico.data.codes.Tables;
 public class QueryLoader {
 
     // Data keys
-    public static final String DATA_KEY_PROJECTION = "projection";
-    public static final String DATA_KEY_SELECTION = "selection";
-    public static final String DATA_KEY_SELECTION_ARGS = "selectionArgs";
-    public static final String DATA_KEY_SORT_ORDER = "sortOrder";
+    public static final String DATA_KEY_PROJECTION = "projection"; // Query projection (table query reserved)
+    public static final String DATA_KEY_SELECTION = "selection"; // Query criteria
+    public static final String DATA_KEY_SELECTION_ARGS = "selectionArgs"; // Query criteria arguments
+    public static final String DATA_KEY_SORT_ORDER = "sortOrder"; // Query order (table query reserved)
 
     public static final String DATA_KEY_URI = "uri";
     public static final String DATA_KEY_ROW_ID = "rowId";
@@ -58,10 +58,14 @@ public class QueryLoader {
             Uri queryURI;
             if ((id > 0) && (id <= Tables.ID_LAST) && (!args.containsKey(DATA_KEY_URI))) // Table query
                 queryURI = Uri.parse(DataProvider.CONTENT_URI + Tables.getName((byte) id));
-            else if (args.containsKey(DATA_KEY_URI)) // Particular query (table or raw query)
+            else if (args.containsKey(DATA_KEY_URI)) { // Raw query
+                if ((args.containsKey(DATA_KEY_PROJECTION)) || (args.containsKey(DATA_KEY_SORT_ORDER)))
+                    throw new IllegalArgumentException("Unexpected table query fields found (raw query)");
+
                 queryURI = args.getParcelable(DATA_KEY_URI);
+            }
             else
-                throw new IllegalArgumentException("Missing URI (not a table query)");
+                throw new IllegalArgumentException("Missing URI (raw query)");
 
             // Check to add row or query ID into the URI
             if (args.containsKey(DATA_KEY_ROW_ID))

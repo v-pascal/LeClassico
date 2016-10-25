@@ -373,7 +373,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         cursor.moveToFirst();
         switch (id) {
 
-            case Queries.MAIN_NOTIFICATIONS: {
+            case Queries.MAIN_NOTIFY_LIST: {
                 mQueryCount = (short)cursor.getCount();
 
                 // Check if not the initial query
@@ -430,7 +430,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                 }
                 break;
             }
-            case Queries.MAIN_NOTIFICATION_MAX: {
+            case Queries.MAIN_NOTIFY_MAX: {
 
                 mQueryID = cursor.getShort(0);
                 break;
@@ -499,13 +499,12 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
 
         }
-        if (queryLimit < Queries.LIMIT_MAIN_NOTIFICATIONS)
-            queryLimit = Queries.LIMIT_MAIN_NOTIFICATIONS;
+        if (queryLimit < Queries.LIMIT_MAIN_NOTIFY)
+            queryLimit = Queries.LIMIT_MAIN_NOTIFY;
 
         // Load notification data (using query loader)
         Bundle queryData = new Bundle();
         queryData.putParcelable(QueryLoader.DATA_KEY_URI, mNotifyUri);
-        queryData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_NOTIFICATIONS);
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
@@ -555,16 +554,14 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         " LIMIT " + queryLimit);
 
         if (mQueryID != Constants.NO_DATA) // Restart
-            mListLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
+            mListLoader.restart(getActivity(), Queries.MAIN_NOTIFY_LIST, queryData);
 
         else { // Initialize
-            mListLoader.init(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
+            mListLoader.init(getActivity(), Queries.MAIN_NOTIFY_LIST, queryData);
 
-            queryData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_NOTIFICATION_MAX);
-            queryData.putString(QueryLoader.DATA_KEY_SELECTION, selection);
-            queryData.putStringArray(QueryLoader.DATA_KEY_PROJECTION,
-                    new String[]{"max(" + IDataTable.DataField.COLUMN_ID + ')'});
-            mMaxLoader.init(getActivity(), Queries.MAIN_NOTIFICATION_MAX, queryData);
+            queryData.putString(QueryLoader.DATA_KEY_SELECTION, "SELECT max(" + IDataTable.DataField.COLUMN_ID +
+                    ") FROM " + NotificationsTable.TABLE_NAME + " WHERE " + selection);
+            mMaxLoader.init(getActivity(), Queries.MAIN_NOTIFY_MAX, queryData);
         }
     }
 

@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
-import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -55,7 +54,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         cursor.moveToFirst();
 
         switch (id) {
-            case Tables.ID_MESSAGERIE: { ////// New mail count
+            case Queries.MAIN_SHORTCUT_MAIL_COUNT: { ////// New mail count
                 mNewMail = cursor.getInt(0);
                 break;
             }
@@ -117,19 +116,18 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         // Set home info (using query loaders)
         Bundle mailData = new Bundle();
         mailData.putParcelable(QueryLoader.DATA_KEY_URI, mListener.onGetShortcutURI());
-        mailData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
         mailData.putString(QueryLoader.DATA_KEY_SELECTION,
-                MessagerieTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        MessagerieTable.COLUMN_LU_FLAG + "=0");
-        mMailLoader.init(getActivity(), Tables.ID_MESSAGERIE, mailData);
+                "SELECT count(*) FROM " + MessagerieTable.TABLE_NAME +
+                        " WHERE " + MessagerieTable.COLUMN_PSEUDO + "='" + pseudo +
+                        "' AND " + MessagerieTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD);
+        mMailLoader.init(getActivity(), Queries.MAIN_SHORTCUT_MAIL_COUNT, mailData);
 
         Bundle notifyData = new Bundle();
         notifyData.putParcelable(QueryLoader.DATA_KEY_URI, mListener.onGetShortcutURI());
-        notifyData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_SHORTCUT_NOTIFY_COUNT);
-        notifyData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{"count(*)"});
         notifyData.putString(QueryLoader.DATA_KEY_SELECTION,
-                NotificationsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        NotificationsTable.COLUMN_LU_FLAG + "=0");
+                "SELECT count(*) FROM " + NotificationsTable.TABLE_NAME +
+                        " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" + pseudo +
+                        "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD);
         mNewNotifyLoader.init(getActivity(), Queries.MAIN_SHORTCUT_NOTIFY_COUNT, notifyData);
 
         return rootView;

@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.studio.artaban.leclassico.data.codes.Tables;
-import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
@@ -118,13 +117,10 @@ public class DataProvider extends ContentProvider {
 
         // Check single row request
         if (table != null)
-            builder.appendWhere(IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1));
-        else {
-
+            builder.appendWhere(IDataTable.DataField.COLUMN_ID + '=' + uri.getLastPathSegment());
+        else
             table = Tables.getName((byte) URI_MATCHER.match(uri));
-            if (table == null)
-                table = Uris.getUriTable(uri);
-        }
+
         Cursor result;
         if (table == null) // Raw query (for multiple table queries)
             result = mDB.getDB().rawQuery(selection, selectionArgs);
@@ -210,7 +206,7 @@ public class DataProvider extends ContentProvider {
 
         String table = Tables.getName((byte) URI_MATCHER_SINGLE.match(uri));
         if (table != null)
-            selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1) +
+            selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getLastPathSegment() +
                     ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
         else {
 
@@ -250,7 +246,7 @@ public class DataProvider extends ContentProvider {
 
         String table = Tables.getName((byte) URI_MATCHER_SINGLE.match(uri));
         if (table != null)
-            selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getPathSegments().get(1) +
+            selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getLastPathSegment() +
                     ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
         else {
 

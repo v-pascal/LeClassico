@@ -1,11 +1,8 @@
 package com.studio.artaban.leclassico.data.codes;
 
-import android.content.UriMatcher;
 import android.net.Uri;
 
-import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -15,14 +12,16 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class Uris {
 
-    private static final String SINGLE_ROW = "#/";
-
-    //////
-    public static Uri getUri(int id, String... arguments) {
+    public static Uri getUri(short id, String... arguments) {
         // Return URI formatted as expected (according ID parameter)
 
         Logs.add(Logs.Type.V, "id: " + id + ";arguments: " + arguments);
         switch (id) {
+
+            case ID_RAW_QUERY:
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_SQL); // SQL
+                // WARNING: Notification not allowed on this URI (reserved)
 
             case ID_USER_NOTIFICATIONS: // User/#/Notifications
                 return Uri.parse(DataProvider.CONTENT_URI +
@@ -35,56 +34,17 @@ public class Uris {
                 throw new IllegalArgumentException("Unexpected URI id: " + id);
         }
     }
-    public static String getUriTable(Uri uri) {
-        // Return table name on which the URI is associated (or NULL if raw query)
-
-        Logs.add(Logs.Type.V, "uri: " + uri);
-        switch (URI_MATCHER_SINGLE.match(uri)) { // With row or query ID
-
-            ////// Main
-            case ID_USER_NOTIFICATIONS:
-            case ID_MAIN_SHORTCUT:
-                return Queries.getTable(Integer.valueOf(uri.getLastPathSegment()));
-        }
-        switch (URI_MATCHER.match(uri)) { // Without row or query ID
-
-            ////// Main
-            case ID_MAIN_SHORTCUT:
-                return MessagerieTable.TABLE_NAME; // See 'HomeFragment.mMailLoader' loader
-
-            default:
-                throw new RuntimeException("Unexpected URI: " + uri);
-        }
-    }
 
     ////// Path ////////////////////////////////////////////////////////////////////////////////////
+
+    private static final String PATH_SQL = "SQL"; // SQL path for raw query (reserved)
 
     private static final String PATH_USER = "User/"; // User URI path following with member ID
     private static final String PATH_SHORTCUT = "/Shortcut"; // Shortcut URI path
 
     ////// URI /////////////////////////////////////////////////////////////////////////////////////
-    // All URI can be append with a query ID (to manage several query ID with an unique URI)
 
-    public static final int ID_USER_NOTIFICATIONS = 0; // User/#/Notifications
-    public static final int ID_MAIN_SHORTCUT = 1;      // User/#/Notifications/Shortcut
-
-    //
-    private static final UriMatcher URI_MATCHER_SINGLE = new UriMatcher(UriMatcher.NO_MATCH);
-    private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-    static {
-
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI,
-                PATH_USER + SINGLE_ROW + NotificationsTable.TABLE_NAME + DataProvider.SINGLE_ROW,
-                ID_USER_NOTIFICATIONS); // User/#/Notifications/#
-        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI,
-                PATH_USER + SINGLE_ROW + NotificationsTable.TABLE_NAME + PATH_SHORTCUT + DataProvider.SINGLE_ROW,
-                ID_MAIN_SHORTCUT); // User/#/Notifications/Shortcut/#
-
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI,
-                PATH_USER + SINGLE_ROW + NotificationsTable.TABLE_NAME,
-                ID_USER_NOTIFICATIONS); // User/#/Notifications
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI,
-                PATH_USER + SINGLE_ROW + NotificationsTable.TABLE_NAME + PATH_SHORTCUT,
-                ID_MAIN_SHORTCUT); // User/#/Notifications/Shortcut
-    }
+    public static final short ID_RAW_QUERY = 0;          // SQL
+    public static final short ID_USER_NOTIFICATIONS = 1; // User/#/Notifications
+    public static final short ID_MAIN_SHORTCUT = 2;      // User/#/Notifications/Shortcut
 }
