@@ -3,8 +3,6 @@ package com.studio.artaban.leclassico.connection;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
 
 import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.helpers.Internet;
@@ -17,23 +15,23 @@ import java.util.TimerTask;
  * Created by pascal on 16/10/16.
  * Remote & local DB exchange request class
  */
-public abstract class DataRequest extends TimerTask implements DataObserver.OnContentListener {
+public abstract class DataRequest implements DataObserver.OnContentListener {
 
     // Extra data keys (common)
     public static final String EXTRA_DATA_URI = "uri";
 
     //////
+    private TimerTask mTask; // Request timer task
+    private boolean mCancelled; // Request timer task cancelled flag
+
     protected DataService mService; // Data service
     protected String mTable; // DB table name
     protected byte mTableId; // DB table ID
 
     public DataRequest(DataService service, String table, byte tableId) {
-
         Logs.add(Logs.Type.V, "service: " + service + ";table: " + table);
-        HandlerThread observerThread = new HandlerThread("requestDataObserverThread");
-        observerThread.start();
 
-        mSyncObserver = new DataObserver(new Handler(observerThread.getLooper()), this);
+        mSyncObserver = new DataObserver("requestDataObserverThread", this);
         mService = service;
         mTable = table;
         mTableId = tableId;
@@ -53,14 +51,14 @@ public abstract class DataRequest extends TimerTask implements DataObserver.OnCo
                 mSyncObserver.register(mService.getContentResolver(), uri);
 
                 return ((stopped) && (Internet.isConnected()));
-                // Return flag to schedule current request timer task (if not already done)
+                // Returns flag to schedule current request timer task
 
             } else
                 Logs.add(Logs.Type.W, "Data request already registered: " + uri);
         }
         return false;
     }
-    public void unregister(Intent intent) { // Unregister URI observer
+    public boolean unregister(Intent intent) { // Unregister URI observer
         Logs.add(Logs.Type.V, "intent: " + intent);
 
         Uri uri = intent.getParcelableExtra(EXTRA_DATA_URI);
@@ -68,19 +66,47 @@ public abstract class DataRequest extends TimerTask implements DataObserver.OnCo
             if (mRegister.remove(uri)) {
 
                 unregister(uri);
-                if (mRegister.isEmpty())
-                    cancel();
+                if (mRegister.isEmpty()) {
+
+                    mTask.cancel();
+                    mCancelled = true;
+                    mSyncObserver.unregister(mService.getContentResolver());
+                    return true;
+                    // Returns timer task cancel flag
+                }
 
             } else
                 Logs.add(Logs.Type.W, "Failed to unregister data request: " + uri);
         }
+        return false;
     }
 
-    ////// TimerTask ///////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void run() {
+    public TimerTask getTask() { // Return request timer task (create it if NULL or cancelled)
         Logs.add(Logs.Type.V, null);
-        request(null);
+
+        if (mRegister.isEmpty())
+            return null;
+
+        if ((mTask == null) || (mCancelled))
+            mTask = new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (mRegister) {
+                        request(null);
+                    }
+                }
+            };
+
+        mCancelled = false;
+        return mTask;
+    }
+    public void cancel() { // Cancel request task
+
+        Logs.add(Logs.Type.V, null);
+        if (mTask != null)
+            mTask.cancel();
+
+        mCancelled = true;
     }
 
     ////// OnContentListener ///////////////////////////////////////////////////////////////////////

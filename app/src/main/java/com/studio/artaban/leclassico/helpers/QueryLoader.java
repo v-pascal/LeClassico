@@ -58,7 +58,7 @@ public class QueryLoader {
             Uri queryURI;
             if ((id > 0) && (id <= Tables.ID_LAST) && (!args.containsKey(DATA_KEY_URI))) // Table query
                 queryURI = Uri.parse(DataProvider.CONTENT_URI + Tables.getName((byte) id));
-            else if (args.containsKey(DATA_KEY_URI)) // Particular query
+            else if (args.containsKey(DATA_KEY_URI)) // Particular query (table or raw query)
                 queryURI = args.getParcelable(DATA_KEY_URI);
             else
                 throw new IllegalArgumentException("Missing URI (not a table query)");

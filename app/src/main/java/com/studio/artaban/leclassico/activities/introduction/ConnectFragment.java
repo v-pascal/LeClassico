@@ -336,7 +336,7 @@ public class ConnectFragment extends RevealFragment {
                             return Boolean.FALSE;
                         }
                         default: { ////// Reply succeeded (check it)
-                            mToken = loginRes.token;
+                            mToken = loginRes.token.get();
 
                             // Check login result
                             if (mToken == null) { // Login failed

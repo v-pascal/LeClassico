@@ -112,7 +112,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     }
     private final DataReceiver mDataReceiver = new DataReceiver(); // Data broadcast receiver
     private final ArrayList<DataRequest> mDataRequests = new ArrayList<>(); // Data request task list
-    private final Timer mRequestTimer = new Timer(); // Timer to manage data request tasks
+    private Timer mRequestTimer; // Timer to manage data request tasks
 
     private class DataReceiver extends BroadcastReceiver { /////////////////////////////////////////
 
@@ -130,14 +130,16 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
                 if (mDataRequests.get(tableIdx).register(intent)) {
 
-                    Logs.add(Logs.Type.I, "Schedule request table ID #" + (tableIdx + 1));
-                    mRequestTimer.schedule(mDataRequests.get(tableIdx), DELAY_REQUEST, DELAY_REQUEST);
+                    Logs.add(Logs.Type.I, "Schedule table ID #" + (tableIdx + 1) + " request");
+                    mRequestTimer.schedule(mDataRequests.get(tableIdx).getTask(), DELAY_REQUEST, DELAY_REQUEST);
                 }
             }
             else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
+                if (mDataRequests.get(tableIdx).unregister(intent)) {
 
-                mDataRequests.get(tableIdx).unregister(intent);
-                mRequestTimer.purge(); // Purge cancelled request task (if any)
+                    Logs.add(Logs.Type.I, "Purge table ID #" + (tableIdx + 1) + " request");
+                    mRequestTimer.purge(); // Purge cancelled request task
+                }
 
             } else if (intent.getAction().equals(REQUEST_OLD_DATA)) // Request old data
                 mDataRequests.get(tableIdx).request(intent.getExtras());
@@ -189,12 +191,12 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     return Tools.receiveLogin(response, replyRes); // Manage method reply (below use)
                 }
             };
-            if (mDataLogin.token != null) {
-                Logs.add(Logs.Type.I, "Update token (" + mDataLogin.token + ")");
+            if (mDataLogin.token.get() != null) {
+                Logs.add(Logs.Type.I, "Update token (" + mDataLogin.token.get() + ")");
 
                 ////// Update token
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
-                                WebServices.URL_CONNECTION + '?' + WebServices.DATA_TOKEN + '=' + mDataLogin.token,
+                                WebServices.URL_CONNECTION + '?' + WebServices.DATA_TOKEN + '=' + mDataLogin.token.get(),
                         data, receiveListener);
                 switch (result) {
 
@@ -206,11 +208,11 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         return; // Nothing to do...
                     }
                     default: { ////// Reply succeeded (check it)
-                        mDataLogin.token = replyRes.token;
+                        mDataLogin.token.set(replyRes.token.get());
 
                         // Check update result
-                        if (mDataLogin.token != null) {
-                            Logs.add(Logs.Type.I, "Token updated (" + mDataLogin.token + ")");
+                        if (mDataLogin.token.get() != null) {
+                            Logs.add(Logs.Type.I, "Token updated (" + mDataLogin.token.get() + ")");
 
                             mDataLogin.pseudo = replyRes.pseudo;
                             mDataLogin.timeLag = replyRes.timeLag;
@@ -245,10 +247,10 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     return;
                 }
                 default: { ////// Reply succeeded (check it)
-                    mDataLogin.token = replyRes.token;
+                    mDataLogin.token.set(replyRes.token.get());
 
                     // Check login result
-                    if (mDataLogin.token != null) {
+                    if (mDataLogin.token.get() != null) {
                         Logs.add(Logs.Type.I, "Token created");
 
                         mDataLogin.pseudo = replyRes.pseudo;
@@ -271,8 +273,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     //
     private void startConnectionSupervisor(boolean now) {
-
         Logs.add(Logs.Type.V, "now: " + now);
+
+        mTokenTimer = new Timer();
         mTokenTimer.schedule(new TimerTask() {
                                  @Override
                                  public void run() {
@@ -280,39 +283,39 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                                      Logs.add(Logs.Type.V, null);
                                      updateToken();
                                  }
+
                              }, (now) ? 0 : Constants.SERVICE_DELAY_TOKEN_UPDATE,
                 Constants.SERVICE_DELAY_TOKEN_UPDATE);
     }
+    private void stopConnectionSupervisor() {
+        Logs.add(Logs.Type.V, null);
+        mTokenTimer.cancel();
+    }
+
     private void startDataRequests() { // Schedule data requests
         Logs.add(Logs.Type.V, null);
 
         for (DataRequest request : mDataRequests) {
-            if (request != null) {
-                if (request.toSynchronize())
-                    request.synchronize(); // Synchronize from local to remote DB
+            if (request.toSynchronize())
+                request.synchronize(); // Synchronize from local to remote DB
 
-                mRequestTimer.schedule(request, DataReceiver.DELAY_REQUEST, DataReceiver.DELAY_REQUEST);
-            }
+            TimerTask task = request.getTask();
+            if (task != null)
+                mRequestTimer.schedule(task, DataReceiver.DELAY_REQUEST, DataReceiver.DELAY_REQUEST);
         }
     }
-
-    private void stopConnectionSupervisor() {
-        Logs.add(Logs.Type.V, null);
-        mTokenTimer.cancel();
-        mTokenTimer.purge();
-    }
-    private void stopDataRequests(boolean clear) { // Cancel & clear data requests (clear if required)
+    private void stopDataRequests(boolean clear) { // Cancel data requests (and clear if requested)
 
         Logs.add(Logs.Type.V, "clear: " + clear);
-        for (TimerTask request : mDataRequests) {
-            if (request != null)
-                request.cancel();
-        }
-        if (clear)
-            mDataRequests.clear();
+        for (DataRequest request : mDataRequests)
+            request.cancel();
 
-        mRequestTimer.cancel();
-        mRequestTimer.purge();
+        if (clear) {
+            mDataRequests.clear();
+            mRequestTimer.cancel();
+
+        } else
+            mRequestTimer.purge();
     }
 
     //////
@@ -330,14 +333,16 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             return mDataLogin;
         }
     }
-    private final Timer mTokenTimer = new Timer(); // Timer used to update token (connection supervisor)
+    private Timer mTokenTimer; // Timer used to update token (connection supervisor)
 
     ////// Service /////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreate() {
         super.onCreate();
+
         Logs.add(Logs.Type.V, null);
         isRunning = true;
+        Internet.setConnectivityListener(this);
     }
 
     @Override
@@ -350,7 +355,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
         Logs.add(Logs.Type.V, "intent: " + intent + ";flags: " + flags + ";startId: " + startId);
         mDataLogin.pseudo = intent.getStringExtra(EXTRA_DATA_PSEUDO);
-        mDataLogin.token = intent.getStringExtra(EXTRA_DATA_TOKEN);
+        mDataLogin.token.set(intent.getStringExtra(EXTRA_DATA_TOKEN));
         mDataLogin.timeLag = intent.getLongExtra(EXTRA_DATA_TIME_LAG, 0);
 
         // Add notification
@@ -383,6 +388,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 case Tables.ID_VOTES: mDataRequests.add(new VotesRequest(this)); break;
             }
         }
+        mRequestTimer = new Timer();
+
         registerReceiver(mDataReceiver, new IntentFilter(REGISTER_NEW_DATA));
         registerReceiver(mDataReceiver, new IntentFilter(UNREGISTER_NEW_DATA));
         registerReceiver(mDataReceiver, new IntentFilter(REQUEST_OLD_DATA));

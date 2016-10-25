@@ -15,6 +15,9 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class Uris {
 
+    private static final String SINGLE_ROW = "#/";
+
+    //////
     public static Uri getUri(int id, String... arguments) {
         // Return URI formatted as expected (according ID parameter)
 
@@ -24,9 +27,9 @@ public class Uris {
             case ID_USER_NOTIFICATIONS: // User/#/Notifications
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME);
-            case ID_MAIN_SHORTCUT: // User/#/Shortcut
+            case ID_MAIN_SHORTCUT: // User/#/Notifications/Shortcut
                 return Uri.parse(DataProvider.CONTENT_URI +
-                        PATH_USER + arguments[0] + PATH_SHORTCUT);
+                        PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME + PATH_SHORTCUT);
 
             default:
                 throw new IllegalArgumentException("Unexpected URI id: " + id);
@@ -36,19 +39,18 @@ public class Uris {
         // Return table name on which the URI is associated (or NULL if raw query)
 
         Logs.add(Logs.Type.V, "uri: " + uri);
-        switch (URI_MATCHER_SINGLE.match(uri)) {
+        switch (URI_MATCHER_SINGLE.match(uri)) { // With row or query ID
 
             ////// Main
             case ID_USER_NOTIFICATIONS:
             case ID_MAIN_SHORTCUT:
-
                 return Queries.getTable(Integer.valueOf(uri.getLastPathSegment()));
         }
-        switch (URI_MATCHER.match(uri)) {
+        switch (URI_MATCHER.match(uri)) { // Without row or query ID
 
             ////// Main
             case ID_MAIN_SHORTCUT:
-                return MessagerieTable.TABLE_NAME; // See 'HomeFragment.mMailLoader' member
+                return MessagerieTable.TABLE_NAME; // See 'HomeFragment.mMailLoader' loader
 
             default:
                 throw new RuntimeException("Unexpected URI: " + uri);
@@ -64,7 +66,7 @@ public class Uris {
     // All URI can be append with a query ID (to manage several query ID with an unique URI)
 
     public static final int ID_USER_NOTIFICATIONS = 0; // User/#/Notifications
-    public static final int ID_MAIN_SHORTCUT = 1;      // User/#/Shortcut
+    public static final int ID_MAIN_SHORTCUT = 1;      // User/#/Notifications/Shortcut
 
     //
     private static final UriMatcher URI_MATCHER_SINGLE = new UriMatcher(UriMatcher.NO_MATCH);
@@ -72,15 +74,17 @@ public class Uris {
     static {
 
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI,
-                PATH_USER + "#/" + NotificationsTable.TABLE_NAME + DataProvider.SINGLE_ROW,
+                PATH_USER + SINGLE_ROW + NotificationsTable.TABLE_NAME + DataProvider.SINGLE_ROW,
                 ID_USER_NOTIFICATIONS); // User/#/Notifications/#
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI,
-                PATH_USER + '#' + PATH_SHORTCUT + DataProvider.SINGLE_ROW,
-                ID_MAIN_SHORTCUT); // User/#/Shortcut/#
+                PATH_USER + SINGLE_ROW + NotificationsTable.TABLE_NAME + PATH_SHORTCUT + DataProvider.SINGLE_ROW,
+                ID_MAIN_SHORTCUT); // User/#/Notifications/Shortcut/#
 
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PATH_USER + "#/" + NotificationsTable.TABLE_NAME,
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI,
+                PATH_USER + SINGLE_ROW + NotificationsTable.TABLE_NAME,
                 ID_USER_NOTIFICATIONS); // User/#/Notifications
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PATH_USER + '#' + PATH_SHORTCUT,
-                ID_MAIN_SHORTCUT); // User/#/Shortcut
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI,
+                PATH_USER + SINGLE_ROW + NotificationsTable.TABLE_NAME + PATH_SHORTCUT,
+                ID_MAIN_SHORTCUT); // User/#/Notifications/Shortcut
     }
 }

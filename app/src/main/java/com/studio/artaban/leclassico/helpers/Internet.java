@@ -276,6 +276,7 @@ public final class Internet {
         void onConnection();
         void onDisconnection();
     };
+
     private static WeakReference<OnConnectivityListener> connectivityListener;
     public static void setConnectivityListener(OnConnectivityListener listener) {
         connectivityListener = new WeakReference<OnConnectivityListener>(listener);

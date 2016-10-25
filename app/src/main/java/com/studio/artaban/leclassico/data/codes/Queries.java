@@ -21,22 +21,18 @@ public class Queries {
     public static final int MAIN_NOTIFICATION_MAX = MAX_TABLE_ID + 4;
 
     //////
-    public static String getTable(int id) { // Return table name associated with the query ID
+    public static String getTable(int id) {
+        // Return table name associated with the query ID (or NULL for raw query)
+
         Logs.add(Logs.Type.V, "id: " + id);
+        switch (id) {
 
-        switch (id) { // Switch on particular query ID
-
-            ////// Particular table query //////////////////////////////////////////////////////////
-
-            // Main
+            ////// Main
             case MAIN_NEW_NOTIFY_FLAG:
             case MAIN_SHORTCUT_NOTIFY_COUNT:
             case MAIN_NOTIFICATION_MAX:
                 return NotificationsTable.TABLE_NAME;
 
-            ////// Raw query ///////////////////////////////////////////////////////////////////////
-
-            // Main
             case MAIN_NOTIFICATIONS:
             case MAIN_SHORTCUT_LAST_FOLLOWED:
                 return null; // Raw query (complex queries)

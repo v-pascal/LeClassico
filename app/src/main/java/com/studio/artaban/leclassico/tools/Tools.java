@@ -53,7 +53,7 @@ public final class Tools { /////////////////////////////////////////////////////
     public static class LoginReply {
 
         public String pseudo; // Pseudo of the login
-        public String token; // Login token
+        public final SyncValue<String> token = new SyncValue<>(null); // Login token
         public long timeLag; // Time lag between remote & local DB
     }
     public static boolean receiveLogin(String response, LoginReply loginRes) { // Receive login reply
@@ -68,7 +68,7 @@ public final class Tools { /////////////////////////////////////////////////////
                 // Login succeeded
                 JSONObject logged = reply.getJSONObject(WebServices.JSON_KEY_LOGGED);
                 loginRes.pseudo = logged.getString(WebServices.JSON_KEY_PSEUDO);
-                loginRes.token = logged.getString(WebServices.JSON_KEY_TOKEN);
+                loginRes.token.set(logged.getString(WebServices.JSON_KEY_TOKEN));
                 loginRes.timeLag = logged.getLong(WebServices.JSON_KEY_TIME_LAG);
 
                 Logs.add(Logs.Type.I, "Logged with time lag: " + loginRes.timeLag);
@@ -80,7 +80,7 @@ public final class Tools { /////////////////////////////////////////////////////
                 case Errors.WEBSERVICE_LOGIN_FAILED: {
 
                     Logs.add(Logs.Type.W, "Invalid login/token");
-                    loginRes.token = null; // Login failed or token expired (invalid)
+                    loginRes.token.set(null); // Login failed or token expired (invalid)
                     result = true; ////// Reply succeeded
                     break;
                 }

@@ -553,9 +553,11 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
                         " WHERE " + selection +
                         " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
                         " LIMIT " + queryLimit);
-        if (mQueryID != Constants.NO_DATA)
+
+        if (mQueryID != Constants.NO_DATA) // Restart
             mListLoader.restart(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
-        else {
+
+        else { // Initialize
             mListLoader.init(getActivity(), Queries.MAIN_NOTIFICATIONS, queryData);
 
             queryData.putLong(QueryLoader.DATA_KEY_ROW_ID, Queries.MAIN_NOTIFICATION_MAX);

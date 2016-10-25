@@ -124,11 +124,17 @@ public class DataProvider extends ContentProvider {
             table = Tables.getName((byte) URI_MATCHER.match(uri));
             if (table == null)
                 table = Uris.getUriTable(uri);
-            if (table == null) // Raw query (for multiple table queries)
-                return mDB.getDB().rawQuery(selection, selectionArgs);
         }
-        builder.setTables(table);
-        return builder.query(mDB.getDB(), projection, selection, selectionArgs, null, null, sortOrder);
+        Cursor result;
+        if (table == null) // Raw query (for multiple table queries)
+            result = mDB.getDB().rawQuery(selection, selectionArgs);
+        else {
+
+            builder.setTables(table);
+            result = builder.query(mDB.getDB(), projection, selection, selectionArgs, null, null, sortOrder);
+        }
+        result.setNotificationUri(getContext().getContentResolver(), uri);
+        return result;
     }
 
     @Nullable

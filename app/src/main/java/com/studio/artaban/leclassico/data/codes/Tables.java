@@ -37,7 +37,7 @@ public final class Tables {
 
     //////
     public static String getName(byte id) { // Return DB table name according its ID
-        Logs.add(Logs.Type.V, "id: " + id);
+        //Logs.add(Logs.Type.V, "id: " + id);
         switch (id) {
 
             case Tables.ID_CAMARADES: return CamaradesTable.TABLE_NAME;
