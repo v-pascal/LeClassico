@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -277,9 +278,19 @@ public final class Internet {
         void onDisconnection();
     };
 
-    private static WeakReference<OnConnectivityListener> connectivityListener;
-    public static void setConnectivityListener(OnConnectivityListener listener) {
-        connectivityListener = new WeakReference<OnConnectivityListener>(listener);
+    private static final ArrayList<OnConnectivityListener> connectivityListeners = new ArrayList<>();
+    public static boolean addConnectivityListener(OnConnectivityListener listener) {
+        Logs.add(Logs.Type.V, "listener: " + listener);
+
+        if (!connectivityListeners.contains(listener)) {
+            connectivityListeners.add(listener);
+            return true;
+        }
+        return false;
+    }
+    public static boolean removeConnectivityListener(OnConnectivityListener listener) {
+        Logs.add(Logs.Type.V, "listener: " + listener);
+        return connectivityListeners.remove(listener);
     }
     // Connectivity listener
 
@@ -294,10 +305,14 @@ public final class Internet {
             isOnline(context);
             if (previousConnection != isConnected) {
                 try {
-                    if (isConnected)
-                        connectivityListener.get().onConnection();
-                    else
-                        connectivityListener.get().onDisconnection();
+                    if (isConnected) {
+                        for (OnConnectivityListener listener : connectivityListeners)
+                            listener.onConnection();
+
+                    } else {
+                        for (OnConnectivityListener listener : connectivityListeners)
+                            listener.onDisconnection();
+                    }
 
                 } catch (NullPointerException e) {
                     Logs.add(Logs.Type.I, "No connectivity listener");

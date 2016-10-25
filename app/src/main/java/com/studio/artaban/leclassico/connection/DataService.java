@@ -344,7 +344,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
         Logs.add(Logs.Type.V, null);
         isRunning = true;
-        Internet.setConnectivityListener(this);
+        Internet.addConnectivityListener(this);
     }
 
     @Override
@@ -372,7 +372,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         if (Internet.isConnected())
             startConnectionSupervisor(false);
 
-        // Set broadcast receiver
+        // Set broadcast receiver & request management
         for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
             switch (tableId) {
 
@@ -404,12 +404,13 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         super.onDestroy();
 
         Logs.add(Logs.Type.V, null);
+        Internet.removeConnectivityListener(this);
         isRunning = false;
 
         Notify.cancel(this); // Remove notification
         stopConnectionSupervisor(); // Cancel token update
 
-        // Remove broadcast receiver
+        // Remove broadcast receiver & request management
         unregisterReceiver(mDataReceiver);
         stopDataRequests(true);
     }
