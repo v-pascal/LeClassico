@@ -144,14 +144,19 @@ public class MainActivity extends AppCompatActivity implements
         newAnim.start();
         prevAnim.start();
     }
-    @Override
-    public Uri onGetShortcutURI() {
-        return mShortcutUri;
-    }
 
     @Override
     public DataService onGetService() {
         return mDataService.get();
+    }
+
+    @Override
+    public Uri onGetShortcutURI() {
+        return mShortcutUri;
+    }
+    @Override
+    public Uri onGetNotifyURI() {
+        return mNotifyUri;
     }
 
     //
@@ -377,7 +382,9 @@ public class MainActivity extends AppCompatActivity implements
     //////
     private ViewPager mViewPager; // Content view pager
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
+
     private Uri mShortcutUri; // Shortcut URI (new mail & notifications)
+    private Uri mNotifyUri; // User notifications URI
 
     public void onAction(View sender) { // Floating action button click event
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -488,7 +495,11 @@ public class MainActivity extends AppCompatActivity implements
         // Display user pseudo, profile icon & banner
         String pseudo = getIntent().getStringExtra(EXTRA_DATA_PSEUDO);
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
+
+        // Set URI to observe DB changes
         mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT, String.valueOf(getIntent()
+                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, 0)));
+        mNotifyUri = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getIntent()
                 .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, 0)));
 
         // Set content view pager
@@ -575,8 +586,9 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
             }
+
             private void positionShortcut(final int section) {
-            // Position shortcut according selected section
+                // Position shortcut according selected section
 
                 //Logs.add(Logs.Type.V, "section: " + section);
                 if (mShortcutWidth == Constants.NO_DATA) {
@@ -613,13 +625,14 @@ public class MainActivity extends AppCompatActivity implements
                 } else
                     translateShortcut(section);
             }
+
             private void translateFab(final int section, final float factor) {
-             // Show/Hide & translate floating action button according section and display factor
+                // Show/Hide & translate floating action button according section and display factor
 
                 //Logs.add(Logs.Type.V, "section: " + section + ";factor: " + factor);
-                final FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-                fab.setImageDrawable(getDrawable((section == Constants.MAIN_SECTION_PUBLICATIONS)?
-                        R.drawable.ic_add_white_36dp:R.drawable.ic_check_white_36dp));
+                final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+                fab.setImageDrawable(getDrawable((section == Constants.MAIN_SECTION_PUBLICATIONS) ?
+                        R.drawable.ic_add_white_36dp : R.drawable.ic_check_white_36dp));
                 fab.setVisibility(((section == Constants.MAIN_SECTION_PUBLICATIONS) || (mNewNotification)) ?
                         View.VISIBLE : View.GONE);
 
@@ -654,11 +667,11 @@ public class MainActivity extends AppCompatActivity implements
                 if ((position >= 0) && (position <= 1)) {
 
                     // Translate floating action button accordingly (for publications & notifications)
-                    switch ((int)page.getTag()) {
+                    switch ((int) page.getTag()) {
 
                         case Constants.MAIN_SECTION_PUBLICATIONS:
                         case Constants.MAIN_SECTION_NOTIFICATIONS: {
-                            translateFab((int)page.getTag(), position);
+                            translateFab((int) page.getTag(), position);
                             break;
                         }
                         case (Constants.MAIN_SECTION_PUBLICATIONS + 1): {
@@ -668,10 +681,10 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
                 if ((position == 1) || (position == 0) || (position == -1) ||
-                        ((mShortcut + 2) == (int)page.getTag()) || ((mShortcut - 2) == (int)page.getTag()))
+                        ((mShortcut + 2) == (int) page.getTag()) || ((mShortcut - 2) == (int) page.getTag()))
                     positionShortcut(mViewPager.getCurrentItem());
 
-                if (mShortcut == (int)page.getTag()) {
+                if (mShortcut == (int) page.getTag()) {
                     View newPub = findViewById(R.id.shortcut_new_publication);
                     View newEvent = findViewById(R.id.shortcut_new_event);
                     View newNotify = findViewById(R.id.shortcut_new_notification);
@@ -725,6 +738,9 @@ public class MainActivity extends AppCompatActivity implements
                         " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" + pseudo +
                         "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD);
         mNewNotifyLoader.init(this, Queries.MAIN_DATA_NEW_NOTIFY, notifyData);
+
+        // Register new user notifications service
+        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mNotifyUri));
     }
 
     @Override
@@ -736,7 +752,7 @@ public class MainActivity extends AppCompatActivity implements
         if (!mDataService.bind(this, null))
             Tools.criticalError(this, R.string.error_service_unavailable);
 
-        //////
+        // Register shortcut data service
         sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mShortcutUri));
         sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_MESSAGERIE, mShortcutUri));
     }
@@ -778,11 +794,20 @@ public class MainActivity extends AppCompatActivity implements
         super.onPause();
         Logs.add(Logs.Type.V, null);
 
-        //////
+        // Unregister shortcut data service
         sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mShortcutUri));
         sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_MESSAGERIE, mShortcutUri));
 
         // Unbind data service
         mDataService.unbind(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Logs.add(Logs.Type.V, null);
+
+        // Unregister new user notifications service
+        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mNotifyUri));
     }
 }

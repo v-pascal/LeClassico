@@ -25,6 +25,10 @@ public class NotificationsRequest extends DataRequest {
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     @Override
+    public long getDelay() {
+        return 60000; // 1 minute
+    }
+    @Override
     public void register(Bundle data) {
 
     }

@@ -67,7 +67,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         // NB: DB use in UI thread!
 
         // Notify notifications URI to refresh notification list
-        getContext().getContentResolver().notifyChange(mNotifyUri, null);
+        getContext().getContentResolver().notifyChange(mListener.onGetNotifyURI(), null);
     }
 
     //////
@@ -504,7 +504,7 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         // Load notification data (using query loader)
         Bundle queryData = new Bundle();
-        queryData.putParcelable(QueryLoader.DATA_KEY_URI, mNotifyUri);
+        queryData.putParcelable(QueryLoader.DATA_KEY_URI, mListener.onGetNotifyURI());
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
@@ -565,9 +565,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         }
     }
 
-    //
-    private Uri mNotifyUri; // Notifications URI
-
     ////// MainFragment ////////////////////////////////////////////////////////////////////////////
     @Override
     public void onAttach(Context context) {
@@ -576,8 +573,6 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
 
         mListLoader = new QueryLoader(context, this);
         mMaxLoader = new QueryLoader(context, this);
-        mNotifyUri = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getActivity().getIntent()
-                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, 0)));
     }
 
     @Override
@@ -715,25 +710,5 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
         setLoaders();
 
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Logs.add(Logs.Type.V, null);
-
-        //////
-        getContext().sendBroadcast(DataService.getIntent(Boolean.TRUE,
-                Tables.ID_NOTIFICATIONS, mNotifyUri)); // Register new data
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Logs.add(Logs.Type.V, null);
-
-        //////
-        getContext().sendBroadcast(DataService.getIntent(Boolean.FALSE,
-                Tables.ID_NOTIFICATIONS, mNotifyUri)); // Unregister new data
     }
 }

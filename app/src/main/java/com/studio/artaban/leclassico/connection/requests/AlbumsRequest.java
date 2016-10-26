@@ -22,6 +22,10 @@ public class AlbumsRequest extends DataRequest {
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     @Override
+    public long getDelay() {
+        return DEFAULT_DELAY;
+    }
+    @Override
     public void register(Bundle data) {
 
     }

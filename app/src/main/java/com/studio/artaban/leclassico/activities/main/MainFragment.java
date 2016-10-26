@@ -58,10 +58,13 @@ public abstract class MainFragment extends Fragment {
         }
         ShortcutFragment onGetShortcut(int section, boolean newItem);
         void onAnimateShortcut(int section, OnAnimationListener listener);
-        Uri onGetShortcutURI();
 
         ////// Service
         DataService onGetService();
+
+        ////// URI
+        Uri onGetShortcutURI();
+        Uri onGetNotifyURI();
     }
     protected OnFragmentListener mListener; // Activity listener
 

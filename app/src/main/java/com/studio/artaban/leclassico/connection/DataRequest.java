@@ -17,8 +17,10 @@ import java.util.TimerTask;
  */
 public abstract class DataRequest implements DataObserver.OnContentListener {
 
-    // Extra data keys (common)
     public static final String EXTRA_DATA_URI = "uri";
+    // Extra data keys (common)
+
+    protected static final long DEFAULT_DELAY = 30000; // DB request task delay (in ms)
 
     //////
     private TimerTask mTask; // Request timer task
@@ -127,6 +129,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     protected final ArrayList<Uri> mRegister = new ArrayList<>(); // Register URI list
 
+    public abstract long getDelay();
     public abstract void register(Bundle data);
     public abstract void unregister(Uri uri);
 

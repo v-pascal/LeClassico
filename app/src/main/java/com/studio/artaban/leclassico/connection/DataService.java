@@ -115,9 +115,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private Timer mRequestTimer; // Timer to manage data request tasks
 
     private class DataReceiver extends BroadcastReceiver { /////////////////////////////////////////
-
-        private static final long DELAY_REQUEST = 30000; // DB request task delay (in ms)
-
         @Override
         public void onReceive(Context context, Intent intent) {
 
@@ -131,7 +128,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 if (mDataRequests.get(tableIdx).register(intent)) {
 
                     Logs.add(Logs.Type.I, "Schedule table ID #" + (tableIdx + 1) + " request");
-                    mRequestTimer.schedule(mDataRequests.get(tableIdx).getTask(), 0, DELAY_REQUEST);
+                    DataRequest request = mDataRequests.get(tableIdx);
+                    mRequestTimer.schedule(request.getTask(), 0, request.getDelay());
                 }
             }
             else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
@@ -303,7 +301,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
             TimerTask task = request.getTask();
             if (task != null)
-                mRequestTimer.schedule(task, 0, DataReceiver.DELAY_REQUEST);
+                mRequestTimer.schedule(task, 0, request.getDelay());
         }
     }
     private void stopDataRequests(boolean clear) { // Cancel data requests (and clear if requested)
