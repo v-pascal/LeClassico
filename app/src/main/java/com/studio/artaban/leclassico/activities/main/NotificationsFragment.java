@@ -654,8 +654,8 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             @Override
             public ViewPropertyAnimatorCompat onAnimate(RecyclerItemAnimator.AnimInfo info, boolean changeNew) {
                 Logs.add(Logs.Type.V, "info: " + info + ";changeNew: " + changeNew);
-                View itemView = info.mHolder.itemView;
 
+                View itemView = info.mHolder.itemView;
                 switch (RecyclerItemAnimator.getAnimType(info)) {
 
                     case REMOVE: {

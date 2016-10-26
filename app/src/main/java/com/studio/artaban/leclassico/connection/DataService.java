@@ -131,7 +131,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 if (mDataRequests.get(tableIdx).register(intent)) {
 
                     Logs.add(Logs.Type.I, "Schedule table ID #" + (tableIdx + 1) + " request");
-                    mRequestTimer.schedule(mDataRequests.get(tableIdx).getTask(), DELAY_REQUEST, DELAY_REQUEST);
+                    mRequestTimer.schedule(mDataRequests.get(tableIdx).getTask(), 0, DELAY_REQUEST);
                 }
             }
             else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
@@ -303,7 +303,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
             TimerTask task = request.getTask();
             if (task != null)
-                mRequestTimer.schedule(task, DataReceiver.DELAY_REQUEST, DataReceiver.DELAY_REQUEST);
+                mRequestTimer.schedule(task, 0, DataReceiver.DELAY_REQUEST);
         }
     }
     private void stopDataRequests(boolean clear) { // Cancel data requests (and clear if requested)

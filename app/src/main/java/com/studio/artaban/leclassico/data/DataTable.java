@@ -17,6 +17,8 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public abstract class DataTable implements IDataTable {
 
+    protected static final String IS_NULL = " is null";
+
     // URL synchronization request data keys
     public static final String DATA_KEY_WEB_SERVICE = "webService";
     public static final String DATA_KEY_TOKEN = "token";

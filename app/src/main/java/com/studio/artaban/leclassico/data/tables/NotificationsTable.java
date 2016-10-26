@@ -121,10 +121,11 @@ public class NotificationsTable extends DataTable {
                                     String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) +
                                             " AND " + COLUMN_DATE + "='" + date + '\'' +
                                             " AND " + COLUMN_OBJECT_TYPE + "='" + objType + '\'' +
-                                            " AND " + COLUMN_OBJECT_ID + '=' +
-                                                ((objID != Constants.NO_DATA)? objID:"null") +
+                                            " AND " + COLUMN_OBJECT_ID +
+                                            ((objID != Constants.NO_DATA)? "=" + objID:DataTable.IS_NULL) +
                                             " AND " + COLUMN_OBJECT_FROM + '=' + DatabaseUtils.sqlEscapeString(objFrom) +
-                                            " AND " + COLUMN_OBJECT_DATE + "='" + objDate + '\'';
+                                            " AND " + COLUMN_OBJECT_DATE +
+                                            ((objDate != null)? "='" + objDate + '\'':DataTable.IS_NULL);
                                     if (Tools.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
 
                                         if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED) {
