@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -66,6 +67,6 @@ public abstract class DataTable implements IDataTable {
 
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
 
-    public abstract int synchronize(ContentResolver resolver, String token, String pseudo,
-                                    @Nullable Short limit, @Nullable ContentValues postData);
+    public abstract Database.SyncResult synchronize(ContentResolver resolver, String token, String pseudo,
+                                                    @Nullable Short limit, @Nullable ContentValues postData);
 }

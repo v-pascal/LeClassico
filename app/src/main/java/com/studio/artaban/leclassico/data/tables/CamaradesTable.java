@@ -15,6 +15,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SyncValue;
@@ -52,15 +53,15 @@ public class CamaradesTable extends DataTable {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public int synchronize(final ContentResolver resolver, String token, String pseudo,
-                           @Nullable Short limit, @Nullable ContentValues postData) {
+    public Database.SyncResult synchronize(final ContentResolver resolver, String token, String pseudo,
+                                           @Nullable Short limit, @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo +
                 ";limit: " + limit + ";postData: " + postData);
 
-        final SyncValue<Integer> entryCount = new SyncValue(0);
+        final Database.SyncResult syncResult = new Database.SyncResult();
         Bundle data = new Bundle();
 
         data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_MEMBERS);
@@ -88,7 +89,6 @@ public class CamaradesTable extends DataTable {
 
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
                         JSONArray entries = reply.getJSONArray(TABLE_NAME);
-                        int entryUpdated = 0;
                         for (int i = 0; i < entries.length(); ++i) {
 
                             JSONObject entry = (JSONObject) entries.get(i);
@@ -164,6 +164,8 @@ public class CamaradesTable extends DataTable {
                                     resolver.update(tableUri, values, selection, null);
                                     resolver.delete(tableUri,
                                             selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
+
+                                    ++syncResult.deleted;
                                 }
                                 else { ////// Update entry
 
@@ -284,8 +286,8 @@ public class CamaradesTable extends DataTable {
                                         values.remove(Constants.DATA_COLUMN_SYNCHRONIZED);
 
                                     resolver.update(tableUri, values, selection, null);
+                                    ++syncResult.updated;
                                 }
-                                ++entryUpdated;
 
                             } else {
                                 cursor.close();
@@ -299,12 +301,11 @@ public class CamaradesTable extends DataTable {
                                     values.put(COLUMN_PSEUDO, pseudo);
                                     resolver.insert(tableUri, values);
 
-                                    ++entryUpdated;
+                                    ++syncResult.inserted;
                                 }
                                 //else // Do not add a deleted entry
                             }
                         }
-                        entryCount.set(entryUpdated);
 
                     } else {
                         Logs.add(Logs.Type.E, "Synchronization error: #" +
@@ -321,9 +322,9 @@ public class CamaradesTable extends DataTable {
         });
         if (result != Internet.DownloadResult.SUCCEEDED) {
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            return Constants.NO_DATA;
+            return null;
         }
-        return entryCount.get();
+        return syncResult;
     }
 
     //

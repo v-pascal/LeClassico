@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.List;
@@ -37,8 +38,8 @@ public class EvenementsTable extends DataTable {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public int synchronize(final ContentResolver resolver, String token, String pseudo,
-                           @Nullable Short limit, @Nullable ContentValues postData) {
+    public Database.SyncResult synchronize(final ContentResolver resolver, String token, String pseudo,
+                                           @Nullable Short limit, @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
@@ -55,7 +56,7 @@ public class EvenementsTable extends DataTable {
 
 
 
-        return 0;
+        return null;
     }
 
     //

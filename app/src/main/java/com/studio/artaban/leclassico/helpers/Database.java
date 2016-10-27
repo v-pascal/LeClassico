@@ -58,8 +58,17 @@ public class Database extends SQLiteOpenHelper {
     }
 
     //
-    public static int synchronize(byte tableId, ContentResolver resolver, String token, String pseudo,
-                                  @Nullable Short limit, @Nullable ContentValues postData) {
+    public static class SyncResult { // Synchronization result
+
+        public static boolean hasChanged(SyncResult result) {
+            return ((result != null) && ((result.inserted > 0) || (result.updated > 0) || (result.deleted > 0)));
+        }
+        public int inserted; // Inserted row count
+        public int updated; // Updated row count
+        public int deleted; // deleted row count
+    }
+    public static SyncResult synchronize(byte tableId, ContentResolver resolver, String token, String pseudo,
+                                         @Nullable Short limit, @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
