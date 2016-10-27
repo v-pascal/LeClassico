@@ -4,9 +4,11 @@ import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Handler;
@@ -39,8 +41,11 @@ import com.studio.artaban.leclassico.activities.main.MainActivity;
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.components.RevealFragment;
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Preferences;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.animations.InOutScreen;
@@ -166,13 +171,6 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
                     .in(findViewById(R.id.fab));
         }
     }
-    private void finishApplication(boolean displayIntro) { // Quit application (stop service)
-        Logs.add(Logs.Type.V, null);
-
-        mIntroDone = displayIntro;
-        DataService.stop(this);
-        finish();
-    }
 
     private float mAlphaSkip;
     private float mAlphaStep1;
@@ -261,6 +259,25 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         }
     }
 
+    private void startMainActivity(String pseudo, int pseudoId, boolean online) {
+        Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";pseudoId: " + pseudoId + ";online: " + online);
+
+        if (!online) // Inform user if working offline
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(IntroActivity.this, R.string.working_offline, Toast.LENGTH_LONG).show();
+                }
+            }, 1200);
+
+        ////// Start main activity
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_DATA_ONLINE, online);
+        intent.putExtra(MainActivity.EXTRA_DATA_PSEUDO, pseudo);
+        intent.putExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, pseudoId);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+    }
+
     //////
     private AlertDialog mErrorDialog; // Alert dialog that displays connection error messages
     private void displayError(byte error) { // Show alert dialog to display en error message
@@ -315,24 +332,11 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) == null)
             return; // Connection task stopped
 
-        if (!online) // Inform user if working offline
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(IntroActivity.this, R.string.working_offline, Toast.LENGTH_LONG).show();
-                }
-            }, 1200);
-
         mLogoutRequested = true; // Needed if back to activity (logout requested)
         // NB: The only reason to be back from main activity to this activity is that the user has
         //     requested a logout operation (see main activity)
 
-        ////// Start main activity
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(MainActivity.EXTRA_DATA_ONLINE, online);
-        intent.putExtra(MainActivity.EXTRA_DATA_PSEUDO, pseudo);
-        intent.putExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, pseudoId);
-        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        startMainActivity(pseudo, pseudoId, online);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -850,6 +854,38 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         // Create working sub folders
         if (!Storage.createWorkingFolders(this))
             Tools.criticalError(this, R.string.error_no_storage);
+
+        // Check if service is already running
+        if (DataService.isRunning()) {
+            Logs.add(Logs.Type.I, "Service already running");
+
+            mLogoutRequested = false; // Connection fragment is not displayed (B4 starting main activity)
+
+            ////// Start main activity (after having retrieved login info via the service)
+            final ServiceBinder binder = new ServiceBinder();
+            boolean bindResult = binder.bind(this, new ServiceBinder.OnServiceListener() {
+                @Override
+                public void onServiceConnected(DataService service) {
+
+                    Logs.add(Logs.Type.V, "service: " + service);
+                    Tools.LoginReply loginInfo = service.getLoginData();
+                    startMainActivity(loginInfo.pseudo,
+                            Tools.getEntryId(getContentResolver(), CamaradesTable.TABLE_NAME,
+                                    CamaradesTable.COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(loginInfo.pseudo)),
+                            Internet.isConnected());
+                }
+
+                @Override
+                public void onServiceDisconnected(ServiceConnection connection) {
+
+                }
+            });
+
+            if (!bindResult) {
+                Logs.add(Logs.Type.W, "Failed to bind existing service");
+                DataService.stop(this);
+            }
+        }
     }
 
     @Override
@@ -912,8 +948,11 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
             }
             case R.id.menu_quit: {
 
-                // Quit application
-                finishApplication(false);
+                // Quit application (stop service)
+                mIntroDone = false;
+                DataService.stop(this);
+                finish();
+
                 return true;
             }
             case R.id.menu_help: {

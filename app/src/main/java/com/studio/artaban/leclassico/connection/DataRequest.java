@@ -77,7 +77,8 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                 }
 
             } else
-                Logs.add(Logs.Type.W, "Failed to unregister data request: " + uri);
+                Logs.add(Logs.Type.D, "Failed to unregister data request: " + uri);
+                // NB: Often called twice in 'onPause' & 'onDestroy' methods (in user kill app case)
         }
         return false;
     }

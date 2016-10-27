@@ -56,6 +56,7 @@ public class NotificationsRequest extends DataRequest {
 
 
 
+
         } else { ////// New or data updates requested
 
             Tools.LoginReply dataLogin = mService.getLoginData();

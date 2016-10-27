@@ -52,13 +52,19 @@ public class Notify {
         ourInstance.hide(context);
     }
 
-    private static final int NOTIFICATION_REF = 1; // Notification reference
+    public static final int NOTIFICATION_REF = 1; // Notification reference
     private static final String NOTIFICATION_TICKER = "Notification"; // Default notification ticker
     private Notify() { }
 
     //
+    private static Notification mNotify; // Notification
+    public static Notification get() {
+        return mNotify;
+    }
+
+    //////
     private void show(Context context, Type type, PendingIntent intent, Bundle data) {
-    // Add or update an existing notification (according its key)
+        // Add or update an existing notification (according its key)
 
         Logs.add(Logs.Type.V, "context: " + context + ";type: " + type + ";intent: " + intent +
                 ";data: " + data);
@@ -100,11 +106,10 @@ public class Notify {
             progressMax = data.getInt(DATA_KEY_PROGRESS_MAX, progressMax);
             progress = data.getInt(DATA_KEY_PROGRESS, progress);
         }
-        Notification notify;
         switch (type) {
 
             case EVENT: { // Deprecated 'setLatestEventInfo' method
-                notify = new Notification.Builder(context)
+                mNotify = new Notification.Builder(context)
                         .setDefaults(Notification.DEFAULT_SOUND)
                         .setSmallIcon(icon)
                         .setContentTitle(title)
@@ -113,7 +118,7 @@ public class Notify {
                 break;
             }
             case NUMBER: {
-                notify = new Notification.Builder(context)
+                mNotify = new Notification.Builder(context)
                         .setSmallIcon(icon)
                         .setTicker(ticker)
                         .setWhen(when)
@@ -129,11 +134,11 @@ public class Notify {
             }
         }
         if (intent != null) // Add pending intent (if any)
-            notify.contentIntent = intent;
+            mNotify.contentIntent = intent;
 
         //
         ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE))
-                .notify(NOTIFICATION_REF, notify);
+                .notify(NOTIFICATION_REF, mNotify);
     }
     private void hide(Context context) { // Cancel notification
         Logs.add(Logs.Type.V, "context: " + context);

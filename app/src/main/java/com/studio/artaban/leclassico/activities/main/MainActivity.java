@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //Logs.add(Logs.Type.V, "section: " + section + ";newItem: " + newItem);
         switch (section) {
+
             case Constants.MAIN_SECTION_HOME:
                 return R.id.shortcut_home;
             case Constants.MAIN_SECTION_PUBLICATIONS:
@@ -318,7 +319,6 @@ public class MainActivity extends AppCompatActivity implements
             }
             case R.id.navig_settings: { // Display settings
                 Logs.add(Logs.Type.I, "Display settings");
-
 
 
 
@@ -809,5 +809,9 @@ public class MainActivity extends AppCompatActivity implements
 
         // Unregister new user notifications service
         sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mNotifyUri));
+
+        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mShortcutUri));
+        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_MESSAGERIE, mShortcutUri));
+        // NB: Also implemented in 'onPause' method but needed in user kill app case
     }
 }

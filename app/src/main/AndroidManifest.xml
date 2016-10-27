@@ -42,7 +42,6 @@
         <activity
             android:name=".activities.main.MainActivity"
             android:parentActivityName=".activities.introduction.IntroActivity"
-            android:launchMode="singleTask"
             android:theme="@style/MainAppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -63,8 +62,7 @@
         <!-- Services -->
         <service
             android:name=".connection.DataService"
-            android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:permission="com.studio.artaban.permission.LECLASSICO_SERVICE">
         </service>
 

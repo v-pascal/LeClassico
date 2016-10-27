@@ -15,7 +15,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.R;
-import com.studio.artaban.leclassico.activities.main.MainActivity;
+import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
 import com.studio.artaban.leclassico.connection.requests.AbonnementsRequest;
 import com.studio.artaban.leclassico.connection.requests.ActualitesRequest;
 import com.studio.artaban.leclassico.connection.requests.AlbumsRequest;
@@ -360,15 +360,23 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         mDataLogin.token.set(intent.getStringExtra(EXTRA_DATA_TOKEN));
         mDataLogin.timeLag = intent.getLongExtra(EXTRA_DATA_TIME_LAG, 0);
 
-        // Add notification
+        // Create notification
         Bundle notifyData = new Bundle();
         notifyData.putInt(Notify.DATA_KEY_ICON, R.drawable.notification);
         notifyData.putString(Notify.DATA_KEY_TITLE, getString(R.string.app_name));
         notifyData.putString(Notify.DATA_KEY_TEXT, getString(R.string.pseudo_connected, mDataLogin.pseudo));
 
+        Intent notifyIntent = new Intent(this, IntroActivity.class);
+        notifyIntent.setAction(Intent.ACTION_MAIN);
+        notifyIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        notifyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
         Notify.update(this, Notify.Type.EVENT,
-                PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0),
+                PendingIntent.getActivity(this, 0, notifyIntent, 0),
                 notifyData);
+
+        // Make this service in foreground mode (persistent)
+        startForeground(Notify.NOTIFICATION_REF, Notify.get());
 
         // Start connection supervisor (if connected)
         if (Internet.isConnected())
@@ -409,7 +417,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         Internet.removeConnectivityListener(this);
         isRunning = false;
 
-        Notify.cancel(this); // Remove notification
+        stopForeground(true); // Remove notification
         stopConnectionSupervisor(); // Cancel token update
 
         // Remove broadcast receiver & request management
