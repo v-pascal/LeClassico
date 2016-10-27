@@ -55,7 +55,8 @@ public class MusicTable extends DataTable {
 
 
 
-        return null;
+        Database.SyncResult syncResult = new Database.SyncResult();
+        return syncResult;
     }
 
     //

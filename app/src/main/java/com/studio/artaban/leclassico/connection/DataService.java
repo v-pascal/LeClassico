@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.connection;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -14,6 +15,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.activities.main.MainActivity;
 import com.studio.artaban.leclassico.connection.requests.AbonnementsRequest;
 import com.studio.artaban.leclassico.connection.requests.ActualitesRequest;
 import com.studio.artaban.leclassico.connection.requests.AlbumsRequest;
@@ -364,7 +366,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         notifyData.putString(Notify.DATA_KEY_TITLE, getString(R.string.app_name));
         notifyData.putString(Notify.DATA_KEY_TEXT, getString(R.string.pseudo_connected, mDataLogin.pseudo));
 
-        Notify.update(this, Notify.Type.EVENT, null, notifyData);
+        Notify.update(this, Notify.Type.EVENT,
+                PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0),
+                notifyData);
 
         // Start connection supervisor (if connected)
         if (Internet.isConnected())

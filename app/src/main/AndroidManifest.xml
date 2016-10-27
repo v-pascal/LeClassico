@@ -42,6 +42,7 @@
         <activity
             android:name=".activities.main.MainActivity"
             android:parentActivityName=".activities.introduction.IntroActivity"
+            android:launchMode="singleTask"
             android:theme="@style/MainAppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

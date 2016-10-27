@@ -18,7 +18,6 @@ import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.tools.SyncValue;
 
 import org.json.JSONArray;
 import org.json.JSONException;

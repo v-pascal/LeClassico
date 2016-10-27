@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.studio.artaban.leclassico.R;
-import com.studio.artaban.leclassico.data.Constants;
 
 /**
  * Created by pascal on 22/08/16.
