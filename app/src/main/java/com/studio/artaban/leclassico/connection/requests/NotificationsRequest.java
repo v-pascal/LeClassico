@@ -71,7 +71,7 @@ public class NotificationsRequest extends DataRequest {
 
 
 
-                //ServiceNotify.update(3);
+                //ServiceNotify.update(mService, 3);
 
 
 

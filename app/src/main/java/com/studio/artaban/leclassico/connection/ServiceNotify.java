@@ -11,7 +11,6 @@ import android.widget.RemoteViews;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.helpers.Notify;
 
 /**
  * Created by pascal on 28/10/16.
@@ -37,11 +36,11 @@ public final class ServiceNotify {
 
 
 
-        views.setTextViewText(R.id.notify_time, notifyData.getString(Notify.DATA_KEY_TEXT));
+        //views.setTextViewText(R.id.notify_time, notifyData.getString(Notify.DATA_KEY_TEXT));
 
 
 
-        views.setTextViewText(R.id.notify_date, notifyData.getString(Notify.DATA_KEY_TEXT));
+        //views.setTextViewText(R.id.notify_date, notifyData.getString(Notify.DATA_KEY_TEXT));
     }
 
     //////
@@ -62,7 +61,7 @@ public final class ServiceNotify {
 
 
 
-        notifyViews.setTextViewText(R.id.notify_text, notifyData.getString(Notify.DATA_KEY_TEXT));
+        //notifyViews.setTextViewText(R.id.notify_text, notifyData.getString(Notify.DATA_KEY_TEXT));
 
         Intent displayActivity = new Intent(service, IntroActivity.class);
         displayActivity.setAction(Intent.ACTION_MAIN);
@@ -106,10 +105,15 @@ public final class ServiceNotify {
 
 
 
-        mNotify.bigContentView.setTextViewText(R.id.notify_title, notifyData.getString(Notify.DATA_KEY_TEXT));
+        //mNotify.bigContentView.setTextViewText(R.id.notify_title, notifyData.getString(Notify.DATA_KEY_TEXT));
 
         //
         ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(SERVICE_NOTIFICATION_REF, mNotify);
+    }
+
+    public static void remove(Service service) {
+        Logs.add(Logs.Type.V, "service: " + service);
+        service.stopForeground(true);
     }
 }

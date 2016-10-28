@@ -406,7 +406,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         Internet.removeConnectivityListener(this);
         isRunning = false;
 
-        stopForeground(true); // Remove notification
+        ServiceNotify.remove(this); // Remove notification
         stopConnectionSupervisor(); // Cancel token update
 
         // Remove broadcast receiver & request management
