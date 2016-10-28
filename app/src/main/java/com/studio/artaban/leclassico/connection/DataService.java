@@ -1,6 +1,5 @@
 package com.studio.artaban.leclassico.connection;
 
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -10,13 +9,9 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.widget.RemoteViews;
 
-import com.studio.artaban.leclassico.R;
-import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
 import com.studio.artaban.leclassico.connection.requests.AbonnementsRequest;
 import com.studio.artaban.leclassico.connection.requests.ActualitesRequest;
 import com.studio.artaban.leclassico.connection.requests.AlbumsRequest;
@@ -36,7 +31,6 @@ import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.helpers.Notify;
 import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
@@ -91,6 +85,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     }
 
     ////// Broadcast actions
+    public static final String REQUEST_LOGOUT = "com." + Constants.APP_URI_COMPANY + '.' +
+            Constants.APP_URI + ".action.REQUEST_LOGOUT";
     public static final String REGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REGISTER_NEW_DATA";
     public static final String UNREGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
@@ -122,28 +118,34 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         public void onReceive(Context context, Intent intent) {
 
             Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
-            int tableIdx = intent.getByteExtra(EXTRA_DATA_TABLE_ID, (byte)0) - 1;
-            if (tableIdx == Constants.NO_DATA)
-                throw new IllegalArgumentException("Unexpected request table ID");
+            if (intent.getAction().equals(REQUEST_LOGOUT)) // Logout
+                stopSelf();
 
-            //////
-            if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
-                if (mDataRequests.get(tableIdx).register(intent)) {
+            else {
 
-                    Logs.add(Logs.Type.I, "Schedule table ID #" + (tableIdx + 1) + " request");
-                    DataRequest request = mDataRequests.get(tableIdx);
-                    mRequestTimer.schedule(request.getTask(), 0, request.getDelay());
+                int tableIdx = intent.getByteExtra(EXTRA_DATA_TABLE_ID, (byte)0) - 1;
+                if (tableIdx == Constants.NO_DATA)
+                    throw new IllegalArgumentException("Unexpected request table ID");
+
+                //////
+                if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
+                    if (mDataRequests.get(tableIdx).register(intent)) {
+
+                        Logs.add(Logs.Type.I, "Schedule table ID #" + (tableIdx + 1) + " request");
+                        DataRequest request = mDataRequests.get(tableIdx);
+                        mRequestTimer.schedule(request.getTask(), 0, request.getDelay());
+                    }
                 }
+                else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
+                    if (mDataRequests.get(tableIdx).unregister(intent)) {
+
+                        Logs.add(Logs.Type.I, "Purge table ID #" + (tableIdx + 1) + " request");
+                        mRequestTimer.purge(); // Purge cancelled request task
+                    }
+
+                } else if (intent.getAction().equals(REQUEST_OLD_DATA)) // Request old data
+                    mDataRequests.get(tableIdx).request(intent.getExtras());
             }
-            else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
-                if (mDataRequests.get(tableIdx).unregister(intent)) {
-
-                    Logs.add(Logs.Type.I, "Purge table ID #" + (tableIdx + 1) + " request");
-                    mRequestTimer.purge(); // Purge cancelled request task
-                }
-
-            } else if (intent.getAction().equals(REQUEST_OLD_DATA)) // Request old data
-                mDataRequests.get(tableIdx).request(intent.getExtras());
         }
     }
 
@@ -361,31 +363,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         mDataLogin.token.set(intent.getStringExtra(EXTRA_DATA_TOKEN));
         mDataLogin.timeLag = intent.getLongExtra(EXTRA_DATA_TIME_LAG, 0);
 
-        // Create notification
-        Bundle notifyData = new Bundle();
-        notifyData.putInt(Notify.DATA_KEY_ICON, R.drawable.notification);
-        notifyData.putString(Notify.DATA_KEY_TITLE, getString(R.string.app_name));
-        notifyData.putString(Notify.DATA_KEY_TEXT, getString(R.string.pseudo_connected, mDataLogin.pseudo));
-
-        Intent notifyIntent = new Intent(this, IntroActivity.class);
-        notifyIntent.setAction(Intent.ACTION_MAIN);
-        notifyIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        notifyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        RemoteViews notifyViews = new RemoteViews(getPackageName(), R.layout.notification_service);
-
-
-
-
-
-
-        Notify.update(this, Notify.Type.EVENT,
-                PendingIntent.getActivity(this, 0, notifyIntent, 0),
-                notifyViews,
-                notifyData);
-
-        // Make this service in foreground mode (persistent)
-        startForeground(Notify.NOTIFICATION_REF, Notify.get());
+        // Create service notification
+        ServiceNotify.create(this, mDataLogin.pseudo);
 
         // Start connection supervisor (if connected)
         if (Internet.isConnected())
@@ -411,6 +390,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         }
         mRequestTimer = new Timer();
 
+        registerReceiver(mDataReceiver, new IntentFilter(REQUEST_LOGOUT));
         registerReceiver(mDataReceiver, new IntentFilter(REGISTER_NEW_DATA));
         registerReceiver(mDataReceiver, new IntentFilter(UNREGISTER_NEW_DATA));
         registerReceiver(mDataReceiver, new IntentFilter(REQUEST_OLD_DATA));

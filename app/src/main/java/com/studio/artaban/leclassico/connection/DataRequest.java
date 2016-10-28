@@ -84,8 +84,8 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     }
 
     public TimerTask getTask() { // Return request timer task (create it if NULL or cancelled)
-        Logs.add(Logs.Type.V, null);
 
+        Logs.add(Logs.Type.V, null);
         if (mRegister.isEmpty())
             return null;
 

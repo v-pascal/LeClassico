@@ -65,6 +65,19 @@ public class NotificationsRequest extends DataRequest {
 
             if (Database.SyncResult.hasChanged(result)) {
 
+
+
+
+
+
+
+                //ServiceNotify.update(3);
+
+
+
+
+
+
                 // Notify DB change to observer URI
                 for (Uri observerUri : mRegister)
                     mService.getContentResolver().notifyChange(observerUri, null);

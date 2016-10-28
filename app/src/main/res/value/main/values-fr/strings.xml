@@ -14,6 +14,10 @@
     <string name="no_notification_info">Pas d\'événement justifiant une notification</string>
     <string name="notification_info">Dernière notification reçue</string>
 
+    <!-- Service -->
+    <string name="service_logout">DECONNECTER</string>
+    <string name="service_display">AFFICHER</string>
+
     <!-- Notification -->
     <string name="notify_shared_message">%1$s a ajouté une photo</string>
     <string name="notify_shared_info">Dans votre album %1$s</string>

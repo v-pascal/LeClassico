@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
+                android:layout_height="wrap_content">
 
     <!-- Icon -->
     <ImageView
@@ -12,27 +11,145 @@
         android:layout_width="@dimen/service_icon_size"
         android:layout_height="@dimen/service_icon_size"/>
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/notify_title"
-        android:text="@string/app_name"
-        android:textColor="@android:color/black"
-        android:textSize="@dimen/service_title_size"
+    <LinearLayout
+        android:id="@+id/layout_title"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/service_icon_margin"
+        android:layout_marginEnd="@dimen/service_date_margin"
+        android:layout_toEndOf="@id/notify_icon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/notify_title"
+            android:text="@string/app_name"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/service_title_size"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/service_text_height"/>
+
+        <!-- Time -->
+        <TextView
+            android:id="@+id/notify_time"
+
+
+
+            android:text="4:23 PM"
+
+
+            android:textColor="@color/colorNotifyText"
+            android:textSize="@dimen/service_title_size"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/service_date_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/service_text_height"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_text"
+        android:layout_toEndOf="@id/notify_icon"
+        android:layout_below="@id/layout_title"
+        android:layout_marginEnd="@dimen/service_date_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/notify_text"
+
+
+
+            android:text="Testers est connecté"
+
+
+
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/service_text_size"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/service_text_height"/>
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/notify_date"
+
+
+
+            android:text="28 Oct, 2016"
+
+
+
+            android:textColor="@color/colorNotifyText"
+            android:textSize="@dimen/service_text_size"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/service_date_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/service_text_height"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/notify_separator"
+        android:background="@color/colorPublication"
         android:layout_marginTop="@dimen/service_icon_margin"
         android:layout_toEndOf="@id/notify_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_below="@id/layout_text"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
 
-    <!-- Text -->
-    <TextView
-        android:id="@+id/notify_text"
-        android:text="Testers est connecté"
-        android:textColor="@android:color/black"
-        android:textSize="@dimen/service_text_size"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_toEndOf="@id/notify_icon"
-        android:layout_below="@id/notify_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_below="@id/notify_separator"
+        android:layout_marginTop="@dimen/service_date_margin"
+        android:layout_marginEnd="@dimen/service_icon_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <!-- Logout icon -->
+        <ImageView
+            android:id="@+id/image_logout"
+            android:src="@drawable/ic_close_white_36dp"
+            android:tint="@color/colorNotifyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
+        <!-- Logout -->
+        <TextView
+            android:id="@+id/text_logout"
+            android:text="@string/service_logout"
+            android:textSize="@dimen/service_title_size"
+            android:textColor="@color/colorNotifyText"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/service_date_margin"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="36dp"/>
+
+        <!-- Display icon -->
+        <ImageView
+            android:id="@+id/image_display"
+            android:src="@drawable/ic_open_in_new_white_36dp"
+            android:tint="@color/colorNotifyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Display -->
+        <TextView
+            android:id="@+id/text_display"
+            android:text="@string/service_display"
+            android:textSize="@dimen/service_title_size"
+            android:textColor="@color/colorNotifyText"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/service_date_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"/>
+    </LinearLayout>
 </RelativeLayout>

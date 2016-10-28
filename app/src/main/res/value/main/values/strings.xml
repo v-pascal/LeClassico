@@ -14,6 +14,10 @@
     <string name="no_notification_info">No event justifying a notification</string>
     <string name="notification_info">Last notification received</string>
 
+    <!-- Service -->
+    <string name="service_logout">LOGOUT</string>
+    <string name="service_display">DISPLAY</string>
+
     <!-- Notification -->
     <string name="notify_shared_message">%1$s has added a photo</string><!-- @integer/notify_shared_message_pseudo_pos -->
     <string name="notify_shared_info">To your %1$s album</string><!-- @integer/notify_shared_info_album_pos -->

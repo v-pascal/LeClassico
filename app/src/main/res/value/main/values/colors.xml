@@ -3,4 +3,7 @@
 
     <color name="colorWindowBackground">#ffefefef</color>
 
+    <!-- Notification service -->
+    <color name="colorNotifyText">#8a000000</color>
+
 </resources>

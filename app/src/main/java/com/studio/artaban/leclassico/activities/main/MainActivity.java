@@ -19,7 +19,6 @@ import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -35,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
@@ -57,7 +57,7 @@ import java.io.File;
  * Created by pascal on 08/08/16.
  * Main activity class
  */
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends LoggedActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
         MainFragment.OnFragmentListener {
 
@@ -409,6 +409,20 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
+    @Override
+    protected void onLoggedResume() {
+        Logs.add(Logs.Type.V, null);
+
+        // Bind data service
+        if ((DataService.isRunning()) && (!mDataService.bind(this, null)))
+            Tools.criticalError(this, R.string.error_service_unavailable);
+
+        // Register shortcut data service
+        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mShortcutUri));
+        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_MESSAGERIE, mShortcutUri));
+    }
+
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -741,20 +755,6 @@ public class MainActivity extends AppCompatActivity implements
 
         // Register new user notifications service
         sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mNotifyUri));
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Logs.add(Logs.Type.V, null);
-
-        // Bind data service
-        if (!mDataService.bind(this, null))
-            Tools.criticalError(this, R.string.error_service_unavailable);
-
-        // Register shortcut data service
-        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mShortcutUri));
-        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_MESSAGERIE, mShortcutUri));
     }
 
     @Override

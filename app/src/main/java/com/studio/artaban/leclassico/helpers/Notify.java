@@ -136,7 +136,7 @@ public class Notify {
             }
         }
         if (views != null) // Add remote views (if any)
-            mNotify.contentView = views;
+            mNotify.bigContentView = views;
         if (intent != null) // Add pending intent (if any)
             mNotify.contentIntent = intent;
 

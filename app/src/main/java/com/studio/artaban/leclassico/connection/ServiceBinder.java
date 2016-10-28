@@ -77,7 +77,7 @@ public class ServiceBinder {
             mBound = false;
 
         } else
-            Logs.add(Logs.Type.W, "Service not bound");
+            Logs.add(Logs.Type.D, "Service not bound");
     }
 
     //
