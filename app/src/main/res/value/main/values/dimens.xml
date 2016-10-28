@@ -4,4 +4,10 @@
     <dimen name="profile_border_width">6dp</dimen>
     <dimen name="profile_size">96dp</dimen>
 
+    <!-- Notification service -->
+    <dimen name="service_icon_margin">10dp</dimen>
+    <dimen name="service_icon_size">42dp</dimen>
+    <dimen name="service_title_size">16sp</dimen>
+    <dimen name="service_text_size">14sp</dimen>
+
 </resources>

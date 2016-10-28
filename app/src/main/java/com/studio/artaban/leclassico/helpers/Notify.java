@@ -7,6 +7,7 @@ import android.content.Context;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.RemoteViews;
 
 import com.studio.artaban.leclassico.R;
 
@@ -45,8 +46,9 @@ public class Notify {
 
     //////
     private static Notify ourInstance = new Notify();
-    public static void update(Context context, Type type, PendingIntent intent, Bundle data) {
-        ourInstance.show(context, type, intent, data);
+    public static void update(Context context, Type type, PendingIntent intent,
+                              RemoteViews views, Bundle data) {
+        ourInstance.show(context, type, intent, views, data);
     }
     public static void cancel(Context context) {
         ourInstance.hide(context);
@@ -63,11 +65,11 @@ public class Notify {
     }
 
     //////
-    private void show(Context context, Type type, PendingIntent intent, Bundle data) {
+    private void show(Context context, Type type, PendingIntent intent, RemoteViews views, Bundle data) {
         // Add or update an existing notification (according its key)
 
         Logs.add(Logs.Type.V, "context: " + context + ";type: " + type + ";intent: " + intent +
-                ";data: " + data);
+                ";views: " + views + ";data: " + data);
         int icon = R.mipmap.ic_launcher;
         String ticker = NOTIFICATION_TICKER;
         String title = context.getString(R.string.app_name);
@@ -133,6 +135,8 @@ public class Notify {
                 throw new IllegalArgumentException("Not implemented yet");
             }
         }
+        if (views != null) // Add remote views (if any)
+            mNotify.contentView = views;
         if (intent != null) // Add pending intent (if any)
             mNotify.contentIntent = intent;
 

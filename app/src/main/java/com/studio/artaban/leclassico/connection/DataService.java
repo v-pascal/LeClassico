@@ -13,6 +13,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.widget.RemoteViews;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
@@ -371,8 +372,16 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         notifyIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         notifyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        RemoteViews notifyViews = new RemoteViews(getPackageName(), R.layout.notification_service);
+
+
+
+
+
+
         Notify.update(this, Notify.Type.EVENT,
                 PendingIntent.getActivity(this, 0, notifyIntent, 0),
+                notifyViews,
                 notifyData);
 
         // Make this service in foreground mode (persistent)
