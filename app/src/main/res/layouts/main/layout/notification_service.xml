@@ -95,8 +95,9 @@
             android:id="@+id/image_logout"
             android:src="@drawable/ic_close_white_36dp"
             android:tint="@color/colorNotifyText"
+            android:layout_margin="@dimen/service_cmd_margin"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="@dimen/service_image_height"/>
 
         <!-- Logout -->
         <TextView
@@ -105,18 +106,18 @@
             android:textSize="@dimen/service_title_size"
             android:textColor="@color/colorNotifyText"
             android:gravity="center_vertical"
-            android:layout_marginStart="@dimen/service_date_margin"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="36dp"/>
+            android:layout_height="@dimen/service_cmd_height"/>
 
         <!-- Display icon -->
         <ImageView
             android:id="@+id/image_display"
             android:src="@drawable/ic_open_in_new_white_36dp"
             android:tint="@color/colorNotifyText"
+            android:layout_margin="@dimen/service_cmd_margin"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="@dimen/service_image_height"/>
 
         <!-- Display -->
         <TextView
@@ -125,8 +126,7 @@
             android:textSize="@dimen/service_title_size"
             android:textColor="@color/colorNotifyText"
             android:gravity="center_vertical"
-            android:layout_marginStart="@dimen/service_date_margin"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"/>
+            android:layout_height="@dimen/service_cmd_height"/>
     </LinearLayout>
 </RelativeLayout>

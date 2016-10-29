@@ -21,10 +21,12 @@ android {
             res.srcDirs =
                     ['src/main/res/layouts/introduction',
                      'src/main/res/layouts/main',
+                     'src/main/res/layouts/notification',
                      'src/main/res/drawables/introduction',
                      'src/main/res/drawables/main',
                      'src/main/res/value/introduction',
                      'src/main/res/value/main',
+                     'src/main/res/value/notification',
                      'src/main/res/value/profile',
                      'src/main/res/layouts',
                      'src/main/res/drawables',

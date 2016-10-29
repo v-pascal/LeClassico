@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -22,9 +23,19 @@ public abstract class LoggedActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
 
             Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
-            if (intent.getAction().equals(DataService.REQUEST_LOGOUT))
-                supportFinishAfterTransition();
+            if (intent.getAction().equals(DataService.REQUEST_LOGOUT)) { ////// Logout requested
+
+                if (mLogoutResult != Constants.NO_DATA)
+                    LoggedActivity.this.setResult(mLogoutResult);
+                supportFinishAfterTransition(); // Finish activity
+            }
         }
+    }
+
+    //////
+    private int mLogoutResult = Constants.NO_DATA; // Logout result code
+    protected void setLogoutResult(int code) {
+        mLogoutResult = code;
     }
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////

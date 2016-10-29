@@ -17,6 +17,7 @@
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>
+    <string name="title_activity_notify">Notification</string>
 
     <string name="error">Error</string>
     <string name="warning">Warning</string>

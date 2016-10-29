@@ -85,7 +85,7 @@ public final class ServiceNotify {
 
         //
         mNotify = new Notification.Builder(service)
-                        .setDefaults(Notification.DEFAULT_SOUND)
+                        .setDefaults(Notification.DEFAULT_ALL)
                         .setSmallIcon(R.drawable.notification)
                         .setContentTitle(service.getString(R.string.app_name))
                         .setContentText(text)
@@ -105,7 +105,7 @@ public final class ServiceNotify {
         setDateTime(context, mNotify.bigContentView); // Update current date & time
         if (newNotify > 0) {
 
-            mNotify.defaults = Notification.DEFAULT_SOUND;
+            mNotify.defaults = Notification.DEFAULT_ALL;
 
             SpannableStringBuilder titleBuilder =
                     new SpannableStringBuilder(context.getString(R.string.service_new_notify, newNotify));
@@ -119,8 +119,6 @@ public final class ServiceNotify {
             mNotify.defaults = 0;
             setDefaultTitle(context, mNotify.bigContentView);
         }
-
-        //
         ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(SERVICE_NOTIFICATION_REF, mNotify);
     }

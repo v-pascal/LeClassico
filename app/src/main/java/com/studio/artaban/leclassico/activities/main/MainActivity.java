@@ -1,6 +1,8 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.app.ActivityOptions;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -35,11 +37,13 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.notification.NotifyActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -772,10 +776,28 @@ public class MainActivity extends LoggedActivity implements
         Logs.add(Logs.Type.V, "item: " + item);
         if (item.getItemId() == R.id.mnu_notification) {
 
-            mViewPager.setCurrentItem(Constants.MAIN_SECTION_NOTIFICATIONS);
+            ////// Start notification activity
+            startActivityForResult(new Intent(this, NotifyActivity.class), Requests.NOTIFY_2_MAIN.CODE,
+                    ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Logs.add(Logs.Type.V, "requestCode: " + requestCode + ";resultCode: " + resultCode + ";data: " + data);
+
+        if (requestCode == Requests.NOTIFY_2_MAIN.CODE) { // Notification activity result
+            switch (resultCode) {
+                case Requests.NOTIFY_2_MAIN.RESULT_LOGOUT: { ////// Logout requested
+
+                    supportFinishAfterTransition();
+                    break;
+                }
+            }
+        }
     }
 
     @Override
