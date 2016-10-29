@@ -13,6 +13,9 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -71,27 +74,47 @@ public class ConnectFragment extends RevealFragment {
     private int mProgress; // Synchronization progress status
     private boolean mOnline; // Online connection flag
 
-    private void reset(boolean indeterminate) { // Reset progress UI components
+    private void animateSynchro(ImageView syncPin) {
+        // Start synchronization pin image animation
 
-        Logs.add(Logs.Type.V, "indeterminate: " + indeterminate);
+        Logs.add(Logs.Type.V, "syncPin: " + syncPin);
+        RotateAnimation anim = new RotateAnimation(0f, 350f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setInterpolator(new LinearInterpolator());
+        anim.setRepeatCount(Animation.INFINITE);
+        anim.setDuration(700);
+
+        syncPin.setImageDrawable(getResources().getDrawable(R.drawable.spinner_blue_36dp));
+        syncPin.setVisibility(View.VISIBLE);
+        syncPin.startAnimation(anim);
+    }
+    private void reset(boolean indeterminate, boolean animSync) { // Reset progress UI components
+
+        Logs.add(Logs.Type.V, "indeterminate: " + indeterminate + ";animSync: " + animSync);
         ((ImageView)mRootView.findViewById(R.id.checked_internet))
                 .setImageDrawable(getResources().getDrawable(R.drawable.forward_purple));
 
         ImageView pin = (ImageView)mRootView.findViewById(R.id.checked_identification);
         pin.setImageDrawable(getResources().getDrawable(R.drawable.forward_purple));
         pin.setVisibility(View.INVISIBLE);
-        pin = (ImageView)mRootView.findViewById(R.id.checked_synchro);
-        pin.setImageDrawable(getResources().getDrawable(R.drawable.forward_purple));
-        pin.setVisibility(View.INVISIBLE);
         pin = (ImageView)mRootView.findViewById(R.id.checked_notification);
         pin.setImageDrawable(getResources().getDrawable(R.drawable.forward_purple));
         pin.setVisibility(View.INVISIBLE);
+        pin = (ImageView)mRootView.findViewById(R.id.checked_synchro);
         if (indeterminate) {
+
+            pin.clearAnimation();
+            pin.setImageDrawable(getResources().getDrawable(R.drawable.forward_purple));
+            pin.setVisibility(View.INVISIBLE);
 
             ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
             progressBar.setIndeterminate(true);
             progressBar.invalidate();
-        }
+
+        } else if (animSync)
+            animateSynchro(pin);
+
         ((TextView)mRootView.findViewById(R.id.progress_percentage)).setText(null);
     }
     public void update(byte step, int progress) { // Update UI connection progress
@@ -102,14 +125,14 @@ public class ConnectFragment extends RevealFragment {
                 case STEP_CHECK_INTERNET: {
                     mProgress = 0;
                     mStep = step;
-                    reset(true);
+                    reset(true, false);
                     break;
                 }
                 case STEP_LOGIN_ONLINE: {
                     mProgress = 0;
                     mStep = step;
                     mOnline = true;
-                    reset(true);
+                    reset(true, false);
 
                     ((ImageView)mRootView.findViewById(R.id.checked_internet))
                             .setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
@@ -120,7 +143,7 @@ public class ConnectFragment extends RevealFragment {
                     mProgress = 0;
                     mStep = step;
                     mOnline = false;
-                    reset(true);
+                    reset(true, false);
 
                     ((ImageView)mRootView.findViewById(R.id.checked_internet))
                             .setImageDrawable(getResources().getDrawable(R.drawable.cancel_orange));
@@ -130,7 +153,7 @@ public class ConnectFragment extends RevealFragment {
                 case STEP_SYNCHRONIZATION_PROGRESS: {
                     mProgress = progress;
                     mStep = step;
-                    reset(false);
+                    reset(false, (progress == 1));
 
                     ((ImageView)mRootView.findViewById(R.id.checked_internet))
                             .setImageDrawable(getResources().getDrawable((mOnline) ?
@@ -138,7 +161,9 @@ public class ConnectFragment extends RevealFragment {
                     ImageView pin = (ImageView)mRootView.findViewById(R.id.checked_identification);
                     pin.setImageDrawable(getResources().getDrawable(R.drawable.checked_orange));
                     pin.findViewById(R.id.checked_identification).setVisibility(View.VISIBLE);
-                    mRootView.findViewById(R.id.checked_synchro).setVisibility(View.VISIBLE);
+                    pin = (ImageView)mRootView.findViewById(R.id.checked_synchro);
+                    if (pin.getVisibility() != View.VISIBLE)
+                        animateSynchro(pin); // Restart synchro animation
 
                     ProgressBar progressBar = (ProgressBar)mRootView.findViewById(R.id.progress_view);
                     progressBar.setIndeterminate(false);
@@ -151,7 +176,7 @@ public class ConnectFragment extends RevealFragment {
                 case STEP_SYNCHRONIZATION_SUCCEEDED: {
                     mProgress = 0;
                     mStep = step;
-                    reset(true);
+                    reset(true, false);
 
                     ((ImageView)mRootView.findViewById(R.id.checked_internet))
                             .setImageDrawable(getResources().getDrawable((mOnline) ?
