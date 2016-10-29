@@ -904,6 +904,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
                 // Display about application info
                 new AlertDialog.Builder(this)
+                        .setIcon(R.drawable.artaban)
                         .setTitle(R.string.mnu_about)
                         .setMessage(getString(R.string.app_about, getString(R.string.app_name)))
                         .show();
