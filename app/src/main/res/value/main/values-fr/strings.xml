@@ -17,6 +17,7 @@
     <!-- Service -->
     <string name="service_logout">DECONNECTER</string>
     <string name="service_display">AFFICHER</string>
+    <string name="service_new_notify">%1$d nouvelle(s) notification(s)</string>
 
     <!-- Notification -->
     <string name="notify_shared_message">%1$s a ajouté une photo</string>

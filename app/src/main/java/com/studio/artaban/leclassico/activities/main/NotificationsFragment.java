@@ -26,13 +26,10 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
-import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
-import com.studio.artaban.leclassico.data.codes.Tables;
-import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
@@ -202,15 +199,17 @@ public class NotificationsFragment extends MainFragment implements QueryLoader.O
             int position = (int)sender.getTag(R.id.tag_position);
             switch (sender.getId()) {
 
-                case R.id.layout_data: {
-                    Logs.add(Logs.Type.I, "Notification #" + position + " selected");
+                case R.id.image_pseudo: {
+                    Logs.add(Logs.Type.I, "Pseudo #" + position + " selected");
+
 
 
 
                     break;
                 }
-                case R.id.image_pseudo: {
-                    Logs.add(Logs.Type.I, "Pseudo #" + position + " selected");
+                case R.id.layout_data: {
+                    Logs.add(Logs.Type.I, "Notification #" + position + " selected");
+
 
 
 

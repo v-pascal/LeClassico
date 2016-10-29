@@ -6,15 +6,21 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.widget.RemoteViews;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 /**
  * Created by pascal on 28/10/16.
- * Service notification helpers
+ * Service notification helpers (with logout & display management)
  */
 public final class ServiceNotify {
 
@@ -26,21 +32,23 @@ public final class ServiceNotify {
 
     private static Notification mNotify; // Notification
 
-    private static void addDateTime(RemoteViews views) {
-        Logs.add(Logs.Type.V, "views: " + views);
+    private static void setDateTime(Context context, RemoteViews views) { // Set current date & time
+        Logs.add(Logs.Type.V, "context: " + context + ";views: " + views);
 
+        Date now = new Date();
+        DateFormat notifyDate = android.text.format.DateFormat.getMediumDateFormat(context);
+        android.text.format.DateFormat notifyTime = new android.text.format.DateFormat();
 
+        views.setTextViewText(R.id.notify_time, notifyTime.format("h:mm a", now));
+        views.setTextViewText(R.id.notify_date, notifyDate.format(now));
+    }
+    private static void setDefaultTitle(Context context, RemoteViews views) {
+        // Set default notification title (app name)
 
-
-
-
-
-
-        //views.setTextViewText(R.id.notify_time, notifyData.getString(Notify.DATA_KEY_TEXT));
-
-
-
-        //views.setTextViewText(R.id.notify_date, notifyData.getString(Notify.DATA_KEY_TEXT));
+        Logs.add(Logs.Type.V, "context: " + context + ";views: " + views);
+        SpannableStringBuilder titleBuilder = new SpannableStringBuilder(context.getString(R.string.app_name));
+        titleBuilder.setSpan(new ForegroundColorSpan(Color.BLACK), 0, titleBuilder.length(), 0);
+        views.setTextViewText(R.id.notify_title, titleBuilder.subSequence(0, titleBuilder.length()));
     }
 
     //////
@@ -51,18 +59,17 @@ public final class ServiceNotify {
         String text = service.getString(R.string.pseudo_connected, pseudo);
 
         RemoteViews notifyViews = new RemoteViews(service.getPackageName(), R.layout.notification_service);
-        addDateTime(notifyViews);
+        setDateTime(service, notifyViews); // Set current date & time
+        setDefaultTitle(service, notifyViews); // Set default title (app name)
 
+        // Set text info (connected user)
+        SpannableStringBuilder textBuilder = new SpannableStringBuilder(text);
+        textBuilder.setSpan(new ForegroundColorSpan(Color.BLACK), pseudo.length(), textBuilder.length(), 0);
+        textBuilder.setSpan(new ForegroundColorSpan(service.getResources().getColor(R.color.colorAccentProfile)),
+                0, pseudo.length(), 0);
+        notifyViews.setTextViewText(R.id.notify_text, textBuilder.subSequence(0, textBuilder.length()));
 
-
-
-
-
-
-
-
-        //notifyViews.setTextViewText(R.id.notify_text, notifyData.getString(Notify.DATA_KEY_TEXT));
-
+        // Add action event (via pending intents)
         Intent displayActivity = new Intent(service, IntroActivity.class);
         displayActivity.setAction(Intent.ACTION_MAIN);
         displayActivity.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -95,17 +102,23 @@ public final class ServiceNotify {
         if (mNotify == null)
             throw new IllegalStateException("Unexpected update call (not created)");
 
-        addDateTime(mNotify.bigContentView);
+        setDateTime(context, mNotify.bigContentView); // Update current date & time
+        if (newNotify > 0) {
 
+            mNotify.defaults = Notification.DEFAULT_SOUND;
 
+            SpannableStringBuilder titleBuilder =
+                    new SpannableStringBuilder(context.getString(R.string.service_new_notify, newNotify));
+            int newNotifyLen = String.valueOf(newNotify).length();
+            titleBuilder.setSpan(new ForegroundColorSpan(Color.RED), 0, newNotifyLen, 0);
+            titleBuilder.setSpan(new ForegroundColorSpan(Color.BLACK), newNotifyLen, titleBuilder.length(), 0);
+            mNotify.bigContentView.setTextViewText(R.id.notify_title, titleBuilder.subSequence(0, titleBuilder.length()));
 
+        } else {
 
-
-
-
-
-
-        //mNotify.bigContentView.setTextViewText(R.id.notify_title, notifyData.getString(Notify.DATA_KEY_TEXT));
+            mNotify.defaults = 0;
+            setDefaultTitle(context, mNotify.bigContentView);
+        }
 
         //
         ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE))
@@ -114,6 +127,8 @@ public final class ServiceNotify {
 
     public static void remove(Service service) {
         Logs.add(Logs.Type.V, "service: " + service);
+
         service.stopForeground(true);
+        mNotify = null;
     }
 }
