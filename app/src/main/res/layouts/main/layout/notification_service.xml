@@ -35,7 +35,7 @@
         <TextView
             android:id="@+id/notify_time"
             android:textColor="@color/colorNotifyText"
-            android:textSize="@dimen/service_title_size"
+            android:textSize="@dimen/service_text_size"
             android:gravity="center_vertical"
             android:layout_marginStart="@dimen/service_date_margin"
             android:layout_width="wrap_content"
@@ -74,28 +74,28 @@
 
     <ImageView
         android:id="@+id/notify_separator"
-        android:background="@color/colorPublication"
+        android:background="@color/colorNotifySeparator"
         android:layout_marginTop="@dimen/service_icon_margin"
         android:layout_toEndOf="@id/notify_icon"
         android:layout_below="@id/layout_text"
         android:layout_width="match_parent"
-        android:layout_height="2dp"/>
+        android:layout_height="1dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_toEndOf="@id/notify_icon"
         android:layout_below="@id/notify_separator"
-        android:layout_marginTop="@dimen/service_date_margin"
-        android:layout_marginEnd="@dimen/service_icon_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <!-- Logout icon -->
         <ImageView
             android:id="@+id/image_logout"
-            android:src="@drawable/ic_close_white_36dp"
+            android:src="@drawable/ic_close_white_24dp"
             android:tint="@color/colorNotifyText"
-            android:layout_margin="@dimen/service_cmd_margin"
+            android:layout_marginTop="@dimen/service_cmd_margin"
+            android:layout_marginEnd="@dimen/service_icon_margin"
+            android:layout_marginBottom="@dimen/service_cmd_margin"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/service_image_height"/>
 
@@ -103,7 +103,7 @@
         <TextView
             android:id="@+id/text_logout"
             android:text="@string/service_logout"
-            android:textSize="@dimen/service_title_size"
+            android:textSize="@dimen/service_text_size"
             android:textColor="@color/colorNotifyText"
             android:gravity="center_vertical"
             android:layout_weight="1"
@@ -113,9 +113,11 @@
         <!-- Display icon -->
         <ImageView
             android:id="@+id/image_display"
-            android:src="@drawable/ic_open_in_new_white_36dp"
+            android:src="@drawable/ic_open_in_new_white_24dp"
             android:tint="@color/colorNotifyText"
-            android:layout_margin="@dimen/service_cmd_margin"
+            android:layout_marginTop="@dimen/service_cmd_margin"
+            android:layout_marginEnd="@dimen/service_icon_margin"
+            android:layout_marginBottom="@dimen/service_cmd_margin"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/service_image_height"/>
 
@@ -123,10 +125,11 @@
         <TextView
             android:id="@+id/text_display"
             android:text="@string/service_display"
-            android:textSize="@dimen/service_title_size"
+            android:textSize="@dimen/service_text_size"
             android:textColor="@color/colorNotifyText"
             android:gravity="center_vertical"
-            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_width="0dp"
             android:layout_height="@dimen/service_cmd_height"/>
     </LinearLayout>
 </RelativeLayout>

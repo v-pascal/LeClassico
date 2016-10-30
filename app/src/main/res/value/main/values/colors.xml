@@ -4,6 +4,7 @@
     <color name="colorWindowBackground">#ffefefef</color>
 
     <!-- Notification service -->
-    <color name="colorNotifyText">#8d000000</color>
+    <color name="colorNotifyText">#aa000000</color>
+    <color name="colorNotifySeparator">#2a000000</color>
 
 </resources>

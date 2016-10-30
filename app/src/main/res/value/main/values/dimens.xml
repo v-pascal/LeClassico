@@ -9,11 +9,11 @@
     <dimen name="service_icon_size">42dp</dimen>
     <dimen name="service_text_height">21dp</dimen><!-- = service_icon_size / 2 -->
     <dimen name="service_title_size">16sp</dimen>
-    <dimen name="service_text_size">14sp</dimen>
+    <dimen name="service_text_size">13sp</dimen>
     <dimen name="service_date_margin">8dp</dimen>
 
-    <dimen name="service_cmd_margin">8dp</dimen>
-    <dimen name="service_image_height">36dp</dimen>
-    <dimen name="service_cmd_height">52dp</dimen><!-- = service_image_height + (service_cmd_margin * 2) -->
+    <dimen name="service_cmd_margin">10dp</dimen>
+    <dimen name="service_image_height">24dp</dimen>
+    <dimen name="service_cmd_height">44dp</dimen><!-- = service_image_height + (service_cmd_margin * 2) -->
 
 </resources>
