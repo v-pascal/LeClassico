@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -39,8 +40,10 @@ import com.studio.artaban.leclassico.activities.main.MainActivity;
 import com.studio.artaban.leclassico.components.LimitlessViewPager;
 import com.studio.artaban.leclassico.components.RevealFragment;
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Preferences;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.animations.InOutScreen;
@@ -848,6 +851,35 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         // Create working sub folders
         if (!Storage.createWorkingFolders(this))
             Tools.criticalError(this, R.string.error_no_storage);
+
+        // Check if application has been killed with an existing token (notification service)
+        if (DataService.isRunning()) {
+            Logs.add(Logs.Type.I, "Service already running");
+
+            mLogoutRequested = false; // Connection fragment is not displayed (B4 starting main activity)
+
+            // Start main activity after having retrieved login info via the service
+            final ServiceBinder binder = new ServiceBinder();
+            boolean bindResult = binder.bind(this, new ServiceBinder.OnServiceListener() {
+                @Override
+                public void onServiceConnected(DataService service) {
+
+                    Logs.add(Logs.Type.V, "service: " + service);
+                    Tools.LoginReply loginInfo = service.getLoginData();
+                    binder.unbind(IntroActivity.this);
+
+                    ////// Start main activity
+                    startMainActivity(loginInfo.pseudo, loginInfo.pseudoId, Internet.isConnected());
+                }
+
+                @Override
+                public void onServiceDisconnected(ServiceConnection connection) {
+
+                }
+            });
+            if (!bindResult)
+                Tools.criticalError(this, R.string.error_service_unavailable);
+        }
     }
 
     @Override

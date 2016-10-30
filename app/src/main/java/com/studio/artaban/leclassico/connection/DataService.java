@@ -47,6 +47,7 @@ import java.util.TimerTask;
 public class DataService extends Service implements Internet.OnConnectivityListener {
 
     private static final String EXTRA_DATA_PSEUDO = "pseudo";
+    private static final String EXTRA_DATA_PSEUDO_ID = "pseudoId";
     private static final String EXTRA_DATA_TOKEN = "token";
     private static final String EXTRA_DATA_TIME_LAG = "timeLag";
 
@@ -68,16 +69,18 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         context.stopService(new Intent(context, DataService.class));
         return true;
     }
-    public static boolean start(Context context, String pseudo, String token, long timeLag)
+    public static boolean start(Context context, String pseudo, int pseudoId, String token, long timeLag)
             throws NullPointerException { // Start service
 
-        Logs.add(Logs.Type.V, "context: " + context);
+        Logs.add(Logs.Type.V, "context: " + context + ";pseudo: " + pseudo + ";pseudoId: " + pseudoId +
+                ";timeLag: " + timeLag);
         if (isRunning) {
             Logs.add(Logs.Type.W, "Service already started");
             return false;
         }
         Intent intent = new Intent(context, DataService.class);
         intent.putExtra(EXTRA_DATA_PSEUDO, pseudo);
+        intent.putExtra(EXTRA_DATA_PSEUDO_ID, pseudoId);
         intent.putExtra(EXTRA_DATA_TOKEN, token);
         intent.putExtra(EXTRA_DATA_TIME_LAG, timeLag);
         context.startService(intent);
@@ -360,6 +363,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
         Logs.add(Logs.Type.V, "intent: " + intent + ";flags: " + flags + ";startId: " + startId);
         mDataLogin.pseudo = intent.getStringExtra(EXTRA_DATA_PSEUDO);
+        mDataLogin.pseudoId = intent.getIntExtra(EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA);
         mDataLogin.token.set(intent.getStringExtra(EXTRA_DATA_TOKEN));
         mDataLogin.timeLag = intent.getLongExtra(EXTRA_DATA_TIME_LAG, 0);
 

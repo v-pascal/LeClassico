@@ -69,10 +69,7 @@ public class NotificationsRequest extends DataRequest {
 
 
 
-
-
                 //ServiceNotify.update(mService, 3);
-
 
 
 

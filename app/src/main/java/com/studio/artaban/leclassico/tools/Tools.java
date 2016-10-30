@@ -53,6 +53,7 @@ public final class Tools { /////////////////////////////////////////////////////
     public static class LoginReply {
 
         public String pseudo; // Pseudo of the login
+        public int pseudoId = Constants.NO_DATA; // Member ID (in local DB)
         public final SyncValue<String> token = new SyncValue<>(null); // Login token
         public long timeLag; // Time lag between remote & local DB
     }

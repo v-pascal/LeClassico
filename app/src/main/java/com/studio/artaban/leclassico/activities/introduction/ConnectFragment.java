@@ -406,7 +406,7 @@ public class ConnectFragment extends RevealFragment {
 
                 ////// Start service
                 Logs.add(Logs.Type.I, "Start service");
-                DataService.start(getWaitActivity(), mPseudo, mToken, mTimeLag);
+                DataService.start(getWaitActivity(), mPseudo, mPseudoId, mToken, mTimeLag);
 
                 return Boolean.TRUE; ////// Succeeded
 
