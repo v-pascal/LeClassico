@@ -65,11 +65,21 @@ public class MainActivity extends LoggedActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
         MainFragment.OnFragmentListener {
 
-    public static final String EXTRA_DATA_ONLINE = "online";
     public static final String EXTRA_DATA_PSEUDO = "pseudo";
     public static final String EXTRA_DATA_PSEUDO_ID = "pseudoId";
+    public static final String EXTRA_DATA_NOTIFY_URI = "notifyURI";
     // Extra data keys
 
+    public static void putLoginData(Intent from, Intent to) {
+    // Put login extras data from an intent to another one (from previous activity to next activity)
+
+        Logs.add(Logs.Type.V, "from: " + from + ";to: " + to);
+        to.putExtra(EXTRA_DATA_PSEUDO, from.getStringExtra(EXTRA_DATA_PSEUDO));
+        to.putExtra(EXTRA_DATA_PSEUDO_ID, from.getIntExtra(EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
+        to.putExtra(EXTRA_DATA_NOTIFY_URI, mNotifyUri); // Always add notification URI (new notification)
+    }
+
+    //////
     private static int getShortcutID(int section, boolean newItem) {
     // Return shortcut fragment container ID according selected section
 
@@ -210,59 +220,8 @@ public class MainActivity extends LoggedActivity implements
                 boolean prevNewFlag = mNewNotification;
 
                 mNewNotification = cursor.getInt(0) > 0;
-                if (prevNewFlag != mNewNotification) {
+                if (prevNewFlag != mNewNotification)
                     invalidateOptionsMenu();
-
-                    if (mViewPager.getCurrentItem() == Constants.MAIN_SECTION_NOTIFICATIONS) {
-                        Logs.add(Logs.Type.I, "Display/Hide floating action button");
-
-                        View fab = findViewById(R.id.fab);
-                        fab.setVisibility(View.VISIBLE);
-                        final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
-
-                        if (mNewNotification) // Display floating action button
-                            animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
-                                    .translationY(0)
-                                    .setListener(new ViewPropertyAnimatorListener() {
-                                        @Override
-                                        public void onAnimationStart(View view) {
-
-                                        }
-
-                                        @Override
-                                        public void onAnimationEnd(View view) {
-                                            animation.setListener(null);
-                                        }
-
-                                        @Override
-                                        public void onAnimationCancel(View view) {
-                                            ViewCompat.setTranslationY(view, 0);
-                                        }
-                                    })
-                                    .start();
-
-                        else // Hide floating action button
-                            animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
-                                    .translationY(mFabTransY)
-                                    .setListener(new ViewPropertyAnimatorListener() {
-                                        @Override
-                                        public void onAnimationStart(View view) {
-
-                                        }
-
-                                        @Override
-                                        public void onAnimationEnd(View view) {
-                                            animation.setListener(null);
-                                        }
-
-                                        @Override
-                                        public void onAnimationCancel(View view) {
-                                            ViewCompat.setTranslationY(view, mFabTransY);
-                                        }
-                                    })
-                                    .start();
-                    }
-                }
                 break;
             }
         }
@@ -388,7 +347,7 @@ public class MainActivity extends LoggedActivity implements
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
 
     private Uri mShortcutUri; // Shortcut URI (new mail & notifications)
-    private Uri mNotifyUri; // User notifications URI
+    private static Uri mNotifyUri; // User notifications URI
 
     public void onAction(View sender) { // Floating action button click event
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -516,9 +475,9 @@ public class MainActivity extends LoggedActivity implements
 
         // Set URI to observe DB changes
         mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT, String.valueOf(getIntent()
-                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, 0)));
+                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
         mNotifyUri = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getIntent()
-                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, 0)));
+                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
 
         // Set content view pager
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -777,7 +736,9 @@ public class MainActivity extends LoggedActivity implements
         if (item.getItemId() == R.id.mnu_notification) {
 
             ////// Start notification activity
-            startActivityForResult(new Intent(this, NotifyActivity.class), Requests.NOTIFY_2_MAIN.CODE,
+            Intent notifyIntent = new Intent(this, NotifyActivity.class);
+            putLoginData(getIntent(), notifyIntent);
+            startActivityForResult(notifyIntent, Requests.NOTIFY_2_MAIN.CODE,
                     ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
             return true;
         }

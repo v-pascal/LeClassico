@@ -115,6 +115,9 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+        if (selfChange)
+            return; // Do not synchronize updates provided by synchronization from remote to local DB
+
         if (Internet.isConnected())
             synchronize();
         else

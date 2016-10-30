@@ -1,8 +1,10 @@
 package com.studio.artaban.leclassico.activities.notification;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.view.ViewCompat;
@@ -15,19 +17,28 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.main.MainActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Requests;
+import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.data.tables.CommentairesTable;
+import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
+import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
@@ -39,17 +50,23 @@ import java.util.Date;
  * Created by pascal on 29/10/16.
  * Notification activity class
  */
-public class NotifyActivity extends LoggedActivity {
+public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
 
-    public void onAction(View sender) { // Floating action button click event
+    public void onRead(View sender) { // Mark unread notification(s) as read
         Logs.add(Logs.Type.V, "sender: " + sender);
 
+        ContentValues values = new ContentValues();
+        values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
+        getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
+                values, NotificationsTable.COLUMN_PSEUDO + "='" +
+                        getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO) +
+                        "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
+                null);
+        // NB: DB use in UI thread!
 
-
-
-
-
-
+        // Notify notifications URI to refresh notification list
+        getContentResolver().notifyChange((Uri) getIntent()
+                .getParcelableExtra(MainActivity.EXTRA_DATA_NOTIFY_URI), null);
     }
 
     //////
@@ -100,9 +117,36 @@ public class NotifyActivity extends LoggedActivity {
         return message;
     }
 
+    private int mFabTransY = Constants.NO_DATA; // Vertical floating action button translation
+    private void hideFab(final ViewPropertyAnimatorCompat animation) {
+        // Hide floating action button (with translation)
+
+        Logs.add(Logs.Type.V,  "animation: " + animation);
+        animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
+                .translationY(mFabTransY)
+                .setListener(new ViewPropertyAnimatorListener() {
+                    @Override
+                    public void onAnimationStart(View view) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(View view) {
+                        animation.setListener(null);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(View view) {
+                        ViewCompat.setTranslationY(view, mFabTransY);
+                    }
+                })
+                .start();
+    }
+
     private RecyclerView mNotifyList; // Recycler view containing notification list
     private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
 
+    //////
     private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
         public NotifyRecyclerViewAdapter(@LayoutRes int layout, int key) {
             super(layout, key);
@@ -331,7 +375,21 @@ public class NotifyActivity extends LoggedActivity {
         switch (id) {
 
             case Queries.MAIN_NOTIFY_LIST: {
+
                 mQueryCount = (short)cursor.getCount();
+                final View fab = findViewById(R.id.fab);
+
+                boolean newNotification = false;
+                if (mQueryCount > 0) { // Get if exists unread notification
+                    do {
+                        if (cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
+                            newNotification = true; // Found new notification (unread)
+                            break;
+                        }
+
+                    } while (cursor.moveToNext());
+                    cursor.moveToFirst();
+                }
 
                 // Check if not the initial query
                 if (mNotifyAdapter != null) {
@@ -357,20 +415,50 @@ public class NotifyActivity extends LoggedActivity {
                         ((RecyclerItemAnimator)mNotifyList.getItemAnimator())
                                 .setDisableChangeAnimations(swapResult.countChanged);
 
-                    if ((!syncFieldsOnly) && (swapResult.firstChanged)) { // First notification has changed
+                    // Display/Hide floating action button
+                    fab.setVisibility(View.VISIBLE);
+                    final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
 
-                        ////// Update shortcut (the new one)
-                        fillShortcut(cursor, true);
-                        mListener.onAnimateShortcut(Constants.MAIN_SECTION_NOTIFICATIONS,
-                                new OnFragmentListener.OnAnimationListener() {
-                            @Override
-                            public void onCopyNewToPrevious(ShortcutFragment previous) {
-                            // Replace new shortcut data into previous fragment
+                    if (newNotification) // Display floating action button
+                        animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
+                                .translationY(0)
+                                .setListener(new ViewPropertyAnimatorListener() {
+                                    @Override
+                                    public void onAnimationStart(View view) {
 
-                                Logs.add(Logs.Type.V, "previous: " + previous);
-                                fillShortcut(cursor, false);
-                            }
-                        });
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(View view) {
+                                        animation.setListener(null);
+                                    }
+
+                                    @Override
+                                    public void onAnimationCancel(View view) {
+                                        ViewCompat.setTranslationY(view, 0);
+                                    }
+                                })
+                                .start();
+
+                    else if (fab.getTranslationY() == 0) { // Hide floating action button
+
+                        Logs.add(Logs.Type.I, "Hide floating action button");
+                        if (mFabTransY == Constants.NO_DATA)
+                            fab.getViewTreeObserver()
+                                    .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                        @Override
+                                        public void onGlobalLayout() {
+
+                                            Logs.add(Logs.Type.V, null);
+                                            mFabTransY = fab.getHeight() +
+                                                    (getResources().getDimensionPixelSize(R.dimen.fab_margin) << 1);
+
+                                            fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                            hideFab(animation);
+                                        }
+                                    });
+                        else
+                            hideFab(animation);
                     }
 
                 } else {
@@ -382,8 +470,9 @@ public class NotifyActivity extends LoggedActivity {
                     mNotifyAdapter.getDataSource().fill(cursor);
                     mNotifyList.setAdapter(mNotifyAdapter);
 
-                    ////// Fill shortcut
-                    fillShortcut(cursor, false);
+                    // Display/Hide floating action button
+                    if (newNotification)
+                        fab.setVisibility(View.VISIBLE);
                 }
                 break;
             }
@@ -401,8 +490,12 @@ public class NotifyActivity extends LoggedActivity {
     }
 
     //////
-    private QueryLoader mListLoader; // User notification list query loader
-    private QueryLoader mMaxLoader; // Max notification Id query loader
+    private final QueryLoader mListLoader = new QueryLoader(this, this); // User notification list query loader
+    private final QueryLoader mMaxLoader = new QueryLoader(this, this); // Max notification Id query loader
+
+    private short mQueryCount; // DB query result count
+    private int mQueryID = Constants.NO_DATA; // Max record Id (used to check if new entries)
+    private short mQueryOld; // DB old entries requested
 
     // Query column indexes
     private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
@@ -432,12 +525,12 @@ public class NotifyActivity extends LoggedActivity {
         // Get query limit
         short queryLimit = 0;
         String selection = NotificationsTable.COLUMN_PSEUDO + "='" +
-                getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO) + '\'';
+                getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO) + '\'';
         if (mQueryID != Constants.NO_DATA) {
 
             queryLimit = mQueryCount;
             queryLimit += mQueryOld;
-            queryLimit += (short)Tools.getEntryCount(getContext().getContentResolver(),
+            queryLimit += (short)Tools.getEntryCount(getContentResolver(),
                     NotificationsTable.TABLE_NAME, selection + " AND " +
                             IDataTable.DataField.COLUMN_ID + '>' + mQueryID);
             // NB: DB use in UI thread!
@@ -461,7 +554,8 @@ public class NotifyActivity extends LoggedActivity {
 
         // Load notification data (using query loader)
         Bundle queryData = new Bundle();
-        queryData.putParcelable(QueryLoader.DATA_KEY_URI, mListener.onGetNotifyURI());
+        queryData.putParcelable(QueryLoader.DATA_KEY_URI,
+                getIntent().getParcelableExtra(MainActivity.EXTRA_DATA_NOTIFY_URI));
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
@@ -511,14 +605,14 @@ public class NotifyActivity extends LoggedActivity {
                         " LIMIT " + queryLimit);
 
         if (mQueryID != Constants.NO_DATA) // Restart
-            mListLoader.restart(getActivity(), Queries.MAIN_NOTIFY_LIST, queryData);
+            mListLoader.restart(this, Queries.MAIN_NOTIFY_LIST, queryData);
 
         else { // Initialize
-            mListLoader.init(getActivity(), Queries.MAIN_NOTIFY_LIST, queryData);
+            mListLoader.init(this, Queries.MAIN_NOTIFY_LIST, queryData);
 
             queryData.putString(QueryLoader.DATA_KEY_SELECTION, "SELECT max(" + IDataTable.DataField.COLUMN_ID +
                     ") FROM " + NotificationsTable.TABLE_NAME + " WHERE " + selection);
-            mMaxLoader.init(getActivity(), Queries.MAIN_NOTIFY_MAX, queryData);
+            mMaxLoader.init(this, Queries.MAIN_NOTIFY_MAX, queryData);
         }
     }
 
@@ -657,22 +751,8 @@ public class NotifyActivity extends LoggedActivity {
         mNotifyList.setLayoutManager(linearManager);
         mNotifyList.setItemAnimator(itemAnimator);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        // Initialize notification list (set query loaders)
+        setLoaders();
     }
 
     @Override
