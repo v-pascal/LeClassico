@@ -115,9 +115,6 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
-        if (selfChange)
-            return; // Do not synchronize updates provided by synchronization from remote to local DB
-
         if (Internet.isConnected())
             synchronize();
         else
@@ -128,7 +125,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     public boolean toSynchronize() {
         return mToSynchronize;
     }
-    private final DataObserver mSyncObserver; // Data update observer
+    protected final DataObserver mSyncObserver; // Data update observer
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     protected final ArrayList<Uri> mRegister = new ArrayList<>(); // Register URI list

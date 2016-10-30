@@ -80,7 +80,7 @@ public class NotificationsRequest extends DataRequest {
 
                 // Notify DB change to observer URI
                 for (Uri observerUri : mRegister)
-                    mService.getContentResolver().notifyChange(observerUri, null);
+                    mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
             }
         }
     }
