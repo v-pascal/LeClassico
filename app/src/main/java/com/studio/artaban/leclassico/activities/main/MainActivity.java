@@ -94,8 +94,6 @@ public class MainActivity extends LoggedActivity implements
                 return (newItem)? R.id.shortcut_new_event:R.id.shortcut_events;
             case Constants.MAIN_SECTION_MEMBERS:
                 return R.id.shortcut_members;
-            case Constants.MAIN_SECTION_NOTIFICATIONS:
-                return (newItem)? R.id.shortcut_new_notification:R.id.shortcut_notifications;
             default:
                 throw new IllegalArgumentException("Unexpected section");
         }
@@ -349,27 +347,13 @@ public class MainActivity extends LoggedActivity implements
     private Uri mShortcutUri; // Shortcut URI (new mail & notifications)
     private static Uri mNotifyUri; // User notifications URI
 
-    public void onAction(View sender) { // Floating action button click event
+    public void onPublish(View sender) { // Floating action button click event
         Logs.add(Logs.Type.V, "sender: " + sender);
-        switch (mViewPager.getCurrentItem()) {
-
-            case Constants.MAIN_SECTION_NOTIFICATIONS: { ////// Mark notifications as read
-
-                Logs.add(Logs.Type.I, "Mark notification(s) as read");
-                ((NotificationsFragment) MainFragment.getBySection(Constants.MAIN_SECTION_NOTIFICATIONS))
-                        .read();
-                break;
-            }
-            case Constants.MAIN_SECTION_PUBLICATIONS: { ////// Add publication
-                Logs.add(Logs.Type.I, "Add publication");
 
 
 
 
 
-                break;
-            }
-        }
     }
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
@@ -552,15 +536,6 @@ public class MainActivity extends LoggedActivity implements
                         mPositionNotifications = mShortcutWidth;
                         break;
                     }
-                    case Constants.MAIN_SECTION_NOTIFICATIONS: { ////// Notifications
-
-                        mPositionHome = mShortcutWidth * -4;
-                        mPositionPublications = mShortcutWidth * -3;
-                        mPositionEvents = mShortcutWidth * -2;
-                        mPositionMembers = -mShortcutWidth;
-                        mPositionNotifications = 0;
-                        break;
-                    }
                 }
             }
 
@@ -591,12 +566,9 @@ public class MainActivity extends LoggedActivity implements
                                     findViewById(R.id.shortcut_events).setTranslationX(mPositionEvents);
                                     findViewById(R.id.shortcut_new_event).setTranslationX(mPositionEvents);
                                     findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers);
-                                    findViewById(R.id.shortcut_notifications).setTranslationX(mPositionNotifications);
-                                    findViewById(R.id.shortcut_new_notification).setTranslationX(mPositionNotifications);
 
                                     findViewById(R.id.shortcut_new_publication).setTranslationY(-mShortcutHeight);
                                     findViewById(R.id.shortcut_new_event).setTranslationY(-mShortcutHeight);
-                                    findViewById(R.id.shortcut_new_notification).setTranslationY(-mShortcutHeight);
                                 }
                             });
                 } else
@@ -646,8 +618,7 @@ public class MainActivity extends LoggedActivity implements
                     // Translate floating action button accordingly (for publications & notifications)
                     switch ((int) page.getTag()) {
 
-                        case Constants.MAIN_SECTION_PUBLICATIONS:
-                        case Constants.MAIN_SECTION_NOTIFICATIONS: {
+                        case Constants.MAIN_SECTION_PUBLICATIONS: {
                             translateFab((int) page.getTag(), position);
                             break;
                         }
@@ -664,17 +635,13 @@ public class MainActivity extends LoggedActivity implements
                 if (mShortcut == (int) page.getTag()) {
                     View newPub = findViewById(R.id.shortcut_new_publication);
                     View newEvent = findViewById(R.id.shortcut_new_event);
-                    View newNotify = findViewById(R.id.shortcut_new_notification);
                     View publications = findViewById(R.id.shortcut_publications);
                     View events = findViewById(R.id.shortcut_events);
-                    View notifications = findViewById(R.id.shortcut_notifications);
 
                     ViewCompat.animate(newPub).cancel();
                     ViewCompat.animate(newEvent).cancel();
-                    ViewCompat.animate(newNotify).cancel();
                     ViewCompat.animate(publications).cancel();
                     ViewCompat.animate(events).cancel();
-                    ViewCompat.animate(notifications).cancel();
 
                     findViewById(R.id.shortcut_home).setTranslationX(mPositionHome +
                             (position * mShortcutWidth));
@@ -684,8 +651,6 @@ public class MainActivity extends LoggedActivity implements
                     newEvent.setTranslationX(mPositionEvents + (position * mShortcutWidth));
                     findViewById(R.id.shortcut_members).setTranslationX(mPositionMembers +
                             (position * mShortcutWidth));
-                    notifications.setTranslationX(mPositionNotifications + (position * mShortcutWidth));
-                    newNotify.setTranslationX(mPositionNotifications + (position * mShortcutWidth));
                 }
             }
         });

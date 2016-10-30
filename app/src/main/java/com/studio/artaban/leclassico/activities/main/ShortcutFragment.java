@@ -49,15 +49,6 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
         Tools.setDateTime(getContext(), date, time, dateTime);
     }
 
-    public void setNotify(char type, boolean read) {
-        Logs.add(Logs.Type.V, "type: " + type + ";read: " + read);
-        ((ImageView)mRootView.findViewById(R.id.image_type))
-                .setImageDrawable(getContext().getDrawable(Tools.getNotifyIcon(type)));
-        if (read)
-            mRootView.findViewById(R.id.layout_end_date).setBackground(getResources()
-                    .getDrawable(R.drawable.notify_read_date_background));
-    }
-
     //////
     private View mRootView; // Fragment root view
     private boolean mSearching; // Search flag (search edit box display)
@@ -141,16 +132,6 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                 search.setVisibility(View.VISIBLE);
                 mRootView.findViewById(R.id.button_search).setOnClickListener(this);
                 mRootView.findViewById(R.id.layout_search).setOnClickListener(this);
-                break;
-            }
-            case R.id.shortcut_new_notification:
-            case R.id.shortcut_notifications: { ////// Notifications (+new)
-                mRootView.findViewById(R.id.layout_start_date).setVisibility(View.GONE);
-                mRootView.findViewById(R.id.layout_end_date).setBackground(getResources()
-                        .getDrawable(R.drawable.notify_unread_date_background));
-                ((TextView)mRootView.findViewById(R.id.end_date)).setTextColor(Color.WHITE);
-                ((TextView)mRootView.findViewById(R.id.end_time)).setTextColor(Color.WHITE);
-                mRootView.findViewById(R.id.image_type).setVisibility(View.VISIBLE);
                 break;
             }
         }

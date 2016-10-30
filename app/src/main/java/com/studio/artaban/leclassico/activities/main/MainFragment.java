@@ -32,7 +32,6 @@ public abstract class MainFragment extends Fragment {
             case Constants.MAIN_SECTION_PUBLICATIONS: newFragment = new PublicationsFragment(); break;
             case Constants.MAIN_SECTION_EVENTS: newFragment = new EventsFragment(); break;
             case Constants.MAIN_SECTION_MEMBERS: newFragment = new MembersFragment(); break;
-            case Constants.MAIN_SECTION_NOTIFICATIONS: newFragment = new NotificationsFragment(); break;
             default:
                 throw new IllegalArgumentException("Unexpected section");
         }

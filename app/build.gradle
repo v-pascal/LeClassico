@@ -24,6 +24,7 @@ android {
                      'src/main/res/layouts/notification',
                      'src/main/res/drawables/introduction',
                      'src/main/res/drawables/main',
+                     'src/main/res/drawables/notification',
                      'src/main/res/value/introduction',
                      'src/main/res/value/main',
                      'src/main/res/value/notification',

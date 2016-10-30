@@ -65,12 +65,6 @@
                             android:layout_margin="@dimen/shortcut_margin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
-                        <fragment
-                            class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
-                            android:id="@+id/shortcut_new_notification"
-                            android:layout_margin="@dimen/shortcut_margin"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
 
                         <!-- Shortcuts -->
                         <fragment
@@ -94,12 +88,6 @@
                         <fragment
                             class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
                             android:id="@+id/shortcut_members"
-                            android:layout_margin="@dimen/shortcut_margin"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
-                        <fragment
-                            class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
-                            android:id="@+id/shortcut_notifications"
                             android:layout_margin="@dimen/shortcut_margin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
@@ -127,7 +115,7 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
-        android:onClick="onAction"
+        android:onClick="onPublish"
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
