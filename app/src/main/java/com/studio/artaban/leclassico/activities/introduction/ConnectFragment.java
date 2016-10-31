@@ -25,6 +25,7 @@ import com.studio.artaban.leclassico.components.RevealFragment;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -35,7 +36,6 @@ import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SyncValue;
-import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -287,7 +287,7 @@ public class ConnectFragment extends RevealFragment {
                 if (!online) {
 
                     // No Internet connection so check existing DB to work offline
-                    int membersCount = Tools.getEntryCount(resolver, CamaradesTable.TABLE_NAME, null);
+                    int membersCount = DataTable.getEntryCount(resolver, CamaradesTable.TABLE_NAME, null);
 
                     if (isStopped()) return Boolean.FALSE;
                     if (membersCount > 0) { // Found existing DB (try to work offline)
@@ -391,7 +391,7 @@ public class ConnectFragment extends RevealFragment {
                     }
 
                     // Get pseudo Id (from local DB)
-                    mPseudoId = Tools.getEntryId(resolver, CamaradesTable.TABLE_NAME,
+                    mPseudoId = DataTable.getEntryId(resolver, CamaradesTable.TABLE_NAME,
                             CamaradesTable.COLUMN_PSEUDO + "='" + mPseudo + '\'');
                 }
 

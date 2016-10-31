@@ -64,7 +64,6 @@ public class AbonnementsTable extends DataTable {
         data.putString(DataTable.DATA_KEY_TOKEN, token);
         data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
         data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, COLUMN_STATUS_DATE);
         data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getUrlSynchroRequest(resolver, data);
 
@@ -93,14 +92,14 @@ public class AbonnementsTable extends DataTable {
 
                             // Entry fields
                             ContentValues values = new ContentValues();
-                            values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                            values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
                                     DataProvider.Synchronized.DONE.getValue());
 
                             // Check if entry already exists
                             String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) +
                                     " AND " + COLUMN_CAMARADE + '=' + DatabaseUtils.sqlEscapeString(camarade);
-                            if (Tools.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
+                            if (DataTable.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
 
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED) {
 
@@ -179,13 +178,12 @@ public class AbonnementsTable extends DataTable {
     // Columns
     public static final String COLUMN_PSEUDO = "ABO_Pseudo";
     public static final String COLUMN_CAMARADE = "ABO_Camarade";
-    public static final String COLUMN_STATUS_DATE = "ABO_StatusDate";
+    private static final String COLUMN_STATUS_DATE = "ABO_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
     private static final short COLUMN_INDEX_CAMARADE = 2;
     private static final short COLUMN_INDEX_STATUS_DATE = 3;
-
     private static final short COLUMN_INDEX_SYNCHRONIZED = 4;
 
     // JSON keys
@@ -206,8 +204,8 @@ public class AbonnementsTable extends DataTable {
 
                 COLUMN_PSEUDO + " TEXT NOT NULL," +
                 COLUMN_CAMARADE + " TEXT NOT NULL," +
-                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");

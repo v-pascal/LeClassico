@@ -67,7 +67,6 @@ public class CamaradesTable extends DataTable {
         data.putString(DataTable.DATA_KEY_TOKEN, token);
         data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
         data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, COLUMN_STATUS_DATE);
         data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getUrlSynchroRequest(resolver, data);
 
@@ -146,7 +145,7 @@ public class CamaradesTable extends DataTable {
                             if (!entry.isNull(JSON_KEY_LONGITUDE))
                                 values.put(COLUMN_LONGITUDE, entry.getDouble(JSON_KEY_LONGITUDE));
                             values.put(COLUMN_LONGITUDE_UPD, entry.getString(JSON_KEY_LONGITUDE_UPD));
-                            values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                            values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
 
                             // Check if entry already exists
                             String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo);
@@ -389,7 +388,7 @@ public class CamaradesTable extends DataTable {
     public static final String COLUMN_LATITUDE_UPD = "CAM_LatitudeUPD";
     public static final String COLUMN_LONGITUDE = "CAM_Longitude";
     public static final String COLUMN_LONGITUDE_UPD = "CAM_LongitudeUPD";
-    public static final String COLUMN_STATUS_DATE = "CAM_StatusDate";
+    private static final String COLUMN_STATUS_DATE = "CAM_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -430,7 +429,6 @@ public class CamaradesTable extends DataTable {
     private static final short COLUMN_INDEX_LONGITUDE = 36;
     private static final short COLUMN_INDEX_LONGITUDE_UPD = 37;
     private static final short COLUMN_INDEX_STATUS_DATE = 38;
-
     private static final short COLUMN_INDEX_SYNCHRONIZED = 39;
 
     // JSON keys
@@ -521,8 +519,8 @@ public class CamaradesTable extends DataTable {
                 COLUMN_LATITUDE_UPD + " TEXT NOT NULL," +
                 COLUMN_LONGITUDE + " REAL," +
                 COLUMN_LONGITUDE_UPD + " TEXT NOT NULL," +
-                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");

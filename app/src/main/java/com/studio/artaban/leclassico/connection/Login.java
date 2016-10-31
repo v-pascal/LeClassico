@@ -1,5 +1,7 @@
 package com.studio.artaban.leclassico.connection;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
@@ -93,5 +95,21 @@ public final class Login {
             Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
         }
         return result;
+    }
+
+    //////
+    public static class TimeChangeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
+
+
+
+
+
+
+
+        }
     }
 }

@@ -1,12 +1,9 @@
 package com.studio.artaban.leclassico.tools;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
@@ -27,7 +24,6 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -232,57 +228,5 @@ public final class Tools { /////////////////////////////////////////////////////
         }
         //else // status == DataProvider.Synchronized.TO_DELETE.getValue()
         //        NB: Should not happen coz nothing to display!
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////// DB
-
-    public static int getEntryCount(ContentResolver resolver, String table, String selection) {
-    // Get entry count on specific table and according selection criteria
-
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";table: " + table + ";selection: " + selection);
-        Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + table),
-                new String[]{"count(*)"}, selection, null, null);
-        result.moveToFirst();
-        int count = result.getInt(0);
-        result.close();
-
-        return count;
-    }
-
-    public static int getEntryId(ContentResolver resolver, String table, String selection) {
-    // Get entry Id on specific table and according selection criteria
-    // NB: Returns NO_DATA if more than one record is found with selection criteria
-
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";table: " + table + ";selection: " + selection);
-        Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + table),
-                new String[]{IDataTable.DataField.COLUMN_ID}, selection, null, null);
-        result.moveToFirst();
-        int id = result.getInt(0);
-        if (result.getCount() > 1)
-            id = Constants.NO_DATA;
-        result.close();
-
-        return id;
-    }
-
-    public static int getNewNotification(ContentResolver resolver, String pseudo) {
-    // Return new notification count for current user (pseudo)
-
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
-        Cursor newNotify = resolver.query(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
-                new String[]{NotificationsTable.COLUMN_LU_FLAG},
-                NotificationsTable.COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo),
-                null, NotificationsTable.COLUMN_DATE + " DESC");
-
-        int newCount = 0;
-        if (newNotify.moveToFirst()) {
-            do {
-                if (newNotify.getInt(0) != Constants.DATA_UNREAD)
-                    break;
-                ++newCount;
-
-            } while (newNotify.moveToNext());
-        }
-        return newCount;
     }
 }

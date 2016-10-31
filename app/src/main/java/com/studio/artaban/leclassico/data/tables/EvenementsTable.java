@@ -98,7 +98,7 @@ public class EvenementsTable extends DataTable {
     public static final String COLUMN_FLYER_UPD = "EVE_FlyerUPD";
     public static final String COLUMN_REMARK = "EVE_Remark";
     public static final String COLUMN_REMARK_UPD = "EVE_RemarkUPD";
-    public static final String COLUMN_STATUS_DATE = "EVE_StatusDate";
+    private static final String COLUMN_STATUS_DATE = "EVE_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_EVENT_ID = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -114,7 +114,6 @@ public class EvenementsTable extends DataTable {
     private static final short COLUMN_INDEX_REMARK = 11;
     private static final short COLUMN_INDEX_REMARK_UPD = 12;
     private static final short COLUMN_INDEX_STATUS_DATE = 13;
-
     private static final short COLUMN_INDEX_SYNCHRONIZED = 14;
 
     //
@@ -140,8 +139,8 @@ public class EvenementsTable extends DataTable {
                 COLUMN_FLYER_UPD + " TEXT NOT NULL," +
                 COLUMN_REMARK + " TEXT," +
                 COLUMN_REMARK_UPD + " TEXT NOT NULL," +
-                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");

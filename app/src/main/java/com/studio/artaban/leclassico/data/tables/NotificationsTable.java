@@ -72,9 +72,8 @@ public class NotificationsTable extends DataTable {
         data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_NOTIFICATIONS);
         data.putString(DataTable.DATA_KEY_TOKEN, token);
         data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
-        data.putShort(DataTable.DATA_KEY_LIMIT, (limit != null)? limit:DEFAULT_LIMIT);
+        data.putShort(DataTable.DATA_KEY_LIMIT, (limit != null) ? limit : DEFAULT_LIMIT);
         data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, COLUMN_STATUS_DATE);
         data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getUrlSynchroRequest(resolver, data);
 
@@ -112,7 +111,7 @@ public class NotificationsTable extends DataTable {
                                     // Entry fields
                                     ContentValues values = new ContentValues();
                                     values.put(COLUMN_LU_FLAG, entry.getInt(JSON_KEY_LU_FLAG));
-                                    values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                                    values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
                                             DataProvider.Synchronized.DONE.getValue());
 
@@ -125,7 +124,7 @@ public class NotificationsTable extends DataTable {
                                             " AND " + COLUMN_OBJECT_FROM + '=' + DatabaseUtils.sqlEscapeString(objFrom) +
                                             " AND " + COLUMN_OBJECT_DATE +
                                             ((objDate != null)? "='" + objDate + '\'':DataTable.IS_NULL);
-                                    if (Tools.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
+                                    if (DataTable.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
 
                                         if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED) {
 
@@ -213,7 +212,7 @@ public class NotificationsTable extends DataTable {
     public static final String COLUMN_OBJECT_DATE = "NOT_ObjDate";
     public static final String COLUMN_OBJECT_FROM = "NOT_ObjFrom";
     public static final String COLUMN_LU_FLAG = "NOT_LuFlag";
-    public static final String COLUMN_STATUS_DATE = "NOT_StatusDate";
+    private static final String COLUMN_STATUS_DATE = "NOT_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -224,7 +223,6 @@ public class NotificationsTable extends DataTable {
     private static final short COLUMN_INDEX_OBJECT_FROM = 6;
     private static final short COLUMN_INDEX_LU_FLAG = 7;
     private static final short COLUMN_INDEX_STATUS_DATE = 8;
-
     private static final short COLUMN_INDEX_SYNCHRONIZED = 9;
 
     // JSON keys
@@ -255,8 +253,8 @@ public class NotificationsTable extends DataTable {
                 COLUMN_OBJECT_DATE + " TEXT," +
                 COLUMN_OBJECT_FROM + " TEXT NOT NULL," +
                 COLUMN_LU_FLAG + " INTEGER NOT NULL," +
-                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");

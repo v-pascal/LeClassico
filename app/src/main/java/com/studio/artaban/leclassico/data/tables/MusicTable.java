@@ -94,7 +94,7 @@ public class MusicTable extends DataTable {
     public static final String COLUMN_MORCEAU = "MSC_Morceau";
     public static final String COLUMN_MORCEAU_UPD = "MSC_MorceauUPD";
     public static final String COLUMN_SOURCE = "MSC_Source";
-    public static final String COLUMN_STATUS_DATE = "MSC_StatusDate";
+    private static final String COLUMN_STATUS_DATE = "MSC_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_FICHIER = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -107,7 +107,6 @@ public class MusicTable extends DataTable {
     private static final short COLUMN_INDEX_MORCEAU_UPD = 8;
     private static final short COLUMN_INDEX_SOURCE = 9;
     private static final short COLUMN_INDEX_STATUS_DATE = 10;
-
     private static final short COLUMN_INDEX_SYNCHRONIZED = 11;
 
     //
@@ -130,8 +129,8 @@ public class MusicTable extends DataTable {
                 COLUMN_MORCEAU + " TEXT NOT NULL," +
                 COLUMN_MORCEAU_UPD + " TEXT NOT NULL," +
                 COLUMN_SOURCE + " TEXT NOT NULL," +
-                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");

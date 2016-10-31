@@ -64,7 +64,6 @@ public class MessagerieTable extends DataTable {
         data.putString(DataTable.DATA_KEY_TOKEN, token);
         data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
         data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_STATUS_DATE, COLUMN_STATUS_DATE);
         data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getUrlSynchroRequest(resolver, data);
 
@@ -101,7 +100,7 @@ public class MessagerieTable extends DataTable {
                                     values.put(COLUMN_WRITE_STK, entry.getInt(JSON_KEY_WRITE_STK));
                                     if (!entry.isNull(JSON_KEY_OBJET))
                                         values.put(COLUMN_OBJET, entry.getString(JSON_KEY_OBJET));
-                                    values.put(COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                                    values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
                                             DataProvider.Synchronized.DONE.getValue());
 
@@ -109,7 +108,7 @@ public class MessagerieTable extends DataTable {
                                     String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) +
                                             " AND " + COLUMN_DATE + "='" + date + '\'' +
                                             " AND " + COLUMN_TIME + "='" + time + '\'';
-                                    if (Tools.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
+                                    if (DataTable.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
 
                                         if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED) {
 
@@ -196,7 +195,7 @@ public class MessagerieTable extends DataTable {
     public static final String COLUMN_READ_STK = "MSG_ReadStk";
     public static final String COLUMN_WRITE_STK = "MSG_WriteStk";
     public static final String COLUMN_OBJET = "MSG_Objet";
-    public static final String COLUMN_STATUS_DATE = "MSG_StatusDate";
+    private static final String COLUMN_STATUS_DATE = "MSG_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -209,7 +208,6 @@ public class MessagerieTable extends DataTable {
     private static final short COLUMN_INDEX_WRITE_STK = 8;
     private static final short COLUMN_INDEX_OBJET = 9;
     private static final short COLUMN_INDEX_STATUS_DATE = 10;
-
     private static final short COLUMN_INDEX_SYNCHRONIZED = 11;
 
     // JSON keys
@@ -244,8 +242,8 @@ public class MessagerieTable extends DataTable {
                 COLUMN_READ_STK + " INTEGER NOT NULL," +
                 COLUMN_WRITE_STK + " INTEGER NOT NULL," +
                 COLUMN_OBJET + " TEXT," +
-                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");

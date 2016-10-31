@@ -28,6 +28,10 @@ import com.studio.artaban.leclassico.data.tables.VotesTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by pascal on 28/07/16.
  * Data content provider class
@@ -255,9 +259,15 @@ public class DataProvider extends ContentProvider {
                 throw new IllegalArgumentException("Unexpected content URI: " + uri);
         }
 
-        // Check exiting synchronized field value (always needed)
+        // Check exiting status date & synchronized fields values (always needed)
         if (!values.containsKey(Constants.DATA_COLUMN_SYNCHRONIZED))
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TODO.getValue());
+        if (!values.containsKey(Constants.DATA_COLUMN_STATUS_DATE)) {
+
+            Date now = new Date();
+            DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+            values.put(Constants.DATA_COLUMN_STATUS_DATE, dateFormat.format(now));
+        }
 
         int result = mDB.getDB().update(table, values, selection, selectionArgs);
         if (result > 0)

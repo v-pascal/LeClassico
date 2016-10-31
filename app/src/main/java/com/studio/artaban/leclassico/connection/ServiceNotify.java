@@ -13,8 +13,8 @@ import android.widget.RemoteViews;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -95,7 +95,7 @@ public final class ServiceNotify {
                         .build();
 
         mNotify.bigContentView = notifyViews;
-        setTextInfo(service, Tools.getNewNotification(service.getContentResolver(), pseudo));
+        setTextInfo(service, DataTable.getNewNotification(service.getContentResolver(), pseudo));
         service.startForeground(SERVICE_NOTIFICATION_REF, mNotify);
     }
 

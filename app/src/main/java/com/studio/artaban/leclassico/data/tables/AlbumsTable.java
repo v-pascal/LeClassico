@@ -94,7 +94,7 @@ public class AlbumsTable extends DataTable {
     public static final String COLUMN_REMARK = "ALB_Remark";
     public static final String COLUMN_REMARK_UPD = "ALB_RemarkUPD";
     public static final String COLUMN_DATE = "ALB_Date";
-    public static final String COLUMN_STATUS_DATE = "ALB_StatusDate";
+    private static final String COLUMN_STATUS_DATE = "ALB_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_NOM = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -107,7 +107,6 @@ public class AlbumsTable extends DataTable {
     private static final short COLUMN_INDEX_REMARK_UPD = 8;
     private static final short COLUMN_INDEX_DATE = 9;
     private static final short COLUMN_INDEX_STATUS_DATE = 10;
-
     private static final short COLUMN_INDEX_SYNCHRONIZED = 11;
 
     //
@@ -130,8 +129,8 @@ public class AlbumsTable extends DataTable {
                 COLUMN_REMARK + " TEXT," +
                 COLUMN_REMARK_UPD + " TEXT NOT NULL," +
                 COLUMN_DATE + " TEXT," +
-                COLUMN_STATUS_DATE + " TEXT NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");

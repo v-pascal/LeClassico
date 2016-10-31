@@ -47,11 +47,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.introduction.IntroActivity"/>
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+                android:resource="@xml/searchable"/>
         </activity>
         <activity
             android:name=".activities.notification.NotifyActivity"
@@ -60,7 +60,8 @@
 
         <!-- Content providers -->
         <provider
-            android:name=".data.DataProvider" android:exported="false"
+            android:name=".data.DataProvider"
+            android:exported="false"
             android:authorities="com.studio.artaban.provider.leclassico"/>
 
         <!-- Services -->
@@ -74,6 +75,11 @@
         <receiver android:name=".helpers.Internet$ConnectivityReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".connection.Login$TimeChangeReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET"/>
             </intent-filter>
         </receiver>
     </application>

@@ -92,7 +92,7 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
         shortcutData.putParcelable(QueryLoader.DATA_KEY_URI,
                 Uris.getUri(Uris.ID_RAW_QUERY)); // To allow raw query without any notification
         shortcutData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT max(" + AbonnementsTable.COLUMN_STATUS_DATE + ")," +
+                "SELECT max(" + Constants.DATA_COLUMN_STATUS_DATE + ")," +
                         CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
                         CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
                         CamaradesTable.COLUMN_PROFILE + // COLUMN_INDEX_PROFILE

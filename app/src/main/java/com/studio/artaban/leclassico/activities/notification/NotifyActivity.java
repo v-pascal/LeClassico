@@ -27,6 +27,7 @@ import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Requests;
@@ -530,7 +531,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
             queryLimit = mQueryCount;
             queryLimit += mQueryOld;
-            queryLimit += (short)Tools.getEntryCount(getContentResolver(),
+            queryLimit += (short) DataTable.getEntryCount(getContentResolver(),
                     NotificationsTable.TABLE_NAME, selection + " AND " +
                             IDataTable.DataField.COLUMN_ID + '>' + mQueryID);
             // NB: DB use in UI thread!
@@ -559,7 +560,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
-                        NotificationsTable.COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
+                        NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
                         NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
                         NotificationsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_NOTIFY_ID
                         NotificationsTable.COLUMN_DATE + ',' + // COLUMN_INDEX_DATE
