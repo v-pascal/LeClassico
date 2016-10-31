@@ -49,7 +49,7 @@ import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
-import com.studio.artaban.leclassico.helpers.Login;
+import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import com.studio.artaban.leclassico.helpers.QueryLoader;

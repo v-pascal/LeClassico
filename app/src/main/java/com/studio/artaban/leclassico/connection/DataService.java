@@ -30,7 +30,6 @@ import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
-import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.text.DateFormat;
@@ -334,9 +333,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     //
     private final Login.Reply mDataLogin = new Login.Reply(); // Login info (token, pseudo & time lag)
-    public Login.Reply getLoginData() {
+    public void copyLoginData(Login.Reply into) {
         synchronized (mDataLogin.token) {
-            return mDataLogin;
+            mDataLogin.copy(into);
         }
     }
     private Timer mTokenTimer; // Timer used to update token (connection supervisor)

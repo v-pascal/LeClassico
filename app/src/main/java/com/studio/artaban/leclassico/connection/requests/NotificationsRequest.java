@@ -10,7 +10,7 @@ import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
-import com.studio.artaban.leclassico.helpers.Login;
+import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -59,7 +59,8 @@ public class NotificationsRequest extends DataRequest {
 
         } else { ////// New or data updates requested
 
-            Login.Reply dataLogin = mService.getLoginData();
+            Login.Reply dataLogin = new Login.Reply();
+            mService.copyLoginData(dataLogin);
             Database.SyncResult result = Database.synchronize(mTableId, mService.getContentResolver(),
                     dataLogin.token.get(), dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
 
@@ -96,7 +97,7 @@ public class NotificationsRequest extends DataRequest {
 
         //synchronized (mRegister) {
         //    for (Uri observerUri : mRegister)
-        //        mService.getContentResolver().notifyChange(observerUri, null);
+        //        mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
         //}
 
         //mToSynchronize = false;

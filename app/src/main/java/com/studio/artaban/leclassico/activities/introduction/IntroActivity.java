@@ -44,7 +44,7 @@ import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.helpers.Internet;
-import com.studio.artaban.leclassico.helpers.Login;
+import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.animations.InOutScreen;
@@ -866,7 +866,8 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
                 public void onServiceConnected(DataService service) {
 
                     Logs.add(Logs.Type.V, "service: " + service);
-                    Login.Reply loginInfo = service.getLoginData();
+                    Login.Reply loginInfo = new Login.Reply();
+                    service.copyLoginData(loginInfo);
                     binder.unbind(IntroActivity.this);
 
                     ////// Start main activity

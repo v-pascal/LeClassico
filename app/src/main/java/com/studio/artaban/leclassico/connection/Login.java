@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico.helpers;
+package com.studio.artaban.leclassico.connection;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -6,6 +6,7 @@ import android.net.Uri;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Errors;
 import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SyncValue;
 
 import org.json.JSONException;
@@ -39,6 +40,15 @@ public final class Login {
         public int pseudoId = Constants.NO_DATA; // Member ID (in local DB)
         public final SyncValue<String> token = new SyncValue<>(null); // Login token
         public long timeLag; // Time lag between remote & local DB
+
+        public void copy(Reply into) {
+            Logs.add(Logs.Type.V, "into: " + into);
+
+            into.pseudo = pseudo;
+            into.pseudoId = pseudoId;
+            into.token.set(token.get());
+            into.timeLag = timeLag;
+        }
     }
     public static boolean receive(String response, Reply loginRes) { // Receive login reply
 
