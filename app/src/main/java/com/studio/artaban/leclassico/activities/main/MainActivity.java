@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
@@ -158,8 +159,10 @@ public class MainActivity extends LoggedActivity implements
     private int mShortcutWidth = Constants.NO_DATA; // Shortcut fragment width
     private int mShortcutHeight = Constants.NO_DATA; // Shortcut fragment height
 
-    private boolean mNewNotification; // New notification flag (unread)
     private int mFabTransY = Constants.NO_DATA; // Vertical floating action button translation
+
+    private boolean mNewNotification; // New notification flag (unread)
+    private boolean mIsNotification; // Existing notification flag
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -197,6 +200,7 @@ public class MainActivity extends LoggedActivity implements
             case Queries.MAIN_DATA_NEW_NOTIFY: {
 
                 Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
+                mIsNotification = true;
                 boolean prevNewFlag = mNewNotification;
 
                 mNewNotification = (cursor.getInt(0) == Constants.DATA_UNREAD);
@@ -679,13 +683,18 @@ public class MainActivity extends LoggedActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Logs.add(Logs.Type.V, "item: " + item);
-        if (item.getItemId() == R.id.mnu_notification) {
 
-            ////// Start notification activity
-            Intent notifyIntent = new Intent(this, NotifyActivity.class);
-            Login.copyExtraData(getIntent(), notifyIntent);
-            startActivityForResult(notifyIntent, Requests.NOTIFY_2_MAIN.CODE,
-                    ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        if (item.getItemId() == R.id.mnu_notification) {
+            if (mIsNotification) {
+
+                ////// Start notification activity
+                Intent notifyIntent = new Intent(this, NotifyActivity.class);
+                Login.copyExtraData(getIntent(), notifyIntent);
+                startActivityForResult(notifyIntent, Requests.NOTIFY_2_MAIN.CODE,
+                        ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+
+            } else
+                Toast.makeText(this, R.string.no_notification, Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);

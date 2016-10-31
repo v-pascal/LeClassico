@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.connection.ServiceNotify;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
@@ -59,22 +61,21 @@ public class NotificationsRequest extends DataRequest {
 
         } else { ////// New or data updates requested
 
+            // Get login info
             Login.Reply dataLogin = new Login.Reply();
             mService.copyLoginData(dataLogin);
+
+            // Get previous new notification count
+            int prevNewNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
+
+            // Synchronization (from remote to local DB)
             Database.SyncResult result = Database.synchronize(mTableId, mService.getContentResolver(),
                     dataLogin.token.get(), dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
-
             if (Database.SyncResult.hasChanged(result)) {
 
-
-
-
-
-                //ServiceNotify.update(mService, 3);
-
-
-
-
+                int newNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
+                if (prevNewNotify != newNotify)
+                    ServiceNotify.update(mService, newNotify);
 
                 // Notify DB change to observer URI
                 for (Uri observerUri : mRegister)
