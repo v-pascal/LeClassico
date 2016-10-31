@@ -41,16 +41,21 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
             if (cursor.getString(COLUMN_INDEX_PSEUDO) == null)
                 return; // No data found yet
 
-            // Set message
-            SpannableStringBuilder member = new SpannableStringBuilder(cursor.getString(COLUMN_INDEX_PSEUDO));
-            mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setMessage(member);
+            try {
+                // Set message
+                SpannableStringBuilder member = new SpannableStringBuilder(cursor.getString(COLUMN_INDEX_PSEUDO));
+                mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setMessage(member);
 
-            // Set profile icon
-            boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
-                    (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
-            String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
-                    cursor.getString(COLUMN_INDEX_PROFILE) : null;
-            mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setIcon(female, profile, R.dimen.shortcut_content_height);
+                // Set profile icon
+                boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
+                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+                String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
+                        cursor.getString(COLUMN_INDEX_PROFILE) : null;
+                mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setIcon(female, profile, R.dimen.shortcut_content_height);
+
+            } catch (NullPointerException e) {
+                Logs.add(Logs.Type.F, "Activity not attached");
+            }
         }
     }
 

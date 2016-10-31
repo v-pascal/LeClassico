@@ -42,7 +42,11 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), mailPos, mailPos + mailsLen, 0);
         infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), notifyPos, notifyPos +
                 String.valueOf(mNewNotification).length(), 0);
-        mListener.onGetShortcut(Constants.MAIN_SECTION_HOME, false).setInfo(infoBuilder);
+        try {
+            mListener.onGetShortcut(Constants.MAIN_SECTION_HOME, false).setInfo(infoBuilder);
+        } catch (NullPointerException e) {
+            Logs.add(Logs.Type.F, "Activity not attached");
+        }
     }
 
     private QueryLoader mMailLoader; // Shortcut new mail query loader
