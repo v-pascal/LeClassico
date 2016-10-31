@@ -30,8 +30,8 @@ import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
+import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,8 +46,6 @@ import java.util.TimerTask;
  */
 public class DataService extends Service implements Internet.OnConnectivityListener {
 
-    private static final String EXTRA_DATA_PSEUDO = "pseudo";
-    private static final String EXTRA_DATA_PSEUDO_ID = "pseudoId";
     private static final String EXTRA_DATA_TOKEN = "token";
     private static final String EXTRA_DATA_TIME_LAG = "timeLag";
 
@@ -79,8 +77,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             return false;
         }
         Intent intent = new Intent(context, DataService.class);
-        intent.putExtra(EXTRA_DATA_PSEUDO, pseudo);
-        intent.putExtra(EXTRA_DATA_PSEUDO_ID, pseudoId);
+        intent.putExtra(Login.EXTRA_DATA_PSEUDO, pseudo);
+        intent.putExtra(Login.EXTRA_DATA_PSEUDO_ID, pseudoId);
         intent.putExtra(EXTRA_DATA_TOKEN, token);
         intent.putExtra(EXTRA_DATA_TIME_LAG, timeLag);
         context.startService(intent);
@@ -188,13 +186,13 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             ContentValues data = new ContentValues();
             data.put(WebServices.CONNECTION_DATA_DATETIME, dateFormat.format(now));
 
-            final Tools.LoginReply replyRes = new Tools.LoginReply();
+            final Login.Reply replyRes = new Login.Reply();
             Internet.OnRequestListener receiveListener = new Internet.OnRequestListener() {
                 @Override
                 public boolean onReceiveReply(String response) {
 
                     Logs.add(Logs.Type.V, "response: " + response);
-                    return Tools.receiveLogin(response, replyRes); // Manage method reply (below use)
+                    return Login.receive(response, replyRes); // Manage method reply (below use)
                 }
             };
             if (mDataLogin.token.get() != null) {
@@ -335,8 +333,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private final Binder mBinder = new DataBinder();
 
     //
-    private final Tools.LoginReply mDataLogin = new Tools.LoginReply(); // Login info (token, pseudo & time lag)
-    public Tools.LoginReply getLoginData() {
+    private final Login.Reply mDataLogin = new Login.Reply(); // Login info (token, pseudo & time lag)
+    public Login.Reply getLoginData() {
         synchronized (mDataLogin.token) {
             return mDataLogin;
         }
@@ -362,8 +360,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Logs.add(Logs.Type.V, "intent: " + intent + ";flags: " + flags + ";startId: " + startId);
-        mDataLogin.pseudo = intent.getStringExtra(EXTRA_DATA_PSEUDO);
-        mDataLogin.pseudoId = intent.getIntExtra(EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA);
+        mDataLogin.pseudo = intent.getStringExtra(Login.EXTRA_DATA_PSEUDO);
+        mDataLogin.pseudoId = intent.getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA);
         mDataLogin.token.set(intent.getStringExtra(EXTRA_DATA_TOKEN));
         mDataLogin.timeLag = intent.getLongExtra(EXTRA_DATA_TIME_LAG, 0);
 

@@ -32,6 +32,7 @@ import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
+import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SyncValue;
 import com.studio.artaban.leclassico.tools.Tools;
@@ -337,7 +338,7 @@ public class ConnectFragment extends RevealFragment {
                     data.put(WebServices.CONNECTION_DATA_PASSWORD, password);
                     data.put(WebServices.CONNECTION_DATA_DATETIME, dateFormat.format(now));
 
-                    final Tools.LoginReply loginRes = new Tools.LoginReply();
+                    final Login.Reply loginRes = new Login.Reply();
                     Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
                             WebServices.URL_CONNECTION, data, new Internet.OnRequestListener() {
 
@@ -346,7 +347,7 @@ public class ConnectFragment extends RevealFragment {
                             Logs.add(Logs.Type.V, "response: " + response);
 
                             if (isStopped()) return Boolean.FALSE;
-                            return Tools.receiveLogin(response, loginRes); // Manage method reply below
+                            return Login.receive(response, loginRes); // Manage method reply below
                         }
                     });
                     if (isStopped()) return Boolean.FALSE;

@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
-import com.studio.artaban.leclassico.activities.main.MainActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
@@ -37,6 +36,7 @@ import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
+import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.tools.Tools;
@@ -59,14 +59,14 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
         getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
                 values, NotificationsTable.COLUMN_PSEUDO + "='" +
-                        getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO) +
+                        getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
                         "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
                 null);
         // NB: DB use in UI thread!
 
         // Notify notifications URI to refresh notification list
         getContentResolver().notifyChange((Uri) getIntent()
-                .getParcelableExtra(MainActivity.EXTRA_DATA_NOTIFY_URI), null);
+                .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI), null);
     }
 
     //////
@@ -525,7 +525,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         // Get query limit
         short queryLimit = 0;
         String selection = NotificationsTable.COLUMN_PSEUDO + "='" +
-                getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO) + '\'';
+                getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) + '\'';
         if (mQueryID != Constants.NO_DATA) {
 
             queryLimit = mQueryCount;
@@ -555,7 +555,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         // Load notification data (using query loader)
         Bundle queryData = new Bundle();
         queryData.putParcelable(QueryLoader.DATA_KEY_URI,
-                getIntent().getParcelableExtra(MainActivity.EXTRA_DATA_NOTIFY_URI));
+                getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI));
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE

@@ -49,6 +49,7 @@ import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
+import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import com.studio.artaban.leclassico.helpers.QueryLoader;
@@ -65,21 +66,6 @@ public class MainActivity extends LoggedActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
         MainFragment.OnFragmentListener {
 
-    public static final String EXTRA_DATA_PSEUDO = "pseudo";
-    public static final String EXTRA_DATA_PSEUDO_ID = "pseudoId";
-    public static final String EXTRA_DATA_NOTIFY_URI = "notifyURI";
-    // Extra data keys
-
-    public static void putLoginData(Intent from, Intent to) {
-    // Put login extras data from an intent to another one (from previous activity to next activity)
-
-        Logs.add(Logs.Type.V, "from: " + from + ";to: " + to);
-        to.putExtra(EXTRA_DATA_PSEUDO, from.getStringExtra(EXTRA_DATA_PSEUDO));
-        to.putExtra(EXTRA_DATA_PSEUDO_ID, from.getIntExtra(EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
-        to.putExtra(EXTRA_DATA_NOTIFY_URI, mNotifyUri); // Always add notification URI (new notification)
-    }
-
-    //////
     private static int getShortcutID(int section, boolean newItem) {
     // Return shortcut fragment container ID according selected section
 
@@ -166,10 +152,6 @@ public class MainActivity extends LoggedActivity implements
     @Override
     public Uri onGetShortcutURI() {
         return mShortcutUri;
-    }
-    @Override
-    public Uri onGetNotifyURI() {
-        return mNotifyUri;
     }
 
     //
@@ -345,7 +327,6 @@ public class MainActivity extends LoggedActivity implements
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
 
     private Uri mShortcutUri; // Shortcut URI (new mail & notifications)
-    private static Uri mNotifyUri; // User notifications URI
 
     public void onPublish(View sender) { // Floating action button click event
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -454,14 +435,14 @@ public class MainActivity extends LoggedActivity implements
                 .setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 
         // Display user pseudo, profile icon & banner
-        String pseudo = getIntent().getStringExtra(EXTRA_DATA_PSEUDO);
+        String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
 
-        // Set URI to observe DB changes
+        // Set URIs to observe DB changes
         mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT, String.valueOf(getIntent()
-                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
-        mNotifyUri = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getIntent()
-                .getIntExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
+                .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
+        Login.notificationURI = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getIntent()
+                .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
 
         // Set content view pager
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -682,7 +663,7 @@ public class MainActivity extends LoggedActivity implements
         mNewNotifyLoader.init(this, Queries.MAIN_DATA_NEW_NOTIFY, notifyData);
 
         // Register new user notifications service
-        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mNotifyUri));
+        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, Login.notificationURI));
     }
 
     @Override
@@ -702,7 +683,7 @@ public class MainActivity extends LoggedActivity implements
 
             ////// Start notification activity
             Intent notifyIntent = new Intent(this, NotifyActivity.class);
-            putLoginData(getIntent(), notifyIntent);
+            Login.copyExtraData(getIntent(), notifyIntent);
             startActivityForResult(notifyIntent, Requests.NOTIFY_2_MAIN.CODE,
                     ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
             return true;
@@ -756,7 +737,7 @@ public class MainActivity extends LoggedActivity implements
         Logs.add(Logs.Type.V, null);
 
         // Unregister new user notifications service
-        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mNotifyUri));
+        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, Login.notificationURI));
 
         sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mShortcutUri));
         sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_MESSAGERIE, mShortcutUri));

@@ -63,7 +63,6 @@ public abstract class MainFragment extends Fragment {
 
         ////// URI
         Uri onGetShortcutURI();
-        Uri onGetNotifyURI();
     }
     protected OnFragmentListener mListener; // Activity listener
 

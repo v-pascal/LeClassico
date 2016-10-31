@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -28,15 +27,10 @@ import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
-import com.studio.artaban.leclassico.data.codes.Errors;
-import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -50,59 +44,6 @@ import java.util.Date;
  */
 public final class Tools { /////////////////////////////////////////////////////////////////////////
 
-    public static class LoginReply {
-
-        public String pseudo; // Pseudo of the login
-        public int pseudoId = Constants.NO_DATA; // Member ID (in local DB)
-        public final SyncValue<String> token = new SyncValue<>(null); // Login token
-        public long timeLag; // Time lag between remote & local DB
-    }
-    public static boolean receiveLogin(String response, LoginReply loginRes) { // Receive login reply
-
-        Logs.add(Logs.Type.V, "response: " + response + ";loginRes: " + loginRes);
-        boolean result = false; ////// Reply error
-        try {
-
-            JSONObject reply = new JSONObject(response);
-            if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
-
-                // Login succeeded
-                JSONObject logged = reply.getJSONObject(WebServices.JSON_KEY_LOGGED);
-                loginRes.pseudo = logged.getString(WebServices.JSON_KEY_PSEUDO);
-                loginRes.token.set(logged.getString(WebServices.JSON_KEY_TOKEN));
-                loginRes.timeLag = logged.getLong(WebServices.JSON_KEY_TIME_LAG);
-
-                Logs.add(Logs.Type.I, "Logged with time lag: " + loginRes.timeLag);
-                result = true; ////// Reply succeeded
-
-            } else switch ((byte)reply.getInt(WebServices.JSON_KEY_ERROR)) {
-
-                case Errors.WEBSERVICE_TOKEN_EXPIRED:
-                case Errors.WEBSERVICE_LOGIN_FAILED: {
-
-                    Logs.add(Logs.Type.W, "Invalid login/token");
-                    loginRes.token.set(null); // Login failed or token expired (invalid)
-                    result = true; ////// Reply succeeded
-                    break;
-                }
-                // Error
-                case Errors.WEBSERVICE_SERVER_UNAVAILABLE:
-                case Errors.WEBSERVICE_INVALID_LOGIN:
-                case Errors.WEBSERVICE_SYSTEM_DATE: {
-
-                    Logs.add(Logs.Type.E, "Connection error: #" +
-                            reply.getInt(WebServices.JSON_KEY_ERROR));
-                    break;
-                }
-            }
-
-        } catch (JSONException e) {
-            Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
-        }
-        return result;
-    }
-
-    //////
     private static float PROFILE_SIZE_RADIUS_FACTOR = 80f;
     public static void setProfile(final Activity activity, ImageView view, final boolean female,
                                   String profile, final int size, final boolean clickable) {

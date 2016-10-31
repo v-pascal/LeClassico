@@ -44,6 +44,7 @@ import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.helpers.Internet;
+import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.animations.InOutScreen;
@@ -270,8 +271,8 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
         ////// Start main activity
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(MainActivity.EXTRA_DATA_PSEUDO, pseudo);
-        intent.putExtra(MainActivity.EXTRA_DATA_PSEUDO_ID, pseudoId);
+        intent.putExtra(Login.EXTRA_DATA_PSEUDO, pseudo);
+        intent.putExtra(Login.EXTRA_DATA_PSEUDO_ID, pseudoId);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
@@ -865,7 +866,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
                 public void onServiceConnected(DataService service) {
 
                     Logs.add(Logs.Type.V, "service: " + service);
-                    Tools.LoginReply loginInfo = service.getLoginData();
+                    Login.Reply loginInfo = service.getLoginData();
                     binder.unbind(IntroActivity.this);
 
                     ////// Start main activity

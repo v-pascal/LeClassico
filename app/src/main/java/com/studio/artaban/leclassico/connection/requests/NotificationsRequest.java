@@ -10,8 +10,8 @@ import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
+import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.tools.Tools;
 
 /**
  * Created by pascal on 17/10/16.
@@ -59,7 +59,7 @@ public class NotificationsRequest extends DataRequest {
 
         } else { ////// New or data updates requested
 
-            Tools.LoginReply dataLogin = mService.getLoginData();
+            Login.Reply dataLogin = mService.getLoginData();
             Database.SyncResult result = Database.synchronize(mTableId, mService.getContentResolver(),
                     dataLogin.token.get(), dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
 

@@ -14,6 +14,7 @@ import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 
@@ -79,7 +80,7 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
         mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setInfo(data);
 
         // Load shortcut info (using query loaders)
-        String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO);
+        String pseudo = getActivity().getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
 
         Bundle shortcutData = new Bundle();
         shortcutData.putParcelable(QueryLoader.DATA_KEY_URI,

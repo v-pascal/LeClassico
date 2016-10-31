@@ -15,6 +15,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
+import com.studio.artaban.leclassico.helpers.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 
@@ -90,7 +91,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         rootView.setTag(Constants.MAIN_SECTION_HOME);
 
         // Set shortcut data
-        String pseudo = getActivity().getIntent().getStringExtra(MainActivity.EXTRA_DATA_PSEUDO);
+        String pseudo = getActivity().getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
         int pseudoPos = getResources().getInteger(R.integer.home_connected_pseudo_pos);
         SpannableStringBuilder msgBuilder =
                 new SpannableStringBuilder(getString(R.string.home_connected, pseudo));
