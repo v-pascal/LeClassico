@@ -166,7 +166,7 @@ public class MainActivity extends LoggedActivity implements
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
 
-        cursor.moveToFirst();
+        if (!cursor.moveToFirst()) return;
         switch (id) {
             case Queries.MAIN_DATA_USER: { ////// User info
 
@@ -199,7 +199,7 @@ public class MainActivity extends LoggedActivity implements
                 Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
                 boolean prevNewFlag = mNewNotification;
 
-                mNewNotification = cursor.getInt(0) > 0;
+                mNewNotification = (cursor.getInt(0) == Constants.DATA_UNREAD);
                 if (prevNewFlag != mNewNotification)
                     invalidateOptionsMenu();
                 break;
@@ -657,9 +657,9 @@ public class MainActivity extends LoggedActivity implements
         Bundle notifyData = new Bundle();
         notifyData.putParcelable(QueryLoader.DATA_KEY_URI, mShortcutUri);
         notifyData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT count(*) FROM " + NotificationsTable.TABLE_NAME +
+                "SELECT " + NotificationsTable.COLUMN_LU_FLAG + " FROM " + NotificationsTable.TABLE_NAME +
                         " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" + pseudo +
-                        "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD);
+                        "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
         mNewNotifyLoader.init(this, Queries.MAIN_DATA_NEW_NOTIFY, notifyData);
 
         // Register new user notifications service

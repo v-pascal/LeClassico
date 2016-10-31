@@ -371,7 +371,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     public void onLoadFinished(int id, final Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
 
-        cursor.moveToFirst();
+        if (!cursor.moveToFirst()) return;
         switch (id) {
 
             case Queries.MAIN_NOTIFY_LIST: {

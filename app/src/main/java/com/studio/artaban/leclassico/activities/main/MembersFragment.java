@@ -35,7 +35,8 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-        cursor.moveToFirst();
+        if (!cursor.moveToFirst())
+            return;
 
         if (id == Queries.MAIN_SHORTCUT_LAST_FOLLOWED) {
             if (cursor.getString(COLUMN_INDEX_PSEUDO) == null)

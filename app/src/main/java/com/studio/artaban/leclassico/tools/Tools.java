@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
@@ -262,5 +263,26 @@ public final class Tools { /////////////////////////////////////////////////////
         result.close();
 
         return id;
+    }
+
+    public static int getNewNotification(ContentResolver resolver, String pseudo) {
+    // Return new notification count for current user (pseudo)
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
+        Cursor newNotify = resolver.query(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
+                new String[]{NotificationsTable.COLUMN_LU_FLAG},
+                NotificationsTable.COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo),
+                null, NotificationsTable.COLUMN_DATE + " DESC");
+
+        int newCount = 0;
+        if (newNotify.moveToFirst()) {
+            do {
+                if (newNotify.getInt(0) != Constants.DATA_UNREAD)
+                    break;
+                ++newCount;
+
+            } while (newNotify.moveToNext());
+        }
+        return newCount;
     }
 }

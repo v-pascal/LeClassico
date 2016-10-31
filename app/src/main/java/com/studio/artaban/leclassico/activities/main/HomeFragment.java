@@ -56,7 +56,8 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-        cursor.moveToFirst();
+        if (!cursor.moveToFirst())
+            return;
 
         switch (id) {
             case Queries.MAIN_SHORTCUT_MAIL_COUNT: { ////// New mail count
