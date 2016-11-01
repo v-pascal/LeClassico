@@ -31,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -398,6 +399,22 @@ public class MainActivity extends LoggedActivity implements
             View toolbarLayout = findViewById(R.id.layout_toolbar);
             toolbarLayout.setTranslationX(margin - getResources().getDimensionPixelSize(R.dimen.appbar_padding_title));
             toolbarLayout.getLayoutParams().width = screenSize.x -(margin << 1);
+
+            //////
+            final View appBar = findViewById(R.id.appbar);
+            appBar.getLayoutParams().height = 666;
+            appBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+
+                    Logs.add(Logs.Type.V, null);
+                    appBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    appBar.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                }
+            });
+            // BUG: Code above will fix a display issue that occurs on some devices when the activity
+            //      switches from landscape to portrait orientation (toolbar partially scrolled on top
+            //      hiding title & icons).
         }
 
         // Set drawer toggle
