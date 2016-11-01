@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Notification -->
+
+    <dimen name="new_notify_height">56dp</dimen>
+    <dimen name="new_notify_text_size">18sp</dimen>
+
+</resources>

@@ -92,10 +92,12 @@ public final class ServiceNotify {
                         .setSmallIcon(R.drawable.notification)
                         .setContentTitle(service.getString(R.string.app_name))
                         .setContentText(title)
+                        .setColor(service.getResources().getColor(R.color.colorPrimaryMain))
                         .build();
 
         mNotify.bigContentView = notifyViews;
         setTextInfo(service, DataTable.getNewNotification(service.getContentResolver(), pseudo));
+        mNotify.defaults = Notification.DEFAULT_ALL; // Always at connection
         service.startForeground(SERVICE_NOTIFICATION_REF, mNotify);
     }
 

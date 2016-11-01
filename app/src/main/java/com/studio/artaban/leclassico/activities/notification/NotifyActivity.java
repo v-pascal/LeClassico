@@ -25,6 +25,7 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
+import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
@@ -54,23 +55,44 @@ import java.util.Date;
 public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
 
     public void onRead(View sender) { // Mark unread notification(s) as read
+
         Logs.add(Logs.Type.V, "sender: " + sender);
+        Tools.startProcess(this, new Tools.OnProcessListener() {
+            @Override
+            public Bundle onBackgroundTask() {
+                Logs.add(Logs.Type.V, null);
 
-        ContentValues values = new ContentValues();
-        values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
-        getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
-                values, NotificationsTable.COLUMN_PSEUDO + "='" +
-                        getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
-                        "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
-                null);
-        // NB: DB use in UI thread!
+                ContentValues values = new ContentValues();
+                values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
+                getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
+                        values, NotificationsTable.COLUMN_PSEUDO + "='" +
+                                getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
+                                "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
+                        null);
+                return null;
+            }
 
-        // Notify notifications URI to refresh notification list
-        getContentResolver().notifyChange((Uri) getIntent()
-                .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI), null);
+            @Override
+            public void onMainNextTask(Bundle backResult) {
+                Logs.add(Logs.Type.V, "backResult: " + backResult);
+
+                // Notify service & notifications URI to refresh notification list
+                ServiceNotify.update(NotifyActivity.this, 0);
+                getContentResolver().notifyChange((Uri) getIntent()
+                        .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI), null);
+            }
+        });
     }
 
     //////
+    private void setNewNotifyInfo(int newNotify) { // Display new notification info
+        Logs.add(Logs.Type.V, "newNotify: " + newNotify);
+        SpannableStringBuilder info =
+                new SpannableStringBuilder(getString(R.string.service_new_notify, newNotify));
+
+        info.setSpan(new ForegroundColorSpan(Color.YELLOW), 0, String.valueOf(newNotify).length(), 0);
+        ((TextView)findViewById(R.id.text_new_notify)).setText(info, TextView.BufferType.SPANNABLE);
+    }
     private SpannableStringBuilder getNotifyMessage(char type, short wallType, String pseudo, int color) {
         // Return notification message formatted according its type
 
@@ -380,17 +402,17 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 mQueryCount = (short)cursor.getCount();
                 final View fab = findViewById(R.id.fab);
 
-                boolean newNotification = false;
-                if (mQueryCount > 0) { // Get if exists unread notification
-                    do {
-                        if (cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
-                            newNotification = true; // Found new notification (unread)
-                            break;
-                        }
+                // Get if exists unread notification
+                int newNotify = 0;
+                do {
+                    if (cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
+                        ++newNotify; // new notification found (unread)
+                    else
+                        break;
 
-                    } while (cursor.moveToNext());
-                    cursor.moveToFirst();
-                }
+                } while (cursor.moveToNext());
+                cursor.moveToFirst();
+                setNewNotifyInfo(newNotify);
 
                 // Check if not the initial query
                 if (mNotifyAdapter != null) {
@@ -420,7 +442,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     fab.setVisibility(View.VISIBLE);
                     final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
 
-                    if (newNotification) // Display floating action button
+                    if (newNotify > 0) // Display floating action button
                         animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
                                 .translationY(0)
                                 .setListener(new ViewPropertyAnimatorListener() {
@@ -472,7 +494,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     mNotifyList.setAdapter(mNotifyAdapter);
 
                     // Display/Hide floating action button
-                    if (newNotification)
+                    if (newNotify > 0)
                         fab.setVisibility(View.VISIBLE);
                 }
                 break;
@@ -522,99 +544,117 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
     private void setLoaders() { // Initialize or update queries loaders
         Logs.add(Logs.Type.V, null);
-
-        // Get query limit
-        short queryLimit = 0;
-        String selection = NotificationsTable.COLUMN_PSEUDO + "='" +
+        final String selection = NotificationsTable.COLUMN_PSEUDO + "='" +
                 getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) + '\'';
-        if (mQueryID != Constants.NO_DATA) {
 
-            queryLimit = mQueryCount;
-            queryLimit += mQueryOld;
-            queryLimit += (short) DataTable.getEntryCount(getContentResolver(),
-                    NotificationsTable.TABLE_NAME, selection + " AND " +
-                            IDataTable.DataField.COLUMN_ID + '>' + mQueryID);
-            // NB: DB use in UI thread!
+        Tools.startProcess(this, new Tools.OnProcessListener() {
+            private static final String DATA_KEY_QUERY_LIMIT = "queryLimit";
 
+            @Override
+            public Bundle onBackgroundTask() {
+                Logs.add(Logs.Type.V, null);
 
+                // Get query limit
+                short queryLimit = 0;
+                if (mQueryID != Constants.NO_DATA) {
 
-
-
-
-            //mQueryOld = Queries.OLDER_NOTIFICATIONS;
-            //mQueryOld = 0;
-
-
-
+                    queryLimit = mQueryCount;
+                    queryLimit += mQueryOld;
+                    queryLimit += (short) DataTable.getEntryCount(getContentResolver(),
+                            NotificationsTable.TABLE_NAME, selection + " AND " +
+                                    IDataTable.DataField.COLUMN_ID + '>' + mQueryID);
 
 
 
-        }
-        if (queryLimit < Queries.LIMIT_MAIN_NOTIFY)
-            queryLimit = Queries.LIMIT_MAIN_NOTIFY;
 
-        // Load notification data (using query loader)
-        Bundle queryData = new Bundle();
-        queryData.putParcelable(QueryLoader.DATA_KEY_URI,
-                getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI));
-        queryData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
-                        NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
-                        NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
-                        NotificationsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_NOTIFY_ID
-                        NotificationsTable.COLUMN_DATE + ',' + // COLUMN_INDEX_DATE
-                        NotificationsTable.COLUMN_LU_FLAG + ',' + // COLUMN_INDEX_LU_FLAG
-                        CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
-                        CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
-                        CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
-                        CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MEMBER_ID
-                        PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_ALBUM
-                        PhotosTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PHOTO_ID
-                        ActualitesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_PUB_TEXT
-                        ActualitesTable.COLUMN_LINK + ',' + // COLUMN_INDEX_LINK
-                        ActualitesTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_FICHIER
-                        ActualitesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PUB_ID
-                        MessagerieTable.COLUMN_MESSAGE + ',' + // COLUMN_INDEX_MSG_TEXT
-                        MessagerieTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MSG_ID
-                        CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COM_TEXT
-                        CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
 
-                        " FROM " + NotificationsTable.TABLE_NAME +
-                        " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + CamaradesTable.COLUMN_PSEUDO +
-                        " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_ID + '=' + PhotosTable.COLUMN_FICHIER_ID + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_SHARED + "' AND " +
-                        NotificationsTable.COLUMN_OBJECT_DATE + " IS NULL" +
-                        " LEFT JOIN " + ActualitesTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_ID + '=' + ActualitesTable.COLUMN_ACTU_ID + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_WALL + '\'' +
-                        " LEFT JOIN " + MessagerieTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + MessagerieTable.COLUMN_FROM + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_DATE + '=' +
-                        MessagerieTable.COLUMN_DATE + "||' '||" + MessagerieTable.COLUMN_TIME + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_MAIL + "' AND " +
-                        NotificationsTable.COLUMN_OBJECT_ID + " IS NULL" +
-                        " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_ID + '=' + CommentairesTable.COLUMN_OBJ_ID + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + '=' + CommentairesTable.COLUMN_OBJ_TYPE + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_DATE + '=' + CommentairesTable.COLUMN_DATE + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + CommentairesTable.COLUMN_PSEUDO +
-                        " WHERE " + selection +
-                        " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
-                        " LIMIT " + queryLimit);
 
-        if (mQueryID != Constants.NO_DATA) // Restart
-            mListLoader.restart(this, Queries.MAIN_NOTIFY_LIST, queryData);
+                    //mQueryOld = Queries.OLDER_NOTIFICATIONS;
+                    //mQueryOld = 0;
 
-        else { // Initialize
-            mListLoader.init(this, Queries.MAIN_NOTIFY_LIST, queryData);
 
-            queryData.putString(QueryLoader.DATA_KEY_SELECTION, "SELECT max(" + IDataTable.DataField.COLUMN_ID +
-                    ") FROM " + NotificationsTable.TABLE_NAME + " WHERE " + selection);
-            mMaxLoader.init(this, Queries.MAIN_NOTIFY_MAX, queryData);
-        }
+
+
+
+
+                }
+                Bundle result = new Bundle();
+                result.putShort(DATA_KEY_QUERY_LIMIT, queryLimit);
+                return result;
+            }
+
+            @Override
+            public void onMainNextTask(Bundle backResult) {
+                Logs.add(Logs.Type.V, "backResult: " + backResult);
+
+                short queryLimit = backResult.getShort(DATA_KEY_QUERY_LIMIT);
+                if (queryLimit < Queries.LIMIT_MAIN_NOTIFY)
+                    queryLimit = Queries.LIMIT_MAIN_NOTIFY;
+
+                // Load notification data (using query loader)
+                Bundle queryData = new Bundle();
+                queryData.putParcelable(QueryLoader.DATA_KEY_URI,
+                        getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI));
+                queryData.putString(QueryLoader.DATA_KEY_SELECTION,
+                        "SELECT " +
+                                NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
+                                NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
+                                NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
+                                NotificationsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_NOTIFY_ID
+                                NotificationsTable.COLUMN_DATE + ',' + // COLUMN_INDEX_DATE
+                                NotificationsTable.COLUMN_LU_FLAG + ',' + // COLUMN_INDEX_LU_FLAG
+                                CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
+                                CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
+                                CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
+                                CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MEMBER_ID
+                                PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_ALBUM
+                                PhotosTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PHOTO_ID
+                                ActualitesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_PUB_TEXT
+                                ActualitesTable.COLUMN_LINK + ',' + // COLUMN_INDEX_LINK
+                                ActualitesTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_FICHIER
+                                ActualitesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PUB_ID
+                                MessagerieTable.COLUMN_MESSAGE + ',' + // COLUMN_INDEX_MSG_TEXT
+                                MessagerieTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MSG_ID
+                                CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COM_TEXT
+                                CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
+
+                                " FROM " + NotificationsTable.TABLE_NAME +
+                                " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
+                                NotificationsTable.COLUMN_OBJECT_FROM + '=' + CamaradesTable.COLUMN_PSEUDO +
+                                " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
+                                NotificationsTable.COLUMN_OBJECT_ID + '=' + PhotosTable.COLUMN_FICHIER_ID + " AND " +
+                                NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_SHARED + "' AND " +
+                                NotificationsTable.COLUMN_OBJECT_DATE + " IS NULL" +
+                                " LEFT JOIN " + ActualitesTable.TABLE_NAME + " ON " +
+                                NotificationsTable.COLUMN_OBJECT_ID + '=' + ActualitesTable.COLUMN_ACTU_ID + " AND " +
+                                NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_WALL + '\'' +
+                                " LEFT JOIN " + MessagerieTable.TABLE_NAME + " ON " +
+                                NotificationsTable.COLUMN_OBJECT_FROM + '=' + MessagerieTable.COLUMN_FROM + " AND " +
+                                NotificationsTable.COLUMN_OBJECT_DATE + '=' +
+                                MessagerieTable.COLUMN_DATE + "||' '||" + MessagerieTable.COLUMN_TIME + " AND " +
+                                NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_MAIL + "' AND " +
+                                NotificationsTable.COLUMN_OBJECT_ID + " IS NULL" +
+                                " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
+                                NotificationsTable.COLUMN_OBJECT_ID + '=' + CommentairesTable.COLUMN_OBJ_ID + " AND " +
+                                NotificationsTable.COLUMN_OBJECT_TYPE + '=' + CommentairesTable.COLUMN_OBJ_TYPE + " AND " +
+                                NotificationsTable.COLUMN_OBJECT_DATE + '=' + CommentairesTable.COLUMN_DATE + " AND " +
+                                NotificationsTable.COLUMN_OBJECT_FROM + '=' + CommentairesTable.COLUMN_PSEUDO +
+                                " WHERE " + selection +
+                                " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
+                                " LIMIT " + queryLimit);
+
+                if (mQueryID != Constants.NO_DATA) // Restart
+                    mListLoader.restart(NotifyActivity.this, Queries.MAIN_NOTIFY_LIST, queryData);
+
+                else { // Initialize
+                    mListLoader.init(NotifyActivity.this, Queries.MAIN_NOTIFY_LIST, queryData);
+
+                    queryData.putString(QueryLoader.DATA_KEY_SELECTION, "SELECT max(" + IDataTable.DataField.COLUMN_ID +
+                            ") FROM " + NotificationsTable.TABLE_NAME + " WHERE " + selection);
+                    mMaxLoader.init(NotifyActivity.this, Queries.MAIN_NOTIFY_MAX, queryData);
+                }
+            }
+        });
     }
 
     ////// NotifyActivity //////////////////////////////////////////////////////////////////////////
@@ -632,8 +672,9 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
         setLogoutResult(Requests.NOTIFY_2_MAIN.RESULT_LOGOUT); // Set logout result (logged activity)
 
-        // Set toolbar
+        // Set toolbar & default new notification
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setNewNotifyInfo(0);
 
         // Set recycler view
         final RecyclerItemAnimator itemAnimator = new RecyclerItemAnimator();

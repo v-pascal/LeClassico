@@ -7,7 +7,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
-import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -105,6 +105,7 @@ public final class Tools { /////////////////////////////////////////////////////
                     activity.getDrawable(R.drawable.man)));
     }
 
+    //////
     public static void setDateTime(Context context, TextView date, TextView time, String dateTime) {
     // Fill date & time text views according a date & time parameter (in query date & time format)
     // i.e: --/-- for the date & --:-- for the time
@@ -126,6 +127,7 @@ public final class Tools { /////////////////////////////////////////////////////
         }
     }
 
+    //////
     public static void criticalError(final Activity activity, @StringRes int error) {
     // Display a critical error message B4 application close
 
@@ -144,6 +146,34 @@ public final class Tools { /////////////////////////////////////////////////////
                 })
                 .create()
                 .show();
+    }
+
+    //////
+    public interface OnProcessListener {
+
+        Bundle onBackgroundTask();
+        void onMainNextTask(Bundle backResult);
+    }
+    public static void startProcess(final Activity activity, final OnProcessListener listener) {
+    // Do a background process B4 executing a followed task on main thread (with background result)
+
+        Logs.add(Logs.Type.V, "listener: " + listener);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                //Logs.add(Logs.Type.V, null);
+                final Bundle result = listener.onBackgroundTask();
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        //Logs.add(Logs.Type.V, null);
+                        listener.onMainNextTask(result);
+                    }
+                });
+            }
+        }).start();
     }
 
     ////////////////////////////////////////////////////////////////////////////////// Notifications
