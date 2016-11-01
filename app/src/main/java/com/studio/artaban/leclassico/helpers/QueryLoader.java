@@ -1,14 +1,14 @@
 package com.studio.artaban.leclassico.helpers;
 
-import android.app.Activity;
-import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -100,17 +100,17 @@ public class QueryLoader {
     };
 
     //////
-    public void init(Activity activity, int id, Bundle args) {
+    public void init(FragmentActivity activity, int id, Bundle args) {
         // Initialize a new cursor loader (destroy previous one if any)
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";id: " + id + ";args: " + args);
-        activity.getLoaderManager().destroyLoader(id);
-        activity.getLoaderManager().initLoader(id, args, mLoaderCallbacks);
+        activity.getSupportLoaderManager().destroyLoader(id);
+        activity.getSupportLoaderManager().initLoader(id, args, mLoaderCallbacks);
     }
-    public void restart(Activity activity, int id, Bundle args) {
+    public void restart(FragmentActivity activity, int id, Bundle args) {
         // Restart a loader with new query parameters
 
         Logs.add(Logs.Type.V, "activity: " + activity + ";id: " + id + ";args: " + args);
-        activity.getLoaderManager().restartLoader(id, args, mLoaderCallbacks);
+        activity.getSupportLoaderManager().restartLoader(id, args, mLoaderCallbacks);
     }
 }

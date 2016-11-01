@@ -88,6 +88,7 @@ public class NotificationsRequest extends DataRequest {
     public void synchronize() { // Update data from local to remote DB
         Logs.add(Logs.Type.V, null);
 
+        // Update synchronization fields (to inform user synchronization in progress)
 
 
 
