@@ -31,7 +31,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -376,14 +375,14 @@ public class MainActivity extends LoggedActivity implements
                             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
                                 int actionHeight = -getResources().getDimensionPixelSize(R.dimen.appbar_padding_title);
-                                verticalOffset = (verticalOffset < actionHeight)? verticalOffset - actionHeight:0;
+                                verticalOffset = (verticalOffset < actionHeight) ? verticalOffset - actionHeight : 0;
                             }
                             appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
                         }
                         //else // NB: Can occur when search operation starts
                     }
                 });
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -401,20 +400,21 @@ public class MainActivity extends LoggedActivity implements
             toolbarLayout.getLayoutParams().width = screenSize.x -(margin << 1);
 
             //////
-            final View appBar = findViewById(R.id.appbar);
-            appBar.getLayoutParams().height = 666;
-            appBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            ((AppBarLayout.LayoutParams) toolbar.getLayoutParams()).setScrollFlags(0);
+            toolbar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
 
                     Logs.add(Logs.Type.V, null);
-                    appBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    appBar.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    toolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    ((AppBarLayout.LayoutParams) toolbar.getLayoutParams())
+                            .setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
+                                    AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
+                                    AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP);
                 }
             });
             // BUG: Code above will fix a display issue that occurs on some devices when the activity
-            //      switches from landscape to portrait orientation (toolbar partially scrolled on top
-            //      hiding title & icons).
+            //      switches its orientation (toolbar partially scrolled to the top hiding title & icons).
         }
 
         // Set drawer toggle
