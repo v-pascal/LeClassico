@@ -21,7 +21,8 @@ public final class WebServices {
 
     public static final byte OPERATION_SELECT = 1;
     public static final byte OPERATION_UPDATE = 2;
-    public static final byte OPERATION_DELETE = 1;
+    public static final byte OPERATION_INSERT = 3;
+    public static final byte OPERATION_DELETE = 4;
 
 
     ////// GET & POST //////////////////////////////////////////////////////////////////////////////

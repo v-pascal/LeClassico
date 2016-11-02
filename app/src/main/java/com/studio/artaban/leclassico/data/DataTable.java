@@ -107,12 +107,13 @@ public abstract class DataTable implements IDataTable {
 
     protected static final String DATA_KEY_LIMIT = "limit";
 
+    //////
     protected static String getUrlSynchroRequest(ContentResolver resolver, Bundle data) {
         // Return URL of synchronization request according table data
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
         String url = Constants.APP_WEBSERVICES + data.getString(DATA_KEY_WEB_SERVICE) + '?' +
-                WebServices.DATA_TOKEN + '=' + data.getString(DATA_KEY_TOKEN) + '?' + // Add token...
+                WebServices.DATA_TOKEN + '=' + data.getString(DATA_KEY_TOKEN) + '&' + // Add token...
                 WebServices.DATA_OPERATION + '=' + data.getByte(DATA_KEY_OPERATION); // ...& operation
 
         // Get last synchronization date (if needed)
