@@ -38,13 +38,14 @@ public class MusicTable extends DataTable {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public Database.SyncResult synchronize(final ContentResolver resolver, String token, String pseudo,
-                                           @Nullable Short limit, @Nullable ContentValues postData) {
+    public Database.SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
+                                           @Nullable String pseudo, @Nullable Short limit,
+                                           @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo +
-                ";limit: " + limit + ";postData: " + postData);
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
+                ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
 
 
 

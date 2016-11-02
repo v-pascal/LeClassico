@@ -11,6 +11,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
@@ -80,29 +81,41 @@ public class Database extends SQLiteOpenHelper {
 
         switch (tableId) {
             case Tables.ID_CAMARADES:
-                return Database.getTable(CamaradesTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(CamaradesTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_ABONNEMENTS:
-                return Database.getTable(AbonnementsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(AbonnementsTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_ACTUALITES:
-                return Database.getTable(ActualitesTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(ActualitesTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_ALBUMS:
-                return Database.getTable(AlbumsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(AlbumsTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_COMMENTAIRES:
-                return Database.getTable(CommentairesTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(CommentairesTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_EVENEMENTS:
-                return Database.getTable(EvenementsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(EvenementsTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_MESSAGERIE:
-                return Database.getTable(MessagerieTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(MessagerieTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_MUSIC:
-                return Database.getTable(MusicTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(MusicTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_PHOTOS:
-                return Database.getTable(PhotosTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(PhotosTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_PRESENTS:
-                return Database.getTable(PresentsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(PresentsTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_VOTES:
-                return Database.getTable(VotesTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(VotesTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             case Tables.ID_NOTIFICATIONS:
-                return Database.getTable(NotificationsTable.TABLE_NAME).synchronize(resolver, token, pseudo, limit, postData);
+                return Database.getTable(NotificationsTable.TABLE_NAME)
+                        .synchronize(resolver, token, WebServices.OPERATION_SELECT, pseudo, limit, postData);
             default:
                 throw new IllegalArgumentException("Unexpected table ID: " + tableId);
         }

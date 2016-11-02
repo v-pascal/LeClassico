@@ -52,22 +52,26 @@ public class CamaradesTable extends DataTable {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public Database.SyncResult synchronize(final ContentResolver resolver, String token, String pseudo,
-                                           @Nullable Short limit, @Nullable ContentValues postData) {
+    public Database.SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
+                                           @Nullable String pseudo, @Nullable Short limit,
+                                           @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo +
-                ";limit: " + limit + ";postData: " + postData);
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
+                ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
 
         final Database.SyncResult syncResult = new Database.SyncResult();
         Bundle data = new Bundle();
 
         data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_MEMBERS);
         data.putString(DataTable.DATA_KEY_TOKEN, token);
-        data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
-        data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        data.putByte(DataTable.DATA_KEY_OPERATION, operation);
+        if (pseudo != null) { // Add status date criteria
+            data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
+            data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
+            data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        }
         String url = getUrlSynchroRequest(resolver, data);
 
         // Send remote DB request
@@ -153,7 +157,7 @@ public class CamaradesTable extends DataTable {
                             cursor.moveToFirst();
                             if (cursor.getCount() > 0) { // DB entry exists
 
-                                if (entry.getInt(WebServices.JSON_KEY_STATUS) == WebServices.STATUS_FIELD_DELETED) {
+                                if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
                                     cursor.close();
 
                                     ////// Delete entry (definitively)
@@ -290,7 +294,7 @@ public class CamaradesTable extends DataTable {
                             } else {
                                 cursor.close();
 
-                                if (entry.getInt(WebServices.JSON_KEY_STATUS) != WebServices.STATUS_FIELD_DELETED) {
+                                if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
                                     ////// Insert entry into DB
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,

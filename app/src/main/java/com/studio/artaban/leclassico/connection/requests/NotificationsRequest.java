@@ -95,14 +95,13 @@ public class NotificationsRequest extends DataRequest {
 
 
 
+        //Database.getTable(NotificationsTable.TABLE_NAME).synchronize()
+
+
 
 
 
         //mToSynchronize = false;
-
-
-
-
 
 
 

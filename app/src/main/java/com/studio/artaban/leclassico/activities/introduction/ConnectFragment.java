@@ -382,7 +382,8 @@ public class ConnectFragment extends RevealFragment {
                         if (isStopped()) return Boolean.FALSE;
                         publishProgress(tableId);
 
-                        if (Database.synchronize(tableId, resolver, mToken, mPseudo, null, null) == null) {
+                        Short limit = 0;
+                        if (Database.synchronize(tableId, resolver, mToken, mPseudo, limit, null) == null) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
                             publishProgress(STEP_ERROR);

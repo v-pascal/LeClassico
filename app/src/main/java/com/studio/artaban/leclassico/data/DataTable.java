@@ -20,6 +20,11 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public abstract class DataTable implements IDataTable {
 
+    protected static final int STATUS_FIELD_NEW = 0;
+    protected static final int STATUS_FIELD_UPDATED = 1;
+    protected static final int STATUS_FIELD_DELETED = 2;
+    // Status field IDs
+
     public static int getEntryCount(ContentResolver resolver, String table, String selection) {
     // Get entry count on specific table and according selection criteria
 
@@ -92,34 +97,41 @@ public abstract class DataTable implements IDataTable {
     protected static final String IS_NULL = " is null";
 
     // URL synchronization request data keys
-    public static final String DATA_KEY_WEB_SERVICE = "webService";
-    public static final String DATA_KEY_TOKEN = "token";
-    public static final String DATA_KEY_PSEUDO = "pseudo";
-    public static final String DATA_KEY_TABLE_NAME = "tableName";
-    public static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
-    public static final String DATA_KEY_LIMIT = "limit";
+    protected static final String DATA_KEY_WEB_SERVICE = "webService";
+    protected static final String DATA_KEY_TOKEN = "token";
+    protected static final String DATA_KEY_OPERATION = "operation";
+
+    protected static final String DATA_KEY_TABLE_NAME = "tableName";
+    protected static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
+    protected static final String DATA_KEY_PSEUDO = "pseudo";
+
+    protected static final String DATA_KEY_LIMIT = "limit";
 
     protected static String getUrlSynchroRequest(ContentResolver resolver, Bundle data) {
         // Return URL of synchronization request according table data
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
         String url = Constants.APP_WEBSERVICES + data.getString(DATA_KEY_WEB_SERVICE) + '?' +
-                WebServices.DATA_TOKEN + '=' + data.getString(DATA_KEY_TOKEN); // Add token to URL
+                WebServices.DATA_TOKEN + '=' + data.getString(DATA_KEY_TOKEN) + '?' + // Add token...
+                WebServices.DATA_OPERATION + '=' + data.getByte(DATA_KEY_OPERATION); // ...& operation
 
-        // Get last synchronization date
-        String statusDate = getMaxStatusDate(resolver, data);
-        if (statusDate != null) {
+        // Get last synchronization date (if needed)
+        if (data.containsKey(DATA_KEY_PSEUDO)) {
+            String statusDate = getMaxStatusDate(resolver, data);
+            if (statusDate != null) {
 
-            Logs.add(Logs.Type.I, "Previous status date: " + statusDate);
-            url += '&' + WebServices.DATA_DATE + '=' + statusDate.replace(' ', 'n');
+                Logs.add(Logs.Type.I, "Previous status date: " + statusDate);
+                url += '&' + WebServices.DATA_DATE + '=' + statusDate.replace(' ', 'n');
+            }
         }
-        if (data.containsKey(DATA_KEY_LIMIT))
+        if (data.containsKey(DATA_KEY_LIMIT)) // Add result limitation (if needed)
             url += '&' + WebServices.DATA_LIMIT + '=' + data.getShort(DATA_KEY_LIMIT);
 
         return url;
     }
 
     //////
-    public abstract Database.SyncResult synchronize(ContentResolver resolver, String token, String pseudo,
-                                                    @Nullable Short limit, @Nullable ContentValues postData);
+    public abstract Database.SyncResult synchronize(ContentResolver resolver, String token, byte operation,
+                                                    @Nullable String pseudo, @Nullable Short limit,
+                                                    @Nullable ContentValues postData);
 }

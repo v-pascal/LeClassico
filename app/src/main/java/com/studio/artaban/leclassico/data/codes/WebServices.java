@@ -6,7 +6,8 @@ package com.studio.artaban.leclassico.data.codes;
  */
 public final class WebServices {
 
-    ////// URL
+    ////// URL /////////////////////////////////////////////////////////////////////////////////////
+
     public static final String URL_CONNECTION = "/connexion.php"; // Connection web service
     public static final String URL_MEMBERS = "/camarades.php"; // Members web service
     public static final String URL_FOLLOWERS = "/abonnements.php"; // Followers web service
@@ -16,8 +17,17 @@ public final class WebServices {
     public static final String URL_COMMENTS = "/commentaires.php"; // Comments web service
 
 
-    ////// GET & POST data keys
+    ////// DB Operations ///////////////////////////////////////////////////////////////////////////
+
+    public static final byte OPERATION_SELECT = 1;
+    public static final byte OPERATION_UPDATE = 2;
+    public static final byte OPERATION_DELETE = 1;
+
+
+    ////// GET & POST //////////////////////////////////////////////////////////////////////////////
+
     public static final String DATA_TOKEN = "Clf";
+    public static final String DATA_OPERATION = "Ope";
     public static final String DATA_DATE = "Date";
     public static final String DATA_LIMIT = "Count";
 
@@ -27,7 +37,8 @@ public final class WebServices {
     public static final String CONNECTION_DATA_DATETIME = "odt";
 
 
-    ////// JSON keys
+    ////// JSON ////////////////////////////////////////////////////////////////////////////////////
+
     public static final String JSON_KEY_ERROR = "Error"; // JSON object error field (containing the web service error codes)
     public static final String JSON_KEY_STATUS = "Status"; // JSON object DB status field
 
@@ -36,11 +47,4 @@ public final class WebServices {
     public static final String JSON_KEY_PSEUDO = "Pseudo";
     public static final String JSON_KEY_TOKEN = "Token";
     public static final String JSON_KEY_TIME_LAG = "TimeLag";
-
-
-    ////// Status field IDs (eg. on 'Camarades' table the 'CAM_Status' field)
-    public static final int STATUS_FIELD_NEW = 0;
-    public static final int STATUS_FIELD_UPDATED = 1;
-    public static final int STATUS_FIELD_DELETED = 2;
-
 }
