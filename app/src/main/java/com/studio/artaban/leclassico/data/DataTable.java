@@ -40,10 +40,10 @@ public abstract class DataTable implements IDataTable {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";table: " + table + ";selection: " + selection);
         Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + table),
                 new String[]{IDataTable.DataField.COLUMN_ID}, selection, null, null);
-        result.moveToFirst();
-        int id = result.getInt(0);
-        if (result.getCount() > 1)
-            id = Constants.NO_DATA;
+
+        int id = Constants.NO_DATA;
+        if ((result.moveToFirst()) && (result.getCount() == 1))
+            id = result.getInt(0);
         result.close();
 
         return id;
@@ -78,8 +78,10 @@ public abstract class DataTable implements IDataTable {
                 new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ")" },
                 data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + '\'',
                 null, null);
-        cursor.moveToFirst();
-        String maxDate = cursor.getString(0);
+
+        String maxDate = null;
+        if (cursor.moveToFirst())
+            maxDate = cursor.getString(0);
         cursor.close();
 
         return maxDate;
