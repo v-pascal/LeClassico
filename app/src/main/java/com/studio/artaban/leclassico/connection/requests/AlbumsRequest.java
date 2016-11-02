@@ -5,8 +5,10 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
-import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.tables.AlbumsTable;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -17,7 +19,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class AlbumsRequest extends DataRequest {
 
     public AlbumsRequest(DataService service) {
-        super(service, AlbumsTable.TABLE_NAME, Tables.ID_ALBUMS);
+        super(service);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
@@ -41,6 +43,10 @@ public class AlbumsRequest extends DataRequest {
         if (!Internet.isConnected())
             return; // Nothing to do (without connection)
 
+        // Get login info
+        Login.Reply dataLogin = new Login.Reply();
+        mService.copyLoginData(dataLogin);
+
         if (data != null) { ////// Old data requested
             Logs.add(Logs.Type.I, "Old notifications requested");
 
@@ -63,9 +69,20 @@ public class AlbumsRequest extends DataRequest {
     public void synchronize() { // Update data from local to remote DB
         Logs.add(Logs.Type.V, null);
 
+        // Get login info
+        Login.Reply dataLogin = new Login.Reply();
+        mService.copyLoginData(dataLogin);
+
+        synchronized (mRegister) {
+            DataTable table = Database.getTable(AlbumsTable.TABLE_NAME);
 
 
 
 
+
+
+
+
+        }
     }
 }

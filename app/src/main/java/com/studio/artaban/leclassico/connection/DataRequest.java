@@ -30,17 +30,13 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     private TimerTask mTask; // Request timer task
     private boolean mCancelled; // Request timer task cancelled flag
 
-    protected DataService mService; // Data service
-    protected String mTable; // DB table name
-    protected byte mTableId; // DB table ID
+    protected final DataService mService; // Data service
 
-    public DataRequest(DataService service, String table, byte tableId) {
-        Logs.add(Logs.Type.V, "service: " + service + ";table: " + table);
+    public DataRequest(DataService service) {
+        Logs.add(Logs.Type.V, "service: " + service);
 
         mSyncObserver = new DataObserver("requestDataObserverThread", this);
         mService = service;
-        mTable = table;
-        mTableId = tableId;
     }
 
     //

@@ -69,6 +69,19 @@ public class MainActivity extends LoggedActivity implements
     private static final String DATA_KEY_SCROLL_OFFSET = "scrollOffset";
     // Data keys
 
+    private void startNotificationActivity() { // Start notification activity
+        Logs.add(Logs.Type.V, null);
+
+        if (mIsNotification) {
+
+            ////// Start notification activity
+            Intent notifyIntent = new Intent(this, NotifyActivity.class);
+            Login.copyExtraData(getIntent(), notifyIntent);
+            startActivity(notifyIntent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+
+        } else
+            Toast.makeText(this, R.string.no_notification, Toast.LENGTH_SHORT).show();
+    }
     private static int getShortcutID(int section, boolean newItem) {
     // Return shortcut fragment container ID according selected section
 
@@ -287,6 +300,12 @@ public class MainActivity extends LoggedActivity implements
 
                 break;
             }
+            case R.id.navig_notification: { // Display notification activity
+
+                Logs.add(Logs.Type.I, "Display notification");
+                startNotificationActivity();
+                break;
+            }
             case R.id.navig_settings: { // Display settings
                 Logs.add(Logs.Type.I, "Display settings");
 
@@ -465,6 +484,8 @@ public class MainActivity extends LoggedActivity implements
                 .setColorFilter(getResources().getColor(R.color.colorPrimaryProfile), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_location).getIcon()
                 .setColorFilter(getResources().getColor(R.color.colorPrimaryLocation), PorterDuff.Mode.SRC_ATOP);
+        navigation.getMenu().findItem(R.id.navig_notification).getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorPrimaryMain), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_settings).getIcon()
                 .setColorFilter(getResources().getColor(R.color.colorPrimarySetting), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_logout).getIcon()
@@ -716,17 +737,9 @@ public class MainActivity extends LoggedActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Logs.add(Logs.Type.V, "item: " + item);
-
         if (item.getItemId() == R.id.mnu_notification) {
-            if (mIsNotification) {
 
-                ////// Start notification activity
-                Intent notifyIntent = new Intent(this, NotifyActivity.class);
-                Login.copyExtraData(getIntent(), notifyIntent);
-                startActivity(notifyIntent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-
-            } else
-                Toast.makeText(this, R.string.no_notification, Toast.LENGTH_SHORT).show();
+            startNotificationActivity();
             return true;
         }
         return super.onOptionsItemSelected(item);

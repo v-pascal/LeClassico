@@ -301,6 +301,19 @@ public class NotificationsTable extends DataTable {
                 });
         if (result != Internet.DownloadResult.SUCCEEDED) {
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
+
+
+
+
+
+
+
+
+
+
+
+
+
             return null;
         }
         return syncResult;

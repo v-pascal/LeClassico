@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.connection.requests;
 
+import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -23,7 +24,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class NotificationsRequest extends DataRequest {
 
     public NotificationsRequest(DataService service) {
-        super(service, NotificationsTable.TABLE_NAME, Tables.ID_NOTIFICATIONS);
+        super(service);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
@@ -72,7 +73,7 @@ public class NotificationsRequest extends DataRequest {
             int prevNewNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
 
             // Synchronization (from remote to local DB)
-            DataTable.SyncResult result = Database.getTable(Tables.getName(mTableId))
+            DataTable.SyncResult result = Database.getTable(NotificationsTable.TABLE_NAME)
                     .synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_SELECT,
                             dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
             if (DataTable.SyncResult.hasChanged(result)) {
@@ -95,19 +96,49 @@ public class NotificationsRequest extends DataRequest {
         mService.copyLoginData(dataLogin);
 
         synchronized (mRegister) {
+            DataTable table = Database.getTable(NotificationsTable.TABLE_NAME);
 
+            // Synchronize inserted rows
+            setSyncInProgress(NotificationsTable.TABLE_NAME,
+                    NotificationsTable.COLUMN_PSEUDO + '=' + dataLogin.pseudo + '\'',
+                    DataTable.Synchronized.TO_INSERT.getValue());
 
+            ContentValues operationData =
+                    table.syncInserted(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+            if ((operationData.size() > 0) &&
+                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_INSERT,
+                    dataLogin.pseudo, null, operationData) == null)) {
 
-            //setSyncInProgress(NotificationsTable.TABLE_NAME, "", DataTable.Synchronized.TO_UPDATE.getValue());
+                Logs.add(Logs.Type.E, "Synchronization #" + Tables.ID_NOTIFICATIONS + " error (inserted)");
+                return;
+            }
 
+            // Synchronize updated rows
+            setSyncInProgress(NotificationsTable.TABLE_NAME,
+                    NotificationsTable.COLUMN_PSEUDO + '=' + dataLogin.pseudo + '\'',
+                    DataTable.Synchronized.TO_UPDATE.getValue());
 
-            // Synchronization (from local to remote DB)
+            operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+            if ((operationData.size() > 0) &&
+                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_UPDATE,
+                    dataLogin.pseudo, null, operationData) == null)) {
 
-            //Database.getTable(NotificationsTable.TABLE_NAME).synchronize()
+                Logs.add(Logs.Type.E, "Synchronization #" + Tables.ID_NOTIFICATIONS + " error (updated)");
+                return;
+            }
 
+            // Synchronize deleted rows
+            setSyncInProgress(NotificationsTable.TABLE_NAME,
+                    NotificationsTable.COLUMN_PSEUDO + '=' + dataLogin.pseudo + '\'',
+                    DataTable.Synchronized.TO_DELETE.getValue());
 
+            operationData = table.syncInserted(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+            if ((operationData.size() > 0) &&
+                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_DELETE,
+                    dataLogin.pseudo, null, operationData) == null)) {
 
-
+                Logs.add(Logs.Type.E, "Synchronization #" + Tables.ID_NOTIFICATIONS + " error (deleted)");
+            }
         }
     }
 }

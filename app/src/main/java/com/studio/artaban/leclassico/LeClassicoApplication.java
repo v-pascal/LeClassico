@@ -9,7 +9,9 @@ import android.app.Application;
 public class LeClassicoApplication extends Application {
 
     private static LeClassicoApplication ourInstance;
-    public static LeClassicoApplication getInstance() { return ourInstance; }
+    public static LeClassicoApplication getInstance() {
+        return ourInstance;
+    }
 
     //////
     @Override
