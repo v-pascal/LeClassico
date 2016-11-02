@@ -15,7 +15,6 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
-import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -52,16 +51,261 @@ public class CamaradesTable extends DataTable {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public Database.SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
-                                           @Nullable String pseudo, @Nullable Short limit,
-                                           @Nullable ContentValues postData) {
+    public int insert(SQLiteDatabase db, Object[] data) {
+        return 0;
+    }
+    @Override
+    public boolean update(SQLiteDatabase db, Object data) {
+        return false;
+    }
+    @Override
+    public int delete(SQLiteDatabase db, long[] keys) {
+        return 0;
+    }
+    @Override
+    public int getEntryCount(SQLiteDatabase db) {
+        return 0;
+    }
+    @Override
+    public <T> List<T> getAllEntries(SQLiteDatabase db) {
+        return null;
+    }
+
+    //////
+    public static final String TABLE_NAME = "Camarades";
+
+    // Columns
+    public static final String COLUMN_PSEUDO = "CAM_Pseudo";
+    public static final String COLUMN_CODE_CONF = "CAM_CodeConf";
+    public static final String COLUMN_CODE_CONF_UPD = "CAM_CodeConfUPD";
+    public static final String COLUMN_NOM = "CAM_Nom";
+    public static final String COLUMN_NOM_UPD = "CAM_NomUPD";
+    public static final String COLUMN_PRENOM = "CAM_Prenom";
+    public static final String COLUMN_PRENOM_UPD = "CAM_PrenomUPD";
+    public static final String COLUMN_SEXE = "CAM_Sexe";
+    public static final String COLUMN_SEXE_UPD = "CAM_SexeUPD";
+    public static final String COLUMN_BORN_DATE = "CAM_BornDate";
+    public static final String COLUMN_BORN_DATE_UPD = "CAM_BornDateUPD";
+    public static final String COLUMN_ADRESSE = "CAM_Adresse";
+    public static final String COLUMN_ADRESSE_UPD = "CAM_AdresseUPD";
+    public static final String COLUMN_VILLE = "CAM_Ville";
+    public static final String COLUMN_VILLE_UPD = "CAM_VilleUPD";
+    public static final String COLUMN_POSTAL = "CAM_Postal";
+    public static final String COLUMN_POSTAL_UPD = "CAM_PostalUPD";
+    public static final String COLUMN_EMAIL = "CAM_Email";
+    public static final String COLUMN_EMAIL_UPD = "CAM_EmailUPD";
+    public static final String COLUMN_HOBBIES = "CAM_Hobbies";
+    public static final String COLUMN_HOBBIES_UPD = "CAM_HobbiesUPD";
+    public static final String COLUMN_A_PROPOS = "CAM_APropos";
+    public static final String COLUMN_A_PROPOS_UPD = "CAM_AProposUPD";
+    public static final String COLUMN_LOG_DATE = "CAM_LogDate";
+    public static final String COLUMN_LOG_DATE_UPD = "CAM_LogDateUPD";
+    public static final String COLUMN_ADMIN = "CAM_Admin";
+    public static final String COLUMN_ADMIN_UPD = "CAM_AdminUPD";
+    public static final String COLUMN_PROFILE = "CAM_Profile";
+    public static final String COLUMN_PROFILE_UPD = "CAM_ProfileUPD";
+    public static final String COLUMN_BANNER = "CAM_Banner";
+    public static final String COLUMN_BANNER_UPD = "CAM_BannerUPD";
+    public static final String COLUMN_LOCATED = "CAM_Located";
+    public static final String COLUMN_LOCATED_UPD = "CAM_LocatedUPD";
+    public static final String COLUMN_LATITUDE = "CAM_Latitude";
+    public static final String COLUMN_LATITUDE_UPD = "CAM_LatitudeUPD";
+    public static final String COLUMN_LONGITUDE = "CAM_Longitude";
+    public static final String COLUMN_LONGITUDE_UPD = "CAM_LongitudeUPD";
+    private static final String COLUMN_STATUS_DATE = "CAM_StatusDate";
+
+    // Columns index
+    private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
+    private static final short COLUMN_INDEX_CODE_CONF = 2;
+    private static final short COLUMN_INDEX_CODE_CONF_UPD = 3;
+    private static final short COLUMN_INDEX_NOM = 4;
+    private static final short COLUMN_INDEX_NOM_UPD = 5;
+    private static final short COLUMN_INDEX_PRENOM = 6;
+    private static final short COLUMN_INDEX_PRENOM_UPD = 7;
+    private static final short COLUMN_INDEX_SEXE = 8;
+    private static final short COLUMN_INDEX_SEXE_UPD = 9;
+    private static final short COLUMN_INDEX_BORN_DATE = 10;
+    private static final short COLUMN_INDEX_BORN_DATE_UPD = 11;
+    private static final short COLUMN_INDEX_ADRESSE = 12;
+    private static final short COLUMN_INDEX_ADRESSE_UPD = 13;
+    private static final short COLUMN_INDEX_VILLE = 14;
+    private static final short COLUMN_INDEX_VILLE_UPD = 15;
+    private static final short COLUMN_INDEX_POSTAL = 16;
+    private static final short COLUMN_INDEX_POSTAL_UPD = 17;
+    private static final short COLUMN_INDEX_EMAIL = 18;
+    private static final short COLUMN_INDEX_EMAIL_UPD = 19;
+    private static final short COLUMN_INDEX_HOBBIES = 20;
+    private static final short COLUMN_INDEX_HOBBIES_UPD = 21;
+    private static final short COLUMN_INDEX_A_PROPOS = 22;
+    private static final short COLUMN_INDEX_A_PROPOS_UPD = 23;
+    private static final short COLUMN_INDEX_LOG_DATE = 24;
+    private static final short COLUMN_INDEX_LOG_DATE_UPD = 25;
+    private static final short COLUMN_INDEX_ADMIN = 26;
+    private static final short COLUMN_INDEX_ADMIN_UPD = 27;
+    private static final short COLUMN_INDEX_PROFILE = 28;
+    private static final short COLUMN_INDEX_PROFILE_UPD = 29;
+    private static final short COLUMN_INDEX_BANNER = 30;
+    private static final short COLUMN_INDEX_BANNER_UPD = 31;
+    private static final short COLUMN_INDEX_LOCATED = 32;
+    private static final short COLUMN_INDEX_LOCATED_UPD = 33;
+    private static final short COLUMN_INDEX_LATITUDE = 34;
+    private static final short COLUMN_INDEX_LATITUDE_UPD = 35;
+    private static final short COLUMN_INDEX_LONGITUDE = 36;
+    private static final short COLUMN_INDEX_LONGITUDE_UPD = 37;
+    private static final short COLUMN_INDEX_STATUS_DATE = 38;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 39;
+
+    //
+    private CamaradesTable() { }
+    public static CamaradesTable newInstance() { return new CamaradesTable(); }
+
+    @Override
+    public void create(SQLiteDatabase db) {
+
+        Logs.add(Logs.Type.V, "db: " + db);
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                DataField.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                COLUMN_PSEUDO + " TEXT NOT NULL," +
+                COLUMN_CODE_CONF + " TEXT NOT NULL," +
+                COLUMN_CODE_CONF_UPD + " TEXT NOT NULL," +
+                COLUMN_NOM + " TEXT," +
+                COLUMN_NOM_UPD + " TEXT NOT NULL," +
+                COLUMN_PRENOM + " TEXT," +
+                COLUMN_PRENOM_UPD + " TEXT NOT NULL," +
+                COLUMN_SEXE + " INTEGER," +
+                COLUMN_SEXE_UPD + " TEXT NOT NULL," +
+                COLUMN_BORN_DATE + " TEXT," +
+                COLUMN_BORN_DATE_UPD + " TEXT NOT NULL," +
+                COLUMN_ADRESSE + " TEXT," +
+                COLUMN_ADRESSE_UPD + " TEXT NOT NULL," +
+                COLUMN_VILLE + " TEXT," +
+                COLUMN_VILLE_UPD + " TEXT NOT NULL," +
+                COLUMN_POSTAL + " TEXT," +
+                COLUMN_POSTAL_UPD + " TEXT NOT NULL," +
+                COLUMN_EMAIL + " TEXT," +
+                COLUMN_EMAIL_UPD + " TEXT NOT NULL," +
+                COLUMN_HOBBIES + " TEXT," +
+                COLUMN_HOBBIES_UPD + " TEXT NOT NULL," +
+                COLUMN_A_PROPOS + " TEXT," +
+                COLUMN_A_PROPOS_UPD + " TEXT NOT NULL," +
+                COLUMN_LOG_DATE + " TEXT," +
+                COLUMN_LOG_DATE_UPD + " TEXT NOT NULL," +
+                COLUMN_ADMIN + " INTEGER NOT NULL," +
+                COLUMN_ADMIN_UPD + " TEXT NOT NULL," +
+                COLUMN_PROFILE + " TEXT," +
+                COLUMN_PROFILE_UPD + " TEXT NOT NULL," +
+                COLUMN_BANNER + " TEXT," +
+                COLUMN_BANNER_UPD + " TEXT NOT NULL," +
+                COLUMN_LOCATED + " INTEGER NOT NULL," +
+                COLUMN_LOCATED_UPD + " TEXT NOT NULL," +
+                COLUMN_LATITUDE + " REAL," +
+                COLUMN_LATITUDE_UPD + " TEXT NOT NULL," +
+                COLUMN_LONGITUDE + " REAL," +
+                COLUMN_LONGITUDE_UPD + " TEXT NOT NULL," +
+
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
+                Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
+
+                ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " +
+                TABLE_NAME + "(" + COLUMN_PSEUDO + ")");
+    }
+    @Override
+    public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        Logs.add(Logs.Type.V, "db: " + db);
+        Logs.add(Logs.Type.W, "Upgrade '" + TABLE_NAME + "' table from " + oldVersion + " to " +
+                newVersion + " version: old data will be destroyed!");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        create(db);
+    }
+
+    ////// DataTable ///////////////////////////////////////////////////////////////////////////////
+    @Override
+    public ContentValues syncInserted(ContentResolver resolver, String token, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+
+
+
+
+        ContentValues inserted = new ContentValues();
+        return inserted;
+    }
+    @Override
+    public ContentValues syncUpdated(ContentResolver resolver, String token, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+
+
+
+
+        ContentValues updated = new ContentValues();
+        return updated;
+    }
+    @Override
+    public ContentValues syncDeleted(ContentResolver resolver, String token, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+
+
+
+
+        ContentValues deleted = new ContentValues();
+        return deleted;
+    }
+
+    // JSON keys
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_CODE_CONF = COLUMN_CODE_CONF.substring(4);
+    private static final String JSON_KEY_CODE_CONF_UPD = COLUMN_CODE_CONF_UPD.substring(4);
+    private static final String JSON_KEY_NOM = COLUMN_NOM.substring(4);
+    private static final String JSON_KEY_NOM_UPD = COLUMN_NOM_UPD.substring(4);
+    private static final String JSON_KEY_PRENOM = COLUMN_PRENOM.substring(4);
+    private static final String JSON_KEY_PRENOM_UPD = COLUMN_PRENOM_UPD.substring(4);
+    private static final String JSON_KEY_SEXE = COLUMN_SEXE.substring(4);
+    private static final String JSON_KEY_SEXE_UPD = COLUMN_SEXE_UPD.substring(4);
+    private static final String JSON_KEY_BORN_DATE = COLUMN_BORN_DATE.substring(4);
+    private static final String JSON_KEY_BORN_DATE_UPD = COLUMN_BORN_DATE_UPD.substring(4);
+    private static final String JSON_KEY_ADRESSE = COLUMN_ADRESSE.substring(4);
+    private static final String JSON_KEY_ADRESSE_UPD = COLUMN_ADRESSE_UPD.substring(4);
+    private static final String JSON_KEY_VILLE = COLUMN_VILLE.substring(4);
+    private static final String JSON_KEY_VILLE_UPD = COLUMN_VILLE_UPD.substring(4);
+    private static final String JSON_KEY_POSTAL = COLUMN_POSTAL.substring(4);
+    private static final String JSON_KEY_POSTAL_UPD = COLUMN_POSTAL_UPD.substring(4);
+    private static final String JSON_KEY_EMAIL = COLUMN_EMAIL.substring(4);
+    private static final String JSON_KEY_EMAIL_UPD = COLUMN_EMAIL_UPD.substring(4);
+    private static final String JSON_KEY_HOBBIES = COLUMN_HOBBIES.substring(4);
+    private static final String JSON_KEY_HOBBIES_UPD = COLUMN_HOBBIES_UPD.substring(4);
+    private static final String JSON_KEY_A_PROPOS = COLUMN_A_PROPOS.substring(4);
+    private static final String JSON_KEY_A_PROPOS_UPD = COLUMN_A_PROPOS_UPD.substring(4);
+    private static final String JSON_KEY_LOG_DATE = COLUMN_LOG_DATE.substring(4);
+    private static final String JSON_KEY_LOG_DATE_UPD = COLUMN_LOG_DATE_UPD.substring(4);
+    private static final String JSON_KEY_ADMIN = COLUMN_ADMIN.substring(4);
+    private static final String JSON_KEY_ADMIN_UPD = COLUMN_ADMIN_UPD.substring(4);
+    private static final String JSON_KEY_PROFILE = COLUMN_PROFILE.substring(4);
+    private static final String JSON_KEY_PROFILE_UPD = COLUMN_PROFILE_UPD.substring(4);
+    private static final String JSON_KEY_BANNER = COLUMN_BANNER.substring(4);
+    private static final String JSON_KEY_BANNER_UPD = COLUMN_BANNER_UPD.substring(4);
+    private static final String JSON_KEY_LOCATED = COLUMN_LOCATED.substring(4);
+    private static final String JSON_KEY_LOCATED_UPD = COLUMN_LOCATED_UPD.substring(4);
+    private static final String JSON_KEY_LATITUDE = COLUMN_LATITUDE.substring(4);
+    private static final String JSON_KEY_LATITUDE_UPD = COLUMN_LATITUDE_UPD.substring(4);
+    private static final String JSON_KEY_LONGITUDE = COLUMN_LONGITUDE.substring(4);
+    private static final String JSON_KEY_LONGITUDE_UPD = COLUMN_LONGITUDE_UPD.substring(4);
+    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
+
+    @Override
+    public SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
+                                  @Nullable String pseudo, @Nullable Short limit,
+                                  @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
                 ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
 
-        final Database.SyncResult syncResult = new Database.SyncResult();
+        final SyncResult syncResult = new SyncResult();
         Bundle data = new Bundle();
 
         data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_MEMBERS);
@@ -72,7 +316,7 @@ public class CamaradesTable extends DataTable {
             data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
             data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         }
-        String url = getUrlSynchroRequest(resolver, data);
+        String url = getSyncUrlRequest(resolver, data);
 
         // Send remote DB request
         Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
@@ -327,219 +571,5 @@ public class CamaradesTable extends DataTable {
             return null;
         }
         return syncResult;
-    }
-
-    //
-    @Override
-    public int insert(SQLiteDatabase db, Object[] data) {
-        return 0;
-    }
-    @Override
-    public boolean update(SQLiteDatabase db, Object data) {
-        return false;
-    }
-    @Override
-    public int delete(SQLiteDatabase db, long[] keys) {
-        return 0;
-    }
-    @Override
-    public int getEntryCount(SQLiteDatabase db) {
-        return 0;
-    }
-    @Override
-    public <T> List<T> getAllEntries(SQLiteDatabase db) {
-        return null;
-    }
-
-    //////
-    public static final String TABLE_NAME = "Camarades";
-
-    // Columns
-    public static final String COLUMN_PSEUDO = "CAM_Pseudo";
-    public static final String COLUMN_CODE_CONF = "CAM_CodeConf";
-    public static final String COLUMN_CODE_CONF_UPD = "CAM_CodeConfUPD";
-    public static final String COLUMN_NOM = "CAM_Nom";
-    public static final String COLUMN_NOM_UPD = "CAM_NomUPD";
-    public static final String COLUMN_PRENOM = "CAM_Prenom";
-    public static final String COLUMN_PRENOM_UPD = "CAM_PrenomUPD";
-    public static final String COLUMN_SEXE = "CAM_Sexe";
-    public static final String COLUMN_SEXE_UPD = "CAM_SexeUPD";
-    public static final String COLUMN_BORN_DATE = "CAM_BornDate";
-    public static final String COLUMN_BORN_DATE_UPD = "CAM_BornDateUPD";
-    public static final String COLUMN_ADRESSE = "CAM_Adresse";
-    public static final String COLUMN_ADRESSE_UPD = "CAM_AdresseUPD";
-    public static final String COLUMN_VILLE = "CAM_Ville";
-    public static final String COLUMN_VILLE_UPD = "CAM_VilleUPD";
-    public static final String COLUMN_POSTAL = "CAM_Postal";
-    public static final String COLUMN_POSTAL_UPD = "CAM_PostalUPD";
-    public static final String COLUMN_EMAIL = "CAM_Email";
-    public static final String COLUMN_EMAIL_UPD = "CAM_EmailUPD";
-    public static final String COLUMN_HOBBIES = "CAM_Hobbies";
-    public static final String COLUMN_HOBBIES_UPD = "CAM_HobbiesUPD";
-    public static final String COLUMN_A_PROPOS = "CAM_APropos";
-    public static final String COLUMN_A_PROPOS_UPD = "CAM_AProposUPD";
-    public static final String COLUMN_LOG_DATE = "CAM_LogDate";
-    public static final String COLUMN_LOG_DATE_UPD = "CAM_LogDateUPD";
-    public static final String COLUMN_ADMIN = "CAM_Admin";
-    public static final String COLUMN_ADMIN_UPD = "CAM_AdminUPD";
-    public static final String COLUMN_PROFILE = "CAM_Profile";
-    public static final String COLUMN_PROFILE_UPD = "CAM_ProfileUPD";
-    public static final String COLUMN_BANNER = "CAM_Banner";
-    public static final String COLUMN_BANNER_UPD = "CAM_BannerUPD";
-    public static final String COLUMN_LOCATED = "CAM_Located";
-    public static final String COLUMN_LOCATED_UPD = "CAM_LocatedUPD";
-    public static final String COLUMN_LATITUDE = "CAM_Latitude";
-    public static final String COLUMN_LATITUDE_UPD = "CAM_LatitudeUPD";
-    public static final String COLUMN_LONGITUDE = "CAM_Longitude";
-    public static final String COLUMN_LONGITUDE_UPD = "CAM_LongitudeUPD";
-    private static final String COLUMN_STATUS_DATE = "CAM_StatusDate";
-
-    // Columns index
-    private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
-    private static final short COLUMN_INDEX_CODE_CONF = 2;
-    private static final short COLUMN_INDEX_CODE_CONF_UPD = 3;
-    private static final short COLUMN_INDEX_NOM = 4;
-    private static final short COLUMN_INDEX_NOM_UPD = 5;
-    private static final short COLUMN_INDEX_PRENOM = 6;
-    private static final short COLUMN_INDEX_PRENOM_UPD = 7;
-    private static final short COLUMN_INDEX_SEXE = 8;
-    private static final short COLUMN_INDEX_SEXE_UPD = 9;
-    private static final short COLUMN_INDEX_BORN_DATE = 10;
-    private static final short COLUMN_INDEX_BORN_DATE_UPD = 11;
-    private static final short COLUMN_INDEX_ADRESSE = 12;
-    private static final short COLUMN_INDEX_ADRESSE_UPD = 13;
-    private static final short COLUMN_INDEX_VILLE = 14;
-    private static final short COLUMN_INDEX_VILLE_UPD = 15;
-    private static final short COLUMN_INDEX_POSTAL = 16;
-    private static final short COLUMN_INDEX_POSTAL_UPD = 17;
-    private static final short COLUMN_INDEX_EMAIL = 18;
-    private static final short COLUMN_INDEX_EMAIL_UPD = 19;
-    private static final short COLUMN_INDEX_HOBBIES = 20;
-    private static final short COLUMN_INDEX_HOBBIES_UPD = 21;
-    private static final short COLUMN_INDEX_A_PROPOS = 22;
-    private static final short COLUMN_INDEX_A_PROPOS_UPD = 23;
-    private static final short COLUMN_INDEX_LOG_DATE = 24;
-    private static final short COLUMN_INDEX_LOG_DATE_UPD = 25;
-    private static final short COLUMN_INDEX_ADMIN = 26;
-    private static final short COLUMN_INDEX_ADMIN_UPD = 27;
-    private static final short COLUMN_INDEX_PROFILE = 28;
-    private static final short COLUMN_INDEX_PROFILE_UPD = 29;
-    private static final short COLUMN_INDEX_BANNER = 30;
-    private static final short COLUMN_INDEX_BANNER_UPD = 31;
-    private static final short COLUMN_INDEX_LOCATED = 32;
-    private static final short COLUMN_INDEX_LOCATED_UPD = 33;
-    private static final short COLUMN_INDEX_LATITUDE = 34;
-    private static final short COLUMN_INDEX_LATITUDE_UPD = 35;
-    private static final short COLUMN_INDEX_LONGITUDE = 36;
-    private static final short COLUMN_INDEX_LONGITUDE_UPD = 37;
-    private static final short COLUMN_INDEX_STATUS_DATE = 38;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 39;
-
-    // JSON keys
-    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
-    private static final String JSON_KEY_CODE_CONF = COLUMN_CODE_CONF.substring(4);
-    private static final String JSON_KEY_CODE_CONF_UPD = COLUMN_CODE_CONF_UPD.substring(4);
-    private static final String JSON_KEY_NOM = COLUMN_NOM.substring(4);
-    private static final String JSON_KEY_NOM_UPD = COLUMN_NOM_UPD.substring(4);
-    private static final String JSON_KEY_PRENOM = COLUMN_PRENOM.substring(4);
-    private static final String JSON_KEY_PRENOM_UPD = COLUMN_PRENOM_UPD.substring(4);
-    private static final String JSON_KEY_SEXE = COLUMN_SEXE.substring(4);
-    private static final String JSON_KEY_SEXE_UPD = COLUMN_SEXE_UPD.substring(4);
-    private static final String JSON_KEY_BORN_DATE = COLUMN_BORN_DATE.substring(4);
-    private static final String JSON_KEY_BORN_DATE_UPD = COLUMN_BORN_DATE_UPD.substring(4);
-    private static final String JSON_KEY_ADRESSE = COLUMN_ADRESSE.substring(4);
-    private static final String JSON_KEY_ADRESSE_UPD = COLUMN_ADRESSE_UPD.substring(4);
-    private static final String JSON_KEY_VILLE = COLUMN_VILLE.substring(4);
-    private static final String JSON_KEY_VILLE_UPD = COLUMN_VILLE_UPD.substring(4);
-    private static final String JSON_KEY_POSTAL = COLUMN_POSTAL.substring(4);
-    private static final String JSON_KEY_POSTAL_UPD = COLUMN_POSTAL_UPD.substring(4);
-    private static final String JSON_KEY_EMAIL = COLUMN_EMAIL.substring(4);
-    private static final String JSON_KEY_EMAIL_UPD = COLUMN_EMAIL_UPD.substring(4);
-    private static final String JSON_KEY_HOBBIES = COLUMN_HOBBIES.substring(4);
-    private static final String JSON_KEY_HOBBIES_UPD = COLUMN_HOBBIES_UPD.substring(4);
-    private static final String JSON_KEY_A_PROPOS = COLUMN_A_PROPOS.substring(4);
-    private static final String JSON_KEY_A_PROPOS_UPD = COLUMN_A_PROPOS_UPD.substring(4);
-    private static final String JSON_KEY_LOG_DATE = COLUMN_LOG_DATE.substring(4);
-    private static final String JSON_KEY_LOG_DATE_UPD = COLUMN_LOG_DATE_UPD.substring(4);
-    private static final String JSON_KEY_ADMIN = COLUMN_ADMIN.substring(4);
-    private static final String JSON_KEY_ADMIN_UPD = COLUMN_ADMIN_UPD.substring(4);
-    private static final String JSON_KEY_PROFILE = COLUMN_PROFILE.substring(4);
-    private static final String JSON_KEY_PROFILE_UPD = COLUMN_PROFILE_UPD.substring(4);
-    private static final String JSON_KEY_BANNER = COLUMN_BANNER.substring(4);
-    private static final String JSON_KEY_BANNER_UPD = COLUMN_BANNER_UPD.substring(4);
-    private static final String JSON_KEY_LOCATED = COLUMN_LOCATED.substring(4);
-    private static final String JSON_KEY_LOCATED_UPD = COLUMN_LOCATED_UPD.substring(4);
-    private static final String JSON_KEY_LATITUDE = COLUMN_LATITUDE.substring(4);
-    private static final String JSON_KEY_LATITUDE_UPD = COLUMN_LATITUDE_UPD.substring(4);
-    private static final String JSON_KEY_LONGITUDE = COLUMN_LONGITUDE.substring(4);
-    private static final String JSON_KEY_LONGITUDE_UPD = COLUMN_LONGITUDE_UPD.substring(4);
-    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
-
-    //
-    private CamaradesTable() { }
-    public static CamaradesTable newInstance() { return new CamaradesTable(); }
-
-    @Override
-    public void create(SQLiteDatabase db) {
-
-        Logs.add(Logs.Type.V, "db: " + db);
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
-                DataField.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-
-                COLUMN_PSEUDO + " TEXT NOT NULL," +
-                COLUMN_CODE_CONF + " TEXT NOT NULL," +
-                COLUMN_CODE_CONF_UPD + " TEXT NOT NULL," +
-                COLUMN_NOM + " TEXT," +
-                COLUMN_NOM_UPD + " TEXT NOT NULL," +
-                COLUMN_PRENOM + " TEXT," +
-                COLUMN_PRENOM_UPD + " TEXT NOT NULL," +
-                COLUMN_SEXE + " INTEGER," +
-                COLUMN_SEXE_UPD + " TEXT NOT NULL," +
-                COLUMN_BORN_DATE + " TEXT," +
-                COLUMN_BORN_DATE_UPD + " TEXT NOT NULL," +
-                COLUMN_ADRESSE + " TEXT," +
-                COLUMN_ADRESSE_UPD + " TEXT NOT NULL," +
-                COLUMN_VILLE + " TEXT," +
-                COLUMN_VILLE_UPD + " TEXT NOT NULL," +
-                COLUMN_POSTAL + " TEXT," +
-                COLUMN_POSTAL_UPD + " TEXT NOT NULL," +
-                COLUMN_EMAIL + " TEXT," +
-                COLUMN_EMAIL_UPD + " TEXT NOT NULL," +
-                COLUMN_HOBBIES + " TEXT," +
-                COLUMN_HOBBIES_UPD + " TEXT NOT NULL," +
-                COLUMN_A_PROPOS + " TEXT," +
-                COLUMN_A_PROPOS_UPD + " TEXT NOT NULL," +
-                COLUMN_LOG_DATE + " TEXT," +
-                COLUMN_LOG_DATE_UPD + " TEXT NOT NULL," +
-                COLUMN_ADMIN + " INTEGER NOT NULL," +
-                COLUMN_ADMIN_UPD + " TEXT NOT NULL," +
-                COLUMN_PROFILE + " TEXT," +
-                COLUMN_PROFILE_UPD + " TEXT NOT NULL," +
-                COLUMN_BANNER + " TEXT," +
-                COLUMN_BANNER_UPD + " TEXT NOT NULL," +
-                COLUMN_LOCATED + " INTEGER NOT NULL," +
-                COLUMN_LOCATED_UPD + " TEXT NOT NULL," +
-                COLUMN_LATITUDE + " REAL," +
-                COLUMN_LATITUDE_UPD + " TEXT NOT NULL," +
-                COLUMN_LONGITUDE + " REAL," +
-                COLUMN_LONGITUDE_UPD + " TEXT NOT NULL," +
-
-                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
-                Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
-
-                ");");
-
-        // Add indexes
-        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " +
-                TABLE_NAME + "(" + COLUMN_PSEUDO + ")");
-    }
-    @Override
-    public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        Logs.add(Logs.Type.V, "db: " + db);
-        Logs.add(Logs.Type.W, "Upgrade '" + TABLE_NAME + "' table from " + oldVersion + " to " +
-                newVersion + " version: old data will be destroyed!");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        create(db);
     }
 }

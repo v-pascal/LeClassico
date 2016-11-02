@@ -299,10 +299,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
     private void startDataRequests() { // Schedule data requests
         Logs.add(Logs.Type.V, null);
-
         for (DataRequest request : mDataRequests) {
-            if (request.toSynchronize())
-                request.synchronize(); // Synchronize from local to remote DB
+
+            request.synchronize(); // Synchronize from local to remote DB
 
             TimerTask task = request.getTask();
             if (task != null)

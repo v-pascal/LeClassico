@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
-import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.List;
@@ -37,30 +36,6 @@ public class AlbumsTable extends DataTable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public Database.SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
-                                           @Nullable String pseudo, @Nullable Short limit,
-                                           @Nullable ContentValues postData) {
-
-        // Synchronize data from remote to local DB (return inserted, deleted or
-        // updated entry count & NO_DATA if error)
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
-                ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
-
-
-
-
-
-
-
-
-
-
-        Database.SyncResult syncResult = new Database.SyncResult();
-        return syncResult;
-    }
-
-    //
     @Override
     public int insert(SQLiteDatabase db, Object[] data) {
         return 0;
@@ -144,5 +119,59 @@ public class AlbumsTable extends DataTable {
                 newVersion + " version: old data will be destroyed!");
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         create(db);
+    }
+
+    ////// DataTable ///////////////////////////////////////////////////////////////////////////////
+    @Override
+    public ContentValues syncInserted(ContentResolver resolver, String token, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+
+
+
+
+        ContentValues inserted = new ContentValues();
+        return inserted;
+    }
+    @Override
+    public ContentValues syncUpdated(ContentResolver resolver, String token, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+
+
+
+
+        ContentValues updated = new ContentValues();
+        return updated;
+    }
+    @Override
+    public ContentValues syncDeleted(ContentResolver resolver, String token, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+
+
+
+
+        ContentValues deleted = new ContentValues();
+        return deleted;
+    }
+
+    // JSON keys
+
+    @Override
+    public SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
+                                  @Nullable String pseudo, @Nullable Short limit,
+                                  @Nullable ContentValues postData) {
+
+        // Synchronize data from remote to local DB (return inserted, deleted or
+        // updated entry count & NO_DATA if error)
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
+                ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
+
+
+
+
+
+
+
+        final SyncResult syncResult = new SyncResult();
+        return syncResult;
     }
 }

@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
-import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -20,24 +19,6 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public abstract class DataTable implements IDataTable {
 
-    protected static final int STATUS_FIELD_NEW = 0;
-    protected static final int STATUS_FIELD_UPDATED = 1;
-    protected static final int STATUS_FIELD_DELETED = 2;
-    // Status field IDs (remote DB)
-
-    public enum Synchronized { // Synchronized field values (local DB)
-
-        DONE((byte)0x00), // Synchronized
-        TO_INSERT((byte)0x01), TO_UPDATE((byte)0x02), TO_DELETE((byte)0x03), // Operations
-        IN_PROGRESS((byte)0x10); // In progress status mask (only combined with an operation)
-
-        //
-        private final byte id;
-        Synchronized(byte id) { this.id = id; }
-        public byte getValue() { return this.id; }
-    }
-
-    //////
     public static int getEntryCount(ContentResolver resolver, String table, String selection) {
     // Get entry count on specific table and according selection criteria
 
@@ -50,7 +31,6 @@ public abstract class DataTable implements IDataTable {
 
         return count;
     }
-
     public static int getEntryId(ContentResolver resolver, String table, String selection) {
     // Get entry Id on specific table and according selection criteria
     // NB: Returns NO_DATA if more than one record is found with selection criteria
@@ -66,6 +46,24 @@ public abstract class DataTable implements IDataTable {
 
         return id;
     }
+    public static String getMaxStatusDate(ContentResolver resolver, Bundle data) {
+    // Return max status date found into table (specified by data)
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
+                new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ")" },
+                data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + '\'',
+                null, null);
+
+        String maxDate = null;
+        if (cursor.moveToFirst())
+            maxDate = cursor.getString(0);
+        cursor.close();
+
+        return maxDate;
+    }
+
+    ////// Notifications
 
     public static int getNewNotification(ContentResolver resolver, String pseudo) {
     // Return new notification count for current user (pseudo)
@@ -88,21 +86,23 @@ public abstract class DataTable implements IDataTable {
         return newCount;
     }
 
-    public static String getMaxStatusDate(ContentResolver resolver, Bundle data) {
-    // Return max status date found into table (specified by data)
+    ////// Synchronization
 
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
-        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
-                new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ")" },
-                data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + '\'',
-                null, null);
+    protected static final int STATUS_FIELD_NEW = 0;
+    protected static final int STATUS_FIELD_UPDATED = 1;
+    protected static final int STATUS_FIELD_DELETED = 2;
+    // Status field IDs (remote DB)
 
-        String maxDate = null;
-        if (cursor.moveToFirst())
-            maxDate = cursor.getString(0);
-        cursor.close();
+    public enum Synchronized { // Synchronized field values (local DB)
 
-        return maxDate;
+        DONE((byte)0x00), // Synchronized
+        TO_INSERT((byte)0x01), TO_UPDATE((byte)0x02), TO_DELETE((byte)0x03), // Operations
+        IN_PROGRESS((byte)0x10); // In progress status mask (only combined with an operation)
+
+        //
+        private final byte id;
+        Synchronized(byte id) { this.id = id; }
+        public byte getValue() { return this.id; }
     }
 
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
@@ -115,13 +115,13 @@ public abstract class DataTable implements IDataTable {
     protected static final String DATA_KEY_OPERATION = "operation";
 
     protected static final String DATA_KEY_TABLE_NAME = "tableName";
-    protected static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
     protected static final String DATA_KEY_PSEUDO = "pseudo";
+    protected static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
 
     protected static final String DATA_KEY_LIMIT = "limit";
 
     //////
-    protected static String getUrlSynchroRequest(ContentResolver resolver, Bundle data) {
+    protected static String getSyncUrlRequest(ContentResolver resolver, Bundle data) {
         // Return URL of synchronization request according table data
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
@@ -145,7 +145,20 @@ public abstract class DataTable implements IDataTable {
     }
 
     //////
-    public abstract Database.SyncResult synchronize(ContentResolver resolver, String token, byte operation,
-                                                    @Nullable String pseudo, @Nullable Short limit,
-                                                    @Nullable ContentValues postData);
+    public abstract ContentValues syncInserted(ContentResolver resolver, String token, String pseudo);
+    public abstract ContentValues syncUpdated(ContentResolver resolver, String token, String pseudo);
+    public abstract ContentValues syncDeleted(ContentResolver resolver, String token, String pseudo);
+
+    public static class SyncResult { // Remote to local DB synchronization result
+
+        public static boolean hasChanged(SyncResult result) {
+            return ((result != null) && ((result.inserted > 0) || (result.updated > 0) || (result.deleted > 0)));
+        }
+        public int inserted; // Inserted row count
+        public int updated; // Updated row count
+        public int deleted; // deleted row count
+    }
+    public abstract SyncResult synchronize(ContentResolver resolver, String token, byte operation,
+                                           @Nullable String pseudo, @Nullable Short limit,
+                                           @Nullable ContentValues postData);
 }

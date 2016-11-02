@@ -9,6 +9,7 @@ import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
@@ -46,11 +47,17 @@ public class NotificationsRequest extends DataRequest {
         if (!Internet.isConnected())
             return; // Nothing to do (without connection)
 
+        // Get login info
+        Login.Reply dataLogin = new Login.Reply();
+        mService.copyLoginData(dataLogin);
+
         if (data != null) { ////// Old data requested
             Logs.add(Logs.Type.I, "Old notifications requested");
 
 
 
+
+            //dataLogin.token
 
             //mService.getContentResolver()
             //         .notifyChange(Uri.parse(intent.getStringExtra(EXTRA_DATA_URI), null);
@@ -61,24 +68,20 @@ public class NotificationsRequest extends DataRequest {
 
         } else { ////// New or data updates requested
 
-            // Get login info
-            Login.Reply dataLogin = new Login.Reply();
-            mService.copyLoginData(dataLogin);
-
             // Get previous new notification count
             int prevNewNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
 
             // Synchronization (from remote to local DB)
-            Database.SyncResult result = Database.synchronize(mTableId, mService.getContentResolver(),
-                    dataLogin.token.get(), dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
-            if (Database.SyncResult.hasChanged(result)) {
+            DataTable.SyncResult result = Database.getTable(Tables.getName(mTableId))
+                    .synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_SELECT,
+                            dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
+            if (DataTable.SyncResult.hasChanged(result)) {
 
                 int newNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
                 if (prevNewNotify != newNotify)
                     ServiceNotify.update(mService, newNotify);
 
-                // Notify DB change to observer URI
-                notifyChange();
+                notifyChange(); // Notify DB change to observer URI
             }
         }
     }
@@ -87,28 +90,24 @@ public class NotificationsRequest extends DataRequest {
     public void synchronize() { // Update data from local to remote DB
         Logs.add(Logs.Type.V, null);
 
+        // Get login info
+        Login.Reply dataLogin = new Login.Reply();
+        mService.copyLoginData(dataLogin);
+
+        synchronized (mRegister) {
+
+
+
+            //setSyncInProgress(NotificationsTable.TABLE_NAME, "", DataTable.Synchronized.TO_UPDATE.getValue());
+
+
+            // Synchronization (from local to remote DB)
+
+            //Database.getTable(NotificationsTable.TABLE_NAME).synchronize()
 
 
 
 
-        // Update synchronization fields (to inform user synchronization in progress)
-        //if (!setSyncInProgress(NotificationsTable.TABLE_NAME, "", DataTable.Synchronized.TO_UPDATE.getValue()))
-        //    return;
-
-        // Synchronization (from local to remote DB)
-
-
-
-
-        //Database.getTable(NotificationsTable.TABLE_NAME).synchronize()
-
-
-
-
-
-        //mToSynchronize = false;
-
-
-
+        }
     }
 }

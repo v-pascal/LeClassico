@@ -380,12 +380,47 @@ public class ConnectFragment extends RevealFragment {
                     ////// Synchronization
                     for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
                         if (isStopped()) return Boolean.FALSE;
+                        DataTable table = Database.getTable(Tables.getName(tableId));
                         publishProgress(tableId);
 
+                        // From remote to local DB
                         Short limit = 0;
-                        if (Database.synchronize(tableId, resolver, mToken, mPseudo, limit, null) == null) {
+                        if (table.synchronize(resolver, mToken, WebServices.OPERATION_SELECT,
+                                mPseudo, limit, null) == null) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
+                            publishProgress(STEP_ERROR);
+                            return Boolean.FALSE;
+                        }
+
+                        // From local to remote DB
+                        if (isStopped()) return Boolean.FALSE;
+                        ContentValues operationData = table.syncInserted(resolver, mToken, mPseudo);
+                        if ((operationData == null) || ((operationData.size() > 0) &&
+                                (table.synchronize(resolver, mToken, WebServices.OPERATION_INSERT,
+                                mPseudo, null, operationData) == null))) {
+
+                            Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (inserted)");
+                            publishProgress(STEP_ERROR);
+                            return Boolean.FALSE;
+                        }
+                        if (isStopped()) return Boolean.FALSE;
+                        operationData = table.syncUpdated(resolver, mToken, mPseudo);
+                        if ((operationData == null) || ((operationData.size() > 0) &&
+                                (table.synchronize(resolver, mToken, WebServices.OPERATION_UPDATE,
+                                mPseudo, null, operationData) == null))) {
+
+                            Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (updated)");
+                            publishProgress(STEP_ERROR);
+                            return Boolean.FALSE;
+                        }
+                        if (isStopped()) return Boolean.FALSE;
+                        operationData = table.syncDeleted(resolver, mToken, mPseudo);
+                        if ((operationData == null) || ((operationData.size() > 0) &&
+                                (table.synchronize(resolver, mToken, WebServices.OPERATION_DELETE,
+                                mPseudo, null, operationData) == null))) {
+
+                            Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (deleted)");
                             publishProgress(STEP_ERROR);
                             return Boolean.FALSE;
                         }

@@ -49,24 +49,20 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
         for (Uri observerUri : mRegister)
             mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
     }
-    protected boolean setSyncInProgress(String table, String selection, byte operation) {
-        // Set synchronization fields into in progress status according its operation
+    protected void setSyncInProgress(String table, String selection, byte operation) {
+    // Set synchronization fields into in progress status according its operation
 
         Logs.add(Logs.Type.V, "table: " + table + ";selection: " + selection + ";operation: " + operation);
-        ContentValues values = new ContentValues();
 
+        ContentValues values = new ContentValues();
         values.put(Constants.DATA_COLUMN_SYNCHRONIZED, operation | DataTable.Synchronized.IN_PROGRESS.getValue());
-        int count = mService.getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + table),
+        int result = mService.getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + table),
                 values, selection + " AND " + Constants.DATA_COLUMN_SYNCHRONIZED + '=' + operation,
                 null);
-        if (count < 1)
-            return false; // No records to synchronize
 
-        // Notify registered URIs
-        synchronized (mRegister) {
+        // Notify registered URIs (if needed)
+        if (result > 0)
             notifyChange();
-        }
-        return true;
     }
 
     //////
@@ -147,14 +143,8 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
         if (Internet.isConnected())
             synchronize();
-        else
-            mToSynchronize = true;
     }
 
-    protected boolean mToSynchronize; // Flag to synchronize data (from local to remote DB)
-    public boolean toSynchronize() {
-        return mToSynchronize;
-    }
     protected final DataObserver mSyncObserver; // Data update observer
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
