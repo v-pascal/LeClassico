@@ -78,8 +78,7 @@ public class NotificationsRequest extends DataRequest {
                     ServiceNotify.update(mService, newNotify);
 
                 // Notify DB change to observer URI
-                for (Uri observerUri : mRegister)
-                    mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
+                notifyChange();
             }
         }
     }
@@ -89,20 +88,18 @@ public class NotificationsRequest extends DataRequest {
         Logs.add(Logs.Type.V, null);
 
         // Update synchronization fields (to inform user synchronization in progress)
+        setSyncInProgress(NotificationsTable.TABLE_NAME);
+
+        // Synchronization (from local to remote DB)
 
 
 
 
 
 
-
-
-        //synchronized (mRegister) {
-        //    for (Uri observerUri : mRegister)
-        //        mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
-        //}
 
         //mToSynchronize = false;
+
 
 
 

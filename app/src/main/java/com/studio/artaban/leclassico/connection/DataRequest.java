@@ -1,10 +1,13 @@
 package com.studio.artaban.leclassico.connection;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
+import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -40,6 +43,26 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     }
 
     //
+    protected void notifyChange() { // Notify change on registered URI
+        Logs.add(Logs.Type.V, null);
+        for (Uri observerUri : mRegister)
+            mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
+    }
+    protected void setSyncInProgress(String table) { // Set synchronization fields to in progress status
+        Logs.add(Logs.Type.V, "table: " + table);
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.IN_PROGRESS.getValue());
+        mService.getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + table),
+                values, Constants.DATA_COLUMN_SYNCHRONIZED + '=' + DataProvider.Synchronized.TODO.getValue(),
+                null);
+
+        synchronized (mRegister) { // Notify registered URIs
+            notifyChange();
+        }
+    }
+
+    //////
     public boolean register(Intent intent) { // Register URI observer (if not already done)
         Logs.add(Logs.Type.V, "intent: " + intent);
 
