@@ -44,7 +44,6 @@ import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
-import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -65,7 +64,7 @@ import java.io.File;
  */
 public class MainActivity extends LoggedActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
-        MainFragment.OnFragmentListener {
+        MainFragment.OnFragmentListener, AppBarLayout.OnOffsetChangedListener {
 
     private static final String DATA_KEY_SCROLL_OFFSET = "scrollOffset";
     // Data keys
@@ -87,6 +86,27 @@ public class MainActivity extends LoggedActivity implements
             default:
                 throw new IllegalArgumentException("Unexpected section");
         }
+    }
+
+    ////// OnOffsetChangedListener /////////////////////////////////////////////////////////////////
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        //Logs.add(Logs.Type.V, "appBarLayout: " + appBarLayout +
+        //        ";verticalOffset: " + verticalOffset);
+        mScrollOffset = 0;
+
+        if (appBarLayout.findViewById(R.id.shortcut) != null) {
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+                int actionHeight = -getResources().getDimensionPixelSize(R.dimen.appbar_padding_title);
+                verticalOffset = (verticalOffset < actionHeight) ? verticalOffset - actionHeight : 0;
+
+            } else
+                mScrollOffset = verticalOffset;
+
+            appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
+        }
+        //else // NB: Can occur when search operation starts
     }
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
@@ -348,7 +368,9 @@ public class MainActivity extends LoggedActivity implements
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
     protected void onLoggedResume() {
+
         Logs.add(Logs.Type.V, null);
+        ((AppBarLayout)findViewById(R.id.appbar)).addOnOffsetChangedListener(this);
 
         // Bind data service
         if ((DataService.isRunning()) && (!mDataService.bind(this, null)))
@@ -371,33 +393,9 @@ public class MainActivity extends LoggedActivity implements
             mScrollOffset = savedInstanceState.getInt(DATA_KEY_SCROLL_OFFSET);
 
         // Set tool & app bars
-        ((AppBarLayout)findViewById(R.id.appbar)).addOnOffsetChangedListener(
-                new AppBarLayout.OnOffsetChangedListener() {
-
-                    @Override
-                    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                        //Logs.add(Logs.Type.V, "appBarLayout: " + appBarLayout +
-                        //        ";verticalOffset: " + verticalOffset);
-                        mScrollOffset = 0;
-
-                        if (appBarLayout.findViewById(R.id.shortcut) != null) {
-                            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-
-                                int actionHeight = -getResources().getDimensionPixelSize(R.dimen.appbar_padding_title);
-                                verticalOffset = (verticalOffset < actionHeight) ? verticalOffset - actionHeight : 0;
-
-                            } else
-                                mScrollOffset = verticalOffset;
-
-                            appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
-                        }
-                        //else // NB: Can occur when search operation starts
-                    }
-                });
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
             // Display shortcut below action bar title & icons
@@ -725,30 +723,13 @@ public class MainActivity extends LoggedActivity implements
                 ////// Start notification activity
                 Intent notifyIntent = new Intent(this, NotifyActivity.class);
                 Login.copyExtraData(getIntent(), notifyIntent);
-                startActivityForResult(notifyIntent, Requests.NOTIFY_2_MAIN.CODE,
-                        ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                startActivity(notifyIntent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
 
             } else
                 Toast.makeText(this, R.string.no_notification, Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Logs.add(Logs.Type.V, "requestCode: " + requestCode + ";resultCode: " + resultCode + ";data: " + data);
-
-        if (requestCode == Requests.NOTIFY_2_MAIN.CODE) { // Notification activity result
-            switch (resultCode) {
-                case Requests.NOTIFY_2_MAIN.RESULT_LOGOUT: { ////// Logout requested
-
-                    supportFinishAfterTransition();
-                    break;
-                }
-            }
-        }
     }
 
     @Override
@@ -765,7 +746,9 @@ public class MainActivity extends LoggedActivity implements
     @Override
     protected void onPause() {
         super.onPause();
+
         Logs.add(Logs.Type.V, null);
+        ((AppBarLayout)findViewById(R.id.appbar)).removeOnOffsetChangedListener(this);
 
         // Unregister shortcut data service
         sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mShortcutUri));

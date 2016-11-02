@@ -8,6 +8,7 @@ import android.app.Activity;
  */
 public final class Requests {
 
+    /*
     private static final int REQUEST_NOTIFY_2_MAIN = 1; // Notification to main activity request
 
     //////
@@ -17,4 +18,5 @@ public final class Requests {
         // Results
         public static final int RESULT_LOGOUT = Activity.RESULT_FIRST_USER;
     };
+    */
 }

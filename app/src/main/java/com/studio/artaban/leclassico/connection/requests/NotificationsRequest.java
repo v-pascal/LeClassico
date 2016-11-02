@@ -92,8 +92,8 @@ public class NotificationsRequest extends DataRequest {
 
 
         // Update synchronization fields (to inform user synchronization in progress)
-        if (!setSyncInProgress(NotificationsTable.TABLE_NAME, "", DataTable.Synchronized.TO_UPDATE.getValue()))
-            return;
+        //if (!setSyncInProgress(NotificationsTable.TABLE_NAME, "", DataTable.Synchronized.TO_UPDATE.getValue()))
+        //    return;
 
         // Synchronization (from local to remote DB)
 

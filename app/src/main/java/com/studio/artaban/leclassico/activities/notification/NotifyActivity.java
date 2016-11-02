@@ -670,8 +670,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_notify);
 
-        setLogoutResult(Requests.NOTIFY_2_MAIN.RESULT_LOGOUT); // Set logout result (logged activity)
-
         // Set toolbar & default new notification
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setNewNotifyInfo(0);
