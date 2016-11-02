@@ -17,7 +17,6 @@ import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.tools.Tools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -105,8 +104,7 @@ public class MessagerieTable extends DataTable {
                                     if (!entry.isNull(JSON_KEY_OBJET))
                                         values.put(COLUMN_OBJET, entry.getString(JSON_KEY_OBJET));
                                     values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
-                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                            DataProvider.Synchronized.DONE.getValue());
+                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
                                     // Check if entry already exists
                                     String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) +
@@ -118,7 +116,7 @@ public class MessagerieTable extends DataTable {
 
                                             // Delete entry (definitively)
                                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                                    DataProvider.Synchronized.TO_DELETE.getValue());
+                                                    Synchronized.TO_DELETE.getValue());
                                             resolver.update(tableUri, values, selection, null);
                                             resolver.delete(tableUri,
                                                     selection + " AND " + Constants.DATA_DELETE_SELECTION, null);

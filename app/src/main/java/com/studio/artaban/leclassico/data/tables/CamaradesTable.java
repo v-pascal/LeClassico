@@ -162,7 +162,7 @@ public class CamaradesTable extends DataTable {
 
                                     ////// Delete entry (definitively)
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                            DataProvider.Synchronized.TO_DELETE.getValue());
+                                            Synchronized.TO_DELETE.getValue());
                                     resolver.update(tableUri, values, selection, null);
                                     resolver.delete(tableUri,
                                             selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
@@ -298,7 +298,7 @@ public class CamaradesTable extends DataTable {
 
                                     ////// Insert entry into DB
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                            DataProvider.Synchronized.DONE.getValue());
+                                            Synchronized.DONE.getValue());
 
                                     values.put(COLUMN_PSEUDO, pseudo);
                                     resolver.insert(tableUri, values);

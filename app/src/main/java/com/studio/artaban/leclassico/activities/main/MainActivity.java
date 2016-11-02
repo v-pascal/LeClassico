@@ -560,8 +560,7 @@ public class MainActivity extends LoggedActivity implements
                 }
             }
 
-            private void positionShortcut(final int section) {
-                // Position shortcut according selected section
+            private void positionShortcut(final int section) { // Position shortcut according section
 
                 //Logs.add(Logs.Type.V, "section: " + section);
                 if (mShortcutWidth == Constants.NO_DATA) {

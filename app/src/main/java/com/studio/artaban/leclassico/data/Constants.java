@@ -40,7 +40,9 @@ public final class Constants {
     public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field name
     public static final String DATA_COLUMN_STATUS_DATE = "StatusDate"; // Status date field name
 
-    public static final String DATA_DELETE_SELECTION = DATA_COLUMN_SYNCHRONIZED + '=' + DataProvider.Synchronized.TO_DELETE.getValue();
+    public static final String DATA_DELETE_SELECTION = '(' +
+            DATA_COLUMN_SYNCHRONIZED + '=' + DataTable.Synchronized.TO_DELETE.getValue() + " OR " +
+            DATA_COLUMN_SYNCHRONIZED + '=' + (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue());
     // Selection criteria to delete records from DB definitively
 
     public static final int DATA_UNREAD = 0;

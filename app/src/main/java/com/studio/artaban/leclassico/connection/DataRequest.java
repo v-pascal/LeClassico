@@ -8,6 +8,7 @@ import android.os.Bundle;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -48,18 +49,24 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
         for (Uri observerUri : mRegister)
             mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
     }
-    protected void setSyncInProgress(String table) { // Set synchronization fields to in progress status
-        Logs.add(Logs.Type.V, "table: " + table);
+    protected boolean setSyncInProgress(String table, String selection, byte operation) {
+        // Set synchronization fields into in progress status according its operation
 
+        Logs.add(Logs.Type.V, "table: " + table + ";selection: " + selection + ";operation: " + operation);
         ContentValues values = new ContentValues();
-        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataProvider.Synchronized.IN_PROGRESS.getValue());
-        mService.getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + table),
-                values, Constants.DATA_COLUMN_SYNCHRONIZED + '=' + DataProvider.Synchronized.TODO.getValue(),
-                null);
 
-        synchronized (mRegister) { // Notify registered URIs
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, operation | DataTable.Synchronized.IN_PROGRESS.getValue());
+        int count = mService.getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + table),
+                values, selection + " AND " + Constants.DATA_COLUMN_SYNCHRONIZED + '=' + operation,
+                null);
+        if (count < 1)
+            return false; // No records to synchronize
+
+        // Notify registered URIs
+        synchronized (mRegister) {
             notifyChange();
         }
+        return true;
     }
 
     //////

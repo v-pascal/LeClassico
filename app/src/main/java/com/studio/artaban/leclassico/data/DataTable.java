@@ -23,8 +23,21 @@ public abstract class DataTable implements IDataTable {
     protected static final int STATUS_FIELD_NEW = 0;
     protected static final int STATUS_FIELD_UPDATED = 1;
     protected static final int STATUS_FIELD_DELETED = 2;
-    // Status field IDs
+    // Status field IDs (remote DB)
 
+    public enum Synchronized { // Synchronized field values (local DB)
+
+        DONE((byte)0x00), // Synchronized
+        TO_INSERT((byte)0x01), TO_UPDATE((byte)0x02), TO_DELETE((byte)0x03), // Operations
+        IN_PROGRESS((byte)0x10); // In progress status mask (only combined with an operation)
+
+        //
+        private final byte id;
+        Synchronized(byte id) { this.id = id; }
+        public byte getValue() { return this.id; }
+    }
+
+    //////
     public static int getEntryCount(ContentResolver resolver, String table, String selection) {
     // Get entry count on specific table and according selection criteria
 

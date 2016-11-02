@@ -38,19 +38,9 @@ import java.util.Date;
  */
 public class DataProvider extends ContentProvider {
 
-    public enum Synchronized {
-
-        TODO((byte)0), IN_PROGRESS((byte)1), DONE((byte)2), TO_DELETE((byte)3);
-
-        //
-        private final byte id;
-        Synchronized(byte id) { this.id = id; }
-        public byte getValue() { return this.id; }
-    }
-
-    //////
     public static final String CONTENT_URI = "content://" + Constants.DATA_CONTENT_URI + '/';
 
+    //////
     private static final String MIME_TYPE_SINGLE = "vnd.android.cursor.item/vnd." + Constants.APP_URI_COMPANY +
             '.' + Constants.APP_URI + '.';
     private static final String MIME_TYPE = "vnd.android.cursor.dir/vnd." + Constants.APP_URI_COMPANY +
@@ -228,7 +218,7 @@ public class DataProvider extends ContentProvider {
         if (!selection.contains(Constants.DATA_DELETE_SELECTION)) {
 
             ContentValues values = new ContentValues();
-            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TO_DELETE.getValue());
+            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataTable.Synchronized.TO_DELETE.getValue());
             result = mDB.getDB().update(table, values, selection, selectionArgs);
 
             getContext().getContentResolver().notifyChange(uri, null);
@@ -261,7 +251,7 @@ public class DataProvider extends ContentProvider {
 
         // Check exiting status date & synchronized fields values (always needed)
         if (!values.containsKey(Constants.DATA_COLUMN_SYNCHRONIZED))
-            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.TODO.getValue());
+            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataTable.Synchronized.TO_UPDATE.getValue());
         if (!values.containsKey(Constants.DATA_COLUMN_STATUS_DATE)) {
 
             Date now = new Date();

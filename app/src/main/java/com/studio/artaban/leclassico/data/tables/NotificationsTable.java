@@ -17,7 +17,6 @@ import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.tools.Tools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -117,8 +116,7 @@ public class NotificationsTable extends DataTable {
                                     ContentValues values = new ContentValues();
                                     values.put(COLUMN_LU_FLAG, entry.getInt(JSON_KEY_LU_FLAG));
                                     values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
-                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                            DataProvider.Synchronized.DONE.getValue());
+                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
                                     // Check if entry already exists
                                     String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) +
@@ -135,7 +133,7 @@ public class NotificationsTable extends DataTable {
 
                                             // Delete entry (definitively)
                                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                                    DataProvider.Synchronized.TO_DELETE.getValue());
+                                                    Synchronized.TO_DELETE.getValue());
                                             resolver.update(tableUri, values, selection, null);
                                             resolver.delete(tableUri,
                                                     selection + " AND " + Constants.DATA_DELETE_SELECTION, null);

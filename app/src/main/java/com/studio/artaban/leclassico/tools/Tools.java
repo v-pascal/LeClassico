@@ -23,7 +23,7 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -224,11 +224,9 @@ public final class Tools { /////////////////////////////////////////////////////
         icon.setColorFilter(Color.BLACK);
         icon.clearAnimation();
 
-        if (status == DataProvider.Synchronized.TODO.getValue()) { // To synchronize
-            text.setText(context.getString(R.string.to_synchronize));
-            icon.setImageDrawable(context.getDrawable(R.drawable.ic_sync_white_18dp));
+        if ((status & DataTable.Synchronized.IN_PROGRESS.getValue()) == DataTable.Synchronized.IN_PROGRESS.getValue()) {
+            // Synchronizing (in progress)
 
-        } else if (status == DataProvider.Synchronized.IN_PROGRESS.getValue()) { // Synchronizing
             text.setText(context.getString(R.string.synchronizing));
             icon.setColorFilter(Color.TRANSPARENT);
             icon.setImageDrawable(context.getDrawable(R.drawable.spinner_black_16));
@@ -241,7 +239,7 @@ public final class Tools { /////////////////////////////////////////////////////
             anim.setDuration(700);
             icon.startAnimation(anim);
 
-        } else if (status == DataProvider.Synchronized.DONE.getValue()) { // Synchronized
+        } else if (status == DataTable.Synchronized.DONE.getValue()) { // Synchronized
 
             SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
             try {
@@ -249,14 +247,17 @@ public final class Tools { /////////////////////////////////////////////////////
                 DateFormat userDate = android.text.format.DateFormat.getMediumDateFormat(context);
                 DateFormat userTime = android.text.format.DateFormat.getTimeFormat(context);
 
-                text.setText(userDate.format(syncDate) + " " + userTime.format(syncDate));
+                text.setText(userDate.format(syncDate) + ' ' + userTime.format(syncDate));
 
             } catch (ParseException e) {
                 Logs.add(Logs.Type.E, "Wrong status date format: " + date);
             }
             icon.setImageDrawable(context.getDrawable(R.drawable.ic_check_white_18dp));
+
+        } else { // To synchronize
+
+            text.setText(context.getString(R.string.to_synchronize));
+            icon.setImageDrawable(context.getDrawable(R.drawable.ic_sync_white_18dp));
         }
-        //else // status == DataProvider.Synchronized.TO_DELETE.getValue()
-        //        NB: Should not happen coz nothing to display!
     }
 }
