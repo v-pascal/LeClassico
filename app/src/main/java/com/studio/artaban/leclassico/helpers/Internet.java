@@ -174,6 +174,7 @@ public final class Internet {
     }
 
     private static String getPostContent(ContentValues data) {
+    // Format content values into HTTP content post data
 
         //Logs.add(Logs.Type.V, "data: " + data);
         StringBuilder postContent = new StringBuilder();

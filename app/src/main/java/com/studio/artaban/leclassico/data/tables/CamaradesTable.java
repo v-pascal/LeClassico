@@ -225,8 +225,8 @@ public class CamaradesTable extends DataTable {
 
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
     @Override
-    public ContentValues syncInserted(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -235,8 +235,8 @@ public class CamaradesTable extends DataTable {
         return inserted;
     }
     @Override
-    public ContentValues syncUpdated(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -245,8 +245,8 @@ public class CamaradesTable extends DataTable {
         return updated;
     }
     @Override
-    public ContentValues syncDeleted(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -308,12 +308,12 @@ public class CamaradesTable extends DataTable {
         final SyncResult syncResult = new SyncResult();
         Bundle data = new Bundle();
 
-        data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_MEMBERS);
-        data.putString(DataTable.DATA_KEY_TOKEN, token);
-        data.putByte(DataTable.DATA_KEY_OPERATION, operation);
-        data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
-        data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        data.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_MEMBERS);
+        data.putString(DATA_KEY_TOKEN, token);
+        data.putByte(DATA_KEY_OPERATION, operation);
+        data.putString(DATA_KEY_PSEUDO, pseudo);
+        data.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
+        data.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getSyncUrlRequest(resolver, data);
 
         // Send remote DB request
@@ -336,9 +336,11 @@ public class CamaradesTable extends DataTable {
                         for (int i = 0; i < entries.length(); ++i) {
 
                             JSONObject entry = (JSONObject) entries.get(i);
+
+                            // Key field
                             String pseudo = entry.getString(JSON_KEY_PSEUDO);
 
-                            // Entry fields
+                            // Data fields
                             ContentValues values = new ContentValues();
                             values.put(COLUMN_CODE_CONF, entry.getString(JSON_KEY_CODE_CONF));
                             values.put(COLUMN_CODE_CONF_UPD, entry.getString(JSON_KEY_CODE_CONF_UPD));
@@ -391,13 +393,14 @@ public class CamaradesTable extends DataTable {
                             if (!entry.isNull(JSON_KEY_LONGITUDE))
                                 values.put(COLUMN_LONGITUDE, entry.getDouble(JSON_KEY_LONGITUDE));
                             values.put(COLUMN_LONGITUDE_UPD, entry.getString(JSON_KEY_LONGITUDE_UPD));
+
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
                             // Check if entry already exists
                             String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo);
                             Cursor cursor = resolver.query(tableUri, null, selection, null, null);
-                            cursor.moveToFirst();
-                            if (cursor.getCount() > 0) { // DB entry exists
+                            if (cursor.moveToFirst()) { // DB entry exists
 
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
                                     cursor.close();
@@ -525,10 +528,23 @@ public class CamaradesTable extends DataTable {
                                         values.remove(COLUMN_LONGITUDE_UPD);
                                         removed = true;
                                     }
-                                    cursor.close();
-                                    if (removed) // Keep local synchronize field
-                                        values.remove(Constants.DATA_COLUMN_SYNCHRONIZED);
 
+
+
+
+
+                                    if (removed) { // Keep local synchronized & status date fields
+
+                                        values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                                cursor.getInt(COLUMN_INDEX_SYNCHRONIZED));
+                                        values.put(Constants.DATA_COLUMN_STATUS_DATE,
+                                                cursor.getString(COLUMN_INDEX_STATUS_DATE));
+                                    }
+
+
+
+
+                                    cursor.close();
                                     resolver.update(tableUri, values, selection, null);
                                     ++syncResult.updated;
                                 }
@@ -539,15 +555,12 @@ public class CamaradesTable extends DataTable {
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
                                     ////// Insert entry into DB
-                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                            Synchronized.DONE.getValue());
-
                                     values.put(COLUMN_PSEUDO, pseudo);
                                     resolver.insert(tableUri, values);
 
                                     ++syncResult.inserted;
                                 }
-                                //else // Do not add a deleted entry
+                                //else // Do not add a deleted entry (created & removed when offline)
                             }
                         }
 

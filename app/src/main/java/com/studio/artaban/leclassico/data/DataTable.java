@@ -46,22 +46,6 @@ public abstract class DataTable implements IDataTable {
 
         return id;
     }
-    public static String getMaxStatusDate(ContentResolver resolver, Bundle data) {
-    // Return max status date found into table (specified by data)
-
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
-        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
-                new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ")" },
-                data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + '\'',
-                null, null);
-
-        String maxDate = null;
-        if (cursor.moveToFirst())
-            maxDate = cursor.getString(0);
-        cursor.close();
-
-        return maxDate;
-    }
 
     ////// Notifications
 
@@ -119,6 +103,24 @@ public abstract class DataTable implements IDataTable {
     protected static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
 
     //////
+    protected static String getMaxStatusDate(ContentResolver resolver, Bundle data) {
+    // Return max status date of table specified by data for a select operation (URL)
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
+                new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ")" },
+                data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue(), // Unchanged
+                null, null);
+
+        String maxDate = null;
+        if (cursor.moveToFirst())
+            maxDate = cursor.getString(0);
+        cursor.close();
+
+        return maxDate;
+    }
+
     protected static String getSyncUrlRequest(ContentResolver resolver, Bundle data) {
         // Return URL of synchronization request according table data
 
@@ -157,9 +159,10 @@ public abstract class DataTable implements IDataTable {
     }
 
     //////
-    public abstract ContentValues syncInserted(ContentResolver resolver, String token, String pseudo);
-    public abstract ContentValues syncUpdated(ContentResolver resolver, String token, String pseudo);
-    public abstract ContentValues syncDeleted(ContentResolver resolver, String token, String pseudo);
+    public abstract ContentValues syncInserted(ContentResolver resolver, String pseudo);
+    public abstract ContentValues syncUpdated(ContentResolver resolver, String pseudo);
+    public abstract ContentValues syncDeleted(ContentResolver resolver, String pseudo);
+    // Local to remote DB synchronization methods
 
     public static class SyncResult { // Remote to local DB synchronization result
 

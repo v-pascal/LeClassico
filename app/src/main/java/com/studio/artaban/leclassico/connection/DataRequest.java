@@ -174,7 +174,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                     DataTable.Synchronized.TO_INSERT.getValue());
 
             ContentValues operationData =
-                    table.syncInserted(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+                    table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
             if ((operationData.size() > 0) &&
                     (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_INSERT,
                     dataLogin.pseudo, null, operationData) == null)) {
@@ -187,7 +187,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
             setSyncInProgress(tableName, mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                     DataTable.Synchronized.TO_UPDATE.getValue());
 
-            operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+            operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.pseudo);
             if ((operationData.size() > 0) &&
                     (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_UPDATE,
                     dataLogin.pseudo, null, operationData) == null)) {
@@ -200,7 +200,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
             setSyncInProgress(tableName, mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                     DataTable.Synchronized.TO_DELETE.getValue());
 
-            operationData = table.syncInserted(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+            operationData = table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
             if ((operationData.size() > 0) &&
                     (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_DELETE,
                     dataLogin.pseudo, null, operationData) == null)) {

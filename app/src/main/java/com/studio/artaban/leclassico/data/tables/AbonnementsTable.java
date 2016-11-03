@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -112,8 +113,8 @@ public class AbonnementsTable extends DataTable {
 
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
     @Override
-    public ContentValues syncInserted(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -122,8 +123,8 @@ public class AbonnementsTable extends DataTable {
         return inserted;
     }
     @Override
-    public ContentValues syncUpdated(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -132,8 +133,8 @@ public class AbonnementsTable extends DataTable {
         return updated;
     }
     @Override
-    public ContentValues syncDeleted(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -160,12 +161,12 @@ public class AbonnementsTable extends DataTable {
         final SyncResult syncResult = new SyncResult();
         Bundle data = new Bundle();
 
-        data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_FOLLOWERS);
-        data.putString(DataTable.DATA_KEY_TOKEN, token);
-        data.putByte(DataTable.DATA_KEY_OPERATION, operation);
-        data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
-        data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        data.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_FOLLOWERS);
+        data.putString(DATA_KEY_TOKEN, token);
+        data.putByte(DATA_KEY_OPERATION, operation);
+        data.putString(DATA_KEY_PSEUDO, pseudo);
+        data.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
+        data.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getSyncUrlRequest(resolver, data);
 
         // Send remote DB request
@@ -188,10 +189,12 @@ public class AbonnementsTable extends DataTable {
                         for (int i = 0; i < entries.length(); ++i) {
 
                             JSONObject entry = (JSONObject) entries.get(i);
+
+                            // Key fields
                             String pseudo = entry.getString(JSON_KEY_PSEUDO);
                             String camarade = entry.getString(JSON_KEY_CAMARADE);
 
-                            // Entry fields
+                            // Data fields
                             ContentValues values = new ContentValues();
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
@@ -199,11 +202,15 @@ public class AbonnementsTable extends DataTable {
                             // Check if entry already exists
                             String selection = COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) +
                                     " AND " + COLUMN_CAMARADE + '=' + DatabaseUtils.sqlEscapeString(camarade);
-                            if (DataTable.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
+                            Cursor cursor = resolver.query(tableUri, new String[]{Constants.DATA_COLUMN_STATUS_DATE},
+                                    selection, null, null);
+                            if (cursor.moveToFirst()) { // DB entry exists
 
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
+                                    // NB: Web site deletion priority (no status date comparison)
+                                    cursor.close();
 
-                                    // Delete entry (definitively)
+                                    ////// Delete entry (definitively)
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
                                             Synchronized.TO_DELETE.getValue());
                                     resolver.update(tableUri, values, selection, null);
@@ -212,22 +219,27 @@ public class AbonnementsTable extends DataTable {
 
                                     ++syncResult.deleted;
 
-                                } else { // Update entry
+                                } else if (cursor.getString(COLUMN_INDEX_STATUS_DATE)
+                                            .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
 
+                                    ////// Update entry
+                                    cursor.close();
                                     resolver.update(tableUri, values, selection, null);
                                     ++syncResult.updated;
-                                }
+
+                                } else // Nothing to do here (let's synchronize from local to remote DB)
+                                    cursor.close();
 
                             } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
-                                // Insert entry into DB
+                                ////// Insert entry into DB
                                 values.put(COLUMN_PSEUDO, pseudo);
                                 values.put(COLUMN_CAMARADE, camarade);
                                 resolver.insert(tableUri, values);
 
                                 ++syncResult.inserted;
                             }
-                            //else // Do not add a deleted entry
+                            //else // Do not add a deleted entry (created & removed when offline)
                         }
 
                     } else {

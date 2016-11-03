@@ -29,8 +29,13 @@ public final class WebServices {
 
     public static final String DATA_TOKEN = "Clf";
     public static final String DATA_OPERATION = "Ope";
+
     public static final String DATA_DATE = "Date";
     public static final String DATA_LIMIT = "Count";
+
+    public static final String DATA_KEYS = "Keys";
+    public static final String DATA_STATUS = "Status";
+    public static final String DATA_UPDATES = "Updates";
 
     // Connection
     public static final String CONNECTION_DATA_PSEUDO = "psd";

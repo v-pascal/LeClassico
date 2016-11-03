@@ -385,8 +385,8 @@ public class ConnectFragment extends RevealFragment {
 
                         // From remote to local DB
                         Short limit = 0;
-                        if (table.synchronize(resolver, mToken, WebServices.OPERATION_SELECT,
-                                mPseudo, limit, null) == null) {
+                        if (table.synchronize(resolver, mToken, WebServices.OPERATION_SELECT, mPseudo,
+                                limit, null) == null) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
                             publishProgress(STEP_ERROR);
@@ -395,7 +395,7 @@ public class ConnectFragment extends RevealFragment {
 
                         // From local to remote DB
                         if (isStopped()) return Boolean.FALSE;
-                        ContentValues operationData = table.syncInserted(resolver, mToken, mPseudo);
+                        ContentValues operationData = table.syncInserted(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
                                 (table.synchronize(resolver, mToken, WebServices.OPERATION_INSERT,
                                 mPseudo, null, operationData) == null)) {
@@ -405,7 +405,7 @@ public class ConnectFragment extends RevealFragment {
                             return Boolean.FALSE;
                         }
                         if (isStopped()) return Boolean.FALSE;
-                        operationData = table.syncUpdated(resolver, mToken, mPseudo);
+                        operationData = table.syncUpdated(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
                                 (table.synchronize(resolver, mToken, WebServices.OPERATION_UPDATE,
                                 mPseudo, null, operationData) == null)) {
@@ -415,7 +415,7 @@ public class ConnectFragment extends RevealFragment {
                             return Boolean.FALSE;
                         }
                         if (isStopped()) return Boolean.FALSE;
-                        operationData = table.syncDeleted(resolver, mToken, mPseudo);
+                        operationData = table.syncDeleted(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
                                 (table.synchronize(resolver, mToken, WebServices.OPERATION_DELETE,
                                 mPseudo, null, operationData) == null)) {

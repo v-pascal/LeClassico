@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -140,8 +141,8 @@ public class NotificationsTable extends DataTable {
 
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
     @Override
-    public ContentValues syncInserted(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -150,18 +151,78 @@ public class NotificationsTable extends DataTable {
         return inserted;
     }
     @Override
-    public ContentValues syncUpdated(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
+        ContentValues updated = new ContentValues(); // Empty (size == 0)
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME), null,
+                COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) + " AND (" +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_UPDATE.getValue() + " OR " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_UPDATE.getValue() |
+                        Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
+        if (cursor.moveToFirst()) {
+            try {
 
+                JSONArray keysArray = new JSONArray();
+                JSONArray statusArray = new JSONArray();
+                JSONArray updatesArray = new JSONArray();
+                do {
 
+                    // Keys
+                    JSONObject key = new JSONObject();
+                    key.put(JSON_KEY_PSEUDO, cursor.getString(COLUMN_INDEX_PSEUDO));
+                    key.put(JSON_KEY_DATE, cursor.getString(COLUMN_INDEX_DATE));
+                    key.put(JSON_KEY_OBJECT_TYPE, cursor.getString(COLUMN_INDEX_OBJECT_TYPE));
+                    key.put(JSON_KEY_OBJECT_ID, (!cursor.isNull(COLUMN_INDEX_OBJECT_ID)) ?
+                            String.valueOf(cursor.getInt(COLUMN_INDEX_OBJECT_ID)) : null);
+                    key.put(JSON_KEY_OBJECT_DATE, (!cursor.isNull(COLUMN_INDEX_OBJECT_DATE)) ?
+                            cursor.getString(COLUMN_INDEX_OBJECT_DATE) : null);
+                    key.put(JSON_KEY_OBJECT_FROM, cursor.getString(COLUMN_INDEX_OBJECT_FROM));
 
-        ContentValues updated = new ContentValues();
+                    // Status
+                    JSONObject state = new JSONObject();
+                    state.put(JSON_KEY_STATUS_DATE, cursor.getString(COLUMN_INDEX_STATUS_DATE));
+                    // TODO: Implement local and remote time lag ?!?!
+
+                    // Updates
+                    JSONObject update = new JSONObject();
+                    update.put(JSON_KEY_LU_FLAG, cursor.getInt(COLUMN_INDEX_LU_FLAG));
+
+                    //////
+                    keysArray.put(key);
+                    statusArray.put(state);
+                    updatesArray.put(update);
+
+                } while (cursor.moveToNext());
+
+                // Assign JSON objects into content data
+                JSONObject keys = new JSONObject();
+                JSONObject status = new JSONObject();
+                JSONObject updates = new JSONObject();
+
+                keys.put(WebServices.DATA_KEYS, keysArray);
+                status.put(WebServices.DATA_STATUS, statusArray);
+                updates.put(WebServices.DATA_UPDATES, updatesArray);
+
+                //////
+                Logs.add(Logs.Type.I, "Keys: " + keys.toString());
+                Logs.add(Logs.Type.I, "Status: " + status.toString());
+                Logs.add(Logs.Type.I, "Updates: " + updates.toString());
+
+                updated.put(WebServices.DATA_KEYS, keys.toString());
+                updated.put(WebServices.DATA_STATUS, status.toString());
+                updated.put(WebServices.DATA_UPDATES, updates.toString());
+
+            } catch (JSONException e) {
+                Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
+            }
+        }
+        cursor.close();
         return updated;
     }
     @Override
-    public ContentValues syncDeleted(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -193,14 +254,14 @@ public class NotificationsTable extends DataTable {
         final SyncResult syncResult = new SyncResult();
         Bundle data = new Bundle();
 
-        data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_NOTIFICATIONS);
-        data.putString(DataTable.DATA_KEY_TOKEN, token);
-        data.putByte(DataTable.DATA_KEY_OPERATION, operation);
+        data.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_NOTIFICATIONS);
+        data.putString(DATA_KEY_TOKEN, token);
+        data.putByte(DATA_KEY_OPERATION, operation);
         if (limit != null)
-            data.putShort(DataTable.DATA_KEY_LIMIT, (limit != 0) ? limit : DEFAULT_LIMIT);
-        data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
-        data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+            data.putShort(DATA_KEY_LIMIT, (limit != 0) ? limit : DEFAULT_LIMIT);
+        data.putString(DATA_KEY_PSEUDO, pseudo);
+        data.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
+        data.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getSyncUrlRequest(resolver, data);
 
         // Send remote DB request
@@ -223,6 +284,8 @@ public class NotificationsTable extends DataTable {
                                 for (int i = 0; i < entries.length(); ++i) {
 
                                     JSONObject entry = (JSONObject) entries.get(i);
+
+                                    // Key fields
                                     String pseudo = entry.getString(JSON_KEY_PSEUDO);
                                     String date = entry.getString(JSON_KEY_DATE);
                                     String objType = entry.getString(JSON_KEY_OBJECT_TYPE);
@@ -234,9 +297,10 @@ public class NotificationsTable extends DataTable {
                                         objDate = entry.getString(JSON_KEY_OBJECT_DATE);
                                     String objFrom = entry.getString(JSON_KEY_OBJECT_FROM);
 
-                                    // Entry fields
+                                    // Data fields
                                     ContentValues values = new ContentValues();
                                     values.put(COLUMN_LU_FLAG, entry.getInt(JSON_KEY_LU_FLAG));
+
                                     values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
@@ -245,15 +309,19 @@ public class NotificationsTable extends DataTable {
                                             " AND " + COLUMN_DATE + "='" + date + '\'' +
                                             " AND " + COLUMN_OBJECT_TYPE + "='" + objType + '\'' +
                                             " AND " + COLUMN_OBJECT_ID +
-                                            ((objID != Constants.NO_DATA)? "=" + objID:DataTable.IS_NULL) +
+                                            ((objID != Constants.NO_DATA)? "=" + objID:IS_NULL) +
                                             " AND " + COLUMN_OBJECT_FROM + '=' + DatabaseUtils.sqlEscapeString(objFrom) +
                                             " AND " + COLUMN_OBJECT_DATE +
-                                            ((objDate != null)? "='" + objDate + '\'':DataTable.IS_NULL);
-                                    if (DataTable.getEntryCount(resolver, TABLE_NAME, selection) > 0) { // DB entry exists
+                                            ((objDate != null)? "='" + objDate + '\'':IS_NULL);
+                                    Cursor cursor = resolver.query(tableUri, new String[]{Constants.DATA_COLUMN_STATUS_DATE},
+                                            selection, null, null);
+                                    if (cursor.moveToFirst()) { // DB entry exists
 
                                         if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
+                                            // NB: Web site deletion priority (no status date comparison)
+                                            cursor.close();
 
-                                            // Delete entry (definitively)
+                                            ////// Delete entry (definitively)
                                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
                                                     Synchronized.TO_DELETE.getValue());
                                             resolver.update(tableUri, values, selection, null);
@@ -262,15 +330,20 @@ public class NotificationsTable extends DataTable {
 
                                             ++syncResult.deleted;
 
-                                        } else { // Update entry
+                                        } else if (cursor.getString(COLUMN_INDEX_STATUS_DATE)
+                                                    .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
 
+                                            ////// Update entry
+                                            cursor.close();
                                             resolver.update(tableUri, values, selection, null);
                                             ++syncResult.updated;
-                                        }
+
+                                        } else // Nothing to do here (let's synchronize from local to remote DB)
+                                            cursor.close();
 
                                     } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
-                                        // Insert entry into DB
+                                        ////// Insert entry into DB
                                         values.put(COLUMN_PSEUDO, pseudo);
                                         values.put(COLUMN_DATE, date);
                                         values.put(COLUMN_OBJECT_TYPE, objType);
@@ -281,7 +354,7 @@ public class NotificationsTable extends DataTable {
 
                                         ++syncResult.inserted;
                                     }
-                                    //else // Do not add a deleted entry
+                                    //else // Do not add a deleted entry (created & removed when offline)
                                 }
 
                             } else {

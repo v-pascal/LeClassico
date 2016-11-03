@@ -99,8 +99,8 @@ public class PresentsTable extends DataTable {
 
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
     @Override
-    public ContentValues syncInserted(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -109,8 +109,8 @@ public class PresentsTable extends DataTable {
         return inserted;
     }
     @Override
-    public ContentValues syncUpdated(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
@@ -119,8 +119,8 @@ public class PresentsTable extends DataTable {
         return updated;
     }
     @Override
-    public ContentValues syncDeleted(ContentResolver resolver, String token, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";pseudo: " + pseudo);
+    public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
 
 
