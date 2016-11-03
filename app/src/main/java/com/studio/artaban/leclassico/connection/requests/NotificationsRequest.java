@@ -1,6 +1,5 @@
 package com.studio.artaban.leclassico.connection.requests;
 
-import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -24,7 +23,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class NotificationsRequest extends DataRequest {
 
     public NotificationsRequest(DataService service) {
-        super(service);
+        super(service, Tables.ID_NOTIFICATIONS, NotificationsTable.COLUMN_PSEUDO);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
@@ -83,61 +82,6 @@ public class NotificationsRequest extends DataRequest {
                     ServiceNotify.update(mService, newNotify);
 
                 notifyChange(); // Notify DB change to observer URI
-            }
-        }
-    }
-
-    @Override
-    public void synchronize() { // Update data from local to remote DB
-        Logs.add(Logs.Type.V, null);
-
-        // Get login info
-        Login.Reply dataLogin = new Login.Reply();
-        mService.copyLoginData(dataLogin);
-
-        synchronized (mRegister) {
-            DataTable table = Database.getTable(NotificationsTable.TABLE_NAME);
-
-            // Synchronize inserted rows
-            setSyncInProgress(NotificationsTable.TABLE_NAME,
-                    NotificationsTable.COLUMN_PSEUDO + '=' + dataLogin.pseudo + '\'',
-                    DataTable.Synchronized.TO_INSERT.getValue());
-
-            ContentValues operationData =
-                    table.syncInserted(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
-            if ((operationData.size() > 0) &&
-                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_INSERT,
-                    dataLogin.pseudo, null, operationData) == null)) {
-
-                Logs.add(Logs.Type.E, "Synchronization #" + Tables.ID_NOTIFICATIONS + " error (inserted)");
-                return;
-            }
-
-            // Synchronize updated rows
-            setSyncInProgress(NotificationsTable.TABLE_NAME,
-                    NotificationsTable.COLUMN_PSEUDO + '=' + dataLogin.pseudo + '\'',
-                    DataTable.Synchronized.TO_UPDATE.getValue());
-
-            operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
-            if ((operationData.size() > 0) &&
-                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_UPDATE,
-                    dataLogin.pseudo, null, operationData) == null)) {
-
-                Logs.add(Logs.Type.E, "Synchronization #" + Tables.ID_NOTIFICATIONS + " error (updated)");
-                return;
-            }
-
-            // Synchronize deleted rows
-            setSyncInProgress(NotificationsTable.TABLE_NAME,
-                    NotificationsTable.COLUMN_PSEUDO + '=' + dataLogin.pseudo + '\'',
-                    DataTable.Synchronized.TO_DELETE.getValue());
-
-            operationData = table.syncInserted(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
-            if ((operationData.size() > 0) &&
-                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_DELETE,
-                    dataLogin.pseudo, null, operationData) == null)) {
-
-                Logs.add(Logs.Type.E, "Synchronization #" + Tables.ID_NOTIFICATIONS + " error (deleted)");
             }
         }
     }

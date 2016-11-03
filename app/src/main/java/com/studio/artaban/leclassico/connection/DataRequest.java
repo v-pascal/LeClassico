@@ -9,6 +9,9 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -31,12 +34,16 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     private boolean mCancelled; // Request timer task cancelled flag
 
     protected final DataService mService; // Data service
+    private final byte mTableId; // DB table ID
+    private final String mFieldPseudo; // DB pseudo column name
 
-    public DataRequest(DataService service) {
-        Logs.add(Logs.Type.V, "service: " + service);
+    public DataRequest(DataService service, byte tableId, String pseudoField) {
+        Logs.add(Logs.Type.V, "service: " + service + ";tableId: " + tableId + ";pseudoField: " + pseudoField);
 
         mSyncObserver = new DataObserver("requestDataObserverThread", this);
+        mFieldPseudo = pseudoField;
         mService = service;
+        mTableId = tableId;
     }
 
     //
@@ -45,7 +52,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
         for (Uri observerUri : mRegister)
             mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
     }
-    protected void setSyncInProgress(String table, String selection, byte operation) {
+    private void setSyncInProgress(String table, String selection, byte operation) {
     // Set synchronization fields into in progress status according its operation
 
         Logs.add(Logs.Type.V, "table: " + table + ";selection: " + selection + ";operation: " + operation);
@@ -151,5 +158,55 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     public abstract void unregister(Uri uri);
 
     public abstract void request(Bundle data); // Update data from remote to local DB
-    public abstract void synchronize(); // Update data from local to remote DB
+    public void synchronize() { // Update data from local to remote DB
+        Logs.add(Logs.Type.V, null);
+
+        // Get login info
+        Login.Reply dataLogin = new Login.Reply();
+        mService.copyLoginData(dataLogin);
+
+        synchronized (mRegister) {
+            String tableName = Tables.getName(mTableId);
+            DataTable table = Database.getTable(tableName);
+
+            ////// Synchronize inserted rows
+            setSyncInProgress(tableName, mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+                    DataTable.Synchronized.TO_INSERT.getValue());
+
+            ContentValues operationData =
+                    table.syncInserted(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+            if ((operationData.size() > 0) &&
+                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_INSERT,
+                    dataLogin.pseudo, null, operationData) == null)) {
+
+                Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (inserted)");
+                return;
+            }
+
+            ////// Synchronize updated rows
+            setSyncInProgress(tableName, mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+                    DataTable.Synchronized.TO_UPDATE.getValue());
+
+            operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+            if ((operationData.size() > 0) &&
+                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_UPDATE,
+                    dataLogin.pseudo, null, operationData) == null)) {
+
+                Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (updated)");
+                return;
+            }
+
+            ////// Synchronize deleted rows
+            setSyncInProgress(tableName, mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+                    DataTable.Synchronized.TO_DELETE.getValue());
+
+            operationData = table.syncInserted(mService.getContentResolver(), dataLogin.token.get(), dataLogin.pseudo);
+            if ((operationData.size() > 0) &&
+                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_DELETE,
+                    dataLogin.pseudo, null, operationData) == null)) {
+
+                Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (deleted)");
+            }
+        }
+    }
 }

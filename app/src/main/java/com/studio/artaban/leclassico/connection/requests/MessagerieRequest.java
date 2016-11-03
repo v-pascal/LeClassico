@@ -6,9 +6,8 @@ import android.os.Bundle;
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.Login;
-import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
-import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -19,7 +18,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class MessagerieRequest extends DataRequest {
 
     public MessagerieRequest(DataService service) {
-        super(service);
+        super(service, Tables.ID_MESSAGERIE, MessagerieTable.COLUMN_PSEUDO);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
@@ -56,27 +55,6 @@ public class MessagerieRequest extends DataRequest {
 
 
         } else { ////// New or data updates requested
-
-
-
-
-
-
-        }
-    }
-
-    @Override
-    public void synchronize() { // Update data from local to remote DB
-        Logs.add(Logs.Type.V, null);
-
-        // Get login info
-        Login.Reply dataLogin = new Login.Reply();
-        mService.copyLoginData(dataLogin);
-
-        synchronized (mRegister) {
-            DataTable table = Database.getTable(MessagerieTable.TABLE_NAME);
-
-
 
 
 

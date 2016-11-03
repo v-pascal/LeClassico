@@ -113,12 +113,10 @@ public abstract class DataTable implements IDataTable {
     protected static final String DATA_KEY_WEB_SERVICE = "webService";
     protected static final String DATA_KEY_TOKEN = "token";
     protected static final String DATA_KEY_OPERATION = "operation";
-
+    protected static final String DATA_KEY_LIMIT = "limit";
     protected static final String DATA_KEY_TABLE_NAME = "tableName";
     protected static final String DATA_KEY_PSEUDO = "pseudo";
     protected static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
-
-    protected static final String DATA_KEY_LIMIT = "limit";
 
     //////
     protected static String getSyncUrlRequest(ContentResolver resolver, Bundle data) {
