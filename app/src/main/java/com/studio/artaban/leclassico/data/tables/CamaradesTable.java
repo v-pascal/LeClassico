@@ -294,6 +294,7 @@ public class CamaradesTable extends DataTable {
     private static final String JSON_KEY_LONGITUDE = COLUMN_LONGITUDE.substring(4);
     private static final String JSON_KEY_LONGITUDE_UPD = COLUMN_LONGITUDE_UPD.substring(4);
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
+    // TODO: Replace JSON keys by column indexes
 
     @Override
     public SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
@@ -529,10 +530,6 @@ public class CamaradesTable extends DataTable {
                                         removed = true;
                                     }
 
-
-
-
-
                                     if (removed) { // Keep local synchronized & status date fields
 
                                         values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
@@ -540,10 +537,6 @@ public class CamaradesTable extends DataTable {
                                         values.put(Constants.DATA_COLUMN_STATUS_DATE,
                                                 cursor.getString(COLUMN_INDEX_STATUS_DATE));
                                     }
-
-
-
-
                                     cursor.close();
                                     resolver.update(tableUri, values, selection, null);
                                     ++syncResult.updated;

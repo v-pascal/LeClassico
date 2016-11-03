@@ -81,6 +81,7 @@ public class NotificationsRequest extends DataRequest {
                 if (prevNewNotify != newNotify)
                     ServiceNotify.update(mService, newNotify);
 
+                Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
                 notifyChange(); // Notify DB change to observer URI
             }
         }

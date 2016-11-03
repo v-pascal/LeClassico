@@ -261,7 +261,7 @@ public class MessagerieTable extends DataTable {
 
                                             ++syncResult.deleted;
 
-                                        } else if (cursor.getString(COLUMN_INDEX_STATUS_DATE)
+                                        } else if (cursor.getString(0)
                                                     .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
 
                                             ////// Update entry

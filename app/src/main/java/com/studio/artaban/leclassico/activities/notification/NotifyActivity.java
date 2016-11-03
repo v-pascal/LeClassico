@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.notification;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -31,7 +32,6 @@ import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
-import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
@@ -78,8 +78,9 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                 // Notify service & notifications URI to refresh notification list
                 ServiceNotify.update(NotifyActivity.this, 0);
-                getContentResolver().notifyChange((Uri) getIntent()
-                        .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI), null);
+                getContentResolver().notifyChange(ContentUris.withAppendedId((Uri) getIntent()
+                        .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI), 0), null);
+                        // NB: The 0 appended ti URI above permits to avoid multiple 'onChange' method call
             }
         });
     }

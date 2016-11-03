@@ -174,7 +174,7 @@ public class NotificationsTable extends DataTable {
                     key.put(JSON_KEY_DATE, cursor.getString(COLUMN_INDEX_DATE));
                     key.put(JSON_KEY_OBJECT_TYPE, cursor.getString(COLUMN_INDEX_OBJECT_TYPE));
                     key.put(JSON_KEY_OBJECT_ID, (!cursor.isNull(COLUMN_INDEX_OBJECT_ID)) ?
-                            String.valueOf(cursor.getInt(COLUMN_INDEX_OBJECT_ID)) : null);
+                            cursor.getInt(COLUMN_INDEX_OBJECT_ID) : null);
                     key.put(JSON_KEY_OBJECT_DATE, (!cursor.isNull(COLUMN_INDEX_OBJECT_DATE)) ?
                             cursor.getString(COLUMN_INDEX_OBJECT_DATE) : null);
                     key.put(JSON_KEY_OBJECT_FROM, cursor.getString(COLUMN_INDEX_OBJECT_FROM));
@@ -182,7 +182,7 @@ public class NotificationsTable extends DataTable {
                     // Status
                     JSONObject state = new JSONObject();
                     state.put(JSON_KEY_STATUS_DATE, cursor.getString(COLUMN_INDEX_STATUS_DATE));
-                    // TODO: Implement local and remote time lag ?!?!
+                    // TODO: Implement local and remote time lag here ?!?!
 
                     // Updates
                     JSONObject update = new JSONObject();
@@ -195,23 +195,14 @@ public class NotificationsTable extends DataTable {
 
                 } while (cursor.moveToNext());
 
-                // Assign JSON objects into content data
-                JSONObject keys = new JSONObject();
-                JSONObject status = new JSONObject();
-                JSONObject updates = new JSONObject();
-
-                keys.put(WebServices.DATA_KEYS, keysArray);
-                status.put(WebServices.DATA_STATUS, statusArray);
-                updates.put(WebServices.DATA_UPDATES, updatesArray);
-
                 //////
-                Logs.add(Logs.Type.I, "Keys: " + keys.toString());
-                Logs.add(Logs.Type.I, "Status: " + status.toString());
-                Logs.add(Logs.Type.I, "Updates: " + updates.toString());
+                Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
+                Logs.add(Logs.Type.I, "Updates: " + updatesArray.toString());
 
-                updated.put(WebServices.DATA_KEYS, keys.toString());
-                updated.put(WebServices.DATA_STATUS, status.toString());
-                updated.put(WebServices.DATA_UPDATES, updates.toString());
+                updated.put(WebServices.DATA_KEYS, keysArray.toString());
+                updated.put(WebServices.DATA_STATUS, statusArray.toString());
+                updated.put(WebServices.DATA_UPDATES, updatesArray.toString());
 
             } catch (JSONException e) {
                 Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
@@ -330,8 +321,8 @@ public class NotificationsTable extends DataTable {
 
                                             ++syncResult.deleted;
 
-                                        } else if (cursor.getString(COLUMN_INDEX_STATUS_DATE)
-                                                    .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
+                                        } else if (cursor.getString(0)
+                                                .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
 
                                             ////// Update entry
                                             cursor.close();

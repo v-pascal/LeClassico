@@ -34,7 +34,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     private boolean mCancelled; // Request timer task cancelled flag
 
     protected final DataService mService; // Data service
-    private final byte mTableId; // DB table ID
+    protected final byte mTableId; // DB table ID
     private final String mFieldPseudo; // DB pseudo column name
 
     public DataRequest(DataService service, byte tableId, String pseudoField) {
@@ -52,20 +52,28 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
         for (Uri observerUri : mRegister)
             mService.getContentResolver().notifyChange(observerUri, mSyncObserver);
     }
-    private void setSyncInProgress(String table, String selection, byte operation) {
+    private void setSyncInProgress(String selection, byte operation) {
     // Set synchronization fields into in progress status according its operation
 
-        Logs.add(Logs.Type.V, "table: " + table + ";selection: " + selection + ";operation: " + operation);
+        Logs.add(Logs.Type.V, "selection: " + selection + ";operation: " + operation);
 
         ContentValues values = new ContentValues();
         values.put(Constants.DATA_COLUMN_SYNCHRONIZED, operation | DataTable.Synchronized.IN_PROGRESS.getValue());
-        int result = mService.getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + table),
-                values, selection + " AND " + Constants.DATA_COLUMN_SYNCHRONIZED + '=' + operation,
+        int result = mService.getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + Tables.getName(mTableId)),
+                values, selection + " AND " + Constants.DATA_COLUMN_SYNCHRONIZED + '=' + String.valueOf(operation),
                 null);
 
         // Notify registered URIs (if needed)
-        if (result > 0)
+        if (result > 0) {
+            Logs.add(Logs.Type.I, "Operation " + operation + " in progress (#" + mTableId + ')');
             notifyChange();
+
+            // Make a delay to let's any UI animations works
+            try { Thread.sleep(2000, 0);
+            } catch (InterruptedException e) {
+                Logs.add(Logs.Type.W, "Unexpected interruption: " + e.getMessage());
+            }
+        }
     }
 
     //////
@@ -159,18 +167,17 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
 
     public abstract void request(Bundle data); // Update data from remote to local DB
     public void synchronize() { // Update data from local to remote DB
-        Logs.add(Logs.Type.V, null);
+        Logs.add(Logs.Type.V, "mTableId: " + mTableId);
 
         // Get login info
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
         synchronized (mRegister) {
-            String tableName = Tables.getName(mTableId);
-            DataTable table = Database.getTable(tableName);
+            DataTable table = Database.getTable(Tables.getName(mTableId));
 
             ////// Synchronize inserted rows
-            setSyncInProgress(tableName, mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+            setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                     DataTable.Synchronized.TO_INSERT.getValue());
 
             ContentValues operationData =
@@ -180,11 +187,12 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                     dataLogin.pseudo, null, operationData) == null)) {
 
                 Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (inserted)");
+                notifyChange();
                 return;
             }
 
             ////// Synchronize updated rows
-            setSyncInProgress(tableName, mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+            setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                     DataTable.Synchronized.TO_UPDATE.getValue());
 
             operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.pseudo);
@@ -193,11 +201,12 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                     dataLogin.pseudo, null, operationData) == null)) {
 
                 Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (updated)");
+                notifyChange();
                 return;
             }
 
             ////// Synchronize deleted rows
-            setSyncInProgress(tableName, mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+            setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                     DataTable.Synchronized.TO_DELETE.getValue());
 
             operationData = table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
@@ -206,6 +215,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                     dataLogin.pseudo, null, operationData) == null)) {
 
                 Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (deleted)");
+                notifyChange();
             }
         }
     }

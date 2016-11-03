@@ -154,7 +154,8 @@ public abstract class DataTable implements IDataTable {
         values.put(Constants.DATA_COLUMN_SYNCHRONIZED, operation);
         resolver.update(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)), values,
                 data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " +
-                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (operation | DataTable.Synchronized.IN_PROGRESS.getValue()),
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + String.valueOf(operation |
+                        DataTable.Synchronized.IN_PROGRESS.getValue()),
                 null);
     }
 
