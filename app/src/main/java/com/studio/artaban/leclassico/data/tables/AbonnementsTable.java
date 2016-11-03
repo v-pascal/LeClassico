@@ -163,11 +163,9 @@ public class AbonnementsTable extends DataTable {
         data.putString(DataTable.DATA_KEY_WEB_SERVICE, WebServices.URL_FOLLOWERS);
         data.putString(DataTable.DATA_KEY_TOKEN, token);
         data.putByte(DataTable.DATA_KEY_OPERATION, operation);
-        if (pseudo != null) { // Add status date criteria
-            data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
-            data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
-            data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
-        }
+        data.putString(DataTable.DATA_KEY_PSEUDO, pseudo);
+        data.putString(DataTable.DATA_KEY_TABLE_NAME, TABLE_NAME);
+        data.putString(DataTable.DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getSyncUrlRequest(resolver, data);
 
         // Send remote DB request
@@ -246,7 +244,10 @@ public class AbonnementsTable extends DataTable {
             }
         });
         if (result != Internet.DownloadResult.SUCCEEDED) {
+
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
+            if (operation != WebServices.OPERATION_SELECT)
+                resetSyncInProgress(resolver, data);
             return null;
         }
         return syncResult;

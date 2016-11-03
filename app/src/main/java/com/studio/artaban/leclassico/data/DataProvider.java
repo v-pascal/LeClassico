@@ -250,9 +250,13 @@ public class DataProvider extends ContentProvider {
         }
 
         // Check exiting status date & synchronized fields values (always needed)
-        if (!values.containsKey(Constants.DATA_COLUMN_SYNCHRONIZED))
+        boolean syncOnly = values.size() == 1; // Only update synchronization field flag
+        if (!values.containsKey(Constants.DATA_COLUMN_SYNCHRONIZED)) {
             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataTable.Synchronized.TO_UPDATE.getValue());
-        if (!values.containsKey(Constants.DATA_COLUMN_STATUS_DATE)) {
+            syncOnly = false;
+        }
+        if ((!syncOnly) && (!values.containsKey(Constants.DATA_COLUMN_STATUS_DATE))) {
+            // NB: Only update status date if not just updating synchronization field
 
             Date now = new Date();
             DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);

@@ -125,12 +125,13 @@ public abstract class DataTable implements IDataTable {
         // Return URL of synchronization request according table data
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
+        byte operation = data.getByte(DATA_KEY_OPERATION);
         String url = Constants.APP_WEBSERVICES + data.getString(DATA_KEY_WEB_SERVICE) + '?' +
                 WebServices.DATA_TOKEN + '=' + data.getString(DATA_KEY_TOKEN) + '&' + // Add token...
-                WebServices.DATA_OPERATION + '=' + data.getByte(DATA_KEY_OPERATION); // ...& operation
+                WebServices.DATA_OPERATION + '=' + operation; // ...& operation (always)
 
-        // Get last synchronization date (if needed)
-        if (data.containsKey(DATA_KEY_PSEUDO)) {
+        // Get & add last synchronization date (if needed)
+        if (operation == WebServices.OPERATION_SELECT) {
             String statusDate = getMaxStatusDate(resolver, data);
             if (statusDate != null) {
 
@@ -142,6 +143,19 @@ public abstract class DataTable implements IDataTable {
             url += '&' + WebServices.DATA_LIMIT + '=' + data.getShort(DATA_KEY_LIMIT);
 
         return url;
+    }
+    protected void resetSyncInProgress(ContentResolver resolver, Bundle data) {
+    // Remove all in progress synchronization status (replaced by its operation)
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
+        byte operation = data.getByte(DATA_KEY_OPERATION);
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, operation);
+        resolver.update(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)), values,
+                data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (operation | DataTable.Synchronized.IN_PROGRESS.getValue()),
+                null);
     }
 
     //////
