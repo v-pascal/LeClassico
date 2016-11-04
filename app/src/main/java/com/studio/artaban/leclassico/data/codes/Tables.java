@@ -12,7 +12,6 @@ import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.data.tables.VotesTable;
-import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
  * Created by pascal on 11/08/16.
@@ -36,7 +35,7 @@ public final class Tables {
     public static final byte ID_LAST = ID_NOTIFICATIONS;
 
     //////
-    public static final int ID_MAX = 255;
+    public static final int ID_MAX = 127; // Max positive byte value
 
     public static String getName(byte id) { // Return DB table name according its ID
         //Logs.add(Logs.Type.V, "id: " + id);

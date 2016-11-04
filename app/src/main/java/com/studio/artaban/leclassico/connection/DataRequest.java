@@ -130,9 +130,13 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
             mTask = new TimerTask() {
                 @Override
                 public void run() {
+                    // Synchronization from remote to local DB
                     synchronized (mRegister) {
                         request(null);
                     }
+                    // Synchronization from local to remote DB (if needed)
+                    if (mToSynchronize) // NB: Should not happen! Only in error case (server not available)
+                        synchronize();
                 }
             };
 
@@ -152,10 +156,12 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+        mToSynchronize = true;
+
         if (Internet.isConnected())
             synchronize();
     }
-
+    private boolean mToSynchronize; // Flag to synchronize from local to remote DB
     protected final DataObserver mSyncObserver; // Data update observer
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
@@ -219,9 +225,12 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                         WebServices.OPERATION_DELETE, dataLogin.pseudo, null, operationData);
                 notifyChange();
 
-                if (result == null)
+                if (result == null) {
                     Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (deleted)");
+                    return;
+                }
             }
+            mToSynchronize = false;
         }
     }
 }

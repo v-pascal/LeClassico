@@ -143,12 +143,8 @@ public class NotificationsTable extends DataTable {
     @Override
     public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
-
-
-
-
         ContentValues inserted = new ContentValues();
-        return inserted;
+        return inserted; // Not needed for notifications table
     }
     @Override
     public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
@@ -214,12 +210,8 @@ public class NotificationsTable extends DataTable {
     @Override
     public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
-
-
-
-
         ContentValues deleted = new ContentValues();
-        return deleted;
+        return deleted; // Not needed for notifications table
     }
 
     // JSON keys

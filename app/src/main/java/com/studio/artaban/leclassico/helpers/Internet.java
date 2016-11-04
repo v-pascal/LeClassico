@@ -201,6 +201,7 @@ public final class Internet {
                                                      OnRequestListener listener) {
 
         Logs.add(Logs.Type.V, "url: " + url + ";postData: " + postData + ";listener: " + listener);
+        //Logs.add(Logs.Type.I, "postData: " + postData);
 
         InputStream is = null;
         OutputStream os = null;

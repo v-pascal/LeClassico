@@ -26,6 +26,7 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
+import com.studio.artaban.leclassico.components.RecyclerRequest;
 import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -52,7 +53,8 @@ import java.util.Date;
  * Created by pascal on 29/10/16.
  * Notification activity class
  */
-public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
+public class NotifyActivity extends LoggedActivity implements
+        QueryLoader.OnResultListener, RecyclerRequest.OnRequestListener {
 
     public void onRead(View sender) { // Mark unread notification(s) as read
 
@@ -80,7 +82,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 ServiceNotify.update(NotifyActivity.this, 0);
                 getContentResolver().notifyChange(ContentUris.withAppendedId((Uri) getIntent()
                         .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI), 0), null);
-                        // NB: The 0 appended ti URI above permits to avoid multiple 'onChange' method call
+                        // NB: The 0 appended to URI above permits to avoid multiple 'onChange' method call
             }
         });
     }
@@ -167,7 +169,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 .start();
     }
 
-    private RecyclerView mNotifyList; // Recycler view containing notification list
+    private RecyclerRequest mNotifyList; // Recycler view containing notification list
     private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
 
     //////
@@ -388,6 +390,21 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 }
             });
         }
+    }
+
+    ////// OnRequestListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean onRequestOld() {
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+
+
+
+        return true;
     }
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
@@ -788,9 +805,10 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         LinearLayoutManager linearManager = new LinearLayoutManager(this);
         linearManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        mNotifyList = (RecyclerView) findViewById(R.id.list_notification);
+        mNotifyList = (RecyclerRequest) findViewById(R.id.list_notification);
         mNotifyList.setLayoutManager(linearManager);
         mNotifyList.setItemAnimator(itemAnimator);
+        mNotifyList.setOnRequestListener(this);
 
         // Initialize notification list (set query loaders)
         setLoaders();

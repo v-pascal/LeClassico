@@ -21,7 +21,7 @@ public class LimitlessViewPager extends ViewPager {
     public static final String TAG_PAGE_RIGHT_BOTTOM = "rightBottom";
     // Tags
 
-    public interface OnLimitCrossedListener {
+    public interface OnLimitCrossedListener { //////////////////////////////////////////////////////
 
         boolean onStartBehavior(boolean leftTop, float originX, float originY);
         boolean onFinishBehavior(boolean leftTop);
@@ -29,19 +29,18 @@ public class LimitlessViewPager extends ViewPager {
         boolean onLeftTopLimitCrossed(View page, float deltaX, float deltaY);
         boolean onRightBottomLimitCrossed(View page, float deltaX, float deltaY);
     };
-    // Listener interface
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     public LimitlessViewPager(Context context) {
         super(context);
     }
-
     public LimitlessViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     //
     private OnLimitCrossedListener mListener;
-
     public void setOnLimitlessListener(OnLimitCrossedListener listener) {
         mListener = listener;
     }
@@ -57,7 +56,7 @@ public class LimitlessViewPager extends ViewPager {
     //////
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if ((getCurrentItem() == 0)||(getCurrentItem() == (getAdapter().getCount() - 1))) {
+        if ((getCurrentItem() == 0) || (getCurrentItem() == (getAdapter().getCount() - 1))) {
             switch (event.getActionMasked()) {
 
                 case MotionEvent.ACTION_DOWN: {
@@ -127,7 +126,6 @@ public class LimitlessViewPager extends ViewPager {
                                     return true;
 
                             } else {
-
                                 if (mListener.onRightBottomLimitCrossed(page, deltaX, deltaY))
                                     return true;
                             }
