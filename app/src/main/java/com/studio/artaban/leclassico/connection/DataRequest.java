@@ -182,13 +182,15 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
 
             ContentValues operationData =
                     table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
-            if ((operationData.size() > 0) &&
-                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_INSERT,
-                    dataLogin.pseudo, null, operationData) == null)) {
+            if (operationData.size() > 0) {
+                Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
+                        WebServices.OPERATION_INSERT, dataLogin.pseudo, null, operationData);
+                notifyChange(); // To update UI synchronization fields (no more in progress status)
 
-                Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (inserted)");
-                notifyChange();
-                return;
+                if (result == null) {
+                    Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (inserted)");
+                    return;
+                }
             }
 
             ////// Synchronize updated rows
@@ -196,13 +198,15 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                     DataTable.Synchronized.TO_UPDATE.getValue());
 
             operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.pseudo);
-            if ((operationData.size() > 0) &&
-                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_UPDATE,
-                    dataLogin.pseudo, null, operationData) == null)) {
-
-                Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (updated)");
+            if (operationData.size() > 0) {
+                Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
+                        WebServices.OPERATION_UPDATE, dataLogin.pseudo, null, operationData);
                 notifyChange();
-                return;
+
+                if (result == null) {
+                    Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (updated)");
+                    return;
+                }
             }
 
             ////// Synchronize deleted rows
@@ -210,12 +214,13 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                     DataTable.Synchronized.TO_DELETE.getValue());
 
             operationData = table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
-            if ((operationData.size() > 0) &&
-                    (table.synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_DELETE,
-                    dataLogin.pseudo, null, operationData) == null)) {
-
-                Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (deleted)");
+            if (operationData.size() > 0) {
+                Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
+                        WebServices.OPERATION_DELETE, dataLogin.pseudo, null, operationData);
                 notifyChange();
+
+                if (result == null)
+                    Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (deleted)");
             }
         }
     }

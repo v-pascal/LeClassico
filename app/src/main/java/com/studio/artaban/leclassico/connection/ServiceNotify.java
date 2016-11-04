@@ -84,8 +84,6 @@ public final class ServiceNotify {
 
         notifyViews.setOnClickPendingIntent(R.id.image_logout, logoutIntent);
         notifyViews.setOnClickPendingIntent(R.id.text_logout, logoutIntent);
-        notifyViews.setOnClickPendingIntent(R.id.image_display, displayIntent);
-        notifyViews.setOnClickPendingIntent(R.id.text_display, displayIntent);
 
         //
         mNotify = new Notification.Builder(service)
@@ -93,6 +91,7 @@ public final class ServiceNotify {
                         .setContentTitle(service.getString(R.string.app_name))
                         .setContentText(title)
                         .setColor(service.getResources().getColor(R.color.colorPrimaryMain))
+                        .setContentIntent(displayIntent)
                         .build();
 
         mNotify.bigContentView = notifyViews;

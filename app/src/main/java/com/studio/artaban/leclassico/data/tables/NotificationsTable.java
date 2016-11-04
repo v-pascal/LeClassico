@@ -196,9 +196,9 @@ public class NotificationsTable extends DataTable {
                 } while (cursor.moveToNext());
 
                 //////
-                Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
-                Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
-                Logs.add(Logs.Type.I, "Updates: " + updatesArray.toString());
+                //Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                //Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
+                //Logs.add(Logs.Type.I, "Updates: " + updatesArray.toString());
 
                 updated.put(WebServices.DATA_KEYS, keysArray.toString());
                 updated.put(WebServices.DATA_STATUS, statusArray.toString());

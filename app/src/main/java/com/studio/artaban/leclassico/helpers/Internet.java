@@ -192,7 +192,7 @@ public final class Internet {
                 postContent.append(URLEncoder.encode(entry.getValue().toString(), POST_CONTENT_ENCODING));
 
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                Logs.add(Logs.Type.E, "Failed to format POST data: " + e.getMessage());
             }
         }
         return postContent.toString();
@@ -219,10 +219,11 @@ public final class Internet {
                 bw.write(getPostContent(postData));
                 bw.flush();
             }
-            httpConnection.connect();
 
-            if (httpConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
-                throw new IOException();
+            httpConnection.connect();
+            int code = httpConnection.getResponseCode();
+            if (code != HttpURLConnection.HTTP_OK)
+                throw new IOException("Wrong HTTP code " + code + " response");
 
             // Store reply into string (if needed)
             if (listener != null) {

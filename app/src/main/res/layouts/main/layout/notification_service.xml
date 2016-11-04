@@ -112,7 +112,6 @@
 
         <!-- Display icon -->
         <ImageView
-            android:id="@+id/image_display"
             android:src="@drawable/ic_open_in_new_white_24dp"
             android:tint="@color/colorNotifyText"
             android:layout_marginTop="@dimen/service_cmd_margin"
@@ -123,7 +122,6 @@
 
         <!-- Display -->
         <TextView
-            android:id="@+id/text_display"
             android:text="@string/service_display"
             android:textSize="@dimen/service_text_size"
             android:textColor="@color/colorNotifyText"
