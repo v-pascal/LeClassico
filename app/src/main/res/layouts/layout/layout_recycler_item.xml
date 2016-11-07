@@ -12,4 +12,11 @@
         android:id="@+id/layout_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+    <!-- Old request layout (if needed) -->
+    <ViewStub
+        android:id="@+id/layout_request"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

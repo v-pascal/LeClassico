@@ -22,6 +22,7 @@ import java.util.Collections;
 public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
     @LayoutRes private final int mItemLayout; // Holder view layout Id
+    @LayoutRes private final int mRequestLayout; // Holder view old request layout Id (NO_DATA if useless)
     protected final DataView mDataSource; // Data source
 
     ////// AppearanceAnimatorMaker /////////////////////////////////////////////////////////////////
@@ -51,10 +52,12 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public RecyclerAdapter(@LayoutRes int layout, int key) {
-        Logs.add(Logs.Type.V, "layout: " + layout);
+    public RecyclerAdapter(@LayoutRes int itemLayout, @LayoutRes int requestLayout, int key) {
+        Logs.add(Logs.Type.V, "layout: " + itemLayout + ";requestLayout: " + requestLayout +
+                ";key: " + key);
 
-        mItemLayout = layout;
+        mItemLayout = itemLayout;
+        mRequestLayout = requestLayout;
         mDataSource = new DataView(key);
     }
     public DataView getDataSource() {
@@ -317,7 +320,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 .inflate(R.layout.layout_recycler_item, parent, false);
 
         view.setTag(Boolean.TRUE); // Needed to avoid first display animation
-        return new ViewHolder(view, mItemLayout);
+        return new ViewHolder(view, mItemLayout, mRequestLayout);
     }
 
     @Override
@@ -335,14 +338,20 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
     //////
     public static class ViewHolder extends RecyclerView.ViewHolder {
-
         public View rootView; // Holder root view
-        public ViewHolder(View view, @LayoutRes int layoutItem) {
+
+        public ViewHolder(View view, @LayoutRes int layoutItem, @LayoutRes int layoutRequest) {
             super(view);
 
             ViewStub stub = (ViewStub)view.findViewById(R.id.layout_item);
             stub.setLayoutResource(layoutItem);
             rootView = stub.inflate();
+
+            if (layoutRequest != Constants.NO_DATA) {
+                stub = (ViewStub)view.findViewById(R.id.layout_request);
+                stub.setLayoutResource(layoutRequest);
+                stub.inflate();
+            }
         }
     }
 }

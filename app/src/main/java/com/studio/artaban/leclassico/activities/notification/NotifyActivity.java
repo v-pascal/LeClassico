@@ -143,10 +143,13 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     }
 
     private int mFabTransY = Constants.NO_DATA; // Vertical floating action button translation
-    private void hideFab(final ViewPropertyAnimatorCompat animation) {
-        // Hide floating action button (with translation)
+    private void hideFab(View fab) { // Hide floating action button (with translation)
 
-        Logs.add(Logs.Type.V,  "animation: " + animation);
+        Logs.add(Logs.Type.V, "fab: " + fab);
+        if (fab.getVisibility() != View.VISIBLE)
+            return; // Noting to do
+
+        final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
         animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
                 .translationY(mFabTransY)
                 .setListener(new ViewPropertyAnimatorListener() {
@@ -167,14 +170,42 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 })
                 .start();
     }
+    private void displayFab(View fab) { // Show floating action button (with translation)
+        Logs.add(Logs.Type.V, "fab: " + fab);
+
+        fab.setVisibility(View.VISIBLE);
+        fab.setTranslationY(mFabTransY);
+        // NB: Coz fab can be invisible without any translation
+
+        final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
+        animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
+                .translationY(0)
+                .setListener(new ViewPropertyAnimatorListener() {
+                    @Override
+                    public void onAnimationStart(View view) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(View view) {
+                        animation.setListener(null);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(View view) {
+                        ViewCompat.setTranslationY(view, 0);
+                    }
+                })
+                .start();
+    }
 
     private RecyclerView mNotifyList; // Recycler view containing notification list
     private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
 
     //////
     private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
-        public NotifyRecyclerViewAdapter(@LayoutRes int layout, int key) {
-            super(layout, key);
+        public NotifyRecyclerViewAdapter() {
+            super(R.layout.layout_notification_item, R.layout.layout_old_request, COLUMN_INDEX_NOTIFY_ID);
         }
 
         private void displayDate(TextView viewDate, String date) {
@@ -442,7 +473,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                                     if ((newData.size() > count) && (((String)newData.get(followed)
                                             .get(COLUMN_INDEX_DATE)).substring(0, 10)
                                             .compareTo(((String) newData.get(followed - 1)
-                                            .get(COLUMN_INDEX_DATE)).substring(0, 10)) == 0))
+                                                    .get(COLUMN_INDEX_DATE)).substring(0, 10)) == 0))
                                         mNotifyAdapter.notifyItemChanged(followed);
                                 }
 
@@ -467,63 +498,45 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                                 .setDisableChangeAnimations(swapResult.countChanged);
 
                     // Display/Hide floating action button
-                    fab.setVisibility(View.VISIBLE);
-                    final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
-
-                    if (newNotify > 0) // Display floating action button
-                        animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
-                                .translationY(0)
-                                .setListener(new ViewPropertyAnimatorListener() {
-                                    @Override
-                                    public void onAnimationStart(View view) {
-
-                                    }
+                    final boolean display = newNotify > 0;
+                    if (mFabTransY == Constants.NO_DATA)
+                        fab.getViewTreeObserver()
+                                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
                                     @Override
-                                    public void onAnimationEnd(View view) {
-                                        animation.setListener(null);
+                                    public void onGlobalLayout() {
+                                        Logs.add(Logs.Type.V, null);
+                                        mFabTransY = fab.getHeight() +
+                                                (getResources().getDimensionPixelSize(R.dimen.fab_margin) << 1);
+
+                                        fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                        if (display)
+                                            displayFab(fab);
+                                        else
+                                            hideFab(fab);
                                     }
+                                });
 
-                                    @Override
-                                    public void onAnimationCancel(View view) {
-                                        ViewCompat.setTranslationY(view, 0);
-                                    }
-                                })
-                                .start();
-
-                    else if (fab.getTranslationY() == 0) { // Hide floating action button
-
-                        Logs.add(Logs.Type.I, "Hide floating action button");
-                        if (mFabTransY == Constants.NO_DATA)
-                            fab.getViewTreeObserver()
-                                    .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                                        @Override
-                                        public void onGlobalLayout() {
-
-                                            Logs.add(Logs.Type.V, null);
-                                            mFabTransY = fab.getHeight() +
-                                                    (getResources().getDimensionPixelSize(R.dimen.fab_margin) << 1);
-
-                                            fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                                            hideFab(animation);
-                                        }
-                                    });
-                        else
-                            hideFab(animation);
-                    }
+                    else if (display)
+                        displayFab(fab);
+                    else
+                        hideFab(fab);
 
                 } else {
                     Logs.add(Logs.Type.I, "Initial query");
 
                     ////// Fill notification list
-                    mNotifyAdapter = new NotifyRecyclerViewAdapter(R.layout.layout_notification_item,
-                            COLUMN_INDEX_NOTIFY_ID);
+                    mNotifyAdapter = new NotifyRecyclerViewAdapter();
                     mNotifyAdapter.getDataSource().fill(cursor);
                     mNotifyList.setAdapter(mNotifyAdapter);
 
-                    // Display/Hide floating action button
-                    if (newNotify > 0)
-                        fab.setVisibility(View.VISIBLE);
+                    do { // Display floating action button according unread notification displayed
+                        if (cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
+                            fab.setVisibility(View.VISIBLE);
+                            break;
+                        }
+
+                    } while (cursor.moveToNext());
                 }
                 break;
             }
