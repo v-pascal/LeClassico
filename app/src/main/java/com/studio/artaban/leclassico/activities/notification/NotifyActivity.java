@@ -26,7 +26,6 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
-import com.studio.artaban.leclassico.components.RecyclerRequest;
 import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -47,14 +46,14 @@ import com.studio.artaban.leclassico.tools.Tools;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by pascal on 29/10/16.
  * Notification activity class
  */
-public class NotifyActivity extends LoggedActivity implements
-        QueryLoader.OnResultListener, RecyclerRequest.OnRequestListener {
+public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
 
     public void onRead(View sender) { // Mark unread notification(s) as read
 
@@ -169,7 +168,7 @@ public class NotifyActivity extends LoggedActivity implements
                 .start();
     }
 
-    private RecyclerRequest mNotifyList; // Recycler view containing notification list
+    private RecyclerView mNotifyList; // Recycler view containing notification list
     private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
 
     //////
@@ -253,34 +252,34 @@ public class NotifyActivity extends LoggedActivity implements
 
             // Set notification date
             if (position == 0) {
-                displayDate((TextView) holder.itemView.findViewById(R.id.text_date),
+                displayDate((TextView) holder.rootView.findViewById(R.id.text_date),
                         mDataSource.getString(position, COLUMN_INDEX_DATE));
-                holder.itemView.findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
+                holder.rootView.findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
 
             } else {
                 String prevDate = mDataSource.getString(position - 1, COLUMN_INDEX_DATE).substring(0, 10); // YYYY-MM-DD
                 String curDate = mDataSource.getString(position, COLUMN_INDEX_DATE);
 
                 if (prevDate.compareTo(curDate.substring(0, 10)) != 0) { // Display the different date (separator)
-                    displayDate((TextView) holder.itemView.findViewById(R.id.text_date), curDate);
-                    holder.itemView.findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
+                    displayDate((TextView) holder.rootView.findViewById(R.id.text_date), curDate);
+                    holder.rootView.findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
                 } else
-                    holder.itemView.findViewById(R.id.date_separator).setVisibility(View.GONE);
+                    holder.rootView.findViewById(R.id.date_separator).setVisibility(View.GONE);
             }
 
             // Set unread notification display (if the case)
-            ImageView notifyType = (ImageView) holder.itemView.findViewById(R.id.image_type);
-            TextView textTime = (TextView) holder.itemView.findViewById(R.id.text_time);
+            ImageView notifyType = (ImageView) holder.rootView.findViewById(R.id.image_type);
+            TextView textTime = (TextView) holder.rootView.findViewById(R.id.text_time);
             int pseudoColor = displayReadFlag(
                     mDataSource.getInt(position, COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD,
-                    holder.itemView, notifyType, textTime);
+                    holder.rootView, notifyType, textTime);
 
             // Set from pseudo icon
             boolean female = (!mDataSource.isNull(position, COLUMN_INDEX_SEX)) &&
                     (mDataSource.getInt(position, COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
             String profile = (!mDataSource.isNull(position, COLUMN_INDEX_PROFILE)) ?
                     mDataSource.getString(position, COLUMN_INDEX_PROFILE) : null;
-            Tools.setProfile(NotifyActivity.this, (ImageView) holder.itemView.findViewById(R.id.image_pseudo),
+            Tools.setProfile(NotifyActivity.this, (ImageView) holder.rootView.findViewById(R.id.image_pseudo),
                     female, profile, R.dimen.shortcut_content_height, true);
 
             // Set notification message & info
@@ -320,22 +319,22 @@ public class NotifyActivity extends LoggedActivity implements
                     break;
                 }
             }
-            ((TextView) holder.itemView.findViewById(R.id.text_message)).setText(message, TextView.BufferType.SPANNABLE);
-            ((TextView) holder.itemView.findViewById(R.id.text_info)).setText(info, TextView.BufferType.SPANNABLE);
+            ((TextView) holder.rootView.findViewById(R.id.text_message)).setText(message, TextView.BufferType.SPANNABLE);
+            ((TextView) holder.rootView.findViewById(R.id.text_info)).setText(info, TextView.BufferType.SPANNABLE);
 
             // Set notification type icon & time
             notifyType.setImageDrawable(getResources().getDrawable(Tools.getNotifyIcon(type)));
             textTime.setText(mDataSource.getString(position, COLUMN_INDEX_DATE).substring(11, 16));
 
             // Set notify synchronization
-            Tools.setSyncView(NotifyActivity.this, (TextView) holder.itemView.findViewById(R.id.text_sync_date),
-                    (ImageView) holder.itemView.findViewById(R.id.image_sync),
+            Tools.setSyncView(NotifyActivity.this, (TextView) holder.rootView.findViewById(R.id.text_sync_date),
+                    (ImageView) holder.rootView.findViewById(R.id.image_sync),
                     mDataSource.getString(position, COLUMN_INDEX_STATUS_DATE),
                     (byte) mDataSource.getInt(position, COLUMN_INDEX_SYNC));
 
             // Events
-            View layoutData = holder.itemView.findViewById(R.id.layout_data);
-            View imagePseudo = holder.itemView.findViewById(R.id.image_pseudo);
+            View layoutData = holder.rootView.findViewById(R.id.layout_data);
+            View imagePseudo = holder.rootView.findViewById(R.id.image_pseudo);
 
             layoutData.setTag(R.id.tag_position, position);
             layoutData.setOnClickListener(this);
@@ -392,21 +391,6 @@ public class NotifyActivity extends LoggedActivity implements
         }
     }
 
-    ////// OnRequestListener ///////////////////////////////////////////////////////////////////////
-    @Override
-    public boolean onRequestOld() {
-        Logs.add(Logs.Type.V, null);
-
-
-
-
-
-
-
-
-        return true;
-    }
-
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, final Cursor cursor) {
@@ -440,7 +424,32 @@ public class NotifyActivity extends LoggedActivity implements
                     if (mNotifyList.getAdapter() == null)
                         mNotifyList.setAdapter(mNotifyAdapter);
                     RecyclerAdapter.SwapResult swapResult =
-                            mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor, true);
+                            mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor,
+                                    new RecyclerAdapter.DataView.OnNotifyChangeListener() {
+                                @Override
+                                public void onRemoved(ArrayList<ArrayList<Object>> newData, int start, int count) {
+
+                                }
+
+                                @Override
+                                public void onInserted(ArrayList<ArrayList<Object>> newData, int start, int count) {
+                                    Logs.add(Logs.Type.V, "newData: " + newData + ";start: " + start +
+                                            ";count: " + count);
+                                    int followed = start + count;
+
+                                    // Notify item that follows last inserted notification if needed
+                                    // NB: If notification day is same as last insertion (update day separator)
+                                    if ((newData.size() > count) && (((String)newData.get(followed)
+                                            .get(COLUMN_INDEX_DATE)).compareTo(((String) newData.get(followed - 1)
+                                            .get(COLUMN_INDEX_DATE)).substring(0, 10)) == 0))
+                                        mNotifyAdapter.notifyItemChanged(followed);
+                                }
+
+                                @Override
+                                public void onMoved(ArrayList<ArrayList<Object>> newData, int prevPos, int newPos) {
+
+                                }
+                            });
 
                     // Check if only change notification(s) on synchronization fields
                     boolean syncFieldsOnly = swapResult.countChanged > 0;
@@ -805,10 +814,9 @@ public class NotifyActivity extends LoggedActivity implements
         LinearLayoutManager linearManager = new LinearLayoutManager(this);
         linearManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        mNotifyList = (RecyclerRequest) findViewById(R.id.list_notification);
+        mNotifyList = (RecyclerView) findViewById(R.id.list_notification);
         mNotifyList.setLayoutManager(linearManager);
         mNotifyList.setItemAnimator(itemAnimator);
-        mNotifyList.setOnRequestListener(this);
 
         // Initialize notification list (set query loaders)
         setLoaders();

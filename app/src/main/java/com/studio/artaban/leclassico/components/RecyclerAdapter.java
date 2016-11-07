@@ -6,7 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 
+import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -28,6 +30,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     private AppearanceAnimatorMaker mMaker; // Appearance animator maker
 
     public interface AppearanceAnimatorMaker {
+
         void onAnimate(View item);
         void onCancel(View item);
     }
@@ -37,8 +40,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         Logs.add(Logs.Type.V, "holder: " + holder);
         mMaker = maker;
         if (holder.getAdapterPosition() > mLastPosition) {
-
             mLastPosition = holder.getAdapterPosition();
+
             if (!(Boolean)holder.itemView.getTag())
                 mMaker.onAnimate(holder.itemView);
         }
@@ -54,7 +57,6 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         mItemLayout = layout;
         mDataSource = new DataView(key);
     }
-
     public DataView getDataSource() {
         return mDataSource;
     }
@@ -132,17 +134,24 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             return Constants.NO_DATA;
         }
 
-        //
+        //////
         public void fill(Cursor cursor) { // Fill data according initial cursor
             Logs.add(Logs.Type.V, "cursor: " + cursor);
 
             clear();
             fill(cursor, mData);
         }
-        public SwapResult swap(RecyclerAdapter adapter, Cursor cursor, boolean below) {
+
+        public interface OnNotifyChangeListener {
+
+            void onRemoved(ArrayList<ArrayList<Object>> newData, int start, int count);
+            void onInserted(ArrayList<ArrayList<Object>> newData, int start, int count);
+            void onMoved(ArrayList<ArrayList<Object>> newData, int prevPos, int newPos);
+        }
+        public SwapResult swap(RecyclerAdapter adapter, Cursor cursor, OnNotifyChangeListener listener) {
         // Swap data with new cursor then notify recycler adapter accordingly
 
-            Logs.add(Logs.Type.V, "adapter: " + adapter + ";cursor: " + cursor + ";below: " + below);
+            Logs.add(Logs.Type.V, "adapter: " + adapter + ";cursor: " + cursor + ";listener: " + listener);
             ArrayList<ArrayList<Object>> newData = new ArrayList<>();
             fill(cursor, newData);
 
@@ -169,18 +178,20 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                     else
                         break;
                 }
-                int removedLast = toDo.get(i);
-                mData.remove(removedLast);
+                mData.remove(toDo.get(i));
                 if (j != (i + 1)) { // Range
-                    adapter.notifyItemRangeRemoved(toDo.get(i), toDo.get(j - 1));
+                    adapter.notifyItemRangeRemoved(toDo.get(i), toDo.get(j - 1) - toDo.get(i));
+                    if (listener != null) // Check to notify item changed according items removed
+                        listener.onRemoved(mData, toDo.get(i), toDo.get(j - 1) - toDo.get(i));
+
                     i = j - 1;
 
-                } else // Single
-                    adapter.notifyItemRemoved(toDo.get(i));
+                } else { // Single
 
-                // Check to update item below the last entry removed
-                if ((below) && (mData.size() > removedLast))
-                    adapter.notifyItemChanged(removedLast);
+                    adapter.notifyItemRemoved(toDo.get(i));
+                    if (listener != null) // Check to notify item changed according item removed
+                        listener.onRemoved(mData, toDo.get(i), 1);
+                }
             }
 
             ////// Add entries (if needed)
@@ -206,16 +217,17 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 }
                 for (int j = 0; j < count; ++j)
                     mData.add(toDo.get(i + j), newData.get(toDo.get(i + j)));
-                if (count > 1) // Range
+                if (count > 1) { // Range
                     adapter.notifyItemRangeInserted(toDo.get(i), count);
-                else // Single
+                    if (listener != null) // Check to notify item changed according items added
+                        listener.onInserted(mData, toDo.get(i), count);
+
+                } else { // Single
+
                     adapter.notifyItemInserted(toDo.get(i));
-
-                // Check to update item below the last entry inserted
-                int insertedLast = toDo.get(i) + count;
-                if ((below) && (mData.size() > insertedLast))
-                    adapter.notifyItemChanged(insertedLast);
-
+                    if (listener != null) // Check to notify item changed according item added
+                        listener.onInserted(mData, toDo.get(i), 1);
+                }
                 i = i + count - 1;
             }
 
@@ -232,13 +244,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                     Collections.swap(mData, i, newPosition);
                     adapter.notifyItemMoved(i, newPosition);
 
-                    // Check to update item below moved entries
-                    if (below) {
-                        if (1 != (newPosition - i))
-                            adapter.notifyItemChanged(i + 1);
-                        if (mData.size() > ++newPosition)
-                            adapter.notifyItemChanged(newPosition);
-                    }
+                    if (listener != null) // Check to notify item changed according item moved
+                        listener.onMoved(mData, i, newPosition);
                 }
             }
 
@@ -306,9 +313,11 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Logs.add(Logs.Type.V, "parent: " + parent + ";viewType: " + viewType);
-        View view = LayoutInflater.from(parent.getContext()).inflate(mItemLayout, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.layout_recycler_item, parent, false);
+
         view.setTag(Boolean.TRUE); // Needed to avoid first display animation
-        return new ViewHolder(view);
+        return new ViewHolder(view, mItemLayout);
     }
 
     @Override
@@ -320,13 +329,20 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     public void onViewDetachedFromWindow(ViewHolder holder) {
         if (!(Boolean)holder.itemView.getTag())
             mMaker.onCancel(holder.itemView);
+
         super.onViewDetachedFromWindow(holder);
     }
 
     //////
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(View view) {
+
+        public View rootView; // Holder root view
+        public ViewHolder(View view, @LayoutRes int layoutItem) {
             super(view);
+
+            ViewStub stub = (ViewStub)view.findViewById(R.id.layout_item);
+            stub.setLayoutResource(layoutItem);
+            rootView = stub.inflate();
         }
     }
 }

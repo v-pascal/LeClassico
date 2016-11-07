@@ -56,16 +56,28 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-        if (!cursor.moveToFirst())
-            return;
-
         switch (id) {
+
             case Queries.MAIN_SHORTCUT_MAIL_COUNT: { ////// New mail count
+                mNewMail = 0;
+                if (!cursor.moveToFirst())
+                    return;
+
                 mNewMail = cursor.getInt(0);
                 break;
             }
             case Queries.MAIN_SHORTCUT_NOTIFY_COUNT: { ////// New notification count
-                mNewNotification = cursor.getInt(0);
+                mNewNotification = 0;
+                if (!cursor.moveToFirst())
+                    return;
+
+                do {
+                    if (cursor.getInt(0) == Constants.DATA_UNREAD)
+                        ++mNewNotification;
+                    else
+                        break;
+
+                } while (cursor.moveToNext());
                 break;
             }
         }
@@ -131,9 +143,9 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         Bundle notifyData = new Bundle();
         notifyData.putParcelable(QueryLoader.DATA_KEY_URI, mListener.onGetShortcutURI());
         notifyData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT count(*) FROM " + NotificationsTable.TABLE_NAME +
+                "SELECT " + NotificationsTable.COLUMN_LU_FLAG + " FROM " + NotificationsTable.TABLE_NAME +
                         " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" + pseudo +
-                        "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD);
+                        "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
         mNewNotifyLoader.init(getActivity(), Queries.MAIN_SHORTCUT_NOTIFY_COUNT, notifyData);
 
         return rootView;
