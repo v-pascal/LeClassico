@@ -433,14 +433,15 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                                 @Override
                                 public void onInserted(ArrayList<ArrayList<Object>> newData, int start, int count) {
-                                    Logs.add(Logs.Type.V, "newData: " + newData + ";start: " + start +
-                                            ";count: " + count);
+                                    //Logs.add(Logs.Type.V, "newData: " + newData + ";start: " + start +
+                                    //        ";count: " + count);
                                     int followed = start + count;
 
-                                    // Notify item that follows last inserted notification if needed
+                                    // Notify item that follows last inserted notification (if needed)
                                     // NB: If notification day is same as last insertion (update day separator)
                                     if ((newData.size() > count) && (((String)newData.get(followed)
-                                            .get(COLUMN_INDEX_DATE)).compareTo(((String) newData.get(followed - 1)
+                                            .get(COLUMN_INDEX_DATE)).substring(0, 10)
+                                            .compareTo(((String) newData.get(followed - 1)
                                             .get(COLUMN_INDEX_DATE)).substring(0, 10)) == 0))
                                         mNotifyAdapter.notifyItemChanged(followed);
                                 }
