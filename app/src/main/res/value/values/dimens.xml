@@ -7,4 +7,8 @@
     <dimen name="appbar_padding_top">8dp</dimen>
     <dimen name="appbar_padding_title">56dp</dimen>
 
+    <!-- Recycler request dimensions -->
+    <dimen name="recycler_request_width">72dp</dimen>
+    <dimen name="recycler_request_height">36dp</dimen>
+
 </resources>

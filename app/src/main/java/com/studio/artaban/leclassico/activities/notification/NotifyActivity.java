@@ -55,6 +55,9 @@ import java.util.Date;
  */
 public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
 
+    private static final String DATA_KEY_OLD_REQUESTED = "oldRequested";
+    // Data keys
+
     public void onRead(View sender) { // Mark unread notification(s) as read
 
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -201,6 +204,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
     private RecyclerView mNotifyList; // Recycler view containing notification list
     private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
+    private boolean mOldRequested; // Old notifications requested flag
 
     //////
     private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
@@ -253,11 +257,10 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         @Override
         public void onClick(View sender) {
             Logs.add(Logs.Type.V, "sender: " + sender);
-
-            int position = (int)sender.getTag(R.id.tag_position);
             switch (sender.getId()) {
 
                 case R.id.image_pseudo: {
+                    int position = (int)sender.getTag(R.id.tag_position);
                     Logs.add(Logs.Type.I, "Pseudo #" + position + " selected");
 
 
@@ -266,7 +269,28 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     break;
                 }
                 case R.id.layout_data: {
+                    int position = (int)sender.getTag(R.id.tag_position);
                     Logs.add(Logs.Type.I, "Notification #" + position + " selected");
+
+
+
+
+                    break;
+                }
+                case R.id.layout_more: {
+                    Logs.add(Logs.Type.I, "Old notifications requested");
+                    mNotifyAdapter.request();
+
+
+
+
+
+
+
+                    mOldRequested = true;
+
+
+
 
 
 
@@ -279,7 +303,44 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         //////
         @Override
         public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
-            //Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
+            Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
+            if (isRequestHolder(holder, position)) { ////// Request
+
+                View request = holder.requestView.findViewById(R.id.layout_more);
+                if (!isRequesting()) {
+                    request.setBackground(getResources().getDrawable(R.drawable.notify_more_background));
+                    request.setOnClickListener(this);
+
+
+
+                    ((ImageView)holder.requestView.findViewById(R.id.image_1)).setColorFilter(Color.TRANSPARENT);
+                    ((ImageView)holder.requestView.findViewById(R.id.image_2)).setColorFilter(Color.TRANSPARENT);
+                    ((ImageView)holder.requestView.findViewById(R.id.image_3)).setColorFilter(Color.TRANSPARENT);
+
+
+
+                } else {
+                    request.setBackground(null);
+
+
+
+
+
+                    ((ImageView)holder.requestView.findViewById(R.id.image_1))
+                            .setColorFilter(getResources().getColor(R.color.colorPublicationDark));
+                    ((ImageView)holder.requestView.findViewById(R.id.image_2))
+                            .setColorFilter(getResources().getColor(R.color.colorPublicationDark));
+                    ((ImageView)holder.requestView.findViewById(R.id.image_3))
+                            .setColorFilter(getResources().getColor(R.color.colorPublicationDark));
+
+
+
+
+
+                }
+                return;
+            }
+            ////// Notification
 
             // Set notification date
             if (position == 0) {
@@ -372,11 +433,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             imagePseudo.setTag(R.id.tag_position, position);
             imagePseudo.setOnClickListener(this);
 
-            // Add margin bottom at last item position
-            ((RecyclerView.LayoutParams)holder.itemView.getLayoutParams()).bottomMargin =
-                    (position == (mDataSource.getCount() - 1))?
-                            getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin):0;
-
             ////// Animate item appearance
             animateAppearance(holder, new AppearanceAnimatorMaker() {
                 @Override
@@ -429,7 +485,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
         if (!cursor.moveToFirst()) return;
         switch (id) {
-
             case Queries.MAIN_NOTIFY_LIST: {
 
                 mQueryCount = (short)cursor.getCount();
@@ -528,6 +583,8 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     ////// Fill notification list
                     mNotifyAdapter = new NotifyRecyclerViewAdapter();
                     mNotifyAdapter.getDataSource().fill(cursor);
+                    if (mOldRequested)
+                        mNotifyAdapter.request();
                     mNotifyList.setAdapter(mNotifyAdapter);
 
                     do { // Display floating action button according unread notification displayed
@@ -711,6 +768,10 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_notify);
 
+        // Restore data
+        if (savedInstanceState != null)
+            mOldRequested = savedInstanceState.getBoolean(DATA_KEY_OLD_REQUESTED);
+
         // Set toolbar & default new notification
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setNewNotifyInfo(0);
@@ -845,5 +906,14 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        outState.putBoolean(DATA_KEY_OLD_REQUESTED, mOldRequested);
+
+        Logs.add(Logs.Type.V, "outState: " + outState);
+        super.onSaveInstanceState(outState);
     }
 }

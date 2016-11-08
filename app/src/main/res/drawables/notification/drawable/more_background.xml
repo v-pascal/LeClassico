@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/colorPublication"/>
+    <corners
+        android:bottomRightRadius="@dimen/recycler_request_height"
+        android:bottomLeftRadius="@dimen/recycler_request_height"
+        android:topLeftRadius="@dimen/recycler_request_height"
+        android:topRightRadius="@dimen/recycler_request_height"/>
+</shape>

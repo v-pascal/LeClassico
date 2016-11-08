@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -23,7 +24,9 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
     @LayoutRes private final int mItemLayout; // Holder view layout Id
     @LayoutRes private final int mRequestLayout; // Holder view old request layout Id (NO_DATA if useless)
+
     protected final DataView mDataSource; // Data source
+    private RecyclerView mRecyclerView;
 
     ////// AppearanceAnimatorMaker /////////////////////////////////////////////////////////////////
 
@@ -60,8 +63,47 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         mRequestLayout = requestLayout;
         mDataSource = new DataView(key);
     }
+
+    //
     public DataView getDataSource() {
         return mDataSource;
+    }
+
+    private static final String ERROR_NO_REQUEST_LAYOUT = "Unexpected method use: No request layout ID";
+    private boolean mRequesting; // Old entries requesting flag
+    public boolean isRequesting() {
+        return mRequesting;
+    }
+    public void request() { // Start requesting old entries
+        Logs.add(Logs.Type.V, null);
+        if (mRequestLayout == Constants.NO_DATA)
+            throw new IllegalStateException(ERROR_NO_REQUEST_LAYOUT);
+
+        mRequesting = true;
+        if (mRecyclerView != null) {
+            if ((mRecyclerView.getItemAnimator() != null) &&
+                    (mRecyclerView.getItemAnimator() instanceof RecyclerItemAnimator))
+                ((RecyclerItemAnimator)mRecyclerView.getItemAnimator()).setDisableChangeAnimations(1);
+
+            notifyItemChanged(getItemCount() - 1);
+        }
+    }
+    public boolean isRequestHolder(ViewHolder holder, int position) {
+    // Set holder according if it is an item or a request (return TRUE if request holder)
+
+        Logs.add(Logs.Type.V, "position: " + position);
+        if (mRequestLayout == Constants.NO_DATA)
+            throw new IllegalStateException(ERROR_NO_REQUEST_LAYOUT);
+
+        if ((getItemCount() - 1) == position) {
+
+            holder.rootView.setVisibility(View.GONE);
+            holder.requestView.setVisibility(View.VISIBLE);
+            return true;
+        }
+        holder.requestView.setVisibility(View.GONE);
+        holder.rootView.setVisibility(View.VISIBLE);
+        return false;
     }
 
     ////// SwapResult //////////////////////////////////////////////////////////////////////////////
@@ -325,7 +367,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
     @Override
     public int getItemCount() {
-        return mDataSource.getCount();
+        return mDataSource.getCount() + ((mRequestLayout != Constants.NO_DATA)? 1:0);
     }
 
     @Override
@@ -336,9 +378,25 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         super.onViewDetachedFromWindow(holder);
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        Logs.add(Logs.Type.V, "recyclerView: " + recyclerView);
+        mRecyclerView = recyclerView;
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        Logs.add(Logs.Type.V, "recyclerView: " + recyclerView);
+        mRecyclerView = null;
+    }
+
     //////
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public View rootView; // Holder root view
+
+        public View rootView; // Holder item root view
+        public View requestView; // Holder request root view
 
         public ViewHolder(View view, @LayoutRes int layoutItem, @LayoutRes int layoutRequest) {
             super(view);
@@ -350,7 +408,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             if (layoutRequest != Constants.NO_DATA) {
                 stub = (ViewStub)view.findViewById(R.id.layout_request);
                 stub.setLayoutResource(layoutRequest);
-                stub.inflate();
+                requestView = stub.inflate();
             }
         }
     }
