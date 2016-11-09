@@ -11,7 +11,7 @@
         android:gravity="center"
         android:clickable="true"
         android:layout_width="@dimen/recycler_request_width"
-        android:layout_height="@dimen/recycler_request_height">
+        android:layout_height="@dimen/recycler_request_width">
 
         <ImageView
             android:id="@+id/image_1"

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android" android:ordering="together">
+    <objectAnimator
+        android:duration="@integer/duration_request_anim"
+        android:propertyName="alpha"
+        android:valueTo="1"
+        android:repeatCount="-1"
+        android:repeatMode="reverse"/>
+    <objectAnimator
+        android:duration="@integer/duration_request_anim"
+        android:propertyName="scaleX"
+        android:valueTo="2"
+        android:repeatCount="-1"
+        android:repeatMode="reverse"/>
+    <objectAnimator
+        android:duration="@integer/duration_request_anim"
+        android:propertyName="scaleY"
+        android:valueTo="2"
+        android:repeatCount="-1"
+        android:repeatMode="reverse"/>
+</set>

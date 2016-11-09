@@ -1,5 +1,7 @@
 package com.studio.artaban.leclassico.activities.notification;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -295,12 +297,18 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
 
 
+
                     break;
                 }
             }
         }
 
-        //////
+        // Requesting old entries animations
+        private AnimatorSet mRequestAnim1;
+        private AnimatorSet mRequestAnim2;
+        private AnimatorSet mRequestAnim3;
+
+        ////// RecyclerAdapter /////////////////////////////////////////////////////////////////////
         @Override
         public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
             Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
@@ -311,20 +319,17 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     request.setBackground(getResources().getDrawable(R.drawable.notify_more_background));
                     request.setOnClickListener(this);
 
-
+                    // Stop requesting old notifications animation
+                    if (mRequestAnim1 != null) mRequestAnim1.cancel();
+                    if (mRequestAnim2 != null) mRequestAnim2.cancel();
+                    if (mRequestAnim3 != null) mRequestAnim3.cancel();
 
                     ((ImageView)holder.requestView.findViewById(R.id.image_1)).setColorFilter(Color.TRANSPARENT);
                     ((ImageView)holder.requestView.findViewById(R.id.image_2)).setColorFilter(Color.TRANSPARENT);
                     ((ImageView)holder.requestView.findViewById(R.id.image_3)).setColorFilter(Color.TRANSPARENT);
 
-
-
                 } else {
                     request.setBackground(null);
-
-
-
-
 
                     ((ImageView)holder.requestView.findViewById(R.id.image_1))
                             .setColorFilter(getResources().getColor(R.color.colorPublicationDark));
@@ -333,10 +338,24 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     ((ImageView)holder.requestView.findViewById(R.id.image_3))
                             .setColorFilter(getResources().getColor(R.color.colorPublicationDark));
 
+                    // Start requesting old notifications animation
+                    mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
+                            R.animator.request_old);
+                    mRequestAnim1.setTarget(holder.requestView.findViewById(R.id.image_1));
+                    mRequestAnim1.start();
 
+                    long delay = getResources().getInteger(R.integer.duration_request_anim) / 3;
+                    mRequestAnim2 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
+                            R.animator.request_old);
+                    mRequestAnim2.setTarget(holder.requestView.findViewById(R.id.image_2));
+                    mRequestAnim2.setStartDelay(delay);
+                    mRequestAnim2.start();
 
-
-
+                    mRequestAnim3 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
+                            R.animator.request_old);
+                    mRequestAnim3.setTarget(holder.requestView.findViewById(R.id.image_3));
+                    mRequestAnim3.setStartDelay(delay << 1);
+                    mRequestAnim3.start();
                 }
                 return;
             }

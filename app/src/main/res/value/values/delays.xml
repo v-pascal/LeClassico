@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Recycler old entries requesting -->
+    <integer name="duration_request_anim">450</integer>
+</resources>
