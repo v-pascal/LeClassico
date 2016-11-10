@@ -45,10 +45,14 @@ import java.util.TimerTask;
  */
 public class DataService extends Service implements Internet.OnConnectivityListener {
 
+    public static final String EXTRA_DATA_RECEIVED = "received";
+
     private static final String EXTRA_DATA_TOKEN = "token";
     private static final String EXTRA_DATA_TIME_LAG = "timeLag";
+    private static final String EXTRA_DATA_TABLE_ID = "tableId";
+    private static final String EXTRA_DATA_NEW = "new";
 
-    public static final String EXTRA_DATA_TABLE_ID = "tableId";
+    private static final String EXTRA_DATA_REQUESTER = "requester";
     // Extra data keys
 
     private static boolean isRunning; // Service running flag
@@ -87,28 +91,52 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     ////// Broadcast actions
     public static final String REQUEST_LOGOUT = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REQUEST_LOGOUT";
-    public static final String REGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.REGISTER_NEW_DATA";
-    public static final String UNREGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.UNREGISTER_NEW_DATA";
     public static final String REQUEST_OLD_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REQUEST_OLD_DATA";
+    private static final String REGISTER_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
+            Constants.APP_URI + ".action.REGISTER_DATA";
+    private static final String UNREGISTER_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
+            Constants.APP_URI + ".action.UNREGISTER_DATA";
 
     //
-    public static Intent getIntent(@Nullable Boolean newRegister, byte tableId, Uri uri) {
-    // Return intent for data request according the 'newRegister' parameter:
-        // true -> Register new data request
-        // false -> Unregister new data request
-        // null -> Old data request
+    public static Intent getIntent(boolean register, byte tableId, Uri uri) {
+    // Return intent for new data request according the 'register' parameter (register/unregister)
 
-        Logs.add(Logs.Type.V, "newRegister: " + newRegister + ";tableId: " + tableId + ";uri: " + uri);
-        Intent dataIntent = new Intent((newRegister != null)?
-                ((newRegister)? REGISTER_NEW_DATA:UNREGISTER_NEW_DATA):REQUEST_OLD_DATA);
+        Logs.add(Logs.Type.V, "register: " + register + ";tableId: " + tableId + ";uri: " + uri);
+        Intent dataIntent = new Intent((register)? REGISTER_DATA:UNREGISTER_DATA);
 
-        dataIntent.putExtra(DataService.EXTRA_DATA_TABLE_ID, tableId);
+        dataIntent.putExtra(EXTRA_DATA_NEW, true);
+        dataIntent.putExtra(EXTRA_DATA_TABLE_ID, tableId);
         dataIntent.putExtra(DataRequest.EXTRA_DATA_URI, uri);
         return dataIntent;
     }
+
+
+
+
+
+
+
+    /*
+    public static Intent getIntent(boolean register, byte tableId, String requester) {
+    // Return intent for old data request according the 'register' parameter (register/unregister)
+
+        Logs.add(Logs.Type.V, "register: " + register + ";tableId: " + tableId + ";requester: " + requester);
+        Intent dataIntent = new Intent((register)? REGISTER_DATA:UNREGISTER_DATA);
+
+        dataIntent.putExtra(EXTRA_DATA_NEW, false);
+        dataIntent.putExtra(EXTRA_DATA_TABLE_ID, tableId);
+        dataIntent.putExtra(EXTRA_DATA_REQUESTER, requester);
+        return dataIntent;
+    }
+    */
+
+
+
+
+
+
+
     private final DataReceiver mDataReceiver = new DataReceiver(); // Data broadcast receiver
     private final ArrayList<DataRequest> mDataRequests = new ArrayList<>(); // Data request task list
     private Timer mRequestTimer; // Timer to manage data request tasks
@@ -128,23 +156,66 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                     throw new IllegalArgumentException("Unexpected request table ID");
 
                 //////
-                if (intent.getAction().equals(REGISTER_NEW_DATA)) { // Register new data request
-                    if (mDataRequests.get(tableIdx).register(intent)) {
+                if (intent.getAction().equals(REGISTER_DATA)) { ////// Register
+                    if (!intent.getBooleanExtra(EXTRA_DATA_NEW, false)) { // Old data
+
+
+
+
+                        //intent.getStringExtra(EXTRA_DATA_REQUESTER) as KEY
+
+
+
+
+                    }
+                    else if (mDataRequests.get(tableIdx).register(intent)) { // New data
 
                         Logs.add(Logs.Type.I, "Schedule table ID #" + (tableIdx + 1) + " request");
                         DataRequest request = mDataRequests.get(tableIdx);
                         mRequestTimer.schedule(request.getTask(), 0, request.getDelay());
                     }
                 }
-                else if(intent.getAction().equals(UNREGISTER_NEW_DATA)) { // Unregister new data request
-                    if (mDataRequests.get(tableIdx).unregister(intent)) {
+                else if(intent.getAction().equals(UNREGISTER_DATA)) { ////// Unregister
+                    if (!intent.getBooleanExtra(EXTRA_DATA_NEW, false)) { // Old data
+
+
+
+
+                        //intent.getStringExtra(EXTRA_DATA_REQUESTER) as KEY
+
+
+
+
+                    }
+                    else if (mDataRequests.get(tableIdx).unregister(intent)) { // New data
 
                         Logs.add(Logs.Type.I, "Purge table ID #" + (tableIdx + 1) + " request");
                         mRequestTimer.purge(); // Purge cancelled request task
                     }
 
-                } else if (intent.getAction().equals(REQUEST_OLD_DATA)) // Request old data
-                    mDataRequests.get(tableIdx).request(intent.getExtras());
+                } else if ((intent.getAction().equals(REQUEST_OLD_DATA)) &&
+                        (!intent.getBooleanExtra(EXTRA_DATA_RECEIVED, false))) { // Request old data
+
+
+
+
+                    //intent.getStringExtra(EXTRA_DATA_REQUESTER) as KEY
+
+
+
+                    // Not UI thread
+
+                    //mDataRequests.get(tableIdx).request(intent.getExtras());
+                    // if registered
+                    //   sendBroadcast(REQUEST_OLD_DATA + EXTRA_DATA_RECEIVED == TRUE);
+                    // else ???
+
+
+
+
+
+
+                }
             }
         }
     }
@@ -391,8 +462,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         mRequestTimer = new Timer();
 
         registerReceiver(mDataReceiver, new IntentFilter(REQUEST_LOGOUT));
-        registerReceiver(mDataReceiver, new IntentFilter(REGISTER_NEW_DATA));
-        registerReceiver(mDataReceiver, new IntentFilter(UNREGISTER_NEW_DATA));
+        registerReceiver(mDataReceiver, new IntentFilter(REGISTER_DATA));
+        registerReceiver(mDataReceiver, new IntentFilter(UNREGISTER_DATA));
         registerReceiver(mDataReceiver, new IntentFilter(REQUEST_OLD_DATA));
 
         return START_NOT_STICKY;

@@ -15,12 +15,11 @@ public class Queries {
     public static final int MAIN_SHORTCUT_LAST_FOLLOWED = Tables.ID_MAX + 3;
     public static final int MAIN_SHORTCUT_MAIL_COUNT = Tables.ID_MAX + 4;
     public static final int MAIN_NOTIFY_LIST = Tables.ID_MAX + 5;
-    public static final int MAIN_NOTIFY_MAX = Tables.ID_MAX + 6;
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////
     // Max entry count to display into a list view at start
 
-    public static final short LIMIT_MAIN_NOTIFY = 20;
+    public static final short LIMIT_MAIN_NOTIFY = 10; //20;
 
     ////// Older ///////////////////////////////////////////////////////////////////////////////////
     // Max entry count to display into a list after the last element (when older entries is requested)

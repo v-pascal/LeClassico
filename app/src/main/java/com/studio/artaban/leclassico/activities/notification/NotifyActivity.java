@@ -2,8 +2,11 @@ package com.studio.artaban.leclassico.activities.notification;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -28,6 +31,7 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
+import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -521,6 +525,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     //////
     private final QueryLoader mListLoader = new QueryLoader(this, this); // User notification list query loader
     private Cursor mNotifyCursor; // Notifications cursor
+    private String mNotifyLast; // Last notification date received
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
     private short mQueryLimit = Queries.LIMIT_MAIN_NOTIFY; // DB query limit
@@ -550,6 +555,29 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     private static final int COLUMN_INDEX_COMMENT_ID = 19;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private final OldReceiver mOldReceiver = new OldReceiver(); // Old data broadcast receiver
+    private class OldReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
+            if ((intent.getAction().equals(DataService.REQUEST_OLD_DATA)) &&
+                    (intent.getBooleanExtra(DataService.EXTRA_DATA_RECEIVED, false))) {
+
+
+
+
+
+                //mOldRequested = false;
+
+
+
+
+
+            }
+        }
+    }
 
     private void refresh() { // Display/Refresh notifications list
         Logs.add(Logs.Type.V, null);
@@ -581,15 +609,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
 
 
-        short count = (short)mNotifyCursor.getCount();
-        if ((mQueryCount != Constants.NO_DATA) && (!mOldRequested))
-            mQueryLimit += count - mQueryCount; // In case of new entries (from remote DB)
-        mQueryCount = count;
-
-
-
-
-        //mOldRequested
 
 
 
@@ -598,10 +617,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
 
 
-
-
-
-        // Get if exists unread notification
+        // Get if exists new notification (first unread notification)
         int newNotify = 0;
         do {
             if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
@@ -612,6 +628,37 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         } while (mNotifyCursor.moveToNext());
         mNotifyCursor.moveToFirst();
         setNewNotifyInfo(newNotify);
+
+        // Get last notification date
+        String lastNotify;
+        do {
+            lastNotify = mNotifyCursor.getString(COLUMN_INDEX_DATE);
+
+        } while (mNotifyCursor.moveToNext());
+        mNotifyCursor.moveToFirst();
+
+
+
+
+
+
+
+
+        // Update current display data
+        short count = (short) mNotifyCursor.getCount();
+        if ((mQueryCount != Constants.NO_DATA) && (mNotifyLast.compareTo(lastNotify) == 0))
+            mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
+
+        mQueryCount = count;
+        mNotifyLast = lastNotify;
+
+
+
+
+
+
+
+
 
         // Check if not the initial query
         final View fab = findViewById(R.id.fab);
@@ -714,6 +761,14 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     ////// NotifyActivity //////////////////////////////////////////////////////////////////////////
     @Override
     protected void onLoggedResume() {
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+
+
 
     }
 
@@ -925,5 +980,17 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+
     }
 }

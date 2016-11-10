@@ -46,24 +46,21 @@ public class MusicRequest extends DataRequest {
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
-        synchronized (mRegister) {
-
-            if (data != null) { ////// Old data requested
-                Logs.add(Logs.Type.I, "Old sounds requested");
+        if (data != null) { ////// Old data requested
+            Logs.add(Logs.Type.I, "Old sounds requested");
 
 
 
 
 
 
-            } else { ////// New or data updates requested
+        } else { ////// New or data updates requested
 
 
 
 
 
 
-            }
         }
     }
 }

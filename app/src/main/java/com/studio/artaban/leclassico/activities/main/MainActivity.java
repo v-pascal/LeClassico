@@ -396,8 +396,8 @@ public class MainActivity extends LoggedActivity implements
             Tools.criticalError(this, R.string.error_service_unavailable);
 
         // Register shortcut data service
-        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, mShortcutUri));
-        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_MESSAGERIE, mShortcutUri));
+        sendBroadcast(DataService.getIntent(true, Tables.ID_NOTIFICATIONS, mShortcutUri));
+        sendBroadcast(DataService.getIntent(true, Tables.ID_MESSAGERIE, mShortcutUri));
     }
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
@@ -721,7 +721,7 @@ public class MainActivity extends LoggedActivity implements
         mNewNotifyLoader.init(this, Queries.MAIN_DATA_NEW_NOTIFY, notifyData);
 
         // Register new user notifications service
-        sendBroadcast(DataService.getIntent(Boolean.TRUE, Tables.ID_NOTIFICATIONS, Login.notificationURI));
+        sendBroadcast(DataService.getIntent(true, Tables.ID_NOTIFICATIONS, Login.notificationURI));
     }
 
     @Override
@@ -764,8 +764,8 @@ public class MainActivity extends LoggedActivity implements
         ((AppBarLayout)findViewById(R.id.appbar)).removeOnOffsetChangedListener(this);
 
         // Unregister shortcut data service
-        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mShortcutUri));
-        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_MESSAGERIE, mShortcutUri));
+        sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, mShortcutUri));
+        sendBroadcast(DataService.getIntent(false, Tables.ID_MESSAGERIE, mShortcutUri));
 
         // Unbind data service
         mDataService.unbind(this);
@@ -786,10 +786,10 @@ public class MainActivity extends LoggedActivity implements
         Logs.add(Logs.Type.V, null);
 
         // Unregister new user notifications service
-        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, Login.notificationURI));
+        sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, Login.notificationURI));
 
-        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_NOTIFICATIONS, mShortcutUri));
-        sendBroadcast(DataService.getIntent(Boolean.FALSE, Tables.ID_MESSAGERIE, mShortcutUri));
+        sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, mShortcutUri));
+        sendBroadcast(DataService.getIntent(false, Tables.ID_MESSAGERIE, mShortcutUri));
         // NB: Also implemented in 'onPause' method but needed in user kill app case
     }
 }

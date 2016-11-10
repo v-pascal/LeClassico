@@ -131,7 +131,9 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                 @Override
                 public void run() {
                     // Synchronization from remote to local DB
-                    request(null);
+                    synchronized (mRegister) {
+                        request(null);
+                    }
 
                     // Synchronization from local to remote DB (if needed)
                     if (mToSynchronize) // NB: Should not happen! Only in error case (server not available)
