@@ -245,6 +245,7 @@ public class NotificationsTable extends DataTable {
         data.putString(DATA_KEY_PSEUDO, pseudo);
         data.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
         data.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        data.putString(DATA_KEY_FIELD_DATE, COLUMN_DATE);
         String url = getSyncUrlRequest(resolver, data);
 
         // Send remote DB request

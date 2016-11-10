@@ -101,6 +101,7 @@ public abstract class DataTable implements IDataTable {
     protected static final String DATA_KEY_TABLE_NAME = "tableName";
     protected static final String DATA_KEY_PSEUDO = "pseudo";
     protected static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
+    protected static final String DATA_KEY_FIELD_DATE = "dateField";
 
     //////
     protected static String getMaxStatusDate(ContentResolver resolver, Bundle data) {
@@ -120,6 +121,23 @@ public abstract class DataTable implements IDataTable {
 
         return maxDate;
     }
+    protected static String getMinDate(ContentResolver resolver, Bundle data) {
+    // Return oldest entry date of table specified by data for a select operation (old entries request)
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
+                new String[]{ "min(" + data.getString(DATA_KEY_FIELD_DATE) + ")" },
+                data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue(), // Unchanged
+                null, null);
+
+        String minDate = null;
+        if (cursor.moveToFirst())
+            minDate = cursor.getString(0);
+        cursor.close();
+
+        return minDate;
+    }
 
     protected static String getSyncUrlRequest(ContentResolver resolver, Bundle data) {
         // Return URL of synchronization request according table data
@@ -130,13 +148,27 @@ public abstract class DataTable implements IDataTable {
                 WebServices.DATA_TOKEN + '=' + data.getString(DATA_KEY_TOKEN) + '&' + // Add token...
                 WebServices.DATA_OPERATION + '=' + operation; // ...& operation (always)
 
-        // Get & add last synchronization date (if needed)
-        if (operation == WebServices.OPERATION_SELECT) {
-            String statusDate = getMaxStatusDate(resolver, data);
-            if (statusDate != null) {
+        // Get & add last synchronization date & date criteria (if needed)
+        switch (operation) {
+            case WebServices.OPERATION_SELECT: {
+
+                String statusDate = getMaxStatusDate(resolver, data);
+                if (statusDate == null)
+                    break; // No entry (no date criteria)
 
                 Logs.add(Logs.Type.I, "Previous status date: " + statusDate);
-                url += '&' + WebServices.DATA_DATE + '=' + statusDate.replace(' ', 'n');
+                url += '&' + WebServices.DATA_STATUS_DATE + '=' + statusDate.replace(' ', 'n');
+                //break;
+            }
+            case WebServices.OPERATION_SELECT_OLD: {
+
+                if (data.containsKey(DATA_KEY_FIELD_DATE)) {
+                    String date = getMinDate(resolver, data);
+
+                    Logs.add(Logs.Type.I, "Previous date: " + date);
+                    url += '&' + WebServices.DATA_DATE + '=' + date.replace(' ', 'n');
+                }
+                break;
             }
         }
         if (data.containsKey(DATA_KEY_LIMIT)) // Add result limitation (if needed)

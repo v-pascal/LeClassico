@@ -74,12 +74,12 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     public boolean isRequesting() {
         return mRequesting;
     }
-    public void request() { // Start requesting old entries
-        Logs.add(Logs.Type.V, null);
+    public void setRequesting(boolean start) { // Set requesting old entries flag
+        Logs.add(Logs.Type.V, "start: " + start);
         if (mRequestLayout == Constants.NO_DATA)
             throw new IllegalStateException(ERROR_NO_REQUEST_LAYOUT);
 
-        mRequesting = true;
+        mRequesting = start;
         if (mRecyclerView != null) {
             if ((mRecyclerView.getItemAnimator() != null) &&
                     (mRecyclerView.getItemAnimator() instanceof RecyclerItemAnimator))
@@ -130,10 +130,10 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             for (ArrayList<Object> data : mData)
                 data.clear();
         }
-        private static void fill(Cursor cursor, ArrayList<ArrayList<Object>> data) {
+        private static void fill(Cursor cursor, ArrayList<ArrayList<Object>> data, int limit) {
         // Fill data array according DB cursor
 
-            Logs.add(Logs.Type.V, "cursor: " + cursor + ";data: " + data);
+            Logs.add(Logs.Type.V, "cursor: " + cursor + ";data: " + data + ";limit: " + limit);
             if (cursor.moveToFirst()) {
                 do {
                     ArrayList<Object> record = new ArrayList<>();
@@ -150,7 +150,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                     }
                     data.add(record);
 
-                } while (cursor.moveToNext());
+                } while ((cursor.moveToNext()) && (--limit != 0));
             }
             cursor.moveToFirst();
         }
@@ -180,11 +180,11 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         }
 
         //////
-        public void fill(Cursor cursor) { // Fill data according initial cursor
-            Logs.add(Logs.Type.V, "cursor: " + cursor);
+        public void fill(Cursor cursor, int limit) { // Fill data according initial cursor
+            Logs.add(Logs.Type.V, "cursor: " + cursor + ";limit: " + limit);
 
             clear();
-            fill(cursor, mData);
+            fill(cursor, mData, limit);
         }
 
         public interface OnNotifyChangeListener {
@@ -193,12 +193,14 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             void onInserted(ArrayList<ArrayList<Object>> newData, int start, int count);
             void onMoved(ArrayList<ArrayList<Object>> newData, int prevPos, int newPos);
         }
-        public SwapResult swap(RecyclerAdapter adapter, Cursor cursor, OnNotifyChangeListener listener) {
-        // Swap data with new cursor then notify recycler adapter accordingly
+        public SwapResult swap(RecyclerAdapter adapter, Cursor cursor,
+                               int limit, OnNotifyChangeListener listener) {
 
-            Logs.add(Logs.Type.V, "adapter: " + adapter + ";cursor: " + cursor + ";listener: " + listener);
+            // Swap data with new cursor then notify recycler adapter accordingly
+            Logs.add(Logs.Type.V, "adapter: " + adapter + ";cursor: " + cursor + ";limit: " + limit +
+                    ";listener: " + listener);
             ArrayList<ArrayList<Object>> newData = new ArrayList<>();
-            fill(cursor, newData);
+            fill(cursor, newData, limit);
 
             SwapResult swapResult = new SwapResult();
 

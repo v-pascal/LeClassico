@@ -20,18 +20,20 @@ public final class WebServices {
     ////// DB Operations ///////////////////////////////////////////////////////////////////////////
 
     public static final byte OPERATION_SELECT = 1;
-    public static final byte OPERATION_UPDATE = 2;
-    public static final byte OPERATION_INSERT = 3;
-    public static final byte OPERATION_DELETE = 4;
+    public static final byte OPERATION_SELECT_OLD = 2;
+    public static final byte OPERATION_UPDATE = 3;
+    public static final byte OPERATION_INSERT = 4;
+    public static final byte OPERATION_DELETE = 5;
 
 
     ////// GET & POST //////////////////////////////////////////////////////////////////////////////
 
     public static final String DATA_TOKEN = "Clf";
     public static final String DATA_OPERATION = "Ope";
+    public static final String DATA_STATUS_DATE = "StatusDate";
+    public static final String DATA_LIMIT = "Count";
 
     public static final String DATA_DATE = "Date";
-    public static final String DATA_LIMIT = "Count";
 
     public static final String DATA_KEYS = "Keys";
     public static final String DATA_STATUS = "Status";

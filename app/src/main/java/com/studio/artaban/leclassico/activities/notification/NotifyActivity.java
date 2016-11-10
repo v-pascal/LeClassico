@@ -31,7 +31,6 @@ import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
@@ -58,6 +57,7 @@ import java.util.Date;
 public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
 
     private static final String DATA_KEY_OLD_REQUESTED = "oldRequested";
+    private static final String DATA_KEY_QUERY_LIMIT = "queryLimit";
     // Data keys
 
     public void onRead(View sender) { // Mark unread notification(s) as read
@@ -206,7 +206,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
     private RecyclerView mNotifyList; // Recycler view containing notification list
     private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
-    private boolean mOldRequested; // Old notifications requested flag
 
     //////
     private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
@@ -281,7 +280,16 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 }
                 case R.id.layout_more: {
                     Logs.add(Logs.Type.I, "Old notifications requested");
-                    mNotifyAdapter.request();
+                    mQueryLimit += Queries.OLDER_MAIN_NOTIFY;
+
+                    int requestCount = mQueryLimit - mQueryCount;
+                    if (requestCount <= 0)
+                        refresh(); // Refresh notification list (with new limitation)
+
+                    else { // Request old entries to remote DB
+
+                        mNotifyAdapter.setRequesting(true);
+                        mOldRequested = true;
 
 
 
@@ -289,15 +297,8 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
 
 
-                    mOldRequested = true;
 
-
-
-
-
-
-
-
+                    }
                     break;
                 }
             }
@@ -500,142 +501,31 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, final Cursor cursor) {
+
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+        if (!cursor.moveToFirst())
+            return;
 
-        if (!cursor.moveToFirst()) return;
-        switch (id) {
-            case Queries.MAIN_NOTIFY_LIST: {
-
-                mQueryCount = (short)cursor.getCount();
-                final View fab = findViewById(R.id.fab);
-
-                // Get if exists unread notification
-                int newNotify = 0;
-                do {
-                    if (cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
-                        ++newNotify; // new notification found (unread)
-                    else
-                        break;
-
-                } while (cursor.moveToNext());
-                cursor.moveToFirst();
-                setNewNotifyInfo(newNotify);
-
-                // Check if not the initial query
-                if (mNotifyAdapter != null) {
-                    Logs.add(Logs.Type.I, "Query update");
-
-                    ////// Update notification list
-                    if (mNotifyList.getAdapter() == null)
-                        mNotifyList.setAdapter(mNotifyAdapter);
-                    RecyclerAdapter.SwapResult swapResult =
-                            mNotifyAdapter.getDataSource().swap(mNotifyAdapter, cursor,
-                                    new RecyclerAdapter.DataView.OnNotifyChangeListener() {
-                                @Override
-                                public void onRemoved(ArrayList<ArrayList<Object>> newData, int start, int count) {
-
-                                }
-
-                                @Override
-                                public void onInserted(ArrayList<ArrayList<Object>> newData, int start, int count) {
-                                    //Logs.add(Logs.Type.V, "newData: " + newData + ";start: " + start +
-                                    //        ";count: " + count);
-                                    int followed = start + count;
-
-                                    // Notify item that follows last inserted notification (if needed)
-                                    // NB: If notification day is same as last insertion (update day separator)
-                                    if ((newData.size() > count) && (((String)newData.get(followed)
-                                            .get(COLUMN_INDEX_DATE)).substring(0, 10)
-                                            .compareTo(((String) newData.get(followed - 1)
-                                                    .get(COLUMN_INDEX_DATE)).substring(0, 10)) == 0))
-                                        mNotifyAdapter.notifyItemChanged(followed);
-                                }
-
-                                @Override
-                                public void onMoved(ArrayList<ArrayList<Object>> newData, int prevPos, int newPos) {
-
-                                }
-                            });
-
-                    // Check if only change notification(s) on synchronization fields
-                    boolean syncFieldsOnly = swapResult.countChanged > 0;
-                    for (int i = 0; i < swapResult.columnChanged.size(); ++i) {
-                        if ((swapResult.columnChanged.get(i) != COLUMN_INDEX_SYNC) &&
-                                (swapResult.columnChanged.get(i) != COLUMN_INDEX_STATUS_DATE)) {
-
-                            syncFieldsOnly = false;
-                            break;
-                        }
-                    }
-                    if (syncFieldsOnly) // Disable change animations (only sync fields have changed)
-                        ((RecyclerItemAnimator)mNotifyList.getItemAnimator())
-                                .setDisableChangeAnimations(swapResult.countChanged);
-
-                    // Display/Hide floating action button
-                    final boolean display = newNotify > 0;
-                    if (mFabTransY == Constants.NO_DATA)
-                        fab.getViewTreeObserver()
-                                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                                    @Override
-                                    public void onGlobalLayout() {
-                                        Logs.add(Logs.Type.V, null);
-                                        mFabTransY = fab.getHeight() +
-                                                (getResources().getDimensionPixelSize(R.dimen.fab_margin) << 1);
-
-                                        fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                                        if (display)
-                                            displayFab(fab);
-                                        else
-                                            hideFab(fab);
-                                    }
-                                });
-
-                    else if (display)
-                        displayFab(fab);
-                    else
-                        hideFab(fab);
-
-                } else {
-                    Logs.add(Logs.Type.I, "Initial query");
-
-                    ////// Fill notification list
-                    mNotifyAdapter = new NotifyRecyclerViewAdapter();
-                    mNotifyAdapter.getDataSource().fill(cursor);
-                    if (mOldRequested)
-                        mNotifyAdapter.request();
-                    mNotifyList.setAdapter(mNotifyAdapter);
-
-                    do { // Display floating action button according unread notification displayed
-                        if (cursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
-                            fab.setVisibility(View.VISIBLE);
-                            break;
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-                break;
-            }
-            case Queries.MAIN_NOTIFY_MAX: {
-
-                mQueryID = cursor.getShort(0);
-                break;
-            }
+        if (id == Queries.MAIN_NOTIFY_LIST) {
+            mNotifyCursor = cursor;
+            refresh(); // Display notifications
         }
     }
 
     @Override
     public void onLoaderReset() {
-
+        Logs.add(Logs.Type.V, null);
+        mNotifyCursor = null;
     }
 
     //////
     private final QueryLoader mListLoader = new QueryLoader(this, this); // User notification list query loader
-    private final QueryLoader mMaxLoader = new QueryLoader(this, this); // Max notification Id query loader
+    private Cursor mNotifyCursor; // Notifications cursor
 
-    private short mQueryCount; // DB query result count
-    private int mQueryID = Constants.NO_DATA; // Max record Id (used to check if new entries)
-    private short mQueryOld; // DB old entries requested
+    private short mQueryCount = Constants.NO_DATA; // DB query result count
+    private short mQueryLimit = Queries.LIMIT_MAIN_NOTIFY; // DB query limit
+
+    private boolean mOldRequested; // Old notifications requested flag
 
     // Query column indexes
     private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
@@ -659,119 +549,166 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     private static final int COLUMN_INDEX_COM_TEXT = 18;
     private static final int COLUMN_INDEX_COMMENT_ID = 19;
 
-    private void setLoaders() { // Initialize or update queries loaders
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void refresh() { // Display/Refresh notifications list
         Logs.add(Logs.Type.V, null);
-        final String selection = NotificationsTable.COLUMN_PSEUDO + "='" +
-                getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) + '\'';
-
-        Tools.startProcess(this, new Tools.OnProcessListener() {
-            private static final String DATA_KEY_QUERY_LIMIT = "queryLimit";
-
-            @Override
-            public Bundle onBackgroundTask() {
-                Logs.add(Logs.Type.V, null);
-
-                // Get query limit
-                short queryLimit = 0;
-                if (mQueryID != Constants.NO_DATA) {
-
-                    queryLimit = mQueryCount;
-                    queryLimit += mQueryOld;
-                    queryLimit += (short) DataTable.getEntryCount(getContentResolver(),
-                            NotificationsTable.TABLE_NAME, selection + " AND " +
-                                    IDataTable.DataField.COLUMN_ID + '>' + mQueryID);
 
 
 
 
 
+        /*
+        mQueryLimit += Queries.OLDER_MAIN_NOTIFY;
 
-                    //mQueryOld = Queries.OLDER_NOTIFICATIONS;
-                    //mQueryOld = 0;
+        int requestCount = mQueryLimit - mQueryCount;
+        if (requestCount <= 0)
+            refresh(); // Refresh notification list (with new limitation)
+
+        else { // Request old entries to remote DB
+
+            mNotifyAdapter.setRequesting(true);
+            mOldRequested = true;
+
+
+
+        }
+        */
 
 
 
 
 
 
+
+        short count = (short)mNotifyCursor.getCount();
+        if ((mQueryCount != Constants.NO_DATA) && (!mOldRequested))
+            mQueryLimit += count - mQueryCount; // In case of new entries (from remote DB)
+        mQueryCount = count;
+
+
+
+
+        //mOldRequested
+
+
+
+
+
+
+
+
+
+
+
+        // Get if exists unread notification
+        int newNotify = 0;
+        do {
+            if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
+                ++newNotify; // new notification found (unread)
+            else
+                break;
+
+        } while (mNotifyCursor.moveToNext());
+        mNotifyCursor.moveToFirst();
+        setNewNotifyInfo(newNotify);
+
+        // Check if not the initial query
+        final View fab = findViewById(R.id.fab);
+        if (mNotifyAdapter != null) {
+
+            ////// Update notification list
+            Logs.add(Logs.Type.I, "Query update");
+
+            if (mNotifyList.getAdapter() == null)
+                mNotifyList.setAdapter(mNotifyAdapter);
+            mNotifyAdapter.setRequesting(mOldRequested);
+
+            RecyclerAdapter.SwapResult swapResult =
+                    mNotifyAdapter.getDataSource().swap(mNotifyAdapter, mNotifyCursor, mQueryLimit,
+                            new RecyclerAdapter.DataView.OnNotifyChangeListener() {
+                        @Override
+                        public void onRemoved(ArrayList<ArrayList<Object>> newData, int start, int count) {
+
+                        }
+
+                        @Override
+                        public void onInserted(ArrayList<ArrayList<Object>> newData, int start, int count) {
+                            //Logs.add(Logs.Type.V, "newData: " + newData + ";start: " + start +
+                            //        ";count: " + count);
+                            int followed = start + count;
+
+                            // Notify item that follows last inserted notification (if needed)
+                            // NB: If notification day is same as last insertion (update day separator)
+                            if ((newData.size() > followed) && (((String)newData.get(followed)
+                                    .get(COLUMN_INDEX_DATE)).substring(0, 10)
+                                    .compareTo(((String) newData.get(followed - 1)
+                                            .get(COLUMN_INDEX_DATE)).substring(0, 10)) == 0))
+                                mNotifyAdapter.notifyItemChanged(followed);
+                        }
+
+                        @Override
+                        public void onMoved(ArrayList<ArrayList<Object>> newData, int prevPos, int newPos) {
+
+                        }
+                    });
+
+            // Check if only change notification(s) on synchronization fields
+            boolean syncFieldsOnly = swapResult.countChanged > 0;
+            for (int i = 0; i < swapResult.columnChanged.size(); ++i) {
+                if ((swapResult.columnChanged.get(i) != COLUMN_INDEX_SYNC) &&
+                        (swapResult.columnChanged.get(i) != COLUMN_INDEX_STATUS_DATE)) {
+
+                    syncFieldsOnly = false;
+                    break;
                 }
-                Bundle result = new Bundle();
-                result.putShort(DATA_KEY_QUERY_LIMIT, queryLimit);
-                return result;
             }
+            if (syncFieldsOnly) // Disable change animations (only sync fields have changed)
+                ((RecyclerItemAnimator)mNotifyList.getItemAnimator())
+                        .setDisableChangeAnimations(swapResult.countChanged);
 
-            @Override
-            public void onMainNextTask(Bundle backResult) {
-                Logs.add(Logs.Type.V, "backResult: " + backResult);
+            // Display/Hide floating action button
+            final boolean display = newNotify > 0;
+            if (mFabTransY == Constants.NO_DATA)
+                fab.getViewTreeObserver()
+                        .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
-                short queryLimit = backResult.getShort(DATA_KEY_QUERY_LIMIT);
-                if (queryLimit < Queries.LIMIT_MAIN_NOTIFY)
-                    queryLimit = Queries.LIMIT_MAIN_NOTIFY;
+                            @Override
+                            public void onGlobalLayout() {
+                                Logs.add(Logs.Type.V, null);
+                                mFabTransY = fab.getHeight() +
+                                        (getResources().getDimensionPixelSize(R.dimen.fab_margin) << 1);
 
-                // Load notification data (using query loader)
-                Bundle queryData = new Bundle();
-                queryData.putParcelable(QueryLoader.DATA_KEY_URI,
-                        getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI));
-                queryData.putString(QueryLoader.DATA_KEY_SELECTION,
-                        "SELECT " +
-                                NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
-                                NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
-                                NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
-                                NotificationsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_NOTIFY_ID
-                                NotificationsTable.COLUMN_DATE + ',' + // COLUMN_INDEX_DATE
-                                NotificationsTable.COLUMN_LU_FLAG + ',' + // COLUMN_INDEX_LU_FLAG
-                                CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
-                                CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
-                                CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
-                                CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MEMBER_ID
-                                PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_ALBUM
-                                PhotosTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PHOTO_ID
-                                ActualitesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_PUB_TEXT
-                                ActualitesTable.COLUMN_LINK + ',' + // COLUMN_INDEX_LINK
-                                ActualitesTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_FICHIER
-                                ActualitesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PUB_ID
-                                MessagerieTable.COLUMN_MESSAGE + ',' + // COLUMN_INDEX_MSG_TEXT
-                                MessagerieTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MSG_ID
-                                CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COM_TEXT
-                                CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
+                                fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                if (display)
+                                    displayFab(fab);
+                                else
+                                    hideFab(fab);
+                            }
+                        });
 
-                                " FROM " + NotificationsTable.TABLE_NAME +
-                                " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
-                                NotificationsTable.COLUMN_OBJECT_FROM + '=' + CamaradesTable.COLUMN_PSEUDO +
-                                " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
-                                NotificationsTable.COLUMN_OBJECT_ID + '=' + PhotosTable.COLUMN_FICHIER_ID + " AND " +
-                                NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_SHARED + "' AND " +
-                                NotificationsTable.COLUMN_OBJECT_DATE + " IS NULL" +
-                                " LEFT JOIN " + ActualitesTable.TABLE_NAME + " ON " +
-                                NotificationsTable.COLUMN_OBJECT_ID + '=' + ActualitesTable.COLUMN_ACTU_ID + " AND " +
-                                NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_WALL + '\'' +
-                                " LEFT JOIN " + MessagerieTable.TABLE_NAME + " ON " +
-                                NotificationsTable.COLUMN_OBJECT_FROM + '=' + MessagerieTable.COLUMN_FROM + " AND " +
-                                NotificationsTable.COLUMN_OBJECT_DATE + '=' +
-                                MessagerieTable.COLUMN_DATE + "||' '||" + MessagerieTable.COLUMN_TIME + " AND " +
-                                NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_MAIL + "' AND " +
-                                NotificationsTable.COLUMN_OBJECT_ID + " IS NULL" +
-                                " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
-                                NotificationsTable.COLUMN_OBJECT_ID + '=' + CommentairesTable.COLUMN_OBJ_ID + " AND " +
-                                NotificationsTable.COLUMN_OBJECT_TYPE + '=' + CommentairesTable.COLUMN_OBJ_TYPE + " AND " +
-                                NotificationsTable.COLUMN_OBJECT_DATE + '=' + CommentairesTable.COLUMN_DATE + " AND " +
-                                NotificationsTable.COLUMN_OBJECT_FROM + '=' + CommentairesTable.COLUMN_PSEUDO +
-                                " WHERE " + selection +
-                                " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC" +
-                                " LIMIT " + queryLimit);
+            else if (display)
+                displayFab(fab);
+            else
+                hideFab(fab);
 
-                if (mQueryID != Constants.NO_DATA) // Restart
-                    mListLoader.restart(NotifyActivity.this, Queries.MAIN_NOTIFY_LIST, queryData);
+        } else {
+            Logs.add(Logs.Type.I, "Initial query");
 
-                else { // Initialize
-                    mListLoader.init(NotifyActivity.this, Queries.MAIN_NOTIFY_LIST, queryData);
+            ////// Fill notification list
+            mNotifyAdapter = new NotifyRecyclerViewAdapter();
+            mNotifyAdapter.getDataSource().fill(mNotifyCursor, mQueryLimit);
+            mNotifyAdapter.setRequesting(mOldRequested);
+            mNotifyList.setAdapter(mNotifyAdapter);
 
-                    queryData.putString(QueryLoader.DATA_KEY_SELECTION, "SELECT max(" + IDataTable.DataField.COLUMN_ID +
-                            ") FROM " + NotificationsTable.TABLE_NAME + " WHERE " + selection);
-                    mMaxLoader.init(NotifyActivity.this, Queries.MAIN_NOTIFY_MAX, queryData);
+            do { // Display floating action button according unread notification displayed
+                if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
+                    fab.setVisibility(View.VISIBLE);
+                    break;
                 }
-            }
-        });
+
+            } while (mNotifyCursor.moveToNext());
+        }
     }
 
     ////// NotifyActivity //////////////////////////////////////////////////////////////////////////
@@ -788,8 +725,10 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         setContentView(R.layout.activity_notify);
 
         // Restore data
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             mOldRequested = savedInstanceState.getBoolean(DATA_KEY_OLD_REQUESTED);
+            mQueryLimit = savedInstanceState.getShort(DATA_KEY_QUERY_LIMIT);
+        }
 
         // Set toolbar & default new notification
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -913,7 +852,58 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         mNotifyList.setItemAnimator(itemAnimator);
 
         // Initialize notification list (set query loaders)
-        setLoaders();
+        Bundle queryData = new Bundle();
+        queryData.putParcelable(QueryLoader.DATA_KEY_URI,
+                getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI));
+        queryData.putString(QueryLoader.DATA_KEY_SELECTION,
+                "SELECT " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
+                        NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
+                        NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
+                        NotificationsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_NOTIFY_ID
+                        NotificationsTable.COLUMN_DATE + ',' + // COLUMN_INDEX_DATE
+                        NotificationsTable.COLUMN_LU_FLAG + ',' + // COLUMN_INDEX_LU_FLAG
+                        CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
+                        CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
+                        CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
+                        CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MEMBER_ID
+                        PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_ALBUM
+                        PhotosTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PHOTO_ID
+                        ActualitesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_PUB_TEXT
+                        ActualitesTable.COLUMN_LINK + ',' + // COLUMN_INDEX_LINK
+                        ActualitesTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_FICHIER
+                        ActualitesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PUB_ID
+                        MessagerieTable.COLUMN_MESSAGE + ',' + // COLUMN_INDEX_MSG_TEXT
+                        MessagerieTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MSG_ID
+                        CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COM_TEXT
+                        CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
+
+                        " FROM " + NotificationsTable.TABLE_NAME +
+                        " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + CamaradesTable.COLUMN_PSEUDO +
+                        " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_ID + '=' + PhotosTable.COLUMN_FICHIER_ID + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_SHARED + "' AND " +
+                        NotificationsTable.COLUMN_OBJECT_DATE + " IS NULL" +
+                        " LEFT JOIN " + ActualitesTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_ID + '=' + ActualitesTable.COLUMN_ACTU_ID + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_WALL + '\'' +
+                        " LEFT JOIN " + MessagerieTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + MessagerieTable.COLUMN_FROM + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_DATE + '=' +
+                        MessagerieTable.COLUMN_DATE + "||' '||" + MessagerieTable.COLUMN_TIME + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_MAIL + "' AND " +
+                        NotificationsTable.COLUMN_OBJECT_ID + " IS NULL" +
+                        " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
+                        NotificationsTable.COLUMN_OBJECT_ID + '=' + CommentairesTable.COLUMN_OBJ_ID + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_TYPE + '=' + CommentairesTable.COLUMN_OBJ_TYPE + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_DATE + '=' + CommentairesTable.COLUMN_DATE + " AND " +
+                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + CommentairesTable.COLUMN_PSEUDO +
+                        " WHERE " +
+                        NotificationsTable.COLUMN_PSEUDO + "='" + getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
+                        "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
+
+        mListLoader.init(NotifyActivity.this, Queries.MAIN_NOTIFY_LIST, queryData);
     }
 
     @Override
@@ -931,6 +921,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     protected void onSaveInstanceState(Bundle outState) {
 
         outState.putBoolean(DATA_KEY_OLD_REQUESTED, mOldRequested);
+        outState.putShort(DATA_KEY_QUERY_LIMIT, mQueryLimit);
 
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);

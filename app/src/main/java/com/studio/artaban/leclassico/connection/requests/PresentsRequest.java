@@ -46,21 +46,24 @@ public class PresentsRequest extends DataRequest {
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
-        if (data != null) { ////// Old data requested
-            Logs.add(Logs.Type.I, "Old notifications requested");
+        synchronized (mRegister) {
+
+            if (data != null) { ////// Old data requested
+                Logs.add(Logs.Type.I, "Old presents info requested");
 
 
 
 
 
 
-        } else { ////// New or data updates requested
+            } else { ////// New or data updates requested
 
 
 
 
 
 
+            }
         }
     }
 }

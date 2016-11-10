@@ -51,38 +51,45 @@ public class NotificationsRequest extends DataRequest {
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
-        if (data != null) { ////// Old data requested
-            Logs.add(Logs.Type.I, "Old notifications requested");
+        synchronized (mRegister) {
 
-
-
-
-            //dataLogin.token
-
-            //mService.getContentResolver()
-            //         .notifyChange(Uri.parse(intent.getStringExtra(EXTRA_DATA_URI), null);
+            if (data != null) { ////// Old data requested
+                Logs.add(Logs.Type.I, "Old notifications requested");
 
 
 
 
 
-        } else { ////// New or data updates requested
 
-            // Get previous new notification count
-            int prevNewNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
+                //dataLogin.token
 
-            // Synchronization (from remote to local DB)
-            DataTable.SyncResult result = Database.getTable(NotificationsTable.TABLE_NAME)
-                    .synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_SELECT,
-                            dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
-            if (DataTable.SyncResult.hasChanged(result)) {
+                //mService.getContentResolver()
+                //         .notifyChange(Uri.parse(intent.getStringExtra(EXTRA_DATA_URI), null);
 
-                int newNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
-                if (prevNewNotify != newNotify)
-                    ServiceNotify.update(mService, newNotify);
 
-                Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
-                notifyChange(); // Notify DB change to observer URI
+
+
+
+
+
+            } else { ////// New or data updates requested
+
+                // Get previous new notification count
+                int prevNewNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
+
+                // Synchronization (from remote to local DB)
+                DataTable.SyncResult result = Database.getTable(NotificationsTable.TABLE_NAME)
+                        .synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_SELECT,
+                                dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
+                if (DataTable.SyncResult.hasChanged(result)) {
+
+                    int newNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
+                    if (prevNewNotify != newNotify)
+                        ServiceNotify.update(mService, newNotify);
+
+                    Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+                    notifyChange(); // Notify DB change to observer URI
+                }
             }
         }
     }
