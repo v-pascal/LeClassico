@@ -51,8 +51,6 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private static final String EXTRA_DATA_TIME_LAG = "timeLag";
     private static final String EXTRA_DATA_TABLE_ID = "tableId";
     private static final String EXTRA_DATA_NEW = "new";
-
-    private static final String EXTRA_DATA_REQUESTER = "requester";
     // Extra data keys
 
     private static boolean isRunning; // Service running flag
@@ -99,44 +97,23 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             Constants.APP_URI + ".action.UNREGISTER_DATA";
 
     //
-    public static Intent getIntent(boolean register, byte tableId, Uri uri) {
+    public static Intent getIntent(Intent action, byte tableId, Uri uri) {
+    // Return action intent with table & URI specification
+
+        Logs.add(Logs.Type.V, "action: " + action + ";tableId: " + tableId + ";uri: " + uri);
+        action.putExtra(EXTRA_DATA_TABLE_ID, tableId);
+        action.putExtra(DataRequest.EXTRA_DATA_URI, uri);
+        return action;
+    }
+    public static Intent getIntent(boolean register, boolean old, byte tableId, Uri uri) {
     // Return intent for new data request according the 'register' parameter (register/unregister)
 
-        Logs.add(Logs.Type.V, "register: " + register + ";tableId: " + tableId + ";uri: " + uri);
+        Logs.add(Logs.Type.V, "register: " + register + ";old: " + old + ";tableId: " + tableId + ";uri: " + uri);
         Intent dataIntent = new Intent((register)? REGISTER_DATA:UNREGISTER_DATA);
 
-        dataIntent.putExtra(EXTRA_DATA_NEW, true);
-        dataIntent.putExtra(EXTRA_DATA_TABLE_ID, tableId);
-        dataIntent.putExtra(DataRequest.EXTRA_DATA_URI, uri);
-        return dataIntent;
+        dataIntent.putExtra(EXTRA_DATA_NEW, !old);
+        return getIntent(dataIntent, tableId, uri);
     }
-
-
-
-
-
-
-
-    /*
-    public static Intent getIntent(boolean register, byte tableId, String requester) {
-    // Return intent for old data request according the 'register' parameter (register/unregister)
-
-        Logs.add(Logs.Type.V, "register: " + register + ";tableId: " + tableId + ";requester: " + requester);
-        Intent dataIntent = new Intent((register)? REGISTER_DATA:UNREGISTER_DATA);
-
-        dataIntent.putExtra(EXTRA_DATA_NEW, false);
-        dataIntent.putExtra(EXTRA_DATA_TABLE_ID, tableId);
-        dataIntent.putExtra(EXTRA_DATA_REQUESTER, requester);
-        return dataIntent;
-    }
-    */
-
-
-
-
-
-
-
     private final DataReceiver mDataReceiver = new DataReceiver(); // Data broadcast receiver
     private final ArrayList<DataRequest> mDataRequests = new ArrayList<>(); // Data request task list
     private Timer mRequestTimer; // Timer to manage data request tasks
@@ -162,7 +139,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
-                        //intent.getStringExtra(EXTRA_DATA_REQUESTER) as KEY
+                        //intent.getParcelableExtra(EXTRA_DATA_URI) as KEY
 
 
 
@@ -181,7 +158,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
-                        //intent.getStringExtra(EXTRA_DATA_REQUESTER) as KEY
+                        //intent.getParcelableExtra(EXTRA_DATA_URI) as KEY
 
 
 
@@ -199,7 +176,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
 
 
-                    //intent.getStringExtra(EXTRA_DATA_REQUESTER) as KEY
+                    //intent.getParcelableExtra(EXTRA_DATA_URI) as KEY
 
 
 

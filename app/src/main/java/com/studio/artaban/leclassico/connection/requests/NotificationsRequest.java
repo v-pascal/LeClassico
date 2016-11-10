@@ -62,7 +62,8 @@ public class NotificationsRequest extends DataRequest {
 
             //dataLogin.token
 
-
+            //mService.getContentResolver()
+            //         .notifyChange((Uri) intent.getParcelableExtra(EXTRA_DATA_URI), mSyncObserver);
 
 
 

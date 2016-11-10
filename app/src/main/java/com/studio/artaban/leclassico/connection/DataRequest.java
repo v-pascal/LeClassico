@@ -25,6 +25,7 @@ import java.util.TimerTask;
 public abstract class DataRequest implements DataObserver.OnContentListener {
 
     public static final String EXTRA_DATA_URI = "uri";
+    public static final String EXTRA_DATA_DATE = "date";
     // Extra data keys (common)
 
     protected static final long DEFAULT_DELAY = 30000; // DB request task delay (in ms)

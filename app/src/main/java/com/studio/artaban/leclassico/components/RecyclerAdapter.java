@@ -74,6 +74,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     public boolean isRequesting() {
         return mRequesting;
     }
+
     public void setRequesting(boolean start) { // Set requesting old entries flag
         Logs.add(Logs.Type.V, "start: " + start);
         if (mRequestLayout == Constants.NO_DATA)

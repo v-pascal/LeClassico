@@ -7,6 +7,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -31,12 +32,14 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
+import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
@@ -291,17 +294,15 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                         refresh(); // Refresh notification list (with new limitation)
 
                     else { // Request old entries to remote DB
+                        Logs.add(Logs.Type.I, "Request old notifications to remote DB");
 
                         mNotifyAdapter.setRequesting(true);
                         mOldRequested = true;
 
-
-
-
-
-
-
-
+                        Intent requestData = new Intent(DataService.REQUEST_OLD_DATA);
+                        requestData.putExtra(DataRequest.EXTRA_DATA_DATE, mNotifyLast);
+                        NotifyActivity.this.sendBroadcast(DataService.getIntent(requestData, Tables.ID_NOTIFICATIONS,
+                                (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
                     }
                     break;
                 }
@@ -565,57 +566,14 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             if ((intent.getAction().equals(DataService.REQUEST_OLD_DATA)) &&
                     (intent.getBooleanExtra(DataService.EXTRA_DATA_RECEIVED, false))) {
 
-
-
-
-
-                //mOldRequested = false;
-
-
-
-
-
+                mOldRequested = false;
+                mNotifyAdapter.setRequesting(false);
             }
         }
     }
 
     private void refresh() { // Display/Refresh notifications list
         Logs.add(Logs.Type.V, null);
-
-
-
-
-
-        /*
-        mQueryLimit += Queries.OLDER_MAIN_NOTIFY;
-
-        int requestCount = mQueryLimit - mQueryCount;
-        if (requestCount <= 0)
-            refresh(); // Refresh notification list (with new limitation)
-
-        else { // Request old entries to remote DB
-
-            mNotifyAdapter.setRequesting(true);
-            mOldRequested = true;
-
-
-
-        }
-        */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         // Get if exists new notification (first unread notification)
         int newNotify = 0;
@@ -637,13 +595,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         } while (mNotifyCursor.moveToNext());
         mNotifyCursor.moveToFirst();
 
-
-
-
-
-
-
-
         // Update current display data
         short count = (short) mNotifyCursor.getCount();
         if ((mQueryCount != Constants.NO_DATA) && (mNotifyLast.compareTo(lastNotify) == 0))
@@ -651,14 +602,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
         mQueryCount = count;
         mNotifyLast = lastNotify;
-
-
-
-
-
-
-
-
 
         // Check if not the initial query
         final View fab = findViewById(R.id.fab);
@@ -763,13 +706,10 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     protected void onLoggedResume() {
         Logs.add(Logs.Type.V, null);
 
-
-
-
-
-
-
-
+        // Register old request
+        registerReceiver(mOldReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
+        sendBroadcast(DataService.getIntent(true, true, Tables.ID_NOTIFICATIONS,
+                (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
     }
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
@@ -987,10 +927,9 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         super.onPause();
         Logs.add(Logs.Type.V, null);
 
-
-
-
-
-
+        // Unregister old request
+        sendBroadcast(DataService.getIntent(false, true, Tables.ID_NOTIFICATIONS,
+                (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
+        unregisterReceiver(mOldReceiver);
     }
 }
