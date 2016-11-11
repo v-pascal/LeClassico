@@ -63,10 +63,6 @@ import java.util.Date;
  */
 public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
 
-    private static final String DATA_KEY_OLD_REQUESTED = "oldRequested";
-    private static final String DATA_KEY_QUERY_LIMIT = "queryLimit";
-    // Data keys
-
     public void onRead(View sender) { // Mark unread notification(s) as read
 
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -274,11 +270,13 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
 
 
+
                     break;
                 }
                 case R.id.layout_data: {
                     int position = (int)sender.getTag(R.id.tag_position);
                     Logs.add(Logs.Type.I, "Notification #" + position + " selected");
+
 
 
 
@@ -293,15 +291,13 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     if (requestCount <= 0)
                         refresh(); // Refresh notification list (with new limitation)
 
-                    else { // Request old entries to remote DB
+                    else {
                         Logs.add(Logs.Type.I, "Request old notifications to remote DB");
-
                         mNotifyAdapter.setRequesting(true);
-                        mOldRequested = true;
 
-                        Intent requestData = new Intent(DataService.REQUEST_OLD_DATA);
-                        requestData.putExtra(DataRequest.EXTRA_DATA_DATE, mNotifyLast);
-                        NotifyActivity.this.sendBroadcast(DataService.getIntent(requestData, Tables.ID_NOTIFICATIONS,
+                        ////// Request old notifications to remote DB
+                        NotifyActivity.this.sendBroadcast(DataService
+                                .getIntent(new Intent(DataService.REQUEST_OLD_DATA), Tables.ID_NOTIFICATIONS,
                                 (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
                     }
                     break;
@@ -506,7 +502,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, final Cursor cursor) {
-
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
         if (!cursor.moveToFirst())
             return;
@@ -530,8 +525,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
     private short mQueryLimit = Queries.LIMIT_MAIN_NOTIFY; // DB query limit
-
-    private boolean mOldRequested; // Old notifications requested flag
 
     // Query column indexes
     private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
@@ -563,12 +556,12 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         public void onReceive(Context context, Intent intent) {
 
             Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
-            if ((intent.getAction().equals(DataService.REQUEST_OLD_DATA)) &&
-                    (intent.getBooleanExtra(DataService.EXTRA_DATA_RECEIVED, false))) {
-
-                mOldRequested = false;
+            if ((intent.getAction().equals(DataService.REQUEST_OLD_DATA)) && // Old request
+                    (intent.getBooleanExtra(DataService.EXTRA_DATA_RECEIVED, false)) && // Received
+                    (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI)) // Notification URI
+                            .compareTo((Uri) NotifyActivity.this.getIntent()
+                                    .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)) == 0))
                 mNotifyAdapter.setRequesting(false);
-            }
         }
     }
 
@@ -603,17 +596,14 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         mQueryCount = count;
         mNotifyLast = lastNotify;
 
-        // Check if not the initial query
         final View fab = findViewById(R.id.fab);
-        if (mNotifyAdapter != null) {
+        if (mNotifyAdapter != null) { // Check if not the initial query
 
             ////// Update notification list
             Logs.add(Logs.Type.I, "Query update");
 
             if (mNotifyList.getAdapter() == null)
                 mNotifyList.setAdapter(mNotifyAdapter);
-            mNotifyAdapter.setRequesting(mOldRequested);
-
             RecyclerAdapter.SwapResult swapResult =
                     mNotifyAdapter.getDataSource().swap(mNotifyAdapter, mNotifyCursor, mQueryLimit,
                             new RecyclerAdapter.DataView.OnNotifyChangeListener() {
@@ -688,7 +678,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             ////// Fill notification list
             mNotifyAdapter = new NotifyRecyclerViewAdapter();
             mNotifyAdapter.getDataSource().fill(mNotifyCursor, mQueryLimit);
-            mNotifyAdapter.setRequesting(mOldRequested);
             mNotifyList.setAdapter(mNotifyAdapter);
 
             do { // Display floating action button according unread notification displayed
@@ -706,10 +695,8 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     protected void onLoggedResume() {
         Logs.add(Logs.Type.V, null);
 
-        // Register old request
+        // Register old request receiver
         registerReceiver(mOldReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
-        sendBroadcast(DataService.getIntent(true, true, Tables.ID_NOTIFICATIONS,
-                (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
     }
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
@@ -718,12 +705,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         super.onCreate(savedInstanceState);
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_notify);
-
-        // Restore data
-        if (savedInstanceState != null) {
-            mOldRequested = savedInstanceState.getBoolean(DATA_KEY_OLD_REQUESTED);
-            mQueryLimit = savedInstanceState.getShort(DATA_KEY_QUERY_LIMIT);
-        }
 
         // Set toolbar & default new notification
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -913,23 +894,11 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-
-        outState.putBoolean(DATA_KEY_OLD_REQUESTED, mOldRequested);
-        outState.putShort(DATA_KEY_QUERY_LIMIT, mQueryLimit);
-
-        Logs.add(Logs.Type.V, "outState: " + outState);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         Logs.add(Logs.Type.V, null);
 
-        // Unregister old request
-        sendBroadcast(DataService.getIntent(false, true, Tables.ID_NOTIFICATIONS,
-                (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
+        // Unregister old request receiver
         unregisterReceiver(mOldReceiver);
     }
 }

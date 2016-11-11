@@ -54,21 +54,16 @@ public class NotificationsRequest extends DataRequest {
         if (data != null) { ////// Old data requested
             Logs.add(Logs.Type.I, "Old notifications requested");
 
+            DataTable.SyncResult result = Database.getTable(NotificationsTable.TABLE_NAME)
+                    .synchronize(mService.getContentResolver(), dataLogin.token.get(),
+                            WebServices.OPERATION_SELECT_OLD, dataLogin.pseudo, Queries.OLDER_MAIN_NOTIFY,
+                            null);
+            if (DataTable.SyncResult.hasChanged(result)) {
 
-
-
-
-
-
-            //dataLogin.token
-
-            //mService.getContentResolver()
-            //         .notifyChange((Uri) intent.getParcelableExtra(EXTRA_DATA_URI), mSyncObserver);
-
-
-
-
-
+                Logs.add(Logs.Type.I, "Old notifications received");
+                mService.getContentResolver().notifyChange((Uri) data.getParcelable(EXTRA_DATA_URI),
+                        mSyncObserver); // Last parameter needed in case where new data URI is registered
+            }
 
         } else { ////// New or data updates requested
 
