@@ -51,6 +51,7 @@ import java.util.TimerTask;
 public class DataService extends Service implements Internet.OnConnectivityListener {
 
     public static final String EXTRA_DATA_RECEIVED = "received";
+    public static final String EXTRA_DATA_OLD_FOUND = "oldFound";
 
     private static final String EXTRA_DATA_TOKEN = "token";
     private static final String EXTRA_DATA_TIME_LAG = "timeLag";
@@ -185,16 +186,20 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
                     // Make a pause (let's old request animation work)
                     try {
-                        Thread.sleep(getResources().getInteger(R.integer.duration_request_anim), 0);
+                        long delay = getResources().getInteger(R.integer.duration_request_anim) << 1;
+                        Thread.sleep(delay, 0); // NB: Double delay to be sure animation displayed
+
                     } catch (InterruptedException e) {
                         Logs.add(Logs.Type.E, "Olb request delay interrupted");
                     }
                     // Request old entries
-                    mDataRequests.get(msg.what).request((Bundle)msg.obj);
+                    boolean found = mDataRequests.get(msg.what).request((Bundle)msg.obj);
 
                     // Send old request finished info (received)
                     Intent received = new Intent(REQUEST_OLD_DATA);
+                    received.putExtra(EXTRA_DATA_TABLE_ID, (byte)msg.what);
                     received.putExtra(EXTRA_DATA_RECEIVED, true);
+                    received.putExtra(EXTRA_DATA_OLD_FOUND, found);
                     received.putExtra(DataRequest.EXTRA_DATA_URI,
                             ((Bundle)msg.obj).getParcelable(DataRequest.EXTRA_DATA_URI));
 

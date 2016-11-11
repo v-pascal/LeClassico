@@ -172,7 +172,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     public abstract void register(Bundle data);
     public abstract void unregister(Uri uri);
 
-    public abstract void request(Bundle data); // Update data from remote to local DB
+    public abstract boolean request(Bundle data); // Update data from remote to local DB
     public void synchronize() { // Update data from local to remote DB
         Logs.add(Logs.Type.V, "mTableId: " + mTableId);
 

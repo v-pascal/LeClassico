@@ -150,7 +150,7 @@ public abstract class DataTable implements IDataTable {
 
         // Get & add last synchronization date & date criteria (if needed)
         switch (operation) {
-            case WebServices.OPERATION_SELECT: {
+            case WebServices.OPERATION_SELECT: { ////// Selection
 
                 String statusDate = getMaxStatusDate(resolver, data);
                 if (statusDate == null)
@@ -160,7 +160,7 @@ public abstract class DataTable implements IDataTable {
                 url += '&' + WebServices.DATA_STATUS_DATE + '=' + statusDate.replace(' ', 'n');
                 //break;
             }
-            case WebServices.OPERATION_SELECT_OLD: {
+            case WebServices.OPERATION_SELECT_OLD: { ////// Old selection
 
                 if (data.containsKey(DATA_KEY_FIELD_DATE)) {
                     String date = getMinDate(resolver, data);

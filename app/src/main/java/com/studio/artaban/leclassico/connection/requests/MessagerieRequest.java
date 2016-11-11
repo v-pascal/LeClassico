@@ -36,11 +36,11 @@ public class MessagerieRequest extends DataRequest {
     }
 
     @Override
-    public void request(Bundle data) { // Update data from remote to local DB
+    public boolean request(Bundle data) { // Update data from remote to local DB
 
         Logs.add(Logs.Type.V, "data: " + data);
         if (!Internet.isConnected())
-            return; // Nothing to do (without connection)
+            return false; // Nothing to do (without connection)
 
         // Get login info
         Login.Reply dataLogin = new Login.Reply();
@@ -62,5 +62,6 @@ public class MessagerieRequest extends DataRequest {
 
 
         }
+        return false;
     }
 }

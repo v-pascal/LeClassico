@@ -182,6 +182,9 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         Logs.add(Logs.Type.V, "fab: " + fab);
 
         fab.setVisibility(View.VISIBLE);
+        if (fab.getTranslationY() == 0)
+            return; // Noting to do
+
         fab.setTranslationY(mFabTransY);
         // NB: Coz fab can be invisible without any translation
 
@@ -285,7 +288,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 }
                 case R.id.layout_more: {
                     Logs.add(Logs.Type.I, "Old notifications requested");
-                    mQueryLimit += Queries.OLDER_MAIN_NOTIFY;
+                    mQueryLimit += Queries.NOTIFICATIONS_OLD_LIMIT;
 
                     int requestCount = mQueryLimit - mQueryCount;
                     if (requestCount <= 0)
@@ -506,7 +509,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         if (!cursor.moveToFirst())
             return;
 
-        if (id == Queries.MAIN_NOTIFY_LIST) {
+        if (id == Queries.NOTIFICATIONS_MAIN_LIST) {
             mNotifyCursor = cursor;
             refresh(); // Display notifications
         }
@@ -524,7 +527,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     private String mNotifyLast; // Last notification date received
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
-    private short mQueryLimit = Queries.LIMIT_MAIN_NOTIFY; // DB query limit
+    private short mQueryLimit = Queries.NOTIFICATIONS_LIST_LIMIT; // DB query limit
 
     // Query column indexes
     private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
@@ -560,33 +563,41 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     (intent.getBooleanExtra(DataService.EXTRA_DATA_RECEIVED, false)) && // Received
                     (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI)) // Notification URI
                             .compareTo((Uri) NotifyActivity.this.getIntent()
-                                    .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)) == 0))
+                                    .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)) == 0)) {
+
                 mNotifyAdapter.setRequesting(false);
+                if (!intent.getBooleanExtra(DataService.EXTRA_DATA_OLD_FOUND, false)) {
+                    if (mQueryCount > (mQueryLimit - Queries.NOTIFICATIONS_OLD_LIMIT)) {
+
+                        // Refresh list if no more old remote DB notifications but existing in local DB
+                        mQueryLimit = mQueryCount;
+                        refresh();
+
+                    } else // Remove expected old notifications count from limitation
+                        mQueryLimit -= Queries.NOTIFICATIONS_OLD_LIMIT;
+                }
+            }
         }
     }
 
     private void refresh() { // Display/Refresh notifications list
         Logs.add(Logs.Type.V, null);
+        mNotifyCursor.moveToFirst();
 
-        // Get if exists new notification (first unread notification)
+        // Get new notification (first unread notifications) + last notification date received
+        String lastNotify;
         int newNotify = 0;
+        boolean unreadNotify = true;
         do {
-            if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
+            lastNotify = mNotifyCursor.getString(COLUMN_INDEX_DATE);
+            if ((unreadNotify) && (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD))
                 ++newNotify; // new notification found (unread)
             else
-                break;
+                unreadNotify = false;
 
         } while (mNotifyCursor.moveToNext());
         mNotifyCursor.moveToFirst();
         setNewNotifyInfo(newNotify);
-
-        // Get last notification date
-        String lastNotify;
-        do {
-            lastNotify = mNotifyCursor.getString(COLUMN_INDEX_DATE);
-
-        } while (mNotifyCursor.moveToNext());
-        mNotifyCursor.moveToFirst();
 
         // Update current display data
         short count = (short) mNotifyCursor.getCount();
@@ -596,6 +607,19 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         mQueryCount = count;
         mNotifyLast = lastNotify;
 
+        // Get unread notifications flag (to display/hide floating action button)
+        int limit = mQueryLimit;
+        unreadNotify = false;
+        do {
+            if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
+                unreadNotify = true;
+            if (--limit == 0)
+                break; // Only visible notifications are concerned
+
+        } while (mNotifyCursor.moveToNext());
+        mNotifyCursor.moveToFirst();
+
+        //////
         final View fab = findViewById(R.id.fab);
         if (mNotifyAdapter != null) { // Check if not the initial query
 
@@ -648,7 +672,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                         .setDisableChangeAnimations(swapResult.countChanged);
 
             // Display/Hide floating action button
-            final boolean display = newNotify > 0;
+            final boolean display = unreadNotify;
             if (mFabTransY == Constants.NO_DATA)
                 fab.getViewTreeObserver()
                         .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -679,6 +703,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             mNotifyAdapter = new NotifyRecyclerViewAdapter();
             mNotifyAdapter.getDataSource().fill(mNotifyCursor, mQueryLimit);
             mNotifyList.setAdapter(mNotifyAdapter);
+            mNotifyList.scrollToPosition(0);
 
             do { // Display floating action button according unread notification displayed
                 if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
@@ -879,7 +904,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                         NotificationsTable.COLUMN_PSEUDO + "='" + getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
                         "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
 
-        mListLoader.init(NotifyActivity.this, Queries.MAIN_NOTIFY_LIST, queryData);
+        mListLoader.init(NotifyActivity.this, Queries.NOTIFICATIONS_MAIN_LIST, queryData);
     }
 
     @Override

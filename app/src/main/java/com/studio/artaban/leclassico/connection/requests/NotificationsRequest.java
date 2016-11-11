@@ -41,11 +41,11 @@ public class NotificationsRequest extends DataRequest {
     }
 
     @Override
-    public void request(Bundle data) { // Update data from remote to local DB
+    public boolean request(Bundle data) { // Update data from remote to local DB
 
         Logs.add(Logs.Type.V, "data: " + data);
         if (!Internet.isConnected())
-            return; // Nothing to do (without connection)
+            return false; // Nothing to do (without connection)
 
         // Get login info
         Login.Reply dataLogin = new Login.Reply();
@@ -56,13 +56,15 @@ public class NotificationsRequest extends DataRequest {
 
             DataTable.SyncResult result = Database.getTable(NotificationsTable.TABLE_NAME)
                     .synchronize(mService.getContentResolver(), dataLogin.token.get(),
-                            WebServices.OPERATION_SELECT_OLD, dataLogin.pseudo, Queries.OLDER_MAIN_NOTIFY,
+                            WebServices.OPERATION_SELECT_OLD, dataLogin.pseudo, Queries.NOTIFICATIONS_OLD_LIMIT,
                             null);
             if (DataTable.SyncResult.hasChanged(result)) {
 
                 Logs.add(Logs.Type.I, "Old notifications received");
                 mService.getContentResolver().notifyChange((Uri) data.getParcelable(EXTRA_DATA_URI),
                         mSyncObserver); // Last parameter needed in case where new data URI is registered
+
+                return true; // Old entries found
             }
 
         } else { ////// New or data updates requested
@@ -73,7 +75,7 @@ public class NotificationsRequest extends DataRequest {
             // Synchronization (from remote to local DB)
             DataTable.SyncResult result = Database.getTable(NotificationsTable.TABLE_NAME)
                     .synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_SELECT,
-                            dataLogin.pseudo, Queries.LIMIT_MAIN_NOTIFY, null);
+                            dataLogin.pseudo, null, null);
             if (DataTable.SyncResult.hasChanged(result)) {
 
                 int newNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);
@@ -84,5 +86,6 @@ public class NotificationsRequest extends DataRequest {
                 notifyChange(); // Notify DB change to observer URI
             }
         }
+        return false;
     }
 }
