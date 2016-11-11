@@ -164,6 +164,8 @@ public abstract class DataTable implements IDataTable {
 
                 if (data.containsKey(DATA_KEY_FIELD_DATE)) {
                     String date = getMinDate(resolver, data);
+                    if (date == null)
+                        break;
 
                     Logs.add(Logs.Type.I, "Previous date: " + date);
                     url += '&' + WebServices.DATA_DATE + '=' + date.replace(' ', 'n');
@@ -180,13 +182,19 @@ public abstract class DataTable implements IDataTable {
     // Remove all in progress synchronization status (replaced by its operation)
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
-        byte operation = data.getByte(DATA_KEY_OPERATION);
-
+        byte sync;
+        switch (data.getByte(DATA_KEY_OPERATION)) {
+            case WebServices.OPERATION_UPDATE: sync = Synchronized.TO_UPDATE.getValue(); break;
+            case WebServices.OPERATION_INSERT: sync = Synchronized.TO_INSERT.getValue(); break;
+            case WebServices.OPERATION_DELETE: sync = Synchronized.TO_DELETE.getValue(); break;
+            default:
+                throw new IllegalArgumentException("Unexpected DB operation");
+        }
         ContentValues values = new ContentValues();
-        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, operation);
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, sync);
         resolver.update(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)), values,
                 data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " +
-                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + String.valueOf(operation |
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + String.valueOf(sync |
                         DataTable.Synchronized.IN_PROGRESS.getValue()),
                 null);
     }

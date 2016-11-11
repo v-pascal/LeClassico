@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Notification -->
 
-    <dimen name="new_notify_height">56dp</dimen>
     <dimen name="new_notify_text_size">18sp</dimen>
+    <dimen name="new_notify_height">56dp</dimen><!-- == Floating Action Button size -->
+    <dimen name="fab_margin_top">28dp</dimen><!-- == new_notify_height / 2 -->
 
 </resources>

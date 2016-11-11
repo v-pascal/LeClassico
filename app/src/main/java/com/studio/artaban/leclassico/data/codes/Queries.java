@@ -11,12 +11,12 @@ public class Queries {
     ////// Main
     public static final int MAIN_DATA_NEW_NOTIFY = Tables.ID_MAX;
     public static final int MAIN_DATA_USER = Tables.ID_CAMARADES; // Table query
-    public static final int MAIN_SHORTCUT_NOTIFY_COUNT = Tables.ID_MAX + 2;
-    public static final int MAIN_SHORTCUT_LAST_FOLLOWED = Tables.ID_MAX + 3;
-    public static final int MAIN_SHORTCUT_MAIL_COUNT = Tables.ID_MAX + 4;
+    public static final int MAIN_SHORTCUT_NOTIFY_COUNT = Tables.ID_MAX + 1;
+    public static final int MAIN_SHORTCUT_LAST_FOLLOWED = Tables.ID_MAX + 2;
+    public static final int MAIN_SHORTCUT_MAIL_COUNT = Tables.ID_MAX + 3;
 
     ////// Notifications
-    public static final int NOTIFICATIONS_MAIN_LIST = Tables.ID_MAX;
+    public static final int NOTIFICATIONS_MAIN_LIST = Tables.ID_MAX + 4;
 
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////

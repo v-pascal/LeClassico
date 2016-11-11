@@ -37,12 +37,14 @@
     <!-- Mark as read button -->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
+        android:src="@drawable/ic_check_white_36dp"
         android:onClick="onRead"
-        android:visibility="gone"
+        android:scaleX="0"
+        android:scaleY="0"
+        android:layout_gravity="end|top"
+        android:layout_marginTop="@dimen/fab_margin_top"
+        android:layout_marginEnd="@dimen/fab_margin"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_check_white_36dp"/>
+        android:layout_height="wrap_content"/>
 
 </android.support.design.widget.CoordinatorLayout>

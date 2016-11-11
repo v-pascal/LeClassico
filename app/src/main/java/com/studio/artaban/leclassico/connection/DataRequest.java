@@ -220,7 +220,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
             setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                     DataTable.Synchronized.TO_DELETE.getValue());
 
-            operationData = table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
+            operationData = table.syncDeleted(mService.getContentResolver(), dataLogin.pseudo);
             if (operationData.size() > 0) {
                 Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
                         WebServices.OPERATION_DELETE, dataLogin.pseudo, null, operationData);

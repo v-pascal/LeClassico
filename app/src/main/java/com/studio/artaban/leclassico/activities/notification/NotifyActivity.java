@@ -150,16 +150,17 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         return message;
     }
 
-    private int mFabTransY = Constants.NO_DATA; // Vertical floating action button translation
-    private void hideFab(View fab) { // Hide floating action button (with translation)
+    private void hideFab() { // Hide floating action button (with scale animation)
+        Logs.add(Logs.Type.V, null);
 
-        Logs.add(Logs.Type.V, "fab: " + fab);
-        if (fab.getVisibility() != View.VISIBLE)
-            return; // Noting to do
+        View fab = findViewById(R.id.fab);
+        if (fab.getScaleX() == 0)
+            return; // Nothing to do
 
         final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
         animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
-                .translationY(mFabTransY)
+                .scaleX(0)
+                .scaleY(0)
                 .setListener(new ViewPropertyAnimatorListener() {
                     @Override
                     public void onAnimationStart(View view) {
@@ -173,24 +174,23 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                     @Override
                     public void onAnimationCancel(View view) {
-                        ViewCompat.setTranslationY(view, mFabTransY);
+                        ViewCompat.setScaleX(view, 0);
+                        ViewCompat.setScaleY(view, 0);
                     }
                 })
                 .start();
     }
-    private void displayFab(View fab) { // Show floating action button (with translation)
-        Logs.add(Logs.Type.V, "fab: " + fab);
+    private void displayFab() { // Show floating action button (with scale animation)
+        Logs.add(Logs.Type.V, null);
 
-        fab.setVisibility(View.VISIBLE);
-        if (fab.getTranslationY() == 0)
-            return; // Noting to do
-
-        fab.setTranslationY(mFabTransY);
-        // NB: Coz fab can be invisible without any translation
+        View fab = findViewById(R.id.fab);
+        if (fab.getScaleX() == 1)
+            return; // Nothing to do
 
         final ViewPropertyAnimatorCompat animation = ViewCompat.animate(fab);
         animation.setDuration(RecyclerItemAnimator.DEFAULT_DURATION)
-                .translationY(0)
+                .scaleX(1)
+                .scaleY(1)
                 .setListener(new ViewPropertyAnimatorListener() {
                     @Override
                     public void onAnimationStart(View view) {
@@ -204,7 +204,8 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                     @Override
                     public void onAnimationCancel(View view) {
-                        ViewCompat.setTranslationY(view, 0);
+                        ViewCompat.setScaleX(view, 1);
+                        ViewCompat.setScaleY(view, 1);
                     }
                 })
                 .start();
@@ -382,6 +383,9 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 } else
                     holder.rootView.findViewById(R.id.date_separator).setVisibility(View.GONE);
             }
+            // Add margin top at first item position (below fab)
+            ((RecyclerView.LayoutParams)holder.itemView.getLayoutParams()).topMargin =
+                    (position == 0)? getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin):0;
 
             // Set unread notification display (if the case)
             ImageView notifyType = (ImageView) holder.rootView.findViewById(R.id.image_type);
@@ -620,7 +624,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         mNotifyCursor.moveToFirst();
 
         //////
-        final View fab = findViewById(R.id.fab);
         if (mNotifyAdapter != null) { // Check if not the initial query
 
             ////// Update notification list
@@ -672,29 +675,10 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                         .setDisableChangeAnimations(swapResult.countChanged);
 
             // Display/Hide floating action button
-            final boolean display = unreadNotify;
-            if (mFabTransY == Constants.NO_DATA)
-                fab.getViewTreeObserver()
-                        .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                            @Override
-                            public void onGlobalLayout() {
-                                Logs.add(Logs.Type.V, null);
-                                mFabTransY = fab.getHeight() +
-                                        (getResources().getDimensionPixelSize(R.dimen.fab_margin) << 1);
-
-                                fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                                if (display)
-                                    displayFab(fab);
-                                else
-                                    hideFab(fab);
-                            }
-                        });
-
-            else if (display)
-                displayFab(fab);
+            else if (unreadNotify)
+                displayFab();
             else
-                hideFab(fab);
+                hideFab();
 
         } else {
             Logs.add(Logs.Type.I, "Initial query");
@@ -707,7 +691,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
             do { // Display floating action button according unread notification displayed
                 if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
-                    fab.setVisibility(View.VISIBLE);
+                    displayFab();
                     break;
                 }
 

@@ -149,7 +149,7 @@ public class AbonnementsTable extends DataTable {
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     @Override
-    public SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
+    public SyncResult synchronize(final ContentResolver resolver, String token, final byte operation,
                                   @Nullable String pseudo, @Nullable Short limit,
                                   @Nullable ContentValues postData) {
 
@@ -182,7 +182,8 @@ public class AbonnementsTable extends DataTable {
                     if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
                         if (reply.isNull(TABLE_NAME))
-                            return true; // Already synchronized
+                            return (operation == WebServices.OPERATION_SELECT);
+                            // Already synchronized for selection but error for any other operation
 
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
                         JSONArray entries = reply.getJSONArray(TABLE_NAME);
@@ -258,7 +259,7 @@ public class AbonnementsTable extends DataTable {
         if (result != Internet.DownloadResult.SUCCEEDED) {
 
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            if (operation != WebServices.OPERATION_SELECT)
+            if ((operation != WebServices.OPERATION_SELECT) && (operation != WebServices.OPERATION_SELECT_OLD))
                 resetSyncInProgress(resolver, data);
             return null;
         }
