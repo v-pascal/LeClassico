@@ -4,7 +4,7 @@
               android:orientation="horizontal"
               android:focusableInTouchMode="true"
               android:layout_width="match_parent"
-              android:layout_height="@dimen/shortcut_content_height"
+              android:layout_height="@dimen/shortcut_height"
               tools:context="com.studio.artaban.leclassico.activities.main.ShortcutFragment">
 
     <!-- Start date & time -->
@@ -12,8 +12,8 @@
         android:orientation="vertical"
         android:id="@+id/layout_start_date"
         android:gravity="center_horizontal"
-        android:layout_width="@dimen/shortcut_content_height"
-        android:layout_height="@dimen/shortcut_content_height">
+        android:layout_width="@dimen/shortcut_height"
+        android:layout_height="@dimen/shortcut_height">
 
         <TextView
             android:id="@+id/start_date"
@@ -42,8 +42,8 @@
     <ImageView
         android:id="@+id/image_icon"
         android:src="@mipmap/ic_launcher"
-        android:layout_width="@dimen/shortcut_content_height"
-        android:layout_height="@dimen/shortcut_content_height"/>
+        android:layout_width="@dimen/shortcut_height"
+        android:layout_height="@dimen/shortcut_height"/>
 
     <!-- Message & info -->
     <RelativeLayout
@@ -58,32 +58,22 @@
             android:text="@string/not_defined"
             android:textSize="@dimen/shortcut_text_size"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="@dimen/shortcut_text_height"/>
-        <ImageView
-            android:id="@+id/image_type"
-            android:visibility="gone"
-            android:tint="@android:color/black"
-            android:src="@drawable/ic_notifications_off_white_18dp"
-            android:scaleType="center"
-            android:layout_marginEnd="@dimen/shortcut_tiny_text_margin"
-            android:layout_below="@id/text_message"
-            android:layout_width="@dimen/shortcut_info_height"
-            android:layout_height="@dimen/shortcut_info_height"/>
         <TextView
             android:id="@+id/text_info"
-            android:layout_toEndOf="@id/image_type"
             android:layout_below="@id/text_message"
             android:textSize="@dimen/shortcut_info_size"
+            android:textColor="@color/yellow"
             android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/shortcut_text_height"/>
+            android:layout_height="@dimen/shortcut_info_height"/>
 
     </RelativeLayout>
 
@@ -95,7 +85,7 @@
         android:background="@drawable/search_background"
         android:layout_marginStart="@dimen/shortcut_text_margin"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/shortcut_content_height">
+        android:layout_height="@dimen/shortcut_height">
 
         <EditText
             android:id="@+id/edit_search"
@@ -120,8 +110,8 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:padding="@dimen/shortcut_border_margin"
             android:onClick="onSearch"
-            android:layout_width="@dimen/shortcut_content_height"
-            android:layout_height="@dimen/shortcut_content_height"/>
+            android:layout_width="@dimen/shortcut_height"
+            android:layout_height="@dimen/shortcut_height"/>
 
     </LinearLayout>
 
@@ -130,13 +120,13 @@
         android:orientation="vertical"
         android:id="@+id/layout_end_date"
         android:gravity="center_horizontal"
-        android:layout_width="@dimen/shortcut_content_height"
-        android:layout_height="@dimen/shortcut_content_height">
+        android:layout_width="@dimen/shortcut_height"
+        android:layout_height="@dimen/shortcut_height">
 
         <TextView
             android:id="@+id/end_date"
             android:text="@string/no_date"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/shortcut_date_size"
             android:fontFamily="monospace"
             android:gravity="bottom"
@@ -146,7 +136,7 @@
         <TextView
             android:id="@+id/end_time"
             android:text="@string/no_time"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/shortcut_date_size"
             android:fontFamily="monospace"
             android:gravity="center_vertical"

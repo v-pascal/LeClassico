@@ -24,6 +24,7 @@
             <LinearLayout
                 android:id="@+id/layout_toolbar"
                 android:orientation="vertical"
+                android:translationX="@dimen/appbar_translate_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -34,7 +35,6 @@
                     android:textColor="@android:color/white"
                     android:textStyle="bold"
                     android:textSize="@dimen/appbar_title_size"
-                    android:visibility="gone"
                     android:gravity="center_vertical"
                     android:layout_marginStart="@dimen/appbar_padding_title"
                     android:layout_width="wrap_content"
@@ -42,8 +42,6 @@
 
                 <!-- Toolbar shortcut info -->
                 <FrameLayout
-                    android:background="@drawable/shortcut_bakground"
-                    android:layout_marginTop="@dimen/shortcut_margin_top"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/shortcut_height">
 
@@ -56,13 +54,15 @@
                         <fragment
                             class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
                             android:id="@+id/shortcut_new_publication"
-                            android:layout_margin="@dimen/shortcut_margin"
+                            android:layout_marginStart="@dimen/shortcut_margin"
+                            android:layout_marginEnd="@dimen/shortcut_margin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                         <fragment
                             class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
                             android:id="@+id/shortcut_new_event"
-                            android:layout_margin="@dimen/shortcut_margin"
+                            android:layout_marginStart="@dimen/shortcut_margin"
+                            android:layout_marginEnd="@dimen/shortcut_margin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 
@@ -70,25 +70,29 @@
                         <fragment
                             class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
                             android:id="@+id/shortcut_home"
-                            android:layout_margin="@dimen/shortcut_margin"
+                            android:layout_marginStart="@dimen/shortcut_margin"
+                            android:layout_marginEnd="@dimen/shortcut_margin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                         <fragment
                             class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
                             android:id="@+id/shortcut_publications"
-                            android:layout_margin="@dimen/shortcut_margin"
+                            android:layout_marginStart="@dimen/shortcut_margin"
+                            android:layout_marginEnd="@dimen/shortcut_margin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                         <fragment
                             class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
                             android:id="@+id/shortcut_events"
-                            android:layout_margin="@dimen/shortcut_margin"
+                            android:layout_marginStart="@dimen/shortcut_margin"
+                            android:layout_marginEnd="@dimen/shortcut_margin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                         <fragment
                             class="com.studio.artaban.leclassico.activities.main.ShortcutFragment"
                             android:id="@+id/shortcut_members"
-                            android:layout_margin="@dimen/shortcut_margin"
+                            android:layout_marginStart="@dimen/shortcut_margin"
+                            android:layout_marginEnd="@dimen/shortcut_margin"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 

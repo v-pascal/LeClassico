@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -64,10 +63,7 @@ import java.io.File;
  */
 public class MainActivity extends LoggedActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
-        MainFragment.OnFragmentListener, AppBarLayout.OnOffsetChangedListener {
-
-    private static final String DATA_KEY_SCROLL_OFFSET = "scrollOffset";
-    // Data keys
+        MainFragment.OnFragmentListener {
 
     private void startNotificationActivity() { // Start notification activity
         Logs.add(Logs.Type.V, null);
@@ -99,27 +95,6 @@ public class MainActivity extends LoggedActivity implements
             default:
                 throw new IllegalArgumentException("Unexpected section");
         }
-    }
-
-    ////// OnOffsetChangedListener /////////////////////////////////////////////////////////////////
-    @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        //Logs.add(Logs.Type.V, "appBarLayout: " + appBarLayout +
-        //        ";verticalOffset: " + verticalOffset);
-        mScrollOffset = 0;
-
-        if (appBarLayout.findViewById(R.id.shortcut) != null) {
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-
-                int actionHeight = -getResources().getDimensionPixelSize(R.dimen.appbar_padding_title);
-                verticalOffset = (verticalOffset < actionHeight) ? verticalOffset - actionHeight : 0;
-
-            } else
-                mScrollOffset = verticalOffset;
-
-            appBarLayout.findViewById(R.id.shortcut).setTranslationY(verticalOffset);
-        }
-        //else // NB: Can occur when search operation starts
     }
 
     ////// OnFragmentListener //////////////////////////////////////////////////////////////////////
@@ -371,7 +346,6 @@ public class MainActivity extends LoggedActivity implements
     //////
     private ViewPager mViewPager; // Content view pager
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
-    private int mScrollOffset; // Action bar scroll offset
 
     private Uri mShortcutUri; // Shortcut URI (new mail & notifications)
 
@@ -387,9 +361,7 @@ public class MainActivity extends LoggedActivity implements
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
     protected void onLoggedResume() {
-
         Logs.add(Logs.Type.V, null);
-        ((AppBarLayout)findViewById(R.id.appbar)).addOnOffsetChangedListener(this);
 
         // Bind data service
         if ((DataService.isRunning()) && (!mDataService.bind(this, null)))
@@ -407,51 +379,15 @@ public class MainActivity extends LoggedActivity implements
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Restore data
-        if (savedInstanceState != null)
-            mScrollOffset = savedInstanceState.getInt(DATA_KEY_SCROLL_OFFSET);
-
         // Set tool & app bars
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-            // Display shortcut below action bar title & icons
-            findViewById(R.id.text_title).setVisibility(View.VISIBLE);
-
-            Point screenSize = new Point();
-            getWindowManager().getDefaultDisplay().getSize(screenSize);
-            int margin = getResources().getDimensionPixelSize(R.dimen.shortcut_margin_horizontal);
-
-            View toolbarLayout = findViewById(R.id.layout_toolbar);
-            toolbarLayout.setTranslationX(margin - getResources().getDimensionPixelSize(R.dimen.appbar_padding_title));
-            toolbarLayout.getLayoutParams().width = screenSize.x - (margin << 1);
-
-            //////
-            int shortcutHeight = -getResources().getDimensionPixelSize(R.dimen.shortcut_height);
-            if (mScrollOffset > shortcutHeight) {
-
-                ((AppBarLayout.LayoutParams) toolbar.getLayoutParams()).setScrollFlags(0);
-                toolbar.getViewTreeObserver().addOnGlobalLayoutListener(
-                        new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                    @Override
-                    public void onGlobalLayout() {
-                        Logs.add(Logs.Type.V, null);
-                        toolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                        ((AppBarLayout.LayoutParams) toolbar.getLayoutParams())
-                                .setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
-                                        AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
-                                        AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP);
-                    }
-                });
-            }
-            // BUG: Code above will fix a display issue that occurs on some devices when the activity
-            //      switches from landscape to portrait orientation (toolbar partially scrolled to the
-            //      top hiding title & icons).
-        }
+        Point screenSize = new Point();
+        getWindowManager().getDefaultDisplay().getSize(screenSize);
+        View toolbarLayout = findViewById(R.id.layout_toolbar);
+        toolbarLayout.getLayoutParams().width = screenSize.x; // Match to screen width
 
         // Set drawer toggle
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -759,9 +695,7 @@ public class MainActivity extends LoggedActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-
         Logs.add(Logs.Type.V, null);
-        ((AppBarLayout)findViewById(R.id.appbar)).removeOnOffsetChangedListener(this);
 
         // Unregister shortcut data service
         sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, mShortcutUri));
@@ -769,15 +703,6 @@ public class MainActivity extends LoggedActivity implements
 
         // Unbind data service
         mDataService.unbind(this);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-
-        outState.putInt(DATA_KEY_SCROLL_OFFSET, mScrollOffset);
-
-        Logs.add(Logs.Type.V, "outState: " + outState);
-        super.onSaveInstanceState(outState);
     }
 
     @Override

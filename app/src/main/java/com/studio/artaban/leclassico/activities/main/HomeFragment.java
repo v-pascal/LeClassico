@@ -39,8 +39,8 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         int mailPos = getResources().getInteger(R.integer.home_info_mail_pos);
         int notifyPos = getResources().getInteger(R.integer.home_info_notify_pos) + mailsLen;
 
-        infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), mailPos, mailPos + mailsLen, 0);
-        infoBuilder.setSpan(new ForegroundColorSpan(Color.BLUE), notifyPos, notifyPos +
+        infoBuilder.setSpan(new ForegroundColorSpan(Color.WHITE), mailPos, mailPos + mailsLen, 0);
+        infoBuilder.setSpan(new ForegroundColorSpan(Color.WHITE), notifyPos, notifyPos +
                 String.valueOf(mNewNotification).length(), 0);
         try {
             mListener.onGetShortcut(Constants.MAIN_SECTION_HOME, false).setInfo(infoBuilder);
@@ -112,7 +112,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         int pseudoPos = getResources().getInteger(R.integer.home_connected_pseudo_pos);
         SpannableStringBuilder msgBuilder =
                 new SpannableStringBuilder(getString(R.string.home_connected, pseudo));
-        msgBuilder.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
+        msgBuilder.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccentMain)),
                 pseudoPos, pseudoPos + pseudo.length(), 0);
 
         mListener.onGetShortcut(Constants.MAIN_SECTION_HOME, false).setMessage(msgBuilder);

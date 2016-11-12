@@ -400,7 +400,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             String profile = (!mDataSource.isNull(position, COLUMN_INDEX_PROFILE)) ?
                     mDataSource.getString(position, COLUMN_INDEX_PROFILE) : null;
             Tools.setProfile(NotifyActivity.this, (ImageView) holder.rootView.findViewById(R.id.image_pseudo),
-                    female, profile, R.dimen.shortcut_content_height, true);
+                    female, profile, R.dimen.shortcut_height, true);
 
             // Set notification message & info
             char type = mDataSource.getString(position, COLUMN_INDEX_OBJECT_TYPE).charAt(0);

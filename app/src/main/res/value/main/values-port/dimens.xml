@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Main -->
 
-    <!-- Shortcut -->
-    <dimen name="shortcut_margin_top">0dp</dimen>
-
     <!-- Notification -->
     <dimen name="notify_item_horizontal_margin">0dp</dimen>
 </resources>

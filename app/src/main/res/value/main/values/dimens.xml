@@ -3,6 +3,7 @@
 
     <dimen name="profile_border_width">6dp</dimen>
     <dimen name="profile_size">96dp</dimen>
+    <dimen name="appbar_translate_title">-56dp</dimen><!-- == appbar_padding_title * -1 -->
 
     <!-- Notification service -->
     <dimen name="service_icon_margin">10dp</dimen>

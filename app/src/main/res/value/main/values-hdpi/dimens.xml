@@ -10,12 +10,11 @@
 
     <!-- Shortcut -->
     <dimen name="shortcut_margin">6dp</dimen>
-    <dimen name="shortcut_height">52dp</dimen>
-    <dimen name="shortcut_content_height">40dp</dimen><!-- = shortcut_height - (2 * shortcut_margin) -->
+    <dimen name="shortcut_height">40dp</dimen>
     <dimen name="shortcut_text_margin">7dp</dimen>
     <dimen name="shortcut_text_size">15sp</dimen>
-    <dimen name="shortcut_text_height">22dp</dimen><!-- = shortcut_content_height - shortcut_info_height -->
-    <dimen name="shortcut_info_height">18dp</dimen><!-- = shortcut_content_height - shortcut_text_height -->
+    <dimen name="shortcut_text_height">22dp</dimen><!-- = shortcut_height - shortcut_info_height -->
+    <dimen name="shortcut_info_height">18dp</dimen><!-- = shortcut_height - shortcut_text_height -->
     <dimen name="shortcut_info_size">12sp</dimen>
     <dimen name="shortcut_border_margin">3dp</dimen>
     <dimen name="shortcut_date_size">10sp</dimen>
