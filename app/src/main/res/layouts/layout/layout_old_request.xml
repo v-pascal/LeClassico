@@ -16,16 +16,19 @@
         <ImageView
             android:id="@+id/image_1"
             android:src="@drawable/ic_more_horiz_white_36dp"
+            android:tint="@color/colorPublicationDark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <ImageView
             android:id="@+id/image_2"
             android:src="@drawable/ic_more_horiz_white_36dp"
+            android:tint="@color/colorPublicationDark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <ImageView
             android:id="@+id/image_3"
             android:src="@drawable/ic_more_horiz_white_36dp"
+            android:tint="@color/colorPublicationDark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>

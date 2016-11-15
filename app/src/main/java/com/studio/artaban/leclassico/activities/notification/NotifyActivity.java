@@ -330,19 +330,8 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     if (mRequestAnim2 != null) mRequestAnim2.cancel();
                     if (mRequestAnim3 != null) mRequestAnim3.cancel();
 
-                    ((ImageView)holder.requestView.findViewById(R.id.image_1)).setColorFilter(Color.TRANSPARENT);
-                    ((ImageView)holder.requestView.findViewById(R.id.image_2)).setColorFilter(Color.TRANSPARENT);
-                    ((ImageView)holder.requestView.findViewById(R.id.image_3)).setColorFilter(Color.TRANSPARENT);
-
                 } else {
                     request.setBackground(null);
-
-                    ((ImageView)holder.requestView.findViewById(R.id.image_1))
-                            .setColorFilter(getResources().getColor(R.color.colorPublicationDark));
-                    ((ImageView)holder.requestView.findViewById(R.id.image_2))
-                            .setColorFilter(getResources().getColor(R.color.colorPublicationDark));
-                    ((ImageView)holder.requestView.findViewById(R.id.image_3))
-                            .setColorFilter(getResources().getColor(R.color.colorPublicationDark));
 
                     // Start requesting old notifications animation
                     mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
