@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.notification.NotifyActivity;
+import com.studio.artaban.leclassico.activities.settings.SettingsActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.ServiceBinder;
@@ -284,9 +285,8 @@ public class MainActivity extends LoggedActivity implements
             case R.id.navig_settings: { // Display settings
                 Logs.add(Logs.Type.I, "Display settings");
 
-
-
-
+                ////// Start settings activity
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             }
             case R.id.navig_logout: { // Logout

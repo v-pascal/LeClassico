@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_notify_way">
+
+        <SwitchPreference
+            android:key="pref_notify_sound"
+            android:defaultValue="true"
+            android:title="@string/pref_notify_sound"
+            android:summary="@string/pref_notify_sound_info" />
+        <SwitchPreference
+            android:key="pref_notify_vibrate"
+            android:defaultValue="true"
+            android:title="@string/pref_notify_vibrate"
+            android:summary="@string/pref_notify_vibrate_info" />
+        <SwitchPreference
+            android:key="pref_notify_lights"
+            android:defaultValue="true"
+            android:title="@string/pref_notify_lights"
+            android:summary="@string/pref_notify_lights_info" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -22,8 +22,10 @@
         <item name="colorPrimary">@color/colorPrimarySetting</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkSetting</item>
         <item name="colorAccent">@color/colorAccentSetting</item>
+        <item name="android:listDivider">@null</item>
 
-        <item name="android:textColorSecondary">@color/colorSecondaryText</item>
+        <!-- Toolbar back arrow color -->
+        <item name="colorControlNormal">@android:color/white</item>
     </style>
     <style name="LocationAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimaryLocation</item>

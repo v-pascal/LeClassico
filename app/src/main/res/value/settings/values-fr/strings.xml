@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Settings -->
+
+    <string name="enabled">Activé</string>
+    <string name="disabled">Désactivé</string>
+
+    <!-- Notifications -->
+    <string name="pref_notify_way">Moyen pour notifier</string>
+    <string name="pref_notify_sound">Effet sonore</string>
+    <string name="pref_notify_sound_info">Emettre un son</string>
+    <string name="pref_notify_vibrate">Vibration</string>
+    <string name="pref_notify_vibrate_info">Vibrer</string>
+    <string name="pref_notify_lights">Lumière</string>
+    <string name="pref_notify_lights_info">Flash lumineux</string>
+
+</resources>

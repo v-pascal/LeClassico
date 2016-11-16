@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Notifications -->
+    <header android:fragment="com.studio.artaban.leclassico.activities.settings.SettingsActivity$PrefsNotifyFragment"
+            android:icon="@drawable/ic_notifications_black_24dp"
+            android:title="@string/title_activity_notify"
+            android:summary="@string/pref_notify_way" />
+</preference-headers>
