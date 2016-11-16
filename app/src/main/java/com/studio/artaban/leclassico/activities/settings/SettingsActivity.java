@@ -1,14 +1,15 @@
 package com.studio.artaban.leclassico.activities.settings;
 
-import android.app.Activity;
-import android.graphics.Color;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.support.annotation.LayoutRes;
+import android.support.v7.app.AppCompatDelegate;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -57,16 +58,6 @@ public class SettingsActivity extends PreferenceActivity {
             //
             addPreferencesFromResource(R.xml.settings_fragment_notify);
         }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-            Logs.add(Logs.Type.V, null);
-
-            // Set title
-            ((Toolbar) getToolbarParent(getActivity()).findViewById(R.id.toolbar))
-                    .setTitle(getResources().getString(R.string.title_activity_notify));
-        }
     }
 
 
@@ -76,29 +67,24 @@ public class SettingsActivity extends PreferenceActivity {
 
 
     //////
-    private static LinearLayout getToolbarParent(Activity activity) {
-        return (LinearLayout) activity.findViewById(android.R.id.list).getParent().getParent().getParent();
+    private AppCompatDelegate mDelegate; // Application compatibility delegate (display action bar)
+    private AppCompatDelegate getDelegate() {
+        if (mDelegate == null)
+            mDelegate = AppCompatDelegate.create(this, null);
+
+        return mDelegate;
     }
 
     ////// PreferenceActivity //////////////////////////////////////////////////////////////////////
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
+        getDelegate().installViewFactory();
+        getDelegate().onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-        // Add toolbar
-        LinearLayout root = getToolbarParent(this);
-        Toolbar toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
-        toolbar.setTitleTextColor(Color.WHITE);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Logs.add(Logs.Type.V, "view: " + view);
-                finish();
-            }
-        });
-        root.addView(toolbar, 0);
+        // Enable to display back arrow (toolbar)
+        getDelegate().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -111,5 +97,69 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     protected boolean isValidFragment(String fragmentName) {
         return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        Logs.add(Logs.Type.V, "featureId: " + featureId + ";item: " + item);
+        if (item.getItemId() == android.R.id.home) {
+
+            finish();
+            return true;
+        }
+        return super.onMenuItemSelected(featureId, item);
+    }
+
+    //////
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
+        getDelegate().onPostCreate(savedInstanceState);
+    }
+    @Override
+    public MenuInflater getMenuInflater() {
+        return getDelegate().getMenuInflater();
+    }
+    @Override
+    public void setContentView(@LayoutRes int layoutResID) {
+        getDelegate().setContentView(layoutResID);
+    }
+    @Override
+    public void setContentView(View view) {
+        getDelegate().setContentView(view);
+    }
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        getDelegate().setContentView(view, params);
+    }
+    @Override
+    public void addContentView(View view, ViewGroup.LayoutParams params) {
+        getDelegate().addContentView(view, params);
+    }
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        getDelegate().onPostResume();
+    }
+    @Override
+    protected void onTitleChanged(CharSequence title, int color) {
+        super.onTitleChanged(title, color);
+        getDelegate().setTitle(title);
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        getDelegate().onConfigurationChanged(newConfig);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        getDelegate().onStop();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getDelegate().onDestroy();
     }
 }

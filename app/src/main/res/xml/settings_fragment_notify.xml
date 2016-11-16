@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/pref_notify_way">
+    <PreferenceCategory android:title="@string/title_activity_notify">
 
         <SwitchPreference
             android:key="pref_notify_sound"

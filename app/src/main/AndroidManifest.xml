@@ -59,6 +59,7 @@
             android:theme="@style/NotifyAppTheme"/>
         <activity
             android:name=".activities.settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
             android:theme="@style/SettingAppTheme"/>
 
         <!-- Content providers -->

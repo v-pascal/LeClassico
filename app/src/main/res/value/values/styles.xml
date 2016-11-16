@@ -22,7 +22,6 @@
         <item name="colorPrimary">@color/colorPrimarySetting</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkSetting</item>
         <item name="colorAccent">@color/colorAccentSetting</item>
-        <item name="android:listDivider">@null</item>
 
         <!-- Toolbar back arrow color -->
         <item name="colorControlNormal">@android:color/white</item>
