@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Settings -->
 
-    <string name="enabled">Enabled</string>
-    <string name="disabled">Disabled</string>
-
     <!-- Notifications -->
     <string name="pref_notify_way">Way to notify</string>
     <string name="pref_notify_sound">Sound</string>
-    <string name="pref_notify_sound_info">Play sound</string>
-    <string name="pref_notify_vibrate">Vibrate</string>
-    <string name="pref_notify_vibrate_info">Apply a vibration</string>
-    <string name="pref_notify_lights">Lights</string>
+    <string name="pref_notify_sound_info">Play a sound</string>
+    <string name="pref_notify_vibrate">Vibration</string>
+    <string name="pref_notify_vibrate_info">Vibrate</string>
+    <string name="pref_notify_lights">Light</string>
     <string name="pref_notify_lights_info">Flash a light</string>
 
 </resources>

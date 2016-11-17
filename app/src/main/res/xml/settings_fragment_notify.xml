@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/title_activity_notify">
+    <PreferenceCategory android:title="@string/pref_notify_way" android:layout="@layout/settings_category">
 
         <SwitchPreference
             android:key="pref_notify_sound"
@@ -13,7 +13,7 @@
             android:title="@string/pref_notify_vibrate"
             android:summary="@string/pref_notify_vibrate_info" />
         <SwitchPreference
-            android:key="pref_notify_lights"
+            android:key="pref_notify_light"
             android:defaultValue="true"
             android:title="@string/pref_notify_lights"
             android:summary="@string/pref_notify_lights_info" />

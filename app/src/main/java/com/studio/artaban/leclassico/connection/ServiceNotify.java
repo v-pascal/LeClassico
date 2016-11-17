@@ -14,6 +14,7 @@ import android.widget.RemoteViews;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.text.DateFormat;
@@ -52,8 +53,16 @@ public final class ServiceNotify {
         textBuilder.setSpan(new ForegroundColorSpan(Color.RED), 0, newNotifyLen, 0);
         textBuilder.setSpan(new ForegroundColorSpan(Color.BLACK), newNotifyLen, textBuilder.length(), 0);
 
+        int defaults = 0;
+        if (Preferences.getBoolean(Preferences.SETTINGS_NOTIFY_SOUND))
+            defaults |= Notification.DEFAULT_SOUND;
+        if (Preferences.getBoolean(Preferences.SETTINGS_NOTIFY_VIBRATE))
+            defaults |= Notification.DEFAULT_VIBRATE;
+        if (Preferences.getBoolean(Preferences.SETTINGS_NOTIFY_LIGHT))
+            defaults |= Notification.DEFAULT_LIGHTS;
+
         mNotify.bigContentView.setTextViewText(R.id.notify_text, textBuilder.subSequence(0, textBuilder.length()));
-        mNotify.defaults = (newNotify > 0)? Notification.DEFAULT_ALL:0;
+        mNotify.defaults = (newNotify > 0)? defaults:0;
     }
 
     //////
