@@ -9,6 +9,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
@@ -18,6 +19,7 @@ import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
+import com.studio.artaban.leclassico.tools.SizeUtils;
 
 /**
  * Created by pascal on 05/09/16.
@@ -118,19 +120,6 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         mListener.onGetShortcut(Constants.MAIN_SECTION_HOME, false).setMessage(msgBuilder);
         setShortcutInfo();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
         // Set home info (using query loaders)
         Bundle mailData = new Bundle();
         mailData.putParcelable(QueryLoader.DATA_KEY_URI, mListener.onGetShortcutURI());
@@ -147,6 +136,26 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                         " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" + pseudo +
                         "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
         mNewNotifyLoader.init(getActivity(), Queries.MAIN_SHORTCUT_NOTIFY_COUNT, notifyData);
+
+        // Display pseudo into title (colored)
+        SpannableStringBuilder welcome = new SpannableStringBuilder(getString(R.string.main_welcome, pseudo));
+        pseudoPos = getResources().getInteger(R.integer.main_welcome_pseudo_pos);
+        welcome.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
+                pseudoPos, pseudoPos + pseudo.length(), 0);
+        ((TextView)rootView.findViewById(R.id.text_welcome)).setText(welcome, TextView.BufferType.SPANNABLE);
+
+        // Set image size of the light
+        SizeUtils.screenRatio(getActivity(), rootView.findViewById(R.id.image_light), true, 1f/7f);
+
+
+
+
+
+
+
+
+
+
 
         return rootView;
     }

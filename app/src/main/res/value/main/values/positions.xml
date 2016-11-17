@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Main -->
 
-    <integer name="home_connected_pseudo_pos">7</integer>
-    <integer name="home_info_mail_pos">14</integer>
-    <integer name="home_info_notify_pos">36</integer>
-
+    <!-- Notifications -->
     <integer name="notify_shared_message_pseudo_pos">0</integer>
     <integer name="notify_shared_info_album_pos">8</integer>
     <integer name="notify_wall_message_pseudo_pos">0</integer>
     <integer name="notify_mail_pseudo_pos">0</integer>
     <integer name="notify_comment_pseudo_pos">0</integer>
+
+    <!-- Home -->
+    <integer name="home_connected_pseudo_pos">7</integer>
+    <integer name="home_info_mail_pos">14</integer>
+    <integer name="home_info_notify_pos">36</integer>
+
+    <integer name="main_welcome_pseudo_pos">18</integer>
 
 </resources>

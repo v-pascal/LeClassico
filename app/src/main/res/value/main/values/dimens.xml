@@ -17,4 +17,23 @@
     <dimen name="service_image_height">24dp</dimen>
     <dimen name="service_cmd_height">44dp</dimen><!-- = service_image_height + (service_cmd_margin * 2) -->
 
+
+
+
+
+
+    <!-- Home -->
+    <dimen name="welcome_text_size">20sp</dimen>
+    <dimen name="intro_text_size">16sp</dimen>
+    <dimen name="light_margin_start">6dp</dimen>
+    <dimen name="welcome_margin">12dp</dimen>
+    <dimen name="home_margin">16dp</dimen>
+
+
+
+
+
+
+
+
 </resources>

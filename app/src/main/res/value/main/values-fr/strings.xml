@@ -52,4 +52,8 @@
         <item>Membres suivis</item>
     </string-array>
 
+    <!-- Home -->
+    <string name="main_welcome">Salut à toi camarade %1$s!</string>
+    <string name="main_intro">Soit le ou la bienvenue sur l\'application du réseau social <a href="http://leclassico.fr/">LeClassico</a>.\n\nCe réseau a été créé en <b>2004</b>, après le départ d\'un ami sur l\'île de La Réunion, afin de garder le contact avec lui. A l\'origine le site web ne comptait qu\'une dizaine de membres, et compte aujourd\'hui&#8230; plus d\'une douzaine de membres! <b>:p</b></string>
+
 </resources>
