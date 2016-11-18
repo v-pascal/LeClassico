@@ -40,6 +40,7 @@
     <string name="nav_profile">Profil</string>
     <string name="nav_location">Géolocation</string>
     <string name="nav_settings">Paramètres</string>
+    <string name="nav_mailbox">Boite aux lettres</string>
     <string name="nav_notification">Notifications</string>
     <string name="nav_logout">Déconnexion</string>
     <string name="nav_exit">Quitter</string>

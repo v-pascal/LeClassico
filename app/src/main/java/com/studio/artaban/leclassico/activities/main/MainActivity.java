@@ -276,6 +276,15 @@ public class MainActivity extends LoggedActivity implements
 
                 break;
             }
+            case R.id.navig_mailbox: { // Display mailbox activity
+                Logs.add(Logs.Type.I, "Display mailbox");
+
+
+
+
+
+                break;
+            }
             case R.id.navig_notification: { // Display notification activity
 
                 Logs.add(Logs.Type.I, "Display notification");
@@ -420,6 +429,8 @@ public class MainActivity extends LoggedActivity implements
                 .setColorFilter(getResources().getColor(R.color.colorPrimaryProfile), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_location).getIcon()
                 .setColorFilter(getResources().getColor(R.color.colorPrimaryLocation), PorterDuff.Mode.SRC_ATOP);
+        navigation.getMenu().findItem(R.id.navig_mailbox).getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorPrimaryMailbox), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_notification).getIcon()
                 .setColorFilter(getResources().getColor(R.color.colorPrimaryMain), PorterDuff.Mode.SRC_ATOP);
         navigation.getMenu().findItem(R.id.navig_settings).getIcon()

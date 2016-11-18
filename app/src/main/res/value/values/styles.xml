@@ -31,5 +31,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDarkLocation</item>
         <item name="colorAccent">@color/colorAccentLocation</item>
     </style>
+    <style name="MailboxAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimaryMailbox</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkMailbox</item>
+        <item name="colorAccent">@color/colorAccentMailbox</item>
+    </style>
 
 </resources>
