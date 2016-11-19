@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <!-- Image -->
+    <include
+        layout="@layout/layout_photo_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/photo_comment_margin"/><!-- Separator -->
+
+    <!-- Comment -->
+
+
+
+
+
+
+    <View
+        android:background="@drawable/photo_comment_background"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"/>
+
+
+
+
+
+
+
+</LinearLayout>

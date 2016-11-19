@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.activities.album.PhotoFragment;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
@@ -147,7 +148,13 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         // Set image size of the light
         SizeUtils.screenRatio(getActivity(), rootView.findViewById(R.id.image_light), true, 1f/7f);
 
+        // Fill best photo container
+        PhotoFragment photo = new PhotoFragment();
+        Bundle data = new Bundle();
+        data.putInt(PhotoFragment.ARG_KEY_TYPE, PhotoFragment.Type.BEST.getValue());
+        photo.setArguments(data);
 
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.photo_container, photo).commit();
 
 
 

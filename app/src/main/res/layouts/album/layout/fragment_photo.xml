@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/layout_header"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <!-- Icon -->
+        <ImageView
+            android:src="@drawable/ic_photo_camera_white_36dp"
+            android:tint="@android:color/black"
+            android:paddingStart="@dimen/photo_icon_padding"
+            android:paddingTop="@dimen/photo_icon_padding"
+            android:paddingEnd="@dimen/photo_icon_padding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/text_title"
+            android:textSize="@dimen/photo_title_text_size"
+            android:textColor="@color/yellow"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="@dimen/photo_icon_padding"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:background="@color/colorPrimarySetting"
+        android:layout_toEndOf="@id/layout_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <View
+            android:background="@drawable/photo_command_background"
+            android:layout_width="@dimen/photo_background_radius"
+            android:layout_height="@dimen/photo_header_height"/>
+    </FrameLayout>
+
+    <!-- Command -->
+    <Button
+        android:id="@+id/display_album"
+        android:text="@string/display"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="@dimen/photo_icon_padding"
+        android:layout_marginStart="@dimen/photo_icon_padding"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/photo_header_height"/>
+    <TextView
+        android:id="@+id/text_album"
+        android:text="@string/album"
+        android:textSize="@dimen/photo_album_text_size"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:layout_toStartOf="@id/display_album"
+        android:layout_marginBottom="@dimen/photo_icon_padding"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/photo_header_height"/>
+
+    <!-- Content -->
+    <include
+        layout="@layout/layout_photo"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_below="@id/layout_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

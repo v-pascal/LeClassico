@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
@@ -24,7 +23,6 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -322,7 +320,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                 View request = holder.requestView.findViewById(R.id.layout_more);
                 if (!isRequesting()) {
-                    request.setBackground(getResources().getDrawable(R.drawable.notify_more_background));
+                    request.setBackground(getResources().getDrawable(R.drawable.select_more_background));
                     request.setOnClickListener(this);
 
                     // Stop requesting old notifications animation
