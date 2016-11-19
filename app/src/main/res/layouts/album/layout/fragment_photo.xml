@@ -68,7 +68,6 @@
     <!-- Content -->
     <include
         layout="@layout/layout_photo"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_below="@id/layout_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
