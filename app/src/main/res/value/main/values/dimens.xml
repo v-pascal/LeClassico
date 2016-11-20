@@ -28,6 +28,7 @@
     <dimen name="light_margin_start">6dp</dimen>
     <dimen name="welcome_margin">12dp</dimen>
     <dimen name="home_margin">16dp</dimen>
+    <dimen name="home_chapter_margin">8dp</dimen>
 
 
 

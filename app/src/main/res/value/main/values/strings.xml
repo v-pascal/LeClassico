@@ -60,5 +60,7 @@
     <!-- Home -->
     <string name="main_welcome">Hi to you comrade %1$s!</string>
     <string name="main_intro">Welcome to the application associated with the <a href="http://leclassico.fr/">LeClassico</a> social network.\n\nThis network has been created during the <b>2004</b> year after the departure of a friend to the french island \"La Réunion\", to keep contact with him. Originally this web site had a tens of members, and counts now&#8230; a dozen of members! <b>:p</b></string>
+    <string name="advertising_label">Advertising</string>
+    <string name="advertising">Can a Classico\'s member jump higher than a house?\nOf course, a house doesn’t jump at all.</string>
 
 </resources>
