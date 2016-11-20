@@ -1,5 +1,8 @@
 <resources><!-- Album -->
 
     <string name="album">Album:</string>
+    <string name="by">Par:</string>
+    <string name="range">Classement:</string>
+    <string name="comments">Commentaires:</string>
 
 </resources>

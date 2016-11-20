@@ -77,6 +77,9 @@ public class PhotoFragment extends Fragment {
 
 
         ((TextView)rootView.findViewById(R.id.text_title)).setText("LC0180.jpg");
+        ((TextView)rootView.findViewById(R.id.text_info_album)).setText("Tillate.com");
+        ((TextView)rootView.findViewById(R.id.text_info_provider)).setText("Pascal");
+        ((TextView)rootView.findViewById(R.id.text_info_range)).setText("1/258");
 
 
 

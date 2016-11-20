@@ -15,21 +15,130 @@
         android:layout_height="@dimen/photo_comment_margin"/><!-- Separator -->
 
     <!-- Comment -->
-
-
-
-
-
-
-    <View
-        android:background="@drawable/photo_comment_background"
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@drawable/photo_comments_background"
+        android:padding="@dimen/comment_info_margin"
         android:layout_width="match_parent"
-        android:layout_height="120dp"/>
+        android:layout_height="wrap_content">
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+            <!-- Album -->
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
 
+                <TextView
+                    android:id="@+id/text_label_album"
+                    android:text="@string/album"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/photo_album_text_size"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/text_info_album"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/photo_album_text_size"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:layout_toEndOf="@id/text_label_album"
+                    android:layout_marginStart="@dimen/comment_info_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
 
+            <!-- By -->
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
 
+                <TextView
+                    android:id="@+id/text_label_provider"
+                    android:text="@string/by"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/photo_album_text_size"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/text_info_provider"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/photo_album_text_size"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:layout_toEndOf="@id/text_label_provider"
+                    android:layout_marginStart="@dimen/comment_info_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Comments (label) -->
+            <TextView
+                android:id="@+id/text_label_comments"
+                android:text="@string/comments"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/photo_album_text_size"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+
+            <!-- Range -->
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/text_label_range"
+                    android:text="@string/range"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/photo_album_text_size"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/text_info_range"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/photo_album_text_size"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:layout_toEndOf="@id/text_label_range"
+                    android:layout_marginStart="@dimen/comment_info_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <!-- Comments (list) -->
+        <FrameLayout
+            android:background="@drawable/comments_background"
+            android:paddingStart="@dimen/comment_info_margin"
+            android:paddingEnd="@dimen/comment_info_margin"
+            android:layout_marginTop="@dimen/comment_info_margin"
+            android:layout_width="match_parent"
+            android:layout_height="192dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_comments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </FrameLayout>
+    </LinearLayout>
 
 </LinearLayout>

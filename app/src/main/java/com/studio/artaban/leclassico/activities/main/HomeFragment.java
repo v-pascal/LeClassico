@@ -164,6 +164,8 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
 
 
 
+
+
         return rootView;
     }
 }

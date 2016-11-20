@@ -58,7 +58,6 @@
         android:text="@string/album"
         android:textSize="@dimen/photo_album_text_size"
         android:textColor="@android:color/black"
-        android:textStyle="bold"
         android:gravity="center_vertical"
         android:layout_toStartOf="@id/display_album"
         android:layout_marginBottom="@dimen/photo_icon_padding"
