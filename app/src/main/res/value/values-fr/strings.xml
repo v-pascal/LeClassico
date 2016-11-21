@@ -16,6 +16,7 @@
     <string name="title_activity_intro">Introduction</string>
     <string name="title_activity_notify">Notifications</string>
     <string name="title_activity_settings">Paramètres</string>
+    <string name="title_activity_mailbox">Boite aux lettres</string>
 
     <string name="error">Erreur</string>
     <string name="warning">Attention</string>

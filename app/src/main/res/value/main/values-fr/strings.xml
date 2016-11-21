@@ -58,5 +58,11 @@
     <string name="main_intro">Soit le ou la bienvenue sur l\'application du réseau social <a href="http://leclassico.fr/">LeClassico</a>.\n\nCe réseau a été créé en <b>2004</b> après le départ d\'un ami sur l\'île de La Réunion, afin de garder le contact avec lui. A l\'origine le site web ne comptait qu\'une dizaine de membres, et compte aujourd\'hui&#8230; plus d\'une douzaine de membres! <b>:p</b></string>
     <string name="advertising_label">Publicité</string>
     <string name="advertising">\"COT! COT! COOOOOTTTTTTTJJJJJJJJJJJJJEEEEE N\'IRAI JAMAIS!!!! AU CLASSICO! NON NON!\"\n-> CEUX QUI ONT UN CERVEAU, VONT AU CLASSICO&#8230;</string>
+    <string name="comrade_definition"><b>CAMARADE [Kamarad]. n. • 1°</b> Personne qui a les mêmes habitudes, les mêmes occupations qu\'une autre et des liens de familiarité avec elle. V. Collègue, compagnon, confrère, copain, pote. <b>• 2°</b> (Trad. russe tovaritch). Appellation, dans les partis socialistes, communistes.</string>
+    <string name="shortcuts_label">Raccourcis</string>
+    <string name="news_label">Dernière minute</string>
+    <string name="shortcut_mailbox">Votre boite aux lettres</string>
+    <string name="shortcut_events">Evénements</string>
+    <string name="shortcut_location">Géolocalisation de vos amis</string>
 
 </resources>

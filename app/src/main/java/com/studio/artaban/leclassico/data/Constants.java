@@ -36,6 +36,7 @@ public final class Constants {
 
     ////// Database ////////////////////////////////////////////////////////////////////////////////
 
+    public static final String DATA_CONTENT_SCHEME = "content://"; // DB content scheme
     public static final String DATA_CONTENT_URI = "com." + APP_URI_COMPANY + ".provider." + APP_URI; // DB content provider URI
     public static final String DATA_COLUMN_SYNCHRONIZED = "Synchronized"; // Synchronized field name
     public static final String DATA_COLUMN_STATUS_DATE = "StatusDate"; // Status date field name

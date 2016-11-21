@@ -29,7 +29,7 @@
     <dimen name="welcome_margin">12dp</dimen>
     <dimen name="home_margin">16dp</dimen>
     <dimen name="home_chapter_margin">8dp</dimen>
-
+    <dimen name="home_shortcut_size">18sp</dimen>
 
 
 

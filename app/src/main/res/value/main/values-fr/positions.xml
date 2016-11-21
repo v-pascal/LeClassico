@@ -13,6 +13,7 @@
     <integer name="home_info_mail_pos">19</integer>
     <integer name="home_info_notify_pos">47</integer>
 
-    <integer name="main_welcome_pseudo_pos">21</integer>
+    <integer name="home_welcome_pseudo_pos">21</integer>
+    <integer name="home_comrade_lenght">8</integer>
 
 </resources>

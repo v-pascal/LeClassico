@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,16 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.album.PhotoFragment;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.tools.SizeUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by pascal on 05/09/16.
@@ -140,7 +145,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
 
         // Display pseudo into title (colored)
         SpannableStringBuilder welcome = new SpannableStringBuilder(getString(R.string.main_welcome, pseudo));
-        pseudoPos = getResources().getInteger(R.integer.main_welcome_pseudo_pos);
+        pseudoPos = getResources().getInteger(R.integer.home_welcome_pseudo_pos);
         welcome.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
                 pseudoPos, pseudoPos + pseudo.length(), 0);
         ((TextView)rootView.findViewById(R.id.text_welcome)).setText(welcome, TextView.BufferType.SPANNABLE);
@@ -156,7 +161,27 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
 
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.photo_container, photo).commit();
 
+        // Format comrade definition (add color)
+        TextView comrade = (TextView)rootView.findViewById(R.id.text_comrade);
+        SpannableStringBuilder definition = new SpannableStringBuilder(comrade.getText());
+        int comradeLen = getResources().getInteger(R.integer.home_comrade_lenght);
+        definition.setSpan(new ForegroundColorSpan(Color.RED), 0, comradeLen, 0);
+        comrade.setText(definition);
 
+        // Add shortcuts links
+        ((TextView)rootView.findViewById(R.id.text_shortcut_web)).setText(Constants.APP_WEBSITE);
+
+        TextView mailbox = (TextView)rootView.findViewById(R.id.text_shortcut_mailbox);
+        Linkify.addLinks(mailbox, Pattern.compile(mailbox.getText().toString(), 0), Constants.DATA_CONTENT_SCHEME,
+                null, new Linkify.TransformFilter() {
+                    @Override
+                    public String transformUrl(Matcher match, String url) {
+
+                        // content://com.studio.artaban.provider.leclassico/User/#/Messagerie
+                        return Uris.getUri(Uris.ID_USER_MAILBOX, String.valueOf(getActivity().getIntent()
+                                .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA))).toString();
+                    }
+                });
 
 
 

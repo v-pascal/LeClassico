@@ -64,22 +64,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <View
-            android:background="@color/colorPublicationDark"
-            android:layout_marginTop="@dimen/home_margin"
-            android:layout_marginBottom="@dimen/home_margin"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"/><!-- Separator -->
-
         <!-- Advertising -->
         <LinearLayout
             android:orientation="horizontal"
+            android:background="@drawable/chapter_background"
+            android:padding="@dimen/chapter_padding"
+            android:layout_marginTop="@dimen/home_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ImageView
                 android:src="@drawable/ic_local_offer_white_24dp"
-                android:tint="@android:color/black"
+                android:tint="@color/yellow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <TextView
@@ -97,6 +93,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- News -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:background="@drawable/chapter_background"
+            android:padding="@dimen/chapter_padding"
+            android:layout_marginTop="@dimen/home_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/ic_local_offer_white_24dp"
+                android:tint="@color/yellow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:text="@string/news_label"
+                android:textSize="@dimen/welcome_text_size"
+                android:textColor="@android:color/black"
+                android:layout_marginStart="@dimen/home_chapter_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
 
 
@@ -113,6 +131,127 @@
 
 
 
+        <!-- Shortcuts -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:background="@drawable/chapter_background"
+            android:padding="@dimen/chapter_padding"
+            android:layout_marginTop="@dimen/home_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/ic_local_offer_white_24dp"
+                android:tint="@color/yellow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:text="@string/shortcuts_label"
+                android:textSize="@dimen/welcome_text_size"
+                android:textColor="@android:color/black"
+                android:layout_marginStart="@dimen/home_chapter_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/home_margin"
+            android:layout_marginStart="@dimen/home_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Location -->
+            <ImageView
+                android:src="@drawable/ic_location_on_white_24dp"
+                android:tint="@color/colorPrimaryLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/text_shortcut_location"
+                android:text="@string/shortcut_location"
+                android:textSize="@dimen/home_shortcut_size"
+                android:textStyle="bold"
+                android:layout_marginStart="@dimen/home_chapter_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginStart="@dimen/home_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Events -->
+            <ImageView
+                android:src="@drawable/ic_event_white_24dp"
+                android:tint="@color/colorPrimaryDarkProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/text_shortcut_events"
+                android:text="@string/shortcut_events"
+                android:textSize="@dimen/home_shortcut_size"
+                android:textStyle="bold"
+                android:layout_marginStart="@dimen/home_chapter_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginStart="@dimen/home_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Web site -->
+            <ImageView
+                android:src="@drawable/ic_language_white_24dp"
+                android:tint="@color/red"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/text_shortcut_web"
+                android:textSize="@dimen/home_shortcut_size"
+                android:textStyle="bold"
+                android:autoLink="web"
+                android:layout_marginStart="@dimen/home_chapter_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginStart="@dimen/home_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Mailbox -->
+            <ImageView
+                android:src="@drawable/ic_markunread_mailbox_white_24dp"
+                android:tint="@color/colorPrimaryMailbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/text_shortcut_mailbox"
+                android:text="@string/shortcut_mailbox"
+                android:textSize="@dimen/home_shortcut_size"
+                android:textStyle="bold"
+                android:layout_marginStart="@dimen/home_chapter_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <View
+            android:background="@color/colorPublicationDark"
+            android:layout_marginTop="@dimen/home_margin"
+            android:layout_marginBottom="@dimen/home_chapter_margin"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"/><!-- Separator -->
+
+        <!-- Definition -->
+        <TextView
+            android:id="@+id/text_comrade"
+            android:text="@string/comrade_definition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

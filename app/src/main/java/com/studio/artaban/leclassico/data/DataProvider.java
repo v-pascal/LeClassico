@@ -38,7 +38,7 @@ import java.util.Date;
  */
 public class DataProvider extends ContentProvider {
 
-    public static final String CONTENT_URI = "content://" + Constants.DATA_CONTENT_URI + '/';
+    public static final String CONTENT_URI = Constants.DATA_CONTENT_SCHEME + Constants.DATA_CONTENT_URI + '/';
 
     //////
     private static final String MIME_TYPE_SINGLE = "vnd.android.cursor.item/vnd." + Constants.APP_URI_COMPANY +
@@ -159,8 +159,10 @@ public class DataProvider extends ContentProvider {
             case Tables.ID_PRESENTS: return MIME_TYPE + PresentsTable.TABLE_NAME;
             case Tables.ID_VOTES: return MIME_TYPE + VotesTable.TABLE_NAME;
             case Tables.ID_NOTIFICATIONS: return MIME_TYPE + NotificationsTable.TABLE_NAME;
-            default:
-                throw new IllegalArgumentException("Unexpected content URI: " + uri);
+            default: {
+                Logs.add(Logs.Type.W, "No type for URI: " + uri);
+                return null;
+            }
         }
     }
 

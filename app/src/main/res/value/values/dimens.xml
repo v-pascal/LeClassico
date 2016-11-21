@@ -11,4 +11,8 @@
     <dimen name="recycler_request_width">72dp</dimen>
     <dimen name="recycler_request_height">36dp</dimen>
 
+    <!-- Chapter -->
+    <dimen name="chapter_background_radius">8dp</dimen>
+    <dimen name="chapter_padding">4dp</dimen>
+
 </resources>

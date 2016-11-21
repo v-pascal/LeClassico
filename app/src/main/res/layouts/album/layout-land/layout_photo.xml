@@ -107,6 +107,7 @@
             android:background="@drawable/comments_background"
             android:paddingStart="@dimen/comment_info_margin"
             android:paddingEnd="@dimen/comment_info_margin"
+            android:minHeight="192dp"
             android:layout_marginTop="@dimen/comment_info_margin"
             android:layout_weight="1"
             android:layout_width="match_parent"

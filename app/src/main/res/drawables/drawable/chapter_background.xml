@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/light_gray"/>
+    <corners
+        android:bottomRightRadius="@dimen/chapter_background_radius"
+        android:bottomLeftRadius="@dimen/chapter_background_radius"
+        android:topLeftRadius="@dimen/chapter_background_radius"
+        android:topRightRadius="@dimen/chapter_background_radius"/>
+</shape>

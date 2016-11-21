@@ -61,6 +61,19 @@
             android:name=".activities.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/SettingAppTheme"/>
+        <activity
+            android:name=".activities.mailbox.MailboxActivity"
+            android:label="@string/title_activity_mailbox"
+            android:theme="@style/MailboxAppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data
+                    android:scheme="content"
+                    android:host="com.studio.artaban.provider.leclassico"
+                    android:pathPattern="/User/.*/Messagerie"/>
+            </intent-filter>
+        </activity>
 
         <!-- Content providers -->
         <provider

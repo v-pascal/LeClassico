@@ -42,6 +42,7 @@ public class PhotoFragment extends Fragment {
         Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
                 ";savedInstanceState: " + savedInstanceState);
 
+        // Set backgrounds
         View rootView = inflater.inflate(R.layout.fragment_photo, container, false);
         try {
             float radius = getResources().getDimensionPixelSize(R.dimen.photo_background_radius);
@@ -69,8 +70,6 @@ public class PhotoFragment extends Fragment {
         } catch (IOException e) {
             Logs.add(Logs.Type.E, "Failed to add background (IO): " + e.getMessage());
         }
-
-
 
 
 
