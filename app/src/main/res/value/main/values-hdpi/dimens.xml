@@ -22,16 +22,4 @@
     <dimen name="shortcut_tiny_text_margin">5dp</dimen>
     <dimen name="shortcut_margin_horizontal">7dp</dimen>
 
-    <!-- Notification -->
-    <dimen name="notify_tiny_text_margin">5dp</dimen>
-    <dimen name="notify_tiny_text_size">12sp</dimen>
-    <dimen name="notify_text_margin">7dp</dimen>
-    <dimen name="notify_text_size">17sp</dimen>
-    <dimen name="notify_item_margin">14dp</dimen>
-    <dimen name="notify_item_height">50dp</dimen>
-    <dimen name="notify_message_height">27dp</dimen><!-- = notify_item_height - notify_info_height -->
-    <dimen name="notify_info_height">23dp</dimen><!-- = notify_item_height - notify_message_height -->
-    <dimen name="notify_time_size">14sp</dimen>
-    <dimen name="notify_search_size">15sp</dimen>
-
 </resources>
