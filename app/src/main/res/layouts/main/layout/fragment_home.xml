@@ -17,29 +17,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:orientation="vertical"
+            <!-- Introduction -->
+            <TextView
+                android:id="@+id/text_intro"
+                android:text="@string/main_intro"
+                android:textSize="@dimen/intro_text_size"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content">
-
-                <!-- Welcome -->
-                <TextView
-                    android:id="@+id/text_welcome"
-                    android:textSize="@dimen/welcome_text_size"
-                    android:textColor="@android:color/black"
-                    android:layout_marginBottom="@dimen/welcome_margin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <!-- Introduction -->
-                <TextView
-                    android:id="@+id/text_intro"
-                    android:text="@string/main_intro"
-                    android:textSize="@dimen/intro_text_size"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
+                android:layout_height="wrap_content"/>
 
             <!-- Light -->
             <ImageView
@@ -80,8 +65,9 @@
                 android:layout_height="wrap_content"/>
             <TextView
                 android:text="@string/advertising_label"
-                android:textSize="@dimen/welcome_text_size"
+                android:textSize="@dimen/chapter_text_size"
                 android:textColor="@android:color/black"
+                android:textStyle="bold"
                 android:layout_marginStart="@dimen/home_chapter_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -109,8 +95,9 @@
                 android:layout_height="wrap_content"/>
             <TextView
                 android:text="@string/shortcuts_label"
-                android:textSize="@dimen/welcome_text_size"
+                android:textSize="@dimen/chapter_text_size"
                 android:textColor="@android:color/black"
+                android:textStyle="bold"
                 android:layout_marginStart="@dimen/home_chapter_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

@@ -7,6 +7,7 @@
     <LinearLayout
         android:id="@+id/layout_header"
         android:orientation="horizontal"
+        android:paddingEnd="@dimen/photo_icon_padding"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 

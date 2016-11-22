@@ -1,21 +1,10 @@
 <resources><!-- Album -->
 
-
-
-
-
-
-
     <!-- Photo dimensions -->
-    <dimen name="photo_background_radius">12dp</dimen>
-    <dimen name="photo_icon_padding">8dp</dimen>
-    <dimen name="photo_title_text_size">22sp</dimen>
-    <dimen name="photo_header_height">44dp</dimen><!-- == photo_icon_padding + 36dp -->
-    <dimen name="photo_album_text_size">18sp</dimen>
-
-
-
-
-
+    <dimen name="photo_background_radius">9dp</dimen>
+    <dimen name="photo_icon_padding">5dp</dimen>
+    <dimen name="photo_title_text_size">21sp</dimen>
+    <dimen name="photo_header_height">41dp</dimen><!-- == photo_icon_padding + 36dp -->
+    <dimen name="photo_album_text_size">17sp</dimen>
 
 </resources>

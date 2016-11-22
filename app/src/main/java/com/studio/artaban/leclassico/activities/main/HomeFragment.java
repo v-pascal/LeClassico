@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
+import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -143,19 +144,25 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                         "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
         mNewNotifyLoader.init(getActivity(), Queries.MAIN_SHORTCUT_NOTIFY_COUNT, notifyData);
 
-        // Display pseudo into title (colored)
-        SpannableStringBuilder welcome = new SpannableStringBuilder(getString(R.string.main_welcome, pseudo));
-        pseudoPos = getResources().getInteger(R.integer.home_welcome_pseudo_pos);
-        welcome.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
+        // Display pseudo into introduction (color & size)
+        TextView introView = (TextView) rootView.findViewById(R.id.text_intro);
+        pseudoPos = getResources().getInteger(R.integer.home_intro_pseudo_pos);
+        SpannableStringBuilder intro = new SpannableStringBuilder(introView.getText());
+        intro.setSpan(new ForegroundColorSpan(Color.BLACK), 0,
+                getResources().getInteger(R.integer.home_intro_title_pos), 0);
+        intro.insert(pseudoPos, pseudo);
+        intro.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimarySetting)),
                 pseudoPos, pseudoPos + pseudo.length(), 0);
-        ((TextView)rootView.findViewById(R.id.text_welcome)).setText(welcome, TextView.BufferType.SPANNABLE);
-
-        // Set image size of the light
-        SizeUtils.screenRatio(getActivity(), rootView.findViewById(R.id.image_light), true, 1f/7f);
+        intro.setSpan(new AbsoluteSizeSpan(getResources().getInteger(R.integer.title_text_size)), 0,
+                getResources().getInteger(R.integer.home_intro_title_pos) + pseudo.length(), 0);
+        introView.setText(intro, TextView.BufferType.SPANNABLE);
 
         // Add introduction link
-        Linkify.addLinks((TextView) rootView.findViewById(R.id.text_intro),
-                Pattern.compile("LeClassico"), "http");
+        Linkify.addLinks(introView, Pattern.compile("LeClassico"), "http");
+
+        // Set image size of the light
+        int lightRatio = getResources().getInteger(R.integer.light_ratio);
+        SizeUtils.screenRatio(getActivity(), rootView.findViewById(R.id.image_light), true, 1f / lightRatio);
 
         // Fill best photo container
         PhotoFragment photo = new PhotoFragment();

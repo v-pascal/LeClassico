@@ -22,4 +22,14 @@
     <dimen name="shortcut_tiny_text_margin">6dp</dimen>
     <dimen name="shortcut_margin_horizontal">8dp</dimen>
 
+    <!-- Home -->
+    <dimen name="intro_text_size">15sp</dimen>
+    <dimen name="definition_text_size">13sp</dimen>
+    <dimen name="light_margin_start">5dp</dimen>
+    <dimen name="home_margin">15dp</dimen>
+    <dimen name="home_chapter_margin">7dp</dimen>
+    <dimen name="home_shortcut_size">18sp</dimen>
+    <integer name="light_ratio">6</integer>
+    <integer name="title_text_size">25</integer>
+
 </resources>

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Chapter -->
+    <dimen name="chapter_text_size">19sp</dimen>
+
     <!-- Synchronization -->
     <dimen name="sync_height">22dp</dimen>
     <dimen name="sync_text_margin">6dp</dimen>
