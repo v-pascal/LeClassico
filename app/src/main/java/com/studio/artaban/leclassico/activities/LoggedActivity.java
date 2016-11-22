@@ -15,6 +15,9 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public abstract class LoggedActivity extends AppCompatActivity {
 
+    protected int mPseudoId; // Connected user ID
+
+    //
     private final LogoutReceiver mLogoutReceiver = new LogoutReceiver();
     private class LogoutReceiver extends BroadcastReceiver {
 

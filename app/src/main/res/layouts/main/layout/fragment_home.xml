@@ -93,44 +93,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <!-- News -->
-        <LinearLayout
-            android:orientation="horizontal"
-            android:background="@drawable/chapter_background"
-            android:padding="@dimen/chapter_padding"
-            android:layout_marginTop="@dimen/home_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:src="@drawable/ic_local_offer_white_24dp"
-                android:tint="@color/yellow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:text="@string/news_label"
-                android:textSize="@dimen/welcome_text_size"
-                android:textColor="@android:color/black"
-                android:layout_marginStart="@dimen/home_chapter_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         <!-- Shortcuts -->
         <LinearLayout
             android:orientation="horizontal"
@@ -192,6 +154,9 @@
                 android:text="@string/shortcut_events"
                 android:textSize="@dimen/home_shortcut_size"
                 android:textStyle="bold"
+                android:textColor="?android:attr/textColorLink"
+                android:clickable="true"
+                android:onClick="onEvents"
                 android:layout_marginStart="@dimen/home_chapter_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

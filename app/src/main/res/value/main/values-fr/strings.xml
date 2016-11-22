@@ -38,7 +38,7 @@
 
     <!-- Navigation -->
     <string name="nav_profile">Profil</string>
-    <string name="nav_location">Géolocation</string>
+    <string name="nav_location">Géolocalisation</string>
     <string name="nav_settings">Paramètres</string>
     <string name="nav_mailbox">Boite aux lettres</string>
     <string name="nav_notification">Notifications</string>
@@ -62,7 +62,7 @@
     <string name="shortcuts_label">Raccourcis</string>
     <string name="news_label">Dernière minute</string>
     <string name="shortcut_mailbox">Votre boite aux lettres</string>
-    <string name="shortcut_events">Evénements</string>
-    <string name="shortcut_location">Géolocalisation de vos amis</string>
+    <string name="shortcut_events"><u>Evénements</u></string>
+    <string name="shortcut_location">Géolocaliser de vos amis</string>
 
 </resources>

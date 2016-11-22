@@ -74,6 +74,19 @@
                     android:pathPattern="/User/.*/Messagerie"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.location.LocationActivity"
+            android:label="@string/title_activity_location"
+            android:theme="@style/LocationAppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data
+                    android:scheme="content"
+                    android:host="com.studio.artaban.provider.leclassico"
+                    android:pathPattern="/User/.*/Locations"/>
+            </intent-filter>
+        </activity>
 
         <!-- Content providers -->
         <provider

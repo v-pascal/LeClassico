@@ -153,6 +153,10 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         // Set image size of the light
         SizeUtils.screenRatio(getActivity(), rootView.findViewById(R.id.image_light), true, 1f/7f);
 
+        // Add introduction link
+        Linkify.addLinks((TextView) rootView.findViewById(R.id.text_intro),
+                Pattern.compile("LeClassico"), "http");
+
         // Fill best photo container
         PhotoFragment photo = new PhotoFragment();
         Bundle data = new Bundle();
@@ -183,13 +187,17 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                     }
                 });
 
+        TextView location = (TextView)rootView.findViewById(R.id.text_shortcut_location);
+        Linkify.addLinks(location, Pattern.compile(location.getText().toString(), 0), Constants.DATA_CONTENT_SCHEME,
+                null, new Linkify.TransformFilter() {
+                    @Override
+                    public String transformUrl(Matcher match, String url) {
 
-
-
-
-
-
-
+                        // content://com.studio.artaban.provider.leclassico/User/#/Location
+                        return Uris.getUri(Uris.ID_USER_LOCATIONS, String.valueOf(getActivity().getIntent()
+                                .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA))).toString();
+                    }
+                });
 
         return rootView;
     }

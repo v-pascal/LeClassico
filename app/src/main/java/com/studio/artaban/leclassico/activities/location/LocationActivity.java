@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico.activities.mailbox;
+package com.studio.artaban.leclassico.activities.location;
 
 import android.os.Bundle;
 
@@ -6,10 +6,10 @@ import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
- * Created by pascal on 21/11/16.
- * Mailbox activity to manage user mails
+ * Created by pascal on 22/11/16.
+ * Location activity
  */
-public class MailboxActivity extends LoggedActivity {
+public class LocationActivity extends LoggedActivity {
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
@@ -25,9 +25,6 @@ public class MailboxActivity extends LoggedActivity {
 
 
 
-
-
-
         if (getIntent().getData() != null)
             mPseudoId = Integer.valueOf(getIntent().getData().getPathSegments().get(1));
         else {
@@ -35,9 +32,6 @@ public class MailboxActivity extends LoggedActivity {
 
 
         }
-
-
-
 
 
 

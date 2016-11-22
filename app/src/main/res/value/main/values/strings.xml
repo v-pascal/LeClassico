@@ -66,7 +66,7 @@
     <string name="shortcuts_label">Shortcuts</string>
     <string name="news_label">News</string>
     <string name="shortcut_mailbox">Your mailbox</string>
-    <string name="shortcut_events">Events</string>
+    <string name="shortcut_events"><u>Events</u></string>
     <string name="shortcut_location">Friends location</string>
 
 </resources>

@@ -366,6 +366,10 @@ public class MainActivity extends LoggedActivity implements
 
 
     }
+    public void onEvents(View sender) { // Events page requested
+        Logs.add(Logs.Type.V, "sender: " + sender);
+        mViewPager.setCurrentItem(Constants.MAIN_SECTION_EVENTS, true);
+    }
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override

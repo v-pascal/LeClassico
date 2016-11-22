@@ -30,6 +30,9 @@ public class Uris {
             case ID_USER_MAILBOX: // User/#/Messagerie
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + MessagerieTable.TABLE_NAME);
+            case ID_USER_LOCATIONS: // User/#/Locations
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_USER + arguments[0] + PATH_LOCATIONS);
             case ID_MAIN_SHORTCUT: // User/#/Notifications/Shortcut
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME + PATH_SHORTCUT);
@@ -45,11 +48,13 @@ public class Uris {
 
     private static final String PATH_USER = "User/"; // User URI path following with member ID
     private static final String PATH_SHORTCUT = "/Shortcut"; // Shortcut URI path
+    private static final String PATH_LOCATIONS = "/Locations"; // Locations URI path
 
     ////// URI /////////////////////////////////////////////////////////////////////////////////////
 
     public static final short ID_RAW_QUERY = 0;          // SQL
     public static final short ID_USER_NOTIFICATIONS = 1; // User/#/Notifications
     public static final short ID_USER_MAILBOX = 2;       // User/#/Messagerie
-    public static final short ID_MAIN_SHORTCUT = 3;      // User/#/Notifications/Shortcut
+    public static final short ID_USER_LOCATIONS = 3;       // User/#/Locations
+    public static final short ID_MAIN_SHORTCUT = 4;      // User/#/Notifications/Shortcut
 }
