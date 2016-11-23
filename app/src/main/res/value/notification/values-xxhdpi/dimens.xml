@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Notification -->
 
-    <dimen name="notify_tiny_text_margin">4dp</dimen>
-    <dimen name="notify_tiny_text_size">11sp</dimen>
-    <dimen name="notify_text_margin">6dp</dimen>
-    <dimen name="notify_text_size">16sp</dimen>
     <dimen name="notify_item_margin">12dp</dimen>
-    <dimen name="notify_item_height">48dp</dimen>
-    <dimen name="notify_message_height">26dp</dimen><!-- = notify_item_height - notify_info_height -->
-    <dimen name="notify_info_height">22dp</dimen><!-- = notify_item_height - notify_message_height -->
     <dimen name="notify_time_size">12sp</dimen>
     <dimen name="notify_search_size">13sp</dimen>
 

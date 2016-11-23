@@ -4,9 +4,13 @@
     <!-- Chapter -->
     <dimen name="chapter_text_size">19sp</dimen>
 
-    <!-- Synchronization -->
-    <dimen name="sync_height">22dp</dimen>
-    <dimen name="sync_text_margin">6dp</dimen>
-    <dimen name="sync_text_size">13sp</dimen>
+    <!-- User notifications, comments & publications -->
+    <dimen name="user_item_height">51dp</dimen>
+    <dimen name="user_info_height">28dp</dimen><!-- = user_item_height - user_date_height -->
+    <dimen name="user_date_height">23dp</dimen><!-- = user_item_height - user_info_height -->
+    <dimen name="user_info_text_size">18sp</dimen>
+    <dimen name="user_date_text_size">13sp</dimen>
+    <dimen name="user_text_margin">8dp</dimen>
+    <dimen name="user_date_text_margin">6dp</dimen>
 
 </resources>

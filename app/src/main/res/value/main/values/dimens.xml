@@ -3,7 +3,7 @@
 
     <dimen name="profile_border_width">6dp</dimen>
     <dimen name="profile_size">96dp</dimen>
-    <dimen name="appbar_translate_title">-56dp</dimen><!-- == appbar_padding_title * -1 -->
+    <dimen name="appbar_translate_title">-56dp</dimen><!-- = appbar_padding_title * -1 -->
 
     <!-- Notification service -->
     <dimen name="service_icon_margin">10dp</dimen>
@@ -16,5 +16,35 @@
     <dimen name="service_cmd_margin">10dp</dimen>
     <dimen name="service_image_height">24dp</dimen>
     <dimen name="service_cmd_height">44dp</dimen><!-- = service_image_height + (service_cmd_margin * 2) -->
+
+
+
+
+
+
+
+
+    <!-- Publication -->
+    <dimen name="pub_radius">8dp</dimen>
+    <dimen name="pub_elevation">6dp</dimen>
+    <dimen name="pub_padding">6dp</dimen>
+    <dimen name="pub_comment_text_size">18sp</dimen>
+    <dimen name="pub_link_padding">18dp</dimen><!-- = pub_text_margin + pub_padding -->
+
+
+
+
+    <dimen name="pub_text_size">24sp</dimen>
+    <dimen name="pub_text_margin">12dp</dimen>
+    <dimen name="pub_title_text_size">20sp</dimen>
+    <dimen name="pub_link_text_size">18sp</dimen>
+
+
+
+
+
+
+
+
 
 </resources>

@@ -4,4 +4,13 @@
     <!-- Chapter -->
     <dimen name="chapter_text_size">16sp</dimen>
 
+    <!-- User notifications, comments & publications -->
+    <dimen name="user_item_height">48dp</dimen>
+    <dimen name="user_info_height">26dp</dimen><!-- = user_item_height - user_date_height -->
+    <dimen name="user_date_height">22dp</dimen><!-- = user_item_height - user_info_height -->
+    <dimen name="user_info_text_size">16sp</dimen>
+    <dimen name="user_date_text_size">11sp</dimen>
+    <dimen name="user_text_margin">6dp</dimen>
+    <dimen name="user_tiny_text_margin">4dp</dimen>
+
 </resources>
