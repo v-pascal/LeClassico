@@ -21,19 +21,7 @@ import java.io.IOException;
  * Created by pascal on 19/11/16.
  * Fragment to display a photo with comments
  */
-public class PhotoFragment extends Fragment {
-
-    public static final String ARG_KEY_TYPE = "type";
-    // Argument keys
-
-    public enum Type {
-        BEST((byte)1);
-
-        //
-        private final byte id;
-        Type(byte id) { this.id = id; }
-        public byte getValue() { return this.id; }
-    }
+public class BestPhotoFragment extends Fragment {
 
     ////// Fragment ////////////////////////////////////////////////////////////////////////////////
     @Nullable
@@ -43,9 +31,9 @@ public class PhotoFragment extends Fragment {
                 ";savedInstanceState: " + savedInstanceState);
 
         // Set backgrounds
-        View rootView = inflater.inflate(R.layout.fragment_photo, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_best, container, false);
         try {
-            float radius = getResources().getDimensionPixelSize(R.dimen.photo_background_radius);
+            float radius = getResources().getDimensionPixelSize(R.dimen.best_background_radius);
             GradientDrawable background = (GradientDrawable) Drawable.createFromXml(getResources(),
                     getResources().getXml(R.xml.photo_background));
             background.setCornerRadii(new float[]{

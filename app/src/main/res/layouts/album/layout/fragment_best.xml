@@ -7,7 +7,7 @@
     <LinearLayout
         android:id="@+id/layout_header"
         android:orientation="horizontal"
-        android:paddingEnd="@dimen/photo_icon_padding"
+        android:paddingEnd="@dimen/best_icon_padding"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -15,20 +15,20 @@
         <ImageView
             android:src="@drawable/ic_photo_camera_white_36dp"
             android:tint="@android:color/black"
-            android:paddingStart="@dimen/photo_icon_padding"
-            android:paddingTop="@dimen/photo_icon_padding"
-            android:paddingEnd="@dimen/photo_icon_padding"
+            android:paddingStart="@dimen/best_icon_padding"
+            android:paddingTop="@dimen/best_icon_padding"
+            android:paddingEnd="@dimen/best_icon_padding"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
         <!-- Title -->
         <TextView
             android:id="@+id/text_title"
-            android:textSize="@dimen/photo_title_text_size"
+            android:textSize="@dimen/best_title_text_size"
             android:textColor="@color/yellow"
             android:textStyle="bold"
             android:gravity="center_vertical"
-            android:layout_marginEnd="@dimen/photo_icon_padding"
+            android:layout_marginEnd="@dimen/best_icon_padding"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"/>
     </LinearLayout>
@@ -40,9 +40,9 @@
         android:layout_height="wrap_content">
 
         <View
-            android:background="@drawable/photo_command_background"
-            android:layout_width="@dimen/photo_background_radius"
-            android:layout_height="@dimen/photo_header_height"/>
+            android:background="@drawable/best_command_background"
+            android:layout_width="@dimen/best_background_radius"
+            android:layout_height="@dimen/best_header_height"/>
     </FrameLayout>
 
     <!-- Command -->
@@ -50,24 +50,24 @@
         android:id="@+id/display_album"
         android:text="@string/display"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="@dimen/photo_icon_padding"
-        android:layout_marginStart="@dimen/photo_icon_padding"
+        android:layout_marginBottom="@dimen/best_icon_padding"
+        android:layout_marginStart="@dimen/best_icon_padding"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/photo_header_height"/>
+        android:layout_height="@dimen/best_header_height"/>
     <TextView
         android:id="@+id/text_album"
         android:text="@string/album"
-        android:textSize="@dimen/photo_album_text_size"
+        android:textSize="@dimen/best_album_text_size"
         android:textColor="@android:color/black"
         android:gravity="center_vertical"
         android:layout_toStartOf="@id/display_album"
-        android:layout_marginBottom="@dimen/photo_icon_padding"
+        android:layout_marginBottom="@dimen/best_icon_padding"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/photo_header_height"/>
+        android:layout_height="@dimen/best_header_height"/>
 
     <!-- Content -->
     <include
-        layout="@layout/layout_photo"
+        layout="@layout/layout_best"
         android:layout_below="@id/layout_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

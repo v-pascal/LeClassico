@@ -6,20 +6,20 @@
 
     <!-- Image -->
     <include
-        layout="@layout/layout_photo_image"
+        layout="@layout/layout_best_image"
         android:layout_weight="3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"/>
 
     <View
-        android:layout_width="@dimen/photo_comment_margin"
-        android:layout_height="@dimen/photo_background_radius"/><!-- Separator -->
+        android:layout_width="@dimen/best_comment_margin"
+        android:layout_height="@dimen/best_background_radius"/><!-- Separator -->
 
     <!-- Comment -->
     <LinearLayout
         android:orientation="vertical"
-        android:background="@drawable/photo_comments_background"
-        android:padding="@dimen/comment_info_margin"
+        android:background="@drawable/best_info_background"
+        android:padding="@dimen/best_comment_info_margin"
         android:layout_weight="2"
         android:layout_width="0dp"
         android:layout_height="match_parent">
@@ -33,18 +33,18 @@
                 android:id="@+id/text_label_album"
                 android:text="@string/album"
                 android:textColor="@android:color/black"
-                android:textSize="@dimen/photo_album_text_size"
+                android:textSize="@dimen/best_album_text_size"
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <TextView
                 android:id="@+id/text_info_album"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/photo_album_text_size"
+                android:textSize="@dimen/best_album_text_size"
                 android:singleLine="true"
                 android:ellipsize="marquee"
                 android:layout_toEndOf="@id/text_label_album"
-                android:layout_marginStart="@dimen/comment_info_margin"
+                android:layout_marginStart="@dimen/best_comment_info_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
@@ -53,7 +53,7 @@
                 android:id="@+id/text_label_provider"
                 android:text="@string/by"
                 android:textColor="@android:color/black"
-                android:textSize="@dimen/photo_album_text_size"
+                android:textSize="@dimen/best_album_text_size"
                 android:textStyle="bold"
                 android:layout_below="@id/text_label_album"
                 android:layout_width="wrap_content"
@@ -61,12 +61,12 @@
             <TextView
                 android:id="@+id/text_info_provider"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/photo_album_text_size"
+                android:textSize="@dimen/best_album_text_size"
                 android:singleLine="true"
                 android:ellipsize="marquee"
                 android:layout_toEndOf="@id/text_label_provider"
                 android:layout_below="@id/text_label_album"
-                android:layout_marginStart="@dimen/comment_info_margin"
+                android:layout_marginStart="@dimen/best_comment_info_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
@@ -75,7 +75,7 @@
                 android:id="@+id/text_label_range"
                 android:text="@string/range"
                 android:textColor="@android:color/black"
-                android:textSize="@dimen/photo_album_text_size"
+                android:textSize="@dimen/best_album_text_size"
                 android:textStyle="bold"
                 android:layout_below="@id/text_label_provider"
                 android:layout_width="wrap_content"
@@ -83,12 +83,12 @@
             <TextView
                 android:id="@+id/text_info_range"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/photo_album_text_size"
+                android:textSize="@dimen/best_album_text_size"
                 android:singleLine="true"
                 android:ellipsize="marquee"
                 android:layout_toEndOf="@id/text_label_range"
                 android:layout_below="@id/text_label_provider"
-                android:layout_marginStart="@dimen/comment_info_margin"
+                android:layout_marginStart="@dimen/best_comment_info_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
@@ -97,18 +97,18 @@
                 android:id="@+id/text_label_comments"
                 android:text="@string/comments"
                 android:textColor="@android:color/black"
-                android:textSize="@dimen/photo_album_text_size"
+                android:textSize="@dimen/best_album_text_size"
                 android:textStyle="bold"
                 android:layout_below="@id/text_label_range"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </RelativeLayout>
         <FrameLayout
-            android:background="@drawable/comments_background"
-            android:paddingStart="@dimen/comment_info_margin"
-            android:paddingEnd="@dimen/comment_info_margin"
+            android:background="@drawable/best_comments_background"
+            android:paddingStart="@dimen/best_comment_info_margin"
+            android:paddingEnd="@dimen/best_comment_info_margin"
             android:minHeight="192dp"
-            android:layout_marginTop="@dimen/comment_info_margin"
+            android:layout_marginTop="@dimen/best_comment_info_margin"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="0dp">

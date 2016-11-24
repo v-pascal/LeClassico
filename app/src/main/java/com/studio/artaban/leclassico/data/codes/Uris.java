@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.codes;
 import android.net.Uri;
 
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -33,6 +34,9 @@ public class Uris {
             case ID_USER_LOCATIONS: // User/#/Locations
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + PATH_LOCATIONS);
+            case ID_USER_PUBLICATIONS: // User/#/Actualites
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_USER + arguments[0] + '/' + ActualitesTable.TABLE_NAME);
             case ID_MAIN_SHORTCUT: // User/#/Notifications/Shortcut
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME + PATH_SHORTCUT);
@@ -56,5 +60,6 @@ public class Uris {
     public static final short ID_USER_NOTIFICATIONS = 1; // User/#/Notifications
     public static final short ID_USER_MAILBOX = 2;       // User/#/Messagerie
     public static final short ID_USER_LOCATIONS = 3;       // User/#/Locations
-    public static final short ID_MAIN_SHORTCUT = 4;      // User/#/Notifications/Shortcut
+    public static final short ID_USER_PUBLICATIONS = 4;       // User/#/Actualites
+    public static final short ID_MAIN_SHORTCUT = 5;      // User/#/Notifications/Shortcut
 }

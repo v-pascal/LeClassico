@@ -571,7 +571,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         }
     }
 
-    private void refresh() { // Display/Refresh notifications list
+    private void refresh() { // Display/Refresh notification list
         Logs.add(Logs.Type.V, null);
         mNotifyCursor.moveToFirst();
 

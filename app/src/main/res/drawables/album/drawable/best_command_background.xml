@@ -2,5 +2,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/egg_shell"/>
     <corners
-        android:bottomLeftRadius="@dimen/photo_background_radius"/>
+        android:bottomLeftRadius="@dimen/best_background_radius"/>
 </shape>

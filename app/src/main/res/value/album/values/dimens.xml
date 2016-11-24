@@ -2,7 +2,7 @@
 <resources><!-- Album -->
 
     <!-- Photo dimensions -->
-    <dimen name="photo_comment_margin">8dp</dimen>
-    <dimen name="comment_info_margin">6dp</dimen>
+    <dimen name="best_comment_margin">8dp</dimen>
+    <dimen name="best_comment_info_margin">6dp</dimen>
 
 </resources>

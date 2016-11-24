@@ -1,10 +1,10 @@
 <resources><!-- Album -->
 
     <!-- Photo dimensions -->
-    <dimen name="photo_background_radius">10dp</dimen>
-    <dimen name="photo_icon_padding">6dp</dimen>
-    <dimen name="photo_title_text_size">21sp</dimen>
-    <dimen name="photo_header_height">42dp</dimen><!-- == photo_icon_padding + 36dp -->
-    <dimen name="photo_album_text_size">17sp</dimen>
+    <dimen name="best_background_radius">10dp</dimen>
+    <dimen name="best_icon_padding">6dp</dimen>
+    <dimen name="best_title_text_size">21sp</dimen>
+    <dimen name="best_header_height">42dp</dimen><!-- == photo_icon_padding + 36dp -->
+    <dimen name="best_album_text_size">17sp</dimen>
 
 </resources>

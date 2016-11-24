@@ -7,13 +7,13 @@
     <View
         android:id="@+id/view_middle"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/photo_background_radius"/><!-- Middle -->
+        android:layout_height="@dimen/best_background_radius"/><!-- Middle -->
 
     <!-- Photo -->
     <FrameLayout
         android:background="@color/colorPrimarySetting"
-        android:paddingStart="@dimen/photo_background_radius"
-        android:paddingEnd="@dimen/photo_background_radius"
+        android:paddingStart="@dimen/best_background_radius"
+        android:paddingEnd="@dimen/best_background_radius"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -29,6 +29,6 @@
     <View
         android:id="@+id/view_bottom"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/photo_background_radius"/><!-- Bottom -->
+        android:layout_height="@dimen/best_background_radius"/><!-- Bottom -->
 
 </LinearLayout>

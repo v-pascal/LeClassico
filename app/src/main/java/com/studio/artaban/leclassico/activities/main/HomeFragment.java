@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
-import com.studio.artaban.leclassico.activities.album.PhotoFragment;
+import com.studio.artaban.leclassico.activities.album.BestPhotoFragment;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Uris;
@@ -165,12 +165,8 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
         SizeUtils.screenRatio(getActivity(), rootView.findViewById(R.id.image_light), true, 1f / lightRatio);
 
         // Fill best photo container
-        PhotoFragment photo = new PhotoFragment();
-        Bundle data = new Bundle();
-        data.putInt(PhotoFragment.ARG_KEY_TYPE, PhotoFragment.Type.BEST.getValue());
-        photo.setArguments(data);
-
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.photo_container, photo).commit();
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.photo_container, new BestPhotoFragment()).commit();
 
         // Format comrade definition (add color)
         TextView comrade = (TextView)rootView.findViewById(R.id.text_comrade);
