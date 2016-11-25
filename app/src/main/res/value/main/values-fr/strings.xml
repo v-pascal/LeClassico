@@ -23,11 +23,6 @@
     <string name="notify_shared_message">%1$s a ajouté une photo</string>
     <string name="notify_shared_info">Dans votre album %1$s</string>
     <string name="notify_wall_message">%1$s a publié %2$s sur votre mur</string>
-    <string-array name="notify_wall_types">
-        <item>un message</item>
-        <item>un lien</item>
-        <item>une image</item>
-    </string-array>
     <string name="notify_no_info">[AUCUN MESSAGE]</string>
     <string name="notify_mail_message">%1$s vous a envoyé un message privé</string>
     <string name="notify_comment_message">%1$s a ajouté un commentaire %2$s</string>

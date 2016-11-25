@@ -14,10 +14,12 @@ import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
@@ -26,13 +28,24 @@ import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.DataService;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
+import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
+import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.data.tables.CommentairesTable;
+import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.tools.Tools;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by pascal on 05/09/16.
@@ -135,53 +148,93 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
             }
             ////// Publication
 
-
-
-
-
-
-
-
-
-
-
-
-            // Set from pseudo icon
+            // Set pseudo icon
             boolean female = (!mDataSource.isNull(position, COLUMN_INDEX_SEX)) &&
                     (mDataSource.getInt(position, COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
             String profile = (!mDataSource.isNull(position, COLUMN_INDEX_PROFILE)) ?
                     mDataSource.getString(position, COLUMN_INDEX_PROFILE) : null;
             Tools.setProfile(getActivity(), (ImageView) holder.rootView.findViewById(R.id.image_pseudo),
-                    female, profile, R.dimen.shortcut_height, true);
+                    female, profile, R.dimen.user_item_height, true);
+
+            // Display/Hide removal publication button
+            holder.rootView.findViewById(R.id.image_remove)
+                    .setVisibility((mDataSource.getInt(position, COLUMN_INDEX_MEMBER_ID) == getActivity()
+                            .getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)) ?
+                            View.VISIBLE : View.GONE);
+
+            // Set publication header (info, date & type icon)
+            String pseudo = mDataSource.getString(position, COLUMN_INDEX_PSEUDO);
+            short type = Tools.getPubType(mDataSource, position, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER);
+            int pseudoPos = getResources().getInteger(R.integer.publication_info_pseudo_pos);
+
+            SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.publication_info,
+                    pseudo, getResources().getStringArray(R.array.publication_types)[type]));
+            info.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimaryProfile)),
+                    pseudoPos, pseudoPos + pseudo.length(), 0);
+
+            ((TextView)holder.rootView.findViewById(R.id.text_info)).setText(info, TextView.BufferType.SPANNABLE);
+            ((ImageView)holder.rootView.findViewById(R.id.image_type))
+                    .setImageDrawable(getResources().getDrawable(Tools.getPubIcon(type)));
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+            String date = mDataSource.getString(position, COLUMN_INDEX_DATE);
+            try {
+                Date pubDate = dateFormat.parse(date);
+                DateFormat userDate = android.text.format.DateFormat.getMediumDateFormat(getContext());
+                DateFormat userTime = android.text.format.DateFormat.getTimeFormat(getContext());
+
+                ((TextView)holder.rootView.findViewById(R.id.text_date))
+                        .setText(getString(R.string.publication_date, userDate.format(pubDate),
+                                userTime.format(pubDate)));
+
+            } catch (ParseException e) {
+                Logs.add(Logs.Type.E, "Wrong status date format: " + date);
+            }
+
+            // Set message text (if any)
+            TextView message = (TextView) holder.rootView.findViewById(R.id.text_message);
+            if (mDataSource.isNull(position, COLUMN_INDEX_TEXT))
+                message.setVisibility(View.GONE);
+            else {
+
+                message.setVisibility(View.VISIBLE);
+                message.setText(mDataSource.getString(position, COLUMN_INDEX_TEXT));
+            }
+
+            // Set image or link (if any)
+
+
+
+
+
+            //image_published
+            //text_link_title
+            //text_link_description
+            //text_link_info
 
 
 
 
 
 
-
-            /*
-            // Set notify synchronization
+            // Set synchronization
             Tools.setSyncView(getActivity(), (TextView) holder.rootView.findViewById(R.id.text_sync_date),
                     (ImageView) holder.rootView.findViewById(R.id.image_sync),
                     mDataSource.getString(position, COLUMN_INDEX_STATUS_DATE),
                     (byte) mDataSource.getInt(position, COLUMN_INDEX_SYNC));
-                    */
 
-
-
-
-
-
-
-
-
-
-            // Events
+            ////// Events
             View imagePseudo = holder.rootView.findViewById(R.id.image_pseudo);
 
             imagePseudo.setTag(R.id.tag_position, position);
             imagePseudo.setOnClickListener(this);
+
+
+
+
+
+
+
 
             ////// Animate item appearance
             animateAppearance(holder, new AppearanceAnimatorMaker() {
@@ -238,22 +291,20 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
     private short mQueryLimit = Queries.PUBLICATIONS_LIST_LIMIT; // DB query limit
 
     // Query column indexes
-    private static final int COLUMN_INDEX_STATUS_DATE = 1;
-    private static final int COLUMN_INDEX_SYNC = 2;
-    private static final int COLUMN_INDEX_DATE = 4;
-    private static final int COLUMN_INDEX_SEX = 7;
-    private static final int COLUMN_INDEX_PROFILE = 8;
-    private static final int COLUMN_INDEX_PUB_ID = 15;
-
-
-
-
-
-
-
-
-
-
+    private static final int COLUMN_INDEX_ACTU_ID = 0;
+    private static final int COLUMN_INDEX_CAMARADE = 1;
+    private static final int COLUMN_INDEX_DATE = 2;
+    private static final int COLUMN_INDEX_TEXT = 3;
+    private static final int COLUMN_INDEX_LINK = 4;
+    private static final int COLUMN_INDEX_FICHIER = 5;
+    private static final int COLUMN_INDEX_STATUS_DATE = 6;
+    private static final int COLUMN_INDEX_SYNC = 7;
+    private static final int COLUMN_INDEX_PUB_ID = 8;
+    private static final int COLUMN_INDEX_PSEUDO = 9;
+    private static final int COLUMN_INDEX_SEX = 10;
+    private static final int COLUMN_INDEX_PROFILE = 11;
+    private static final int COLUMN_INDEX_MEMBER_ID = 12;
+    private static final int COLUMN_INDEX_COMMENTS_COUNT = 13;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -439,55 +490,46 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
         mPubList.setItemAnimator(itemAnimator);
 
         // Initialize notification list (set query loaders)
-        Bundle pubData = new Bundle();
-        pubData.putParcelable(QueryLoader.DATA_KEY_URI, mPubUri);
-        /*pubData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
-                        NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
-                        NotificationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
-                        NotificationsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_NOTIFY_ID
-                        NotificationsTable.COLUMN_DATE + ',' + // COLUMN_INDEX_DATE
-                        NotificationsTable.COLUMN_LU_FLAG + ',' + // COLUMN_INDEX_LU_FLAG
+        String fields = ActualitesTable.COLUMN_ACTU_ID + ',' + // COLUMN_INDEX_ACTU_ID
+                        ActualitesTable.COLUMN_CAMARADE + ',' + // COLUMN_INDEX_CAMARADE
+                        ActualitesTable.COLUMN_DATE + ',' + // COLUMN_INDEX_DATE
+                        ActualitesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_TEXT
+                        ActualitesTable.COLUMN_LINK + ',' + // COLUMN_INDEX_LINK
+                        ActualitesTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_FICHIER
+                        ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
+                        ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
+                        ActualitesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PUB_ID
                         CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
                         CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
                         CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
-                        CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MEMBER_ID
-                        PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_ALBUM
-                        PhotosTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PHOTO_ID
-                        ActualitesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_PUB_TEXT
-                        ActualitesTable.COLUMN_LINK + ',' + // COLUMN_INDEX_LINK
-                        ActualitesTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_FICHIER
-                        ActualitesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PUB_ID
-                        MessagerieTable.COLUMN_MESSAGE + ',' + // COLUMN_INDEX_MSG_TEXT
-                        MessagerieTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MSG_ID
-                        CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COM_TEXT
-                        CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
+                        CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID; // COLUMN_INDEX_MEMBER_ID
 
-                        " FROM " + NotificationsTable.TABLE_NAME +
+        Bundle pubData = new Bundle();
+        pubData.putParcelable(QueryLoader.DATA_KEY_URI, mPubUri);
+        pubData.putString(QueryLoader.DATA_KEY_SELECTION,
+                "SELECT " +
+                        fields + ',' +
+                        "count(" + CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ')' + // COLUMN_INDEX_COMMENTS_COUNT
+                        " FROM " + ActualitesTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + CamaradesTable.COLUMN_PSEUDO +
-                        " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_ID + '=' + PhotosTable.COLUMN_FICHIER_ID + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_SHARED + "' AND " +
-                        NotificationsTable.COLUMN_OBJECT_DATE + " IS NULL" +
-                        " LEFT JOIN " + ActualitesTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_ID + '=' + ActualitesTable.COLUMN_ACTU_ID + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_WALL + '\'' +
-                        " LEFT JOIN " + MessagerieTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + MessagerieTable.COLUMN_FROM + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_DATE + '=' +
-                        MessagerieTable.COLUMN_DATE + "||' '||" + MessagerieTable.COLUMN_TIME + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + "='" + NotificationsTable.TYPE_MAIL + "' AND " +
-                        NotificationsTable.COLUMN_OBJECT_ID + " IS NULL" +
+                        CamaradesTable.COLUMN_PSEUDO + '=' + ActualitesTable.COLUMN_PSEUDO +
                         " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
-                        NotificationsTable.COLUMN_OBJECT_ID + '=' + CommentairesTable.COLUMN_OBJ_ID + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_TYPE + '=' + CommentairesTable.COLUMN_OBJ_TYPE + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_DATE + '=' + CommentairesTable.COLUMN_DATE + " AND " +
-                        NotificationsTable.COLUMN_OBJECT_FROM + '=' + CommentairesTable.COLUMN_PSEUDO +
+                        CommentairesTable.COLUMN_OBJ_ID + '=' + ActualitesTable.COLUMN_ACTU_ID + " AND " +
+                        CommentairesTable.COLUMN_OBJ_TYPE + "='" + NotificationsTable.TYPE_PUB_COMMENT + '\'' +
+                        " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
+                        AbonnementsTable.COLUMN_CAMARADE + '=' + ActualitesTable.COLUMN_PSEUDO + " AND " +
+                        AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
+                        AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) + " AND " +
+                        AbonnementsTable.COLUMN_PSEUDO + "='" + getActivity().getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) + '\'' +
                         " WHERE " +
-                        NotificationsTable.COLUMN_PSEUDO + "='" + getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
-                        "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");*/
+                        ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
+                        ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
+                        " GROUP BY " + fields +
+                        " ORDER BY " + ActualitesTable.COLUMN_DATE + " DESC");
 
         mListLoader.init(getActivity(), Queries.MAIN_PUBLICATIONS_LIST, pubData);
         return rootView;

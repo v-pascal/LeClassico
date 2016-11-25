@@ -30,6 +30,8 @@
     <dimen name="pub_padding">6dp</dimen>
     <dimen name="pub_comment_text_size">18sp</dimen>
     <dimen name="pub_link_padding">18dp</dimen><!-- = pub_text_margin + pub_padding -->
+    <dimen name="pub_margin_top">18dp</dimen>
+    <dimen name="pub_margin">8dp</dimen>
 
 
 

@@ -2,14 +2,24 @@ package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -18,6 +28,8 @@ import java.util.List;
  * Actualites database table class
  */
 public class ActualitesTable extends DataTable {
+
+    private static final short DEFAULT_LIMIT = 7; // Default remote DB query limit
 
     public static class Publication extends DataField { /////////////////////////// Actualites entry
 
@@ -68,6 +80,7 @@ public class ActualitesTable extends DataTable {
     public static final String COLUMN_TEXT = "ACT_Text";
     public static final String COLUMN_LINK = "ACT_Link";
     public static final String COLUMN_FICHIER = "ACT_Fichier";
+    private static final String COLUMN_STATUS_DATE = "ACT_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_ACTU_ID = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -76,7 +89,8 @@ public class ActualitesTable extends DataTable {
     private static final short COLUMN_INDEX_TEXT = 4;
     private static final short COLUMN_INDEX_LINK = 5;
     private static final short COLUMN_INDEX_FICHIER = 6;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 7;
+    private static final short COLUMN_INDEX_STATUS_DATE = 7;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
 
     //
     private ActualitesTable() { }
@@ -97,13 +111,14 @@ public class ActualitesTable extends DataTable {
                 COLUMN_LINK + " TEXT," +
                 COLUMN_FICHIER + " TEXT," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
 
         // Add indexes
         db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_ACTU_ID + " ON " +
-                TABLE_NAME + "(" + COLUMN_ACTU_ID + ")");
+                TABLE_NAME + '(' + COLUMN_ACTU_ID + ')');
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -149,9 +164,16 @@ public class ActualitesTable extends DataTable {
 
     // JSON keys
     private static final String JSON_KEY_ACTU_ID = COLUMN_ACTU_ID.substring(4);
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_DATE = COLUMN_DATE.substring(4);
+    private static final String JSON_KEY_CAMARADE = COLUMN_CAMARADE.substring(4);
+    private static final String JSON_KEY_TEXT = COLUMN_TEXT.substring(4);
+    private static final String JSON_KEY_LINK = COLUMN_LINK.substring(4);
+    private static final String JSON_KEY_FICHIER = COLUMN_FICHIER.substring(4);
+    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     @Override
-    public SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
+    public SyncResult synchronize(final ContentResolver resolver, String token, final byte operation,
                                   @Nullable String pseudo, @Nullable Short limit,
                                   @Nullable ContentValues postData) {
 
@@ -160,13 +182,123 @@ public class ActualitesTable extends DataTable {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
                 ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
 
-
-
-
-
-
-
         final SyncResult syncResult = new SyncResult();
+        Bundle data = new Bundle();
+
+        data.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_PUBLICATIONS);
+        data.putString(DATA_KEY_TOKEN, token);
+        data.putByte(DATA_KEY_OPERATION, operation);
+        if (limit != null)
+            data.putShort(DATA_KEY_LIMIT, (limit != 0) ? limit : DEFAULT_LIMIT);
+        data.putString(DATA_KEY_PSEUDO, pseudo);
+        data.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
+        //data.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        String url = getSyncUrlRequest(resolver, data);
+
+        data.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        // NB: Do not use pseudo criteria to get max status date but add it to reset sync fields!
+
+        // Send remote DB request
+        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
+                new Internet.OnRequestListener() {
+
+            @Override
+            public boolean onReceiveReply(String response) {
+                //Logs.add(Logs.Type.V, "response: " + response);
+                try {
+
+                    JSONObject reply = new JSONObject(response);
+                    if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
+
+                        if (reply.isNull(TABLE_NAME))
+                            return (operation == WebServices.OPERATION_SELECT);
+                            // Already synchronized for selection but error for any other operation
+
+                        Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
+                        JSONArray entries = reply.getJSONArray(TABLE_NAME);
+                        for (int i = 0; i < entries.length(); ++i) {
+
+                            JSONObject entry = (JSONObject) entries.get(i);
+
+                            // Key fields
+                            int actuId = entry.getInt(JSON_KEY_ACTU_ID);
+
+                            // Data fields
+                            ContentValues values = new ContentValues();
+                            values.put(COLUMN_PSEUDO, entry.getString(JSON_KEY_PSEUDO));
+                            values.put(COLUMN_DATE, entry.getString(JSON_KEY_DATE));
+                            if (!entry.isNull(JSON_KEY_CAMARADE))
+                                values.put(COLUMN_CAMARADE, entry.getString(JSON_KEY_CAMARADE));
+                            if (!entry.isNull(JSON_KEY_TEXT))
+                                values.put(COLUMN_TEXT, entry.getString(JSON_KEY_TEXT));
+                            if (!entry.isNull(JSON_KEY_LINK))
+                                values.put(COLUMN_LINK, entry.getString(JSON_KEY_LINK));
+                            if (!entry.isNull(JSON_KEY_FICHIER))
+                                values.put(COLUMN_FICHIER, entry.getString(JSON_KEY_FICHIER));
+                            values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
+
+                            // Check if entry already exists
+                            String selection = COLUMN_ACTU_ID + '=' + actuId;
+                            Cursor cursor = resolver.query(tableUri, new String[]{Constants.DATA_COLUMN_STATUS_DATE},
+                                    selection, null, null);
+                            if (cursor.moveToFirst()) { // DB entry exists
+
+                                if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
+                                    // NB: Web site deletion priority (no status date comparison)
+                                    cursor.close();
+
+                                    ////// Delete entry (definitively)
+                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                            Synchronized.TO_DELETE.getValue());
+                                    resolver.update(tableUri, values, selection, null);
+                                    resolver.delete(tableUri,
+                                            selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
+
+                                    ++syncResult.deleted;
+
+                                } else if (cursor.getString(0)
+                                            .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
+
+                                    ////// Update entry
+                                    cursor.close();
+                                    resolver.update(tableUri, values, selection, null);
+                                    ++syncResult.updated;
+
+                                } else // Nothing to do here (let's synchronize from local to remote DB)
+                                    cursor.close();
+
+                            } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
+
+                                ////// Insert entry into DB
+                                values.put(COLUMN_ACTU_ID, actuId);
+                                resolver.insert(tableUri, values);
+
+                                ++syncResult.inserted;
+                            }
+                            //else // Do not add a deleted entry (created & removed when offline)
+                        }
+
+                    } else {
+                        Logs.add(Logs.Type.E, "Synchronization error: #" +
+                                reply.getInt(WebServices.JSON_KEY_ERROR));
+                        return false;
+                    }
+
+                } catch (JSONException e) {
+                    Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                    return false;
+                }
+                return true;
+            }
+        });
+        if (result != Internet.DownloadResult.SUCCEEDED) {
+
+            Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
+            if ((operation != WebServices.OPERATION_SELECT) && (operation != WebServices.OPERATION_SELECT_OLD))
+                resetSyncInProgress(resolver, data);
+            return null;
+        }
         return syncResult;
     }
 }

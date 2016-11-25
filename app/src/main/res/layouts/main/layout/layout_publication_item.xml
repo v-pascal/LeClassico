@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -11,6 +10,10 @@
         card_view:cardCornerRadius="@dimen/pub_radius"
         card_view:cardBackgroundColor="@android:color/white"
         card_view:theme="@style/MainAppTheme"
+        android:layout_marginTop="@dimen/pub_margin_top"
+        android:layout_marginBottom="@dimen/pub_margin"
+        android:layout_marginStart="@dimen/pub_margin"
+        android:layout_marginEnd="@dimen/pub_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -22,11 +25,6 @@
             <!-- Pseudo icon -->
             <ImageView
                 android:id="@+id/image_pseudo"
-
-
-                android:src="@drawable/man"
-
-
                 android:clickable="true"
                 android:layout_width="@dimen/user_item_height"
                 android:layout_height="@dimen/user_item_height">
@@ -37,11 +35,6 @@
             <!-- Publication info -->
             <TextView
                 android:id="@+id/text_info"
-
-
-                android:text="Pascal à publié sur le mur de Testers"
-
-
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/user_info_text_size"
                 android:singleLine="true"
@@ -55,11 +48,6 @@
             <!-- Publication type -->
             <ImageView
                 android:id="@+id/image_type"
-
-
-                android:src="@drawable/ic_message_white_18dp"
-
-
                 android:tint="@android:color/black"
                 android:layout_marginStart="@dimen/user_text_margin"
                 android:layout_toEndOf="@id/image_pseudo"
@@ -70,13 +58,6 @@
             <!-- Publication date -->
             <TextView
                 android:id="@+id/text_date"
-
-
-
-                android:text="Le 15 nov. 2016 à 15:32"
-
-
-
                 android:textSize="@dimen/user_date_text_size"
                 android:singleLine="true"
                 android:ellipsize="marquee"
@@ -90,8 +71,9 @@
             <!-- Remove command -->
             <ImageView
                 android:id="@+id/image_remove"
-                android:src="@drawable/ic_close_white_24dp"
-                android:tint="@color/red"
+                android:src="@drawable/ic_close_white_36dp"
+                android:background="@drawable/best_info_background"
+                android:clickable="true"
                 android:layout_alignParentEnd="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -99,12 +81,7 @@
             <!-- Publication text -->
             <TextView
                 android:id="@+id/text_message"
-
-
-                android:text="Bonjour tout le monde bla blabla bla blabla bla bla bl a bla bla  bla"
-
-
-                android:textColor="@android:color/black"
+                android:textColor="@color/colorPrimarySetting"
                 android:textSize="@dimen/pub_text_size"
                 android:layout_marginTop="@dimen/pub_text_margin"
                 android:layout_marginBottom="@dimen/pub_text_margin"
@@ -161,6 +138,7 @@
 
                     android:text="Le Canada à la recherche de travailleurs francophones"
 
+
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/pub_title_text_size"
                     android:textStyle="bold|italic"
@@ -176,6 +154,7 @@
 
                     android:text="Le Canada à la recherche de travailleurs francophones"
 
+
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/pub_link_text_size"
                     android:textStyle="italic"
@@ -190,6 +169,7 @@
 
 
                     android:text="Le Canada à la recherche de travailleurs francophones"
+
 
                     android:textSize="@dimen/pub_link_text_size"
                     android:textStyle="italic"

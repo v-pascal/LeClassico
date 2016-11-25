@@ -66,6 +66,7 @@ public class CommentairesTable extends DataTable {
     public static final String COLUMN_PSEUDO = "COM_Pseudo";
     public static final String COLUMN_DATE = "COM_Date";
     public static final String COLUMN_TEXT = "COM_Text";
+    private static final String COLUMN_STATUS_DATE = "COM_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_OBJ_TYPE = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -73,11 +74,8 @@ public class CommentairesTable extends DataTable {
     private static final short COLUMN_INDEX_PSEUDO = 3;
     private static final short COLUMN_INDEX_DATE = 4;
     private static final short COLUMN_INDEX_TEXT = 5;
-
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 6;
-
-    // JSON keys
-    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final short COLUMN_INDEX_STATUS_DATE = 6;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 7;
 
     //
     private CommentairesTable() { }
@@ -96,13 +94,16 @@ public class CommentairesTable extends DataTable {
                 COLUMN_DATE + " TEXT NOT NULL," +
                 COLUMN_TEXT + " TEXT NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
 
         // Add indexes
         db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " +
-                TABLE_NAME + "(" + COLUMN_PSEUDO + ")");
+                TABLE_NAME + '(' + COLUMN_PSEUDO + ')');
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_OBJ_ID + " ON " +
+                TABLE_NAME + '(' + COLUMN_OBJ_ID + ')');
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -147,6 +148,8 @@ public class CommentairesTable extends DataTable {
     }
 
     // JSON keys
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_OBJ_ID = COLUMN_OBJ_ID.substring(4);
 
     @Override
     public SyncResult synchronize(final ContentResolver resolver, String token, byte operation,

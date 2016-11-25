@@ -37,7 +37,7 @@ public class NotificationsTable extends DataTable {
     public static final char TYPE_PIC_COMMENT = 'P'; // User photo commented
     // Notification types
 
-    public static final short DEFAULT_LIMIT = 25; // Default remote DB query limit
+    private static final short DEFAULT_LIMIT = 25; // Default remote DB query limit
 
     public static class Pin extends DataField { //////////////////////////////// Notifications entry
 
@@ -127,7 +127,7 @@ public class NotificationsTable extends DataTable {
 
         // Add indexes
         db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " +
-                TABLE_NAME + "(" + COLUMN_PSEUDO + ")");
+                TABLE_NAME + '(' + COLUMN_PSEUDO + ')');
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

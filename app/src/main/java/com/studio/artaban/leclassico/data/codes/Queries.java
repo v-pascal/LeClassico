@@ -24,7 +24,7 @@ public class Queries {
     // Max entry count to display into a list view at start
 
     public static final short NOTIFICATIONS_LIST_LIMIT = 20;
-    public static final short PUBLICATIONS_LIST_LIMIT = 10;
+    public static final short PUBLICATIONS_LIST_LIMIT = 5;
 
 
     ////// Older ///////////////////////////////////////////////////////////////////////////////////

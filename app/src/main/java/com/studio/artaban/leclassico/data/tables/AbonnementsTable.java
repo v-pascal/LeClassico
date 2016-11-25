@@ -100,6 +100,10 @@ public class AbonnementsTable extends DataTable {
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_CAMARADE + " ON " +
+                TABLE_NAME + '(' + COLUMN_CAMARADE + ')');
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -220,7 +224,7 @@ public class AbonnementsTable extends DataTable {
 
                                     ++syncResult.deleted;
 
-                                } else if (cursor.getString(COLUMN_INDEX_STATUS_DATE)
+                                } else if (cursor.getString(0)
                                             .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
 
                                     ////// Update entry

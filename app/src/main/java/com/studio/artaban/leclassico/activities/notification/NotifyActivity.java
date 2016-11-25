@@ -119,7 +119,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             case NotificationsTable.TYPE_WALL: { ////// Wall publication
 
                 message = new SpannableStringBuilder(getString(R.string.notify_wall_message, pseudo,
-                        getResources().getStringArray(R.array.notify_wall_types)[wallType]));
+                        getResources().getStringArray(R.array.publication_types)[wallType]));
                 int pseudoPos = getResources().getInteger(R.integer.notify_wall_message_pseudo_pos);
                 message.setSpan(new ForegroundColorSpan(getResources().getColor(color)),
                         pseudoPos, pseudoPos + pseudo.length(), 0);
@@ -393,7 +393,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             char type = mDataSource.getString(position, COLUMN_INDEX_OBJECT_TYPE).charAt(0);
 
             SpannableStringBuilder message = getNotifyMessage(type,
-                    Tools.getNotifyWallType(mDataSource, position, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER),
+                    Tools.getPubType(mDataSource, position, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER),
                     mDataSource.getString(position, COLUMN_INDEX_PSEUDO), pseudoColor);
             SpannableStringBuilder info = null;
             switch (type) {

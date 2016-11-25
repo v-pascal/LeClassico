@@ -1,0 +1,13 @@
+<resources><!-- Publication -->
+
+    <string name="publication_info">%1$s has published %2$s</string>
+    <string name="publication_date">%1$s at %2$s</string>
+
+    <!-- Types -->
+    <string-array name="publication_types">
+        <item>a text</item>
+        <item>a link</item>
+        <item>an image</item>
+    </string-array>
+
+</resources>

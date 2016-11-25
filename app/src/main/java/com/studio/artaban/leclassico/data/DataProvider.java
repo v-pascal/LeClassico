@@ -203,7 +203,7 @@ public class DataProvider extends ContentProvider {
         String table = Tables.getName((byte) URI_MATCHER_SINGLE.match(uri));
         if (table != null)
             selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getLastPathSegment() +
-                    ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
+                    ((!TextUtils.isEmpty(selection))? " AND (" + selection + ')':"");
         else {
 
             table = Tables.getName((byte) URI_MATCHER.match(uri));
@@ -243,7 +243,7 @@ public class DataProvider extends ContentProvider {
         String table = Tables.getName((byte) URI_MATCHER_SINGLE.match(uri));
         if (table != null)
             selection = IDataTable.DataField.COLUMN_ID + '=' + uri.getLastPathSegment() +
-                    ((!TextUtils.isEmpty(selection))? " AND (" + selection + ")":"");
+                    ((!TextUtils.isEmpty(selection))? " AND (" + selection + ')':"");
         else {
 
             table = Tables.getName((byte) URI_MATCHER.match(uri));

@@ -107,7 +107,7 @@ public class Glider {
 
                         } catch (IOException e) {
                             Logs.add(Logs.Type.E, "Failed to save image '" + mImageFile +
-                                    "' (" + e.getMessage() + ")");
+                                    "' (" + e.getMessage() + ')');
                         }
                     }
 

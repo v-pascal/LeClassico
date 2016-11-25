@@ -23,11 +23,6 @@
     <string name="notify_shared_message">%1$s has added a photo</string><!-- @integer/notify_shared_message_pseudo_pos -->
     <string name="notify_shared_info">To your %1$s album</string><!-- @integer/notify_shared_info_album_pos -->
     <string name="notify_wall_message">%1$s has published %2$s on your wall</string><!-- @integer/notify_wall_message_pseudo_pos -->
-    <string-array name="notify_wall_types">
-        <item>a text</item>
-        <item>a link</item>
-        <item>an image</item>
-    </string-array>
     <string name="notify_no_info">[NO MESSAGE]</string>
     <string name="notify_mail_message">%1$s has sent you a private message</string><!-- @integer/notify_mail_pseudo_pos -->
     <string name="notify_comment_message">%1$s has added a comment to %2$s</string><!-- @integer/notify_comment_pseudo_pos -->

@@ -109,8 +109,9 @@ public abstract class DataTable implements IDataTable {
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
         Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
-                new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ")" },
-                data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " +
+                new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ')' },
+                ((data.containsKey(DATA_KEY_FIELD_PSEUDO))? // Check pseudo criteria need
+                        data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND ":"") +
                         Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue(), // Unchanged
                 null, null);
 
@@ -126,8 +127,9 @@ public abstract class DataTable implements IDataTable {
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
         Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
-                new String[]{ "min(" + data.getString(DATA_KEY_FIELD_DATE) + ")" },
-                data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " +
+                new String[]{ "min(" + data.getString(DATA_KEY_FIELD_DATE) + ')' },
+                ((data.containsKey(DATA_KEY_FIELD_PSEUDO))? // Check pseudo criteria need
+                        data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND ":"") +
                         Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue(), // Unchanged
                 null, null);
 

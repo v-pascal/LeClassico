@@ -257,7 +257,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 }
             };
             if (mDataLogin.token.get() != null) {
-                Logs.add(Logs.Type.I, "Update token (" + mDataLogin.token.get() + ")");
+                Logs.add(Logs.Type.I, "Update token (" + mDataLogin.token.get() + ')');
 
                 ////// Update token
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
@@ -277,7 +277,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
                         // Check update result
                         if (mDataLogin.token.get() != null) {
-                            Logs.add(Logs.Type.I, "Token updated (" + mDataLogin.token.get() + ")");
+                            Logs.add(Logs.Type.I, "Token updated (" + mDataLogin.token.get() + ')');
 
                             mDataLogin.pseudo = replyRes.pseudo;
                             mDataLogin.timeLag = replyRes.timeLag;

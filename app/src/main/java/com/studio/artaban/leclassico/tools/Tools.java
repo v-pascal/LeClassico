@@ -195,23 +195,39 @@ public final class Tools { /////////////////////////////////////////////////////
         }
     }
 
-    //////
-    private static final short NOTIFY_WALL_TYPE_TEXT = 0;
-    private static final short NOTIFY_WALL_TYPE_LINK = 1;
-    private static final short NOTIFY_WALL_TYPE_IMAGE = 2;
+    /////////////////////////////////////////////////////////////////////////////////// Publications
 
-    public static short getNotifyWallType(RecyclerAdapter.DataView data, int rank, int linkIndex, int imageIndex) {
+    public static @DrawableRes int getPubIcon(short type) {
+    // Return the drawable ID of the publication icon type passed as parameter
+
+        Logs.add(Logs.Type.V, "type: " + type);
+        switch (type) {
+            case PUBLICATION_WALL_TYPE_TEXT: return R.drawable.ic_message_white_18dp;
+            case PUBLICATION_WALL_TYPE_LINK: return R.drawable.ic_web_white_18dp;
+            case PUBLICATION_WALL_TYPE_IMAGE: return R.drawable.ic_photo_white_18dp;
+
+            default:
+                throw new IllegalArgumentException("Unexpected publication type: " + type);
+        }
+    }
+
+    //////
+    private static final short PUBLICATION_WALL_TYPE_TEXT = 0;
+    private static final short PUBLICATION_WALL_TYPE_LINK = 1;
+    private static final short PUBLICATION_WALL_TYPE_IMAGE = 2;
+
+    public static short getPubType(RecyclerAdapter.DataView data, int rank, int linkIndex, int imageIndex) {
     // Return the wall type resource string ID according notification link & image fields
 
         Logs.add(Logs.Type.V, "data: " + data + ";rank: " + rank + ";linkIndex: " + linkIndex +
                 ";imageIndex: " + imageIndex);
         if (!data.isNull(rank, linkIndex))
-            return NOTIFY_WALL_TYPE_LINK;
+            return PUBLICATION_WALL_TYPE_LINK;
 
         if (!data.isNull(rank, imageIndex))
-            return NOTIFY_WALL_TYPE_IMAGE;
+            return PUBLICATION_WALL_TYPE_IMAGE;
 
-        return NOTIFY_WALL_TYPE_TEXT;
+        return PUBLICATION_WALL_TYPE_TEXT;
     }
 
     //////////////////////////////////////////////////////////////////////////////// Synchronization
