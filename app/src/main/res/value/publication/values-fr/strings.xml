@@ -3,6 +3,7 @@
 
     <string name="publication_info">%1$s à publié %2$s</string>
     <string name="publication_date">Le %1$s à %2$s</string>
+    <string name="publication_comments_count">%1$d commentaire(s)</string>
 
     <!-- Types -->
     <string-array name="publication_types">

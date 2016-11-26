@@ -103,11 +103,38 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <!-- URL (displayed during loading) -->
+                    <TextView
+                        android:id="@+id/text_url"
+                        android:padding="@dimen/pub_padding"
+
+
+                        android:text="http://leclassico.fr"
+
+
+                        android:textSize="@dimen/pub_link_text_size"
+                        android:autoLink="web"
+                        android:singleLine="true"
+                        android:ellipsize="marquee"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                    <ImageView
+                        android:id="@+id/image_loading"
+                        android:src="@drawable/spinner_white_48"
+                        android:tint="?android:attr/textColorLink"
+                        android:paddingStart="@dimen/pub_padding"
+                        android:layout_below="@id/text_url"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/><!-- Loading progress image -->
+
+                    <!-- Image or link image (or loading image) -->
                     <ImageView
                         android:id="@+id/image_published"
 
 
-                        android:src="@drawable/banner"
+
+                        android:src="@drawable/earth"
+
 
 
                         android:adjustViewBounds="true"
@@ -201,11 +228,6 @@
             <!-- Comments info -->
             <TextView
                 android:id="@+id/text_comments_count"
-
-
-                android:text="5 commentaires"
-
-
                 android:textSize="@dimen/pub_comment_text_size"
                 android:gravity="center_vertical"
                 android:layout_marginStart="@dimen/user_text_margin"

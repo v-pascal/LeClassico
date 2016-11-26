@@ -29,6 +29,11 @@ import java.util.List;
  */
 public class ActualitesTable extends DataTable {
 
+    public static final short TYPE_TEXT = 0;
+    public static final short TYPE_LINK = 1;
+    public static final short TYPE_IMAGE = 2;
+    // Publication types
+
     private static final short DEFAULT_LIMIT = 7; // Default remote DB query limit
 
     public static class Publication extends DataField { /////////////////////////// Actualites entry

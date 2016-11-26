@@ -38,6 +38,7 @@ import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
+import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.tools.Tools;
@@ -202,20 +203,63 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
             }
 
             // Set image or link (if any)
+            if (type != ActualitesTable.TYPE_TEXT) {
+                holder.rootView.findViewById(R.id.layout_published).setVisibility(View.VISIBLE);
+
+                holder.rootView.findViewById(R.id.text_url).setVisibility(View.GONE);
+                holder.rootView.findViewById(R.id.image_loading).setVisibility(View.GONE);
+                holder.rootView.findViewById(R.id.image_link).setVisibility(View.GONE);
+                holder.rootView.findViewById(R.id.text_link_title).setVisibility(View.GONE);
+                holder.rootView.findViewById(R.id.text_link_description).setVisibility(View.GONE);
+                holder.rootView.findViewById(R.id.text_link_info).setVisibility(View.GONE);
+
+                if (type == ActualitesTable.TYPE_IMAGE) // Image
+                    Glider.with(getContext()).placeholder(R.drawable.photos)
+
+
+
+                            .load("", mDataSource.getString(position, COLUMN_INDEX_FICHIER))
+
+
+
+                            .into((ImageView) holder.rootView.findViewById(R.id.image_published), null);
+
+                else { // Link
+
+                }
 
 
 
 
 
-            //image_published
-            //text_link_title
-            //text_link_description
-            //text_link_info
+
+
+
+                //image_published
+
+                //text_url
+                //image_loading
+
+                //image_link
+                //text_link_title
+                //text_link_description
+                //text_link_info
 
 
 
 
 
+
+
+
+
+            } else // Text
+                holder.rootView.findViewById(R.id.layout_published).setVisibility(View.GONE);
+
+            // Set comments count
+            ((TextView)holder.rootView.findViewById(R.id.text_comments_count))
+                    .setText(getString(R.string.publication_comments_count,
+                            mDataSource.getInt(position, COLUMN_INDEX_COMMENTS_COUNT)));
 
             // Set synchronization
             Tools.setSyncView(getActivity(), (TextView) holder.rootView.findViewById(R.id.text_sync_date),

@@ -24,6 +24,7 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -202,9 +203,9 @@ public final class Tools { /////////////////////////////////////////////////////
 
         Logs.add(Logs.Type.V, "type: " + type);
         switch (type) {
-            case PUBLICATION_WALL_TYPE_TEXT: return R.drawable.ic_message_white_18dp;
-            case PUBLICATION_WALL_TYPE_LINK: return R.drawable.ic_web_white_18dp;
-            case PUBLICATION_WALL_TYPE_IMAGE: return R.drawable.ic_photo_white_18dp;
+            case ActualitesTable.TYPE_TEXT: return R.drawable.ic_message_white_18dp;
+            case ActualitesTable.TYPE_LINK: return R.drawable.ic_web_white_18dp;
+            case ActualitesTable.TYPE_IMAGE: return R.drawable.ic_photo_white_18dp;
 
             default:
                 throw new IllegalArgumentException("Unexpected publication type: " + type);
@@ -212,22 +213,18 @@ public final class Tools { /////////////////////////////////////////////////////
     }
 
     //////
-    private static final short PUBLICATION_WALL_TYPE_TEXT = 0;
-    private static final short PUBLICATION_WALL_TYPE_LINK = 1;
-    private static final short PUBLICATION_WALL_TYPE_IMAGE = 2;
-
     public static short getPubType(RecyclerAdapter.DataView data, int rank, int linkIndex, int imageIndex) {
     // Return the wall type resource string ID according notification link & image fields
 
         Logs.add(Logs.Type.V, "data: " + data + ";rank: " + rank + ";linkIndex: " + linkIndex +
                 ";imageIndex: " + imageIndex);
         if (!data.isNull(rank, linkIndex))
-            return PUBLICATION_WALL_TYPE_LINK;
+            return ActualitesTable.TYPE_LINK;
 
         if (!data.isNull(rank, imageIndex))
-            return PUBLICATION_WALL_TYPE_IMAGE;
+            return ActualitesTable.TYPE_IMAGE;
 
-        return PUBLICATION_WALL_TYPE_TEXT;
+        return ActualitesTable.TYPE_TEXT;
     }
 
     //////////////////////////////////////////////////////////////////////////////// Synchronization
