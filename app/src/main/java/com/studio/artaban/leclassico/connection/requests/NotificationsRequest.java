@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
-import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;

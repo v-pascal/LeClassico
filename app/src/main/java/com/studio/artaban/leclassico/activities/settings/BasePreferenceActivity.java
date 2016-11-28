@@ -14,7 +14,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**

@@ -16,6 +16,7 @@ import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.services.DataService;
 
 import java.text.DateFormat;
 import java.util.Date;

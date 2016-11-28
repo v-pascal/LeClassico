@@ -25,6 +25,7 @@ import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.data.tables.VotesTable;
+import com.studio.artaban.leclassico.data.tables.persistent.LinksTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -65,6 +66,9 @@ public class DataProvider extends ContentProvider {
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME + SINGLE_ROW, Tables.ID_VOTES);
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_NOTIFICATIONS);
 
+        // Persistent tables
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, LinksTable.TABLE_NAME + SINGLE_ROW, Tables.ID_LINKS);
+
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, CamaradesTable.TABLE_NAME, Tables.ID_CAMARADES);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, AbonnementsTable.TABLE_NAME, Tables.ID_ABONNEMENTS);
@@ -78,6 +82,9 @@ public class DataProvider extends ContentProvider {
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME, Tables.ID_PRESENTS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME, Tables.ID_VOTES);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME, Tables.ID_NOTIFICATIONS);
+
+        // Persistent tables
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, LinksTable.TABLE_NAME, Tables.ID_LINKS);
     }
 
     //
@@ -145,6 +152,9 @@ public class DataProvider extends ContentProvider {
             case Tables.ID_PRESENTS: return MIME_TYPE_SINGLE + PresentsTable.TABLE_NAME;
             case Tables.ID_VOTES: return MIME_TYPE_SINGLE + VotesTable.TABLE_NAME;
             case Tables.ID_NOTIFICATIONS: return MIME_TYPE_SINGLE + NotificationsTable.TABLE_NAME;
+
+            // Persistent tables
+            case Tables.ID_LINKS: return MIME_TYPE_SINGLE + LinksTable.TABLE_NAME;
         }
         switch (URI_MATCHER.match(uri)) {
             case Tables.ID_CAMARADES: return MIME_TYPE + CamaradesTable.TABLE_NAME;
@@ -159,6 +169,10 @@ public class DataProvider extends ContentProvider {
             case Tables.ID_PRESENTS: return MIME_TYPE + PresentsTable.TABLE_NAME;
             case Tables.ID_VOTES: return MIME_TYPE + VotesTable.TABLE_NAME;
             case Tables.ID_NOTIFICATIONS: return MIME_TYPE + NotificationsTable.TABLE_NAME;
+
+            // Persistent tables
+            case Tables.ID_LINKS: return MIME_TYPE + LinksTable.TABLE_NAME;
+
             default: {
                 Logs.add(Logs.Type.W, "No type for URI: " + uri);
                 return null;

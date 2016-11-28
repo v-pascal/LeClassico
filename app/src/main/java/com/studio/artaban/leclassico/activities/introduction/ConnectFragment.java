@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.RevealFragment;
-import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
@@ -36,6 +36,7 @@ import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.SyncValue;
+import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -79,16 +80,9 @@ public class ConnectFragment extends RevealFragment {
         // Start synchronization pin image animation
 
         Logs.add(Logs.Type.V, "syncPin: " + syncPin);
-        RotateAnimation anim = new RotateAnimation(0f, 350f,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f);
-        anim.setInterpolator(new LinearInterpolator());
-        anim.setRepeatCount(Animation.INFINITE);
-        anim.setDuration(700);
-
         syncPin.setImageDrawable(getResources().getDrawable(R.drawable.spinner_blue_36dp));
         syncPin.setVisibility(View.VISIBLE);
-        syncPin.startAnimation(anim);
+        syncPin.startAnimation(Tools.getProgressAnimation());
     }
     private void reset(boolean indeterminate, boolean animSync) { // Reset progress UI components
 

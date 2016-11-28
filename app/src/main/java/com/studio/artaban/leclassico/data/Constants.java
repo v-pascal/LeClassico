@@ -17,6 +17,7 @@ public final class Constants {
 
     public static final String APP_WEBSERVICES = APP_WEBSITE + "WebServices"; // LeClassico web services URL
     public static final String APP_URL_PROFILES = APP_WEBSITE + "Profiles"; // LeClassico profile URL
+    public static final String APP_URL_PHOTOS = APP_WEBSITE + "Photos"; // LeClassico photos URL
 
     // Preference keys
     public static final String APP_PREFERENCE = APP_NAME + "Preferences"; // Application preference

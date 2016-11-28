@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
@@ -25,7 +26,11 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
-import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.data.DataObserver;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.tables.persistent.LinksTable;
+import com.studio.artaban.leclassico.helpers.Internet;
+import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
@@ -41,18 +46,26 @@ import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
+import com.studio.artaban.leclassico.helpers.Storage;
+import com.studio.artaban.leclassico.services.LinkService;
 import com.studio.artaban.leclassico.tools.Tools;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by pascal on 05/09/16.
  * Publications fragment class (MainActivity)
  */
-public class PublicationsFragment extends MainFragment implements QueryLoader.OnResultListener {
+public class PublicationsFragment extends MainFragment implements
+        QueryLoader.OnResultListener, Internet.OnConnectivityListener, DataObserver.OnContentListener {
+
+    private static final String DATA_KEY_LINK_REQUESTS = "linkRequests";
+    // Data keys
 
     private RecyclerView mPubList; // Recycler view containing publication list
     private PubRecyclerViewAdapter mPubAdapter; // Recycler view adapter (with cursor management)
@@ -106,6 +119,16 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
         private AnimatorSet mRequestAnim1;
         private AnimatorSet mRequestAnim2;
         private AnimatorSet mRequestAnim3;
+
+        private void displayURL(RecyclerAdapter.ViewHolder holder, int position) {
+        // Display URL text view on the link image
+
+            Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
+            TextView url = (TextView) holder.rootView.findViewById(R.id.text_url);
+
+            url.setText(mDataSource.getString(position, COLUMN_INDEX_LINK));
+            url.setVisibility(View.VISIBLE);
+        }
 
         ////// RecyclerAdapter /////////////////////////////////////////////////////////////////////
         @Override
@@ -213,47 +236,79 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
                 holder.rootView.findViewById(R.id.text_link_description).setVisibility(View.GONE);
                 holder.rootView.findViewById(R.id.text_link_info).setVisibility(View.GONE);
 
-                if (type == ActualitesTable.TYPE_IMAGE) // Image
+                if (type == ActualitesTable.TYPE_IMAGE) { ////// Image
+
+                    String photo = mDataSource.getString(position, COLUMN_INDEX_FICHIER);
                     Glider.with(getContext()).placeholder(R.drawable.photos)
-
-
-
-                            .load("", mDataSource.getString(position, COLUMN_INDEX_FICHIER))
-
-
-
+                            .load(Storage.FOLDER_PHOTOS + File.separator + photo,
+                                    Constants.APP_URL_PHOTOS + '/' + photo)
+                            .placeholder(R.drawable.photos)
                             .into((ImageView) holder.rootView.findViewById(R.id.image_published), null);
 
-                else { // Link
+                } else { ////// Link
+                    ((ImageView) holder.rootView.findViewById(R.id.image_published))
+                            .setImageDrawable(getResources().getDrawable(R.drawable.earth));
 
+                    if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_ID)) {
+                        // Link data already downloaded
+
+                        if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_IMAGE)) {
+                            String bmp = Storage.get() + Storage.FOLDER_LINKS + File.separator +
+                                    mDataSource.getInt(position, COLUMN_INDEX_LINK_ID) + File.separator +
+                                    mDataSource.getString(position, COLUMN_INDEX_LINK_IMAGE);
+
+                            ((ImageView) holder.rootView.findViewById(R.id.image_published))
+                                    .setImageBitmap(BitmapFactory.decodeFile(bmp));
+                            holder.rootView.findViewById(R.id.image_loading).setVisibility(View.VISIBLE);
+
+                        } else
+                            displayURL(holder, position);
+                        if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_TITLE)) {
+                            TextView title = (TextView) holder.rootView.findViewById(R.id.text_link_title);
+
+                            title.setText(mDataSource.getString(position, COLUMN_INDEX_LINK_TITLE));
+                            title.setVisibility(View.VISIBLE);
+                        }
+                        if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_DESC)) {
+                            TextView desc = (TextView) holder.rootView.findViewById(R.id.text_link_description);
+
+                            desc.setText(mDataSource.getString(position, COLUMN_INDEX_LINK_DESC));
+                            desc.setVisibility(View.VISIBLE);
+                        }
+                        if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_INFO)) {
+                            TextView owner = (TextView) holder.rootView.findViewById(R.id.text_link_info);
+
+                            owner.setText(mDataSource.getString(position, COLUMN_INDEX_LINK_INFO));
+                            owner.setVisibility(View.VISIBLE);
+                        }
+
+                    } else { // Download or wait link data downloaded
+                        displayURL(holder, position);
+
+                        boolean downloading = // Downloading link data (wait)
+                                mLinkRequests.contains(mDataSource.getInt(position, COLUMN_INDEX_LINK_ID));
+                        if ((downloading) || (Internet.isConnected())) {
+                            // Waiting (progress animation)
+
+                            ImageView loading = (ImageView) holder.rootView.findViewById(R.id.image_loading);
+                            loading.setVisibility(View.VISIBLE);
+                            loading.startAnimation(Tools.getProgressAnimation());
+                        }
+                        if ((!downloading) && (Internet.isConnected())) {
+                            // Download data link (send request to link service)
+
+                            Intent linkIntent = new Intent(getContext(), LinkService.class);
+                            linkIntent.setData(Uri.parse(mDataSource.getString(position, COLUMN_INDEX_LINK)));
+                            getContext().startService(linkIntent); // Start link data download service
+
+                            mLinkRequests.add(mDataSource.getInt(position, COLUMN_INDEX_PUB_ID));
+                        }
+                        //else if ((!downloading) && (!Internet.isConnected()))
+                        // Nothing to do (let's connectivity listener do the job)
+                    }
                 }
 
-
-
-
-
-
-
-
-                //image_published
-
-                //text_url
-                //image_loading
-
-                //image_link
-                //text_link_title
-                //text_link_description
-                //text_link_info
-
-
-
-
-
-
-
-
-
-            } else // Text
+            } else ////// Text
                 holder.rootView.findViewById(R.id.layout_published).setVisibility(View.GONE);
 
             // Set comments count
@@ -307,6 +362,45 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
         }
     }
 
+    ////// OnConnectivityListener //////////////////////////////////////////////////////////////////
+    @Override
+    public void onConnection() {
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+        //mPubCursor
+        //mLinkRequests
+
+
+
+
+    }
+
+    @Override
+    public void onDisconnection() {
+
+    }
+
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+
+
+
+
+
+
+
+    }
+
+    //////
+    private final DataObserver mLinkObserver = new DataObserver(PublicationsFragment.class.getName(), this);
+    private ArrayList<Integer> mLinkRequests; // To keep download data link requests
+
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, final Cursor cursor) {
@@ -344,11 +438,16 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
     private static final int COLUMN_INDEX_STATUS_DATE = 6;
     private static final int COLUMN_INDEX_SYNC = 7;
     private static final int COLUMN_INDEX_PUB_ID = 8;
-    private static final int COLUMN_INDEX_PSEUDO = 9;
-    private static final int COLUMN_INDEX_SEX = 10;
-    private static final int COLUMN_INDEX_PROFILE = 11;
-    private static final int COLUMN_INDEX_MEMBER_ID = 12;
-    private static final int COLUMN_INDEX_COMMENTS_COUNT = 13;
+    private static final int COLUMN_INDEX_LINK_ID = 9;
+    private static final int COLUMN_INDEX_LINK_IMAGE = 10;
+    private static final int COLUMN_INDEX_LINK_TITLE = 11;
+    private static final int COLUMN_INDEX_LINK_DESC = 12;
+    private static final int COLUMN_INDEX_LINK_INFO = 13;
+    private static final int COLUMN_INDEX_PSEUDO = 14;
+    private static final int COLUMN_INDEX_SEX = 15;
+    private static final int COLUMN_INDEX_PROFILE = 16;
+    private static final int COLUMN_INDEX_MEMBER_ID = 17;
+    private static final int COLUMN_INDEX_COMMENTS_COUNT = 18;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -449,6 +548,12 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
         View rootView = inflater.inflate(R.layout.fragment_publications, container, false);
         rootView.setTag(Constants.MAIN_SECTION_PUBLICATIONS);
 
+        // Restore data
+        if (savedInstanceState != null)
+            mLinkRequests = savedInstanceState.getIntegerArrayList(DATA_KEY_LINK_REQUESTS);
+        else
+            mLinkRequests = new ArrayList<>();
+
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_publication));
         mListener.onGetShortcut(Constants.MAIN_SECTION_PUBLICATIONS, false).setMessage(data);
@@ -543,6 +648,11 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
                         ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
                         ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
                         ActualitesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PUB_ID
+                        LinksTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_LINK_ID
+                        LinksTable.COLUMN_IMAGE + ',' + // COLUMN_INDEX_LINK_IMAGE
+                        LinksTable.COLUMN_TITLE + ',' + // COLUMN_INDEX_LINK_TITLE
+                        LinksTable.COLUMN_DESCRIPTION + ',' + // COLUMN_INDEX_LINK_DESC
+                        LinksTable.COLUMN_INFO + ',' + // COLUMN_INDEX_LINK_INFO
                         CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
                         CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
                         CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
@@ -557,6 +667,8 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
                         " FROM " + ActualitesTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
                         CamaradesTable.COLUMN_PSEUDO + '=' + ActualitesTable.COLUMN_PSEUDO +
+                        " LEFT JOIN " + LinksTable.TABLE_NAME + " ON " +
+                        LinksTable.COLUMN_URL + '=' + ActualitesTable.COLUMN_LINK +
                         " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
                         CommentairesTable.COLUMN_OBJ_ID + '=' + ActualitesTable.COLUMN_ACTU_ID + " AND " +
                         CommentairesTable.COLUMN_OBJ_TYPE + "='" + NotificationsTable.TYPE_PUB_COMMENT + '\'' +
@@ -587,7 +699,21 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
         // Register data service & old request receiver
         getContext().sendBroadcast(DataService.getIntent(true, Tables.ID_ACTUALITES, mPubUri));
         getContext().registerReceiver(mOldReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
+
+        // Register link observer (using service to download link data)
+        mLinkObserver.register(getContext().getContentResolver(),
+                Uri.parse(DataProvider.CONTENT_URI + LinksTable.TABLE_NAME));
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putIntegerArrayList(DATA_KEY_LINK_REQUESTS, mLinkRequests);
+
+        Logs.add(Logs.Type.V, "outState: " + outState);
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -596,5 +722,8 @@ public class PublicationsFragment extends MainFragment implements QueryLoader.On
         // Unregister data service & old request receiver
         getContext().sendBroadcast(DataService.getIntent(false, Tables.ID_ACTUALITES, mPubUri));
         getContext().unregisterReceiver(mOldReceiver);
+
+        // Unregister link observer
+        mLinkObserver.unregister(getContext().getContentResolver());
     }
 }

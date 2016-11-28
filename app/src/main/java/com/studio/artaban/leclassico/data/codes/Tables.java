@@ -12,6 +12,7 @@ import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.data.tables.VotesTable;
+import com.studio.artaban.leclassico.data.tables.persistent.LinksTable;
 
 /**
  * Created by pascal on 11/08/16.
@@ -34,6 +35,9 @@ public final class Tables {
 
     public static final byte ID_LAST = ID_NOTIFICATIONS;
 
+    // Persistent tables
+    public static final byte ID_LINKS = 13;
+
     //////
     public static final int ID_MAX = 127; // Max positive byte value
 
@@ -53,6 +57,9 @@ public final class Tables {
             case Tables.ID_PRESENTS: return PresentsTable.TABLE_NAME;
             case Tables.ID_VOTES: return VotesTable.TABLE_NAME;
             case Tables.ID_NOTIFICATIONS: return NotificationsTable.TABLE_NAME;
+
+            // Persistent tables
+            case Tables.ID_LINKS: return LinksTable.TABLE_NAME;
         }
         return null;
     }

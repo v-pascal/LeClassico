@@ -19,6 +19,7 @@ import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.data.tables.VotesTable;
+import com.studio.artaban.leclassico.data.tables.persistent.LinksTable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +55,9 @@ public class Database extends SQLiteOpenHelper {
         mTableMap.put(PresentsTable.TABLE_NAME, PresentsTable.newInstance());
         mTableMap.put(VotesTable.TABLE_NAME, VotesTable.newInstance());
         mTableMap.put(NotificationsTable.TABLE_NAME, NotificationsTable.newInstance());
+
+        // Persistent tables
+        mTableMap.put(LinksTable.TABLE_NAME, LinksTable.newInstance());
     }
 
     //////

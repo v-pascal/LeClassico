@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 
-import com.studio.artaban.leclassico.connection.DataService;
+import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**

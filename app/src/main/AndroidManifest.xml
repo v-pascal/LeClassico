@@ -96,9 +96,13 @@
 
         <!-- Services -->
         <service
-            android:name=".connection.DataService"
+            android:name=".services.DataService"
             android:exported="false"
             android:permission="com.studio.artaban.permission.LECLASSICO_SERVICE">
+        </service><!-- TODO: Allow to export LeClassico data -->
+        <service
+            android:name=".services.LinkService"
+            android:exported="false">
         </service>
 
         <!-- Receivers -->

@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico.connection;
+package com.studio.artaban.leclassico.services;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.services.DataService;
 
 /**
  * Created by pascal on 05/08/16.

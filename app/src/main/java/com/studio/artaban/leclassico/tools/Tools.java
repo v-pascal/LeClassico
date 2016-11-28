@@ -177,6 +177,21 @@ public final class Tools { /////////////////////////////////////////////////////
         }).start();
     }
 
+    //////
+    public static RotateAnimation getProgressAnimation() {
+    // Return rotate animation used to animate a progression status
+
+        Logs.add(Logs.Type.V, null);
+        RotateAnimation anim = new RotateAnimation(0f, 350f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+
+        anim.setInterpolator(new LinearInterpolator());
+        anim.setRepeatCount(Animation.INFINITE);
+        anim.setDuration(700);
+        return anim;
+    }
+
     ////////////////////////////////////////////////////////////////////////////////// Notifications
 
     public static @DrawableRes int getNotifyIcon(char type) {
@@ -243,14 +258,7 @@ public final class Tools { /////////////////////////////////////////////////////
             text.setText(context.getString(R.string.synchronizing));
             icon.setColorFilter(Color.TRANSPARENT);
             icon.setImageDrawable(context.getDrawable(R.drawable.spinner_black_16));
-
-            RotateAnimation anim = new RotateAnimation(0f, 350f,
-                    Animation.RELATIVE_TO_SELF, 0.5f,
-                    Animation.RELATIVE_TO_SELF, 0.5f);
-            anim.setInterpolator(new LinearInterpolator());
-            anim.setRepeatCount(Animation.INFINITE);
-            anim.setDuration(700);
-            icon.startAnimation(anim);
+            icon.startAnimation(getProgressAnimation());
 
         } else if (status == DataTable.Synchronized.DONE.getValue()) { // Synchronized
 

@@ -130,13 +130,6 @@
                     <!-- Image or link image (or loading image) -->
                     <ImageView
                         android:id="@+id/image_published"
-
-
-
-                        android:src="@drawable/earth"
-
-
-
                         android:adjustViewBounds="true"
                         android:minHeight="36dp"
                         android:minWidth="36dp"

@@ -1,4 +1,4 @@
-package com.studio.artaban.leclassico.connection;
+package com.studio.artaban.leclassico.services;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -14,9 +14,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.connection.DataRequest;
+import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.connection.requests.AbonnementsRequest;
 import com.studio.artaban.leclassico.connection.requests.ActualitesRequest;
 import com.studio.artaban.leclassico.connection.requests.AlbumsRequest;
