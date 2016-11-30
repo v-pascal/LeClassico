@@ -25,7 +25,17 @@ public class LinksTable extends DataTable {
 
     public static class Link extends DataField { /////////////////////////////////////// Links entry
 
-        public Link(short count, long id) { super(count, id); }
+        private static final short FIELD_COUNT = 7;
+
+        public String url;
+        public String date;
+        public byte status;
+        public String image;
+        public String title;
+        public String description;
+        public String info;
+
+        public Link(long id) { super(FIELD_COUNT, id); }
         public Link(Parcel parcel) {
 
             super(parcel);

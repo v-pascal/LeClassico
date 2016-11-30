@@ -62,7 +62,7 @@
 
                 <TextView
                     android:id="@+id/text_label_provider"
-                    android:text="@string/by"
+                    android:text="@string/by_dots"
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/best_album_text_size"
                     android:textStyle="bold"

@@ -282,6 +282,11 @@ public class PublicationsFragment extends MainFragment implements
                             owner.setVisibility(View.VISIBLE);
                         }
 
+                        // Remove link request from list if exists (download finished)
+                        int request = mLinkRequests.indexOf(mDataSource.getInt(position, COLUMN_INDEX_PUB_ID));
+                        if (request != Constants.NO_DATA)
+                            mLinkRequests.remove(request);
+
                     } else { // Download or wait link data downloaded
                         displayURL(holder, position);
 

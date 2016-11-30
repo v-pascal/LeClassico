@@ -1,7 +1,7 @@
 <resources><!-- Album -->
 
     <string name="album">Album:</string>
-    <string name="by">By:</string>
+    <string name="by_dots">By:</string>
     <string name="range">Range:</string>
     <string name="comments">Comments:</string>
 
