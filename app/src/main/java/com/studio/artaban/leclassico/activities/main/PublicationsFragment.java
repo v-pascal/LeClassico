@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -253,16 +254,22 @@ public class PublicationsFragment extends MainFragment implements
                         // Link data already downloaded
 
                         if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_IMAGE)) {
-                            String bmp = Storage.get() + Storage.FOLDER_LINKS + File.separator +
-                                    mDataSource.getInt(position, COLUMN_INDEX_LINK_ID) + File.separator +
-                                    mDataSource.getString(position, COLUMN_INDEX_LINK_IMAGE);
+                            Bitmap bmp = BitmapFactory.decodeFile(Storage.get() + Storage.FOLDER_LINKS +
+                                    File.separator + mDataSource.getInt(position, COLUMN_INDEX_LINK_ID) +
+                                    File.separator + mDataSource.getString(position, COLUMN_INDEX_LINK_IMAGE));
 
-                            ((ImageView) holder.rootView.findViewById(R.id.image_published))
-                                    .setImageBitmap(BitmapFactory.decodeFile(bmp));
-                            holder.rootView.findViewById(R.id.image_loading).setVisibility(View.VISIBLE);
+                            if (bmp != null) {
+                                ((ImageView) holder.rootView.findViewById(R.id.image_published)).setImageBitmap(bmp);
+                                holder.rootView.findViewById(R.id.image_link).setVisibility(View.VISIBLE);
+
+                            } else {
+                                Logs.add(Logs.Type.W, "Failed to decode link image");
+                                displayURL(holder, position);
+                            }
 
                         } else
                             displayURL(holder, position);
+
                         if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_TITLE)) {
                             TextView title = (TextView) holder.rootView.findViewById(R.id.text_link_title);
 
@@ -290,26 +297,14 @@ public class PublicationsFragment extends MainFragment implements
                     } else { // Download or wait link data downloaded
                         displayURL(holder, position);
 
-                        boolean downloading = // Downloading link data (wait)
-                                mLinkRequests.contains(mDataSource.getInt(position, COLUMN_INDEX_LINK_ID));
-                        if ((downloading) || (Internet.isConnected())) {
-                            // Waiting (progress animation)
+                        if (mLinkRequests.contains(mDataSource.getInt(position, COLUMN_INDEX_PUB_ID))) {
+                            // Wait downloading link data (progress animation)
 
                             ImageView loading = (ImageView) holder.rootView.findViewById(R.id.image_loading);
                             loading.setVisibility(View.VISIBLE);
                             loading.startAnimation(Tools.getProgressAnimation());
                         }
-                        if ((!downloading) && (Internet.isConnected())) {
-                            // Download data link (send request to link service)
-
-                            Intent linkIntent = new Intent(getContext(), LinkService.class);
-                            linkIntent.setData(Uri.parse(mDataSource.getString(position, COLUMN_INDEX_LINK)));
-                            getContext().startService(linkIntent); // Start link data download service
-
-                            mLinkRequests.add(mDataSource.getInt(position, COLUMN_INDEX_PUB_ID));
-                        }
-                        //else if ((!downloading) && (!Internet.isConnected()))
-                        // Nothing to do (let's connectivity listener do the job)
+                        //else // Nothing to do (let's connectivity listener do the job)
                     }
                 }
 
@@ -500,6 +495,24 @@ public class PublicationsFragment extends MainFragment implements
 
         mQueryCount = count;
         mPubLast = lastPub;
+
+        // Send link data requests (if needed)
+        if (Internet.isConnected()) {
+            do {
+                if ((mPubCursor.isNull(COLUMN_INDEX_LINK_ID)) &&
+                        (!mLinkRequests.contains(mPubCursor.getInt(COLUMN_INDEX_PUB_ID)))) {
+                    // Download data link (send request to link service)
+
+                    Intent linkIntent = new Intent(getContext(), LinkService.class);
+                    linkIntent.setData(Uri.parse(mPubCursor.getString(COLUMN_INDEX_LINK)));
+                    getContext().startService(linkIntent); // Start link data download service
+
+                    mLinkRequests.add(mPubCursor.getInt(COLUMN_INDEX_PUB_ID));
+                }
+
+            } while (mPubCursor.moveToNext());
+            mPubCursor.moveToFirst();
+        }
 
         //////
         if (mPubAdapter != null) { // Check if not the initial query

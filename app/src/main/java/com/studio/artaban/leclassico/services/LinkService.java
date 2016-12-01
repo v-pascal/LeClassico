@@ -8,14 +8,15 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.tables.persistent.LinksTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.helpers.Storage;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Created by pascal on 28/11/16.
- * Publication link service (needed to download link image, title, description & info data
- * from URL link)
+ * Publication link service (needed to download image, title, description & info data from URL link)
  */
 public class LinkService extends IntentService {
 
@@ -70,7 +71,6 @@ public class LinkService extends IntentService {
                 if (matcher.find())
                     link.image = (matcher.group(1) != null)? matcher.group(1):matcher.group(2);
                 else {
-
                     property = ' ' + ATTRIBUTE_PROPERTY + "=\"" + VALUE_TWITTER_IMAGE +"\"";
                     matcher = Pattern.compile(MARKER_META_A + '(' + content + "[^>]" + property + '|' +
                             property + "[^>]" + content + ')' + MARKER_B).matcher(response);
@@ -86,7 +86,6 @@ public class LinkService extends IntentService {
                 if (matcher.find())
                     link.title = (matcher.group(1) != null)? matcher.group(1):matcher.group(2);
                 else {
-
                     matcher = Pattern.compile(MARKER_TITLE_A + "(.*?)" + MARKER_TITLE_B).matcher(response);
                     if (matcher.find())
                         link.title = matcher.group(1);
@@ -100,7 +99,6 @@ public class LinkService extends IntentService {
                 if (matcher.find())
                     link.description = (matcher.group(1) != null)? matcher.group(1):matcher.group(2);
                 else {
-
                     property = ' ' + ATTRIBUTE_NAME + "=\"" + VALUE_DESCRIPTION +"\"";
                     matcher = Pattern.compile(MARKER_META_A + '(' + content + "[^>]" + property + '|' +
                             property + "[^>]" + content + ')' + MARKER_B).matcher(response);
@@ -116,7 +114,6 @@ public class LinkService extends IntentService {
                 if (matcher.find())
                     link.info = (matcher.group(1) != null)? matcher.group(1):matcher.group(2);
                 else {
-
                     property = ' ' + ATTRIBUTE_NAME + "=\"" + VALUE_AUTHOR +"\"";
                     matcher = Pattern.compile(MARKER_META_A + '(' + content + "[^>]" + property + '|' +
                             property + "[^>]" + content + ')' + MARKER_B).matcher(response);
@@ -126,13 +123,65 @@ public class LinkService extends IntentService {
                 return true;
             }
         });
-        if (result != Internet.DownloadResult.SUCCEEDED)
+        if (result != Internet.DownloadResult.SUCCEEDED) {
+            Logs.add(Logs.Type.W, "Failed to download link date (" + link.url + ')');
             link.status = LinksTable.STATUS_FAILED;
+        }
 
-        // Download image (if any)
-        if (link.url != null) {
+        // Set link info (URL + by + source)
+        if ((link.title != null) || (link.description != null)) {
+            Matcher matcher = Pattern.compile("http[s]://(.*?)/").matcher(link.url);
+            link.info = matcher.group(1).toUpperCase() + ((link.info != null)?
+                    ' ' + getResources().getString(R.string.by) + ' ' + link.info:"");
+
+        } else
+            link.info = null;
+
+        ////// Insert link entry (if not already exists)
 
 
+
+
+
+
+        long linkId = 0;
+        //getContentResolver().insert()
+
+
+
+
+
+
+        // Download link image (if any)
+        if (link.image != null) {
+
+            // Create link folder (e.i .../Links/link ID/image file name)
+            String imageFile = Storage.get() + Storage.FOLDER_LINKS + File.separator + linkId;
+            Storage.createFolder(imageFile);
+
+            String imageName = null;
+            int imagePos = link.image.lastIndexOf('/');
+            if (imagePos != Constants.NO_DATA)
+                imageName = link.image.substring(imagePos);
+            if ((imageName == null) || (imageName.isEmpty())) {
+
+                Logs.add(Logs.Type.E, "Wrong image URL");
+                link.status = LinksTable.STATUS_IMAGE_FAILED;
+                link.image = null;
+                return;
+            }
+            imageFile += File.separator + imageName;
+
+            // Download image
+            result = Internet.downloadHttpFile(link.image, imageFile, null);
+            if (result != Internet.DownloadResult.SUCCEEDED) {
+
+                Logs.add(Logs.Type.W, "Failed to download link image (" + link.image + ')');
+                link.status = LinksTable.STATUS_IMAGE_FAILED;
+                link.image = null;
+            }
+
+            ////// Update link entry
 
 
 
@@ -142,25 +191,5 @@ public class LinkService extends IntentService {
 
 
         }
-
-        // Set link info (URL + by + source)
-        if ((link.title != null) || (link.description != null)) {
-
-            Matcher matcher = Pattern.compile("^http[s]://(.*?)/").matcher(link.url);
-            link.info = matcher.group(1).toUpperCase() + ((link.info != null)?
-                    ' ' + getResources().getString(R.string.by) + ' ' + link.info:"");
-
-        } else
-            link.info = null;
-
-        // Insert|update link entry
-
-
-
-
-
-
-
-
     }
 }
