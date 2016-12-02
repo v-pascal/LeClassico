@@ -21,14 +21,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.publication.PublicationActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
-import com.studio.artaban.leclassico.data.DataObserver;
-import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.tables.persistent.LinksTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.services.DataService;
@@ -63,7 +64,7 @@ import java.util.Date;
  * Publications fragment class (MainActivity)
  */
 public class PublicationsFragment extends MainFragment implements
-        QueryLoader.OnResultListener, Internet.OnConnectivityListener, DataObserver.OnContentListener {
+        QueryLoader.OnResultListener, Internet.OnConnectivityListener {
 
     private static final String DATA_KEY_LINK_REQUESTS = "linkRequests";
     // Data keys
@@ -85,12 +86,43 @@ public class PublicationsFragment extends MainFragment implements
             switch (sender.getId()) {
 
                 case R.id.image_pseudo: {
+                    int pseudoId = (int)sender.getTag(R.id.tag_pseudo_id);
+                    Logs.add(Logs.Type.I, "Pseudo #" + pseudoId + " selected");
+
+
+
+
+
+                    break;
+                }
+                case R.id.image_display: {
                     int position = (int)sender.getTag(R.id.tag_position);
-                    Logs.add(Logs.Type.I, "Pseudo #" + position + " selected");
+                    Logs.add(Logs.Type.I, "Display #" + position + " selected");
+
+                    ////// Start publication activity
+                    Intent pub = new Intent(getContext(), PublicationActivity.class);
+                    pub.putExtra(LoggedActivity.EXTRA_DATA_ID, mDataSource.getInt(position, COLUMN_INDEX_PUB_ID));
+                    pub.putExtra(LoggedActivity.EXTRA_DATA_URI, mPubUri);
+
+                    startActivity(pub);
+                    break;
+                }
+                case R.id.layout_published: {
+                    int position = (int)sender.getTag(R.id.tag_position);
+                    Logs.add(Logs.Type.I, "Link/Image #" + position + " selected");
+
+                    if (mDataSource.isNull(position, COLUMN_INDEX_LINK)) { // Image clicked
 
 
 
 
+
+
+
+
+                    } else // Link clicked
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(mDataSource.getString(position, COLUMN_INDEX_LINK))));
 
                     break;
                 }
@@ -232,10 +264,12 @@ public class PublicationsFragment extends MainFragment implements
 
                 holder.rootView.findViewById(R.id.text_url).setVisibility(View.GONE);
                 holder.rootView.findViewById(R.id.image_loading).setVisibility(View.GONE);
-                holder.rootView.findViewById(R.id.image_link).setVisibility(View.GONE);
                 holder.rootView.findViewById(R.id.text_link_title).setVisibility(View.GONE);
                 holder.rootView.findViewById(R.id.text_link_description).setVisibility(View.GONE);
                 holder.rootView.findViewById(R.id.text_link_info).setVisibility(View.GONE);
+
+                ImageView image = (ImageView)holder.rootView.findViewById(R.id.image_published);
+                ((RelativeLayout.LayoutParams)image.getLayoutParams()).setMargins(0, 0, 0, 0);
 
                 if (type == ActualitesTable.TYPE_IMAGE) { ////// Image
 
@@ -259,8 +293,11 @@ public class PublicationsFragment extends MainFragment implements
                                     File.separator + mDataSource.getString(position, COLUMN_INDEX_LINK_IMAGE));
 
                             if (bmp != null) {
-                                ((ImageView) holder.rootView.findViewById(R.id.image_published)).setImageBitmap(bmp);
-                                holder.rootView.findViewById(R.id.image_link).setVisibility(View.VISIBLE);
+                                image.setImageBitmap(bmp);
+
+                                int margin = getResources().getDimensionPixelSize(R.dimen.pub_image_margin);
+                                ((RelativeLayout.LayoutParams)image.getLayoutParams())
+                                        .setMargins(margin, margin, margin, 0);
 
                             } else {
                                 Logs.add(Logs.Type.W, "Failed to decode link image");
@@ -324,16 +361,15 @@ public class PublicationsFragment extends MainFragment implements
 
             ////// Events
             View imagePseudo = holder.rootView.findViewById(R.id.image_pseudo);
+            View layoutPub = holder.rootView.findViewById(R.id.layout_published);
+            View imageDisplay = holder.rootView.findViewById(R.id.image_display);
 
-            imagePseudo.setTag(R.id.tag_position, position);
+            imagePseudo.setTag(R.id.tag_pseudo_id, mDataSource.getInt(position, COLUMN_INDEX_MEMBER_ID));
             imagePseudo.setOnClickListener(this);
-
-
-
-
-
-
-
+            layoutPub.setTag(R.id.tag_position, position);
+            layoutPub.setOnClickListener(this);
+            imageDisplay.setTag(R.id.tag_position, position);
+            imageDisplay.setOnClickListener(this);
 
             ////// Animate item appearance
             animateAppearance(holder, new AppearanceAnimatorMaker() {
@@ -366,17 +402,7 @@ public class PublicationsFragment extends MainFragment implements
     @Override
     public void onConnection() {
         Logs.add(Logs.Type.V, null);
-
-
-
-
-
-        //mPubCursor
-        //mLinkRequests
-
-
-
-
+        refresh();
     }
 
     @Override
@@ -384,21 +410,7 @@ public class PublicationsFragment extends MainFragment implements
 
     }
 
-    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
-    @Override
-    public void onChange(boolean selfChange, Uri uri) {
-        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
-
-
-
-
-
-
-
-    }
-
     //////
-    private final DataObserver mLinkObserver = new DataObserver(PublicationsFragment.class.getName(), this);
     private ArrayList<Integer> mLinkRequests; // To keep download data link requests
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
@@ -499,12 +511,16 @@ public class PublicationsFragment extends MainFragment implements
         // Send link data requests (if needed)
         if (Internet.isConnected()) {
             do {
-                if ((mPubCursor.isNull(COLUMN_INDEX_LINK_ID)) &&
+                if ((!mPubCursor.isNull(COLUMN_INDEX_LINK)) && (mPubCursor.isNull(COLUMN_INDEX_LINK_ID)) &&
                         (!mLinkRequests.contains(mPubCursor.getInt(COLUMN_INDEX_PUB_ID)))) {
-                    // Download data link (send request to link service)
 
+                    // Download data link (send request to link service)
+                    Logs.add(Logs.Type.I, "Download '" + mPubCursor.getString(COLUMN_INDEX_LINK) + "' link data");
+
+                    ////// Start link service
                     Intent linkIntent = new Intent(getContext(), LinkService.class);
                     linkIntent.setData(Uri.parse(mPubCursor.getString(COLUMN_INDEX_LINK)));
+                    linkIntent.putExtra(LinkService.EXTRA_DATA_URI, mPubUri);
                     getContext().startService(linkIntent); // Start link data download service
 
                     mLinkRequests.add(mPubCursor.getInt(COLUMN_INDEX_PUB_ID));
@@ -717,10 +733,6 @@ public class PublicationsFragment extends MainFragment implements
         // Register data service & old request receiver
         getContext().sendBroadcast(DataService.getIntent(true, Tables.ID_ACTUALITES, mPubUri));
         getContext().registerReceiver(mOldReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
-
-        // Register link observer (using service to download link data)
-        mLinkObserver.register(getContext().getContentResolver(),
-                Uri.parse(DataProvider.CONTENT_URI + LinksTable.TABLE_NAME));
     }
 
     @Override
@@ -740,8 +752,5 @@ public class PublicationsFragment extends MainFragment implements
         // Unregister data service & old request receiver
         getContext().sendBroadcast(DataService.getIntent(false, Tables.ID_ACTUALITES, mPubUri));
         getContext().unregisterReceiver(mOldReceiver);
-
-        // Unregister link observer
-        mLinkObserver.unregister(getContext().getContentResolver());
     }
 }

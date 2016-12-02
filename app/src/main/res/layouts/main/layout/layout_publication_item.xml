@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:paddingStart="@dimen/fragment_horizontal_margin"
+                android:paddingEnd="@dimen/fragment_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -10,10 +12,8 @@
         card_view:cardCornerRadius="@dimen/pub_radius"
         card_view:cardBackgroundColor="@android:color/white"
         card_view:theme="@style/MainAppTheme"
+        card_view:cardUseCompatPadding="true"
         android:layout_marginTop="@dimen/pub_margin_top"
-        android:layout_marginBottom="@dimen/pub_margin"
-        android:layout_marginStart="@dimen/pub_margin"
-        android:layout_marginEnd="@dimen/pub_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -29,7 +29,7 @@
                 android:layout_width="@dimen/user_item_height"
                 android:layout_height="@dimen/user_item_height">
 
-                <tag android:id="@+id/tag_position"/>
+                <tag android:id="@+id/tag_pseudo_id"/>
             </ImageView>
 
             <!-- Publication info -->
@@ -81,8 +81,8 @@
             <!-- Publication text -->
             <TextView
                 android:id="@+id/text_message"
-                android:textColor="@color/colorPrimarySetting"
                 android:textSize="@dimen/pub_text_size"
+                android:textColor="@android:color/black"
                 android:layout_marginTop="@dimen/pub_text_margin"
                 android:layout_marginBottom="@dimen/pub_text_margin"
                 android:layout_below="@id/image_pseudo"
@@ -94,6 +94,7 @@
                 android:id="@+id/layout_published"
                 android:orientation="vertical"
                 android:background="@color/egg_shell"
+                android:clickable="true"
                 android:layout_below="@id/text_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -103,17 +104,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <!-- Image or link image (or loading image) -->
+                    <ImageView
+                        android:id="@+id/image_published"
+                        android:background="@color/light_gray"
+                        android:adjustViewBounds="true"
+                        android:minHeight="36dp"
+                        android:minWidth="36dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
                     <!-- URL (displayed during loading) -->
                     <TextView
                         android:id="@+id/text_url"
                         android:padding="@dimen/pub_padding"
-
-
-                        android:text="http://leclassico.fr"
-
-
-                        android:textSize="@dimen/pub_link_text_size"
+                        android:textSize="@dimen/pub_text_size"
                         android:autoLink="web"
+                        android:textColorLink="@color/yellow"
                         android:singleLine="true"
                         android:ellipsize="marquee"
                         android:layout_width="match_parent"
@@ -121,83 +128,48 @@
                     <ImageView
                         android:id="@+id/image_loading"
                         android:src="@drawable/spinner_white_48"
-                        android:tint="?android:attr/textColorLink"
-                        android:paddingStart="@dimen/pub_padding"
+                        android:tint="@color/yellow"
+                        android:layout_marginStart="@dimen/pub_padding"
                         android:layout_below="@id/text_url"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/><!-- Loading progress image -->
-
-                    <!-- Image or link image (or loading image) -->
-                    <ImageView
-                        android:id="@+id/image_published"
-                        android:adjustViewBounds="true"
-                        android:minHeight="36dp"
-                        android:minWidth="36dp"
-                        android:layout_marginBottom="@dimen/pub_text_margin"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <!-- Link icon -->
-                    <ImageView
-                        android:id="@+id/image_link"
-                        android:clickable="true"
-                        android:src="@drawable/ic_language_white_36dp"
-                        android:paddingEnd="@dimen/pub_padding"
-                        android:paddingBottom="@dimen/pub_link_padding"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentBottom="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
 
                 </RelativeLayout>
 
                 <!-- Web site title -->
                 <TextView
                     android:id="@+id/text_link_title"
-
-
-                    android:text="Le Canada à la recherche de travailleurs francophones"
-
-
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/pub_title_text_size"
                     android:textStyle="bold|italic"
                     android:layout_marginStart="@dimen/pub_text_margin"
-                    android:layout_marginBottom="@dimen/pub_text_margin"
+                    android:layout_marginTop="@dimen/pub_text_margin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <!-- Web site description -->
                 <TextView
                     android:id="@+id/text_link_description"
-
-
-                    android:text="Le Canada à la recherche de travailleurs francophones"
-
-
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/pub_link_text_size"
                     android:textStyle="italic"
                     android:layout_marginStart="@dimen/pub_text_margin"
-                    android:layout_marginBottom="@dimen/pub_text_margin"
+                    android:layout_marginTop="@dimen/pub_text_margin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <!-- Web site info -->
                 <TextView
                     android:id="@+id/text_link_info"
-
-
-                    android:text="Le Canada à la recherche de travailleurs francophones"
-
-
                     android:textSize="@dimen/pub_link_text_size"
                     android:textStyle="italic"
                     android:layout_marginStart="@dimen/pub_text_margin"
+                    android:layout_marginTop="@dimen/pub_text_margin"
                     android:layout_marginBottom="@dimen/pub_text_margin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <tag android:id="@+id/tag_position"/>
             </LinearLayout>
 
             <View
@@ -232,13 +204,19 @@
 
             <!-- Commands -->
             <ImageView
+                android:id="@+id/image_display"
                 android:src="@drawable/ic_open_in_new_white_36dp"
                 android:tint="@android:color/black"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
                 android:layout_marginTop="@dimen/pub_text_margin"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/view_separator"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content">
+
+                <tag android:id="@id/tag_position"/>
+            </ImageView>
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>
@@ -250,6 +228,7 @@
         android:layout_alignParentEnd="true"
         android:scaleType="center"
         android:layout_marginStart="@dimen/sync_text_margin"
+        android:layout_marginEnd="@dimen/pub_padding"
         android:layout_width="@dimen/sync_height"
         android:layout_height="@dimen/sync_height"/>
     <TextView

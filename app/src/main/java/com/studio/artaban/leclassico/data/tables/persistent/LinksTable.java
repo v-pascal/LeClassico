@@ -7,6 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -25,10 +26,9 @@ public class LinksTable extends DataTable {
 
     public static class Link extends DataField { /////////////////////////////////////// Links entry
 
-        private static final short FIELD_COUNT = 7;
+        private static final short FIELD_COUNT = 8;
 
         public String url;
-        public String date;
         public byte status;
         public String image;
         public String title;
@@ -76,7 +76,6 @@ public class LinksTable extends DataTable {
 
     // Columns
     public static final String COLUMN_URL = "LNK_URL";
-    public static final String COLUMN_DATE = "LNK_Date";
     public static final String COLUMN_STATUS = "LNK_Status";
     public static final String COLUMN_IMAGE = "LNK_Image";
     public static final String COLUMN_TITLE = "LNK_Title";
@@ -85,12 +84,13 @@ public class LinksTable extends DataTable {
 
     // Columns index
     private static final short COLUMN_INDEX_URL = 1; // DataField.COLUMN_INDEX_ID + 1
-    private static final short COLUMN_INDEX_DATE = 2;
-    private static final short COLUMN_INDEX_STATUS = 3;
-    private static final short COLUMN_INDEX_IMAGE = 4;
-    private static final short COLUMN_INDEX_TITLE = 5;
-    private static final short COLUMN_INDEX_DESCRIPTION = 6;
-    private static final short COLUMN_INDEX_INFO = 7;
+    private static final short COLUMN_INDEX_STATUS = 2;
+    private static final short COLUMN_INDEX_IMAGE = 3;
+    private static final short COLUMN_INDEX_TITLE = 4;
+    private static final short COLUMN_INDEX_DESCRIPTION = 5;
+    private static final short COLUMN_INDEX_INFO = 6;
+    private static final short COLUMN_INDEX_STATUS_DATE = 7;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
 
     //
     private LinksTable() { }
@@ -104,12 +104,15 @@ public class LinksTable extends DataTable {
                 DataField.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
                 COLUMN_URL + " TEXT NOT NULL," +
-                COLUMN_DATE + " TEXT NOT NULL," +
                 COLUMN_STATUS + " INTEGER NOT NULL," +
                 COLUMN_IMAGE + " TEXT," +
                 COLUMN_TITLE + " TEXT," +
                 COLUMN_DESCRIPTION + " TEXT," +
-                COLUMN_INFO + " TEXT" +
+                COLUMN_INFO + " TEXT," +
+
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
+                Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
+                // NB: Needed by the data provider
 
                 ");");
 

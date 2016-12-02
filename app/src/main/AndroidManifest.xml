@@ -87,6 +87,10 @@
                     android:pathPattern="/User/.*/Locations"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.publication.PublicationActivity"
+            android:label="@string/title_activity_publication"
+            android:theme="@style/MainAppTheme"/>
 
         <!-- Content providers -->
         <provider

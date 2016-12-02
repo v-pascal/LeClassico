@@ -28,8 +28,9 @@ public class MailboxActivity extends LoggedActivity {
 
 
 
+        // Get pseudo ID
         if (getIntent().getData() != null)
-            mPseudoId = Integer.valueOf(getIntent().getData().getPathSegments().get(1));
+            mId = Integer.valueOf(getIntent().getData().getPathSegments().get(1));
         else {
 
 

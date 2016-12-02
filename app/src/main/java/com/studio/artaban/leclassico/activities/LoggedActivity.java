@@ -15,7 +15,11 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public abstract class LoggedActivity extends AppCompatActivity {
 
-    protected int mPseudoId; // Connected user ID
+    public static String EXTRA_DATA_ID = "id";
+    public static String EXTRA_DATA_URI = "uri";
+    // Extra data key
+
+    protected int mId; // ID (pseudo, publication, etc)
 
     //
     private final LogoutReceiver mLogoutReceiver = new LogoutReceiver();

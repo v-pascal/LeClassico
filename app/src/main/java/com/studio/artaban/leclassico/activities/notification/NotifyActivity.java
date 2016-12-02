@@ -266,8 +266,8 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             switch (sender.getId()) {
 
                 case R.id.image_pseudo: {
-                    int position = (int)sender.getTag(R.id.tag_position);
-                    Logs.add(Logs.Type.I, "Pseudo #" + position + " selected");
+                    int pseudoId = (int)sender.getTag(R.id.tag_pseudo_id);
+                    Logs.add(Logs.Type.I, "Pseudo #" + pseudoId + " selected");
 
 
 
@@ -445,7 +445,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
             layoutData.setTag(R.id.tag_position, position);
             layoutData.setOnClickListener(this);
-            imagePseudo.setTag(R.id.tag_position, position);
+            imagePseudo.setTag(R.id.tag_pseudo_id, mDataSource.getInt(position, COLUMN_INDEX_MEMBER_ID));
             imagePseudo.setOnClickListener(this);
 
             ////// Animate item appearance
