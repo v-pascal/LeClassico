@@ -219,7 +219,7 @@ public final class Tools { /////////////////////////////////////////////////////
         Logs.add(Logs.Type.V, "type: " + type);
         switch (type) {
             case ActualitesTable.TYPE_TEXT: return R.drawable.ic_message_white_18dp;
-            case ActualitesTable.TYPE_LINK: return R.drawable.ic_web_white_18dp;
+            case ActualitesTable.TYPE_LINK: return R.drawable.ic_link_white_18dp;
             case ActualitesTable.TYPE_IMAGE: return R.drawable.ic_photo_white_18dp;
 
             default:

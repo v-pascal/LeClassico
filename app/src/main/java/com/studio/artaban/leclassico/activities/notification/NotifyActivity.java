@@ -62,8 +62,8 @@ import java.util.Date;
 public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
 
     public void onRead(View sender) { // Mark unread notification(s) as read
-
         Logs.add(Logs.Type.V, "sender: " + sender);
+
         Tools.startProcess(this, new Tools.OnProcessListener() {
             @Override
             public Bundle onBackgroundTask() {
@@ -209,8 +209,9 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 .start();
     }
 
+    // Recycler view adapter (with cursor management)
+    private final NotifyRecyclerViewAdapter mNotifyAdapter = new NotifyRecyclerViewAdapter();
     private RecyclerView mNotifyList; // Recycler view containing notification list
-    private NotifyRecyclerViewAdapter mNotifyAdapter; // Recycler view adapter (with cursor management)
 
     //////
     private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
@@ -258,6 +259,11 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             time.setTextColor(getResources().getColor(R.color.orange));
             return R.color.colorPrimaryProfile;
         }
+
+        // Requesting old entries animations
+        private AnimatorSet mRequestAnim1;
+        private AnimatorSet mRequestAnim2;
+        private AnimatorSet mRequestAnim3;
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
         @Override
@@ -307,47 +313,78 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             }
         }
 
-        // Requesting old entries animations
-        private AnimatorSet mRequestAnim1;
-        private AnimatorSet mRequestAnim2;
-        private AnimatorSet mRequestAnim3;
-
         ////// RecyclerAdapter /////////////////////////////////////////////////////////////////////
         @Override
         public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
             Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
-            if (isRequestHolder(holder, position)) { ////// Request
 
+            if (isRequestHolder(holder, position)) { ////// Request
+                Logs.add(Logs.Type.I, "Request item (" + isRequesting() + ')');
+
+                if (mRequestAnim1 != null) {
+                    mRequestAnim1.removeAllListeners();
+                    mRequestAnim1.end();
+                    mRequestAnim1.cancel();
+                }
+                if (mRequestAnim2 != null) {
+                    mRequestAnim2.removeAllListeners();
+                    mRequestAnim2.end();
+                    mRequestAnim2.cancel();
+                }
+                if (mRequestAnim3 != null) {
+                    mRequestAnim3.removeAllListeners();
+                    mRequestAnim3.end();
+                    mRequestAnim3.cancel();
+                }
                 View request = holder.requestView.findViewById(R.id.layout_more);
                 if (!isRequesting()) {
+
                     request.setBackground(getResources().getDrawable(R.drawable.select_more_background));
                     request.setOnClickListener(this);
 
-                    // Stop requesting old notifications animation
-                    if (mRequestAnim1 != null) mRequestAnim1.cancel();
-                    if (mRequestAnim2 != null) mRequestAnim2.cancel();
-                    if (mRequestAnim3 != null) mRequestAnim3.cancel();
+                    View image1 = holder.requestView.findViewById(R.id.image_1);
+                    image1.clearAnimation();
+                    image1.setAlpha(1);
+                    image1.setScaleX(1);
+                    image1.setScaleY(1);
+
+                    View image2 = holder.requestView.findViewById(R.id.image_2);
+                    image2.clearAnimation();
+                    image2.setAlpha(1);
+                    image2.setScaleX(1);
+                    image2.setScaleY(1);
+
+                    View image3 = holder.requestView.findViewById(R.id.image_3);
+                    image3.clearAnimation();
+                    image3.setAlpha(1);
+                    image3.setScaleX(1);
+                    image3.setScaleY(1);
 
                 } else {
                     request.setBackground(null);
+                    request.setOnClickListener(null);
 
                     // Start requesting old notifications animation
-                    mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
-                            R.animator.request_old);
+                    if (mRequestAnim1 == null)
+                        mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
+                                R.animator.request_old);
+                    if (mRequestAnim2 == null)
+                        mRequestAnim2 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
+                                R.animator.request_old);
+                    if (mRequestAnim3 == null)
+                        mRequestAnim3 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
+                                R.animator.request_old);
+
                     mRequestAnim1.setTarget(holder.requestView.findViewById(R.id.image_1));
                     mRequestAnim1.start();
 
                     long delay = getResources().getInteger(R.integer.duration_request_anim) / 3;
-                    mRequestAnim2 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
-                            R.animator.request_old);
-                    mRequestAnim2.setTarget(holder.requestView.findViewById(R.id.image_2));
                     mRequestAnim2.setStartDelay(delay);
+                    mRequestAnim2.setTarget(holder.requestView.findViewById(R.id.image_2));
                     mRequestAnim2.start();
 
-                    mRequestAnim3 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
-                            R.animator.request_old);
-                    mRequestAnim3.setTarget(holder.requestView.findViewById(R.id.image_3));
                     mRequestAnim3.setStartDelay(delay << 1);
+                    mRequestAnim3.setTarget(holder.requestView.findViewById(R.id.image_3));
                     mRequestAnim3.start();
                 }
                 return;
@@ -611,13 +648,10 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         mNotifyCursor.moveToFirst();
 
         //////
-        if (mNotifyAdapter != null) { // Check if not the initial query
-
-            ////// Update notification list
+        if (mNotifyAdapter.isInitialized()) { // Check if not the initial query
             Logs.add(Logs.Type.I, "Query update");
 
-            if (mNotifyList.getAdapter() == null)
-                mNotifyList.setAdapter(mNotifyAdapter);
+            ////// Update notification list
             RecyclerAdapter.SwapResult swapResult =
                     mNotifyAdapter.getDataSource().swap(mNotifyAdapter, mNotifyCursor, mQueryLimit,
                             new RecyclerAdapter.DataView.OnNotifyChangeListener() {
@@ -671,9 +705,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             Logs.add(Logs.Type.I, "Initial query");
 
             ////// Fill notification list
-            mNotifyAdapter = new NotifyRecyclerViewAdapter();
             mNotifyAdapter.getDataSource().fill(mNotifyCursor, mQueryLimit);
-            mNotifyList.setAdapter(mNotifyAdapter);
             mNotifyList.scrollToPosition(0);
 
             do { // Display floating action button according unread notification displayed
@@ -822,6 +854,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         mNotifyList = (RecyclerView) findViewById(R.id.list_notification);
         mNotifyList.setLayoutManager(linearManager);
         mNotifyList.setItemAnimator(itemAnimator);
+        mNotifyList.setAdapter(mNotifyAdapter);
 
         // Initialize notification list (set query loaders)
         Bundle queryData = new Bundle();

@@ -70,7 +70,7 @@ public class PublicationsFragment extends MainFragment implements
     // Data keys
 
     private RecyclerView mPubList; // Recycler view containing publication list
-    private PubRecyclerViewAdapter mPubAdapter; // Recycler view adapter (with cursor management)
+    private final PubRecyclerViewAdapter mPubAdapter; // Recycler view adapter (with cursor management)
     private Uri mPubUri; // Publications observer URI
 
     //////
@@ -78,6 +78,21 @@ public class PublicationsFragment extends MainFragment implements
         public PubRecyclerViewAdapter() {
             super(R.layout.layout_publication_item, R.layout.layout_old_request, COLUMN_INDEX_PUB_ID);
         }
+
+        private void displayURL(RecyclerAdapter.ViewHolder holder, int position) {
+        // Display URL text view on the link image
+
+            Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
+            TextView url = (TextView) holder.rootView.findViewById(R.id.text_url);
+
+            url.setText(mDataSource.getString(position, COLUMN_INDEX_LINK));
+            url.setVisibility(View.VISIBLE);
+        }
+
+        // Requesting old entries animations
+        private AnimatorSet mRequestAnim1;
+        private AnimatorSet mRequestAnim2;
+        private AnimatorSet mRequestAnim3;
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
         @Override
@@ -148,57 +163,78 @@ public class PublicationsFragment extends MainFragment implements
             }
         }
 
-        // Requesting old entries animations
-        private AnimatorSet mRequestAnim1;
-        private AnimatorSet mRequestAnim2;
-        private AnimatorSet mRequestAnim3;
-
-        private void displayURL(RecyclerAdapter.ViewHolder holder, int position) {
-        // Display URL text view on the link image
-
-            Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
-            TextView url = (TextView) holder.rootView.findViewById(R.id.text_url);
-
-            url.setText(mDataSource.getString(position, COLUMN_INDEX_LINK));
-            url.setVisibility(View.VISIBLE);
-        }
-
         ////// RecyclerAdapter /////////////////////////////////////////////////////////////////////
         @Override
         public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
             Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
-            if (isRequestHolder(holder, position)) { ////// Request
 
+            if (isRequestHolder(holder, position)) { ////// Request
+                Logs.add(Logs.Type.I, "Request item (" + isRequesting() + ')');
+
+                if (mRequestAnim1 != null) {
+                    mRequestAnim1.removeAllListeners();
+                    mRequestAnim1.end();
+                    mRequestAnim1.cancel();
+                }
+                if (mRequestAnim2 != null) {
+                    mRequestAnim2.removeAllListeners();
+                    mRequestAnim2.end();
+                    mRequestAnim2.cancel();
+                }
+                if (mRequestAnim3 != null) {
+                    mRequestAnim3.removeAllListeners();
+                    mRequestAnim3.end();
+                    mRequestAnim3.cancel();
+                }
                 View request = holder.requestView.findViewById(R.id.layout_more);
                 if (!isRequesting()) {
+
                     request.setBackground(getResources().getDrawable(R.drawable.select_more_background));
                     request.setOnClickListener(this);
 
-                    // Stop requesting old publications animation
-                    if (mRequestAnim1 != null) mRequestAnim1.cancel();
-                    if (mRequestAnim2 != null) mRequestAnim2.cancel();
-                    if (mRequestAnim3 != null) mRequestAnim3.cancel();
+                    View image1 = holder.requestView.findViewById(R.id.image_1);
+                    image1.clearAnimation();
+                    image1.setAlpha(1);
+                    image1.setScaleX(1);
+                    image1.setScaleY(1);
+
+                    View image2 = holder.requestView.findViewById(R.id.image_2);
+                    image2.clearAnimation();
+                    image2.setAlpha(1);
+                    image2.setScaleX(1);
+                    image2.setScaleY(1);
+
+                    View image3 = holder.requestView.findViewById(R.id.image_3);
+                    image3.clearAnimation();
+                    image3.setAlpha(1);
+                    image3.setScaleX(1);
+                    image3.setScaleY(1);
 
                 } else {
                     request.setBackground(null);
+                    request.setOnClickListener(null);
 
-                    // Start requesting old publications animation
-                    mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                            R.animator.request_old);
+                    // Start requesting old notifications animation
+                    if (mRequestAnim1 == null)
+                        mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                R.animator.request_old);
+                    if (mRequestAnim2 == null)
+                        mRequestAnim2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                R.animator.request_old);
+                    if (mRequestAnim3 == null)
+                        mRequestAnim3 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                R.animator.request_old);
+
                     mRequestAnim1.setTarget(holder.requestView.findViewById(R.id.image_1));
                     mRequestAnim1.start();
 
                     long delay = getResources().getInteger(R.integer.duration_request_anim) / 3;
-                    mRequestAnim2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                            R.animator.request_old);
-                    mRequestAnim2.setTarget(holder.requestView.findViewById(R.id.image_2));
                     mRequestAnim2.setStartDelay(delay);
+                    mRequestAnim2.setTarget(holder.requestView.findViewById(R.id.image_2));
                     mRequestAnim2.start();
 
-                    mRequestAnim3 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                            R.animator.request_old);
-                    mRequestAnim3.setTarget(holder.requestView.findViewById(R.id.image_3));
                     mRequestAnim3.setStartDelay(delay << 1);
+                    mRequestAnim3.setTarget(holder.requestView.findViewById(R.id.image_3));
                     mRequestAnim3.start();
                 }
                 return;

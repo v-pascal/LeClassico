@@ -68,6 +68,9 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     public DataView getDataSource() {
         return mDataSource;
     }
+    public boolean isInitialized() {
+        return mDataSource.mInitialized;
+    }
 
     private static final String ERROR_NO_REQUEST_LAYOUT = "Unexpected method use: No request layout ID";
     private boolean mRequesting; // Old entries requesting flag
@@ -120,6 +123,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
         private ArrayList<ArrayList<Object>> mData = new ArrayList<>(); // Data source
         private int mColumnKey; // Key column index (column index containing unique entries Id)
+        private boolean mInitialized; // Initialization flag (filled once at least)
 
         public DataView(int columnKey) {
             Logs.add(Logs.Type.V, "columnKey: " + columnKey);
@@ -186,6 +190,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
             clear();
             fill(cursor, mData, limit);
+            mInitialized = true;
         }
 
         public interface OnNotifyChangeListener {
@@ -370,7 +375,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
     @Override
     public int getItemCount() {
-        return mDataSource.getCount() + ((mRequestLayout != Constants.NO_DATA)? 1:0);
+        return (!mDataSource.mInitialized)?
+                0:mDataSource.getCount() + ((mRequestLayout != Constants.NO_DATA)? 1:0);
     }
 
     @Override

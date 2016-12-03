@@ -380,6 +380,8 @@ public class MainActivity extends LoggedActivity implements
         if ((DataService.isRunning()) && (!mDataService.bind(this, null)))
             Tools.criticalError(this, R.string.error_service_unavailable);
 
+        getContentResolver().notifyChange(mShortcutUri, null); // Refresh shortcut info
+
         // Register shortcut data service
         sendBroadcast(DataService.getIntent(true, Tables.ID_NOTIFICATIONS, mShortcutUri));
         sendBroadcast(DataService.getIntent(true, Tables.ID_MESSAGERIE, mShortcutUri));

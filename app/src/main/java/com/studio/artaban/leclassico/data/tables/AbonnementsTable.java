@@ -186,7 +186,8 @@ public class AbonnementsTable extends DataTable {
                     if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
                         if (reply.isNull(TABLE_NAME))
-                            return (operation == WebServices.OPERATION_SELECT);
+                            return ((operation == WebServices.OPERATION_SELECT) ||
+                                    (operation == WebServices.OPERATION_SELECT_OLD));
                             // Already synchronized for selection but error for any other operation
 
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
