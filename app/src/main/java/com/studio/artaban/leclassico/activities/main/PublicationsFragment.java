@@ -1,7 +1,5 @@
 package com.studio.artaban.leclassico.activities.main;
 
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorCompat;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
@@ -28,6 +25,7 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.publication.PublicationActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
+import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.data.tables.persistent.LinksTable;
@@ -70,11 +68,14 @@ public class PublicationsFragment extends MainFragment implements
     // Data keys
 
     private RecyclerView mPubList; // Recycler view containing publication list
-    private final PubRecyclerViewAdapter mPubAdapter; // Recycler view adapter (with cursor management)
     private Uri mPubUri; // Publications observer URI
+    // Recycler view adapter (with cursor management)
+    private final PubRecyclerViewAdapter mPubAdapter = new PubRecyclerViewAdapter();
 
     //////
-    private class PubRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
+    private class PubRecyclerViewAdapter extends RecyclerAdapter {
+
+        private RequestAnimation mRequestAnim; // Request old management (animation + event)
         public PubRecyclerViewAdapter() {
             super(R.layout.layout_publication_item, R.layout.layout_old_request, COLUMN_INDEX_PUB_ID);
         }
@@ -88,11 +89,6 @@ public class PublicationsFragment extends MainFragment implements
             url.setText(mDataSource.getString(position, COLUMN_INDEX_LINK));
             url.setVisibility(View.VISIBLE);
         }
-
-        // Requesting old entries animations
-        private AnimatorSet mRequestAnim1;
-        private AnimatorSet mRequestAnim2;
-        private AnimatorSet mRequestAnim3;
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
         @Override
@@ -169,74 +165,12 @@ public class PublicationsFragment extends MainFragment implements
             Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
 
             if (isRequestHolder(holder, position)) { ////// Request
+
                 Logs.add(Logs.Type.I, "Request item (" + isRequesting() + ')');
+                if (mRequestAnim == null)
+                    mRequestAnim = new RequestAnimation(getContext());
 
-                if (mRequestAnim1 != null) {
-                    mRequestAnim1.removeAllListeners();
-                    mRequestAnim1.end();
-                    mRequestAnim1.cancel();
-                }
-                if (mRequestAnim2 != null) {
-                    mRequestAnim2.removeAllListeners();
-                    mRequestAnim2.end();
-                    mRequestAnim2.cancel();
-                }
-                if (mRequestAnim3 != null) {
-                    mRequestAnim3.removeAllListeners();
-                    mRequestAnim3.end();
-                    mRequestAnim3.cancel();
-                }
-                View request = holder.requestView.findViewById(R.id.layout_more);
-                if (!isRequesting()) {
-
-                    request.setBackground(getResources().getDrawable(R.drawable.select_more_background));
-                    request.setOnClickListener(this);
-
-                    View image1 = holder.requestView.findViewById(R.id.image_1);
-                    image1.clearAnimation();
-                    image1.setAlpha(1);
-                    image1.setScaleX(1);
-                    image1.setScaleY(1);
-
-                    View image2 = holder.requestView.findViewById(R.id.image_2);
-                    image2.clearAnimation();
-                    image2.setAlpha(1);
-                    image2.setScaleX(1);
-                    image2.setScaleY(1);
-
-                    View image3 = holder.requestView.findViewById(R.id.image_3);
-                    image3.clearAnimation();
-                    image3.setAlpha(1);
-                    image3.setScaleX(1);
-                    image3.setScaleY(1);
-
-                } else {
-                    request.setBackground(null);
-                    request.setOnClickListener(null);
-
-                    // Start requesting old notifications animation
-                    if (mRequestAnim1 == null)
-                        mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.request_old);
-                    if (mRequestAnim2 == null)
-                        mRequestAnim2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.request_old);
-                    if (mRequestAnim3 == null)
-                        mRequestAnim3 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.request_old);
-
-                    mRequestAnim1.setTarget(holder.requestView.findViewById(R.id.image_1));
-                    mRequestAnim1.start();
-
-                    long delay = getResources().getInteger(R.integer.duration_request_anim) / 3;
-                    mRequestAnim2.setStartDelay(delay);
-                    mRequestAnim2.setTarget(holder.requestView.findViewById(R.id.image_2));
-                    mRequestAnim2.start();
-
-                    mRequestAnim3.setStartDelay(delay << 1);
-                    mRequestAnim3.setTarget(holder.requestView.findViewById(R.id.image_3));
-                    mRequestAnim3.start();
-                }
+                mRequestAnim.display(getResources(), this, holder.requestView);
                 return;
             }
             ////// Publication
@@ -406,31 +340,6 @@ public class PublicationsFragment extends MainFragment implements
             layoutPub.setOnClickListener(this);
             imageDisplay.setTag(R.id.tag_position, position);
             imageDisplay.setOnClickListener(this);
-
-            ////// Animate item appearance
-            animateAppearance(holder, new AppearanceAnimatorMaker() {
-                @Override
-                public void onAnimate(View item) {
-                    //Logs.add(Logs.Type.V, "item: " + item);
-
-
-
-
-
-
-                }
-
-                @Override
-                public void onCancel(View item) {
-                    Logs.add(Logs.Type.V, "item: " + item);
-
-
-
-
-
-
-                }
-            });
         }
     }
 
@@ -567,13 +476,10 @@ public class PublicationsFragment extends MainFragment implements
         }
 
         //////
-        if (mPubAdapter != null) { // Check if not the initial query
-
-            ////// Update publication list
+        if (mPubAdapter.isInitialized()) { // Check if not the initial query
             Logs.add(Logs.Type.I, "Query update");
 
-            if (mPubList.getAdapter() == null)
-                mPubList.setAdapter(mPubAdapter);
+            ////// Update publication list
             RecyclerAdapter.SwapResult swapResult = mPubAdapter.getDataSource().swap(mPubAdapter, mPubCursor,
                     mQueryLimit, null);
 
@@ -595,9 +501,7 @@ public class PublicationsFragment extends MainFragment implements
             Logs.add(Logs.Type.I, "Initial query");
 
             ////// Fill publication list
-            mPubAdapter = new PubRecyclerViewAdapter();
             mPubAdapter.getDataSource().fill(mPubCursor, mQueryLimit);
-            mPubList.setAdapter(mPubAdapter);
             mPubList.scrollToPosition(0);
         }
     }
@@ -635,78 +539,13 @@ public class PublicationsFragment extends MainFragment implements
                 .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
 
         // Set recycler view
-        final RecyclerItemAnimator itemAnimator = new RecyclerItemAnimator();
-        itemAnimator.setAnimationMaker(new RecyclerItemAnimator.ItemAnimatorMaker() {
-            @Override
-            public void onCancel(RecyclerItemAnimator.AnimType type, View item) {
-                Logs.add(Logs.Type.V, "type: " + type + ";item: " + item);
-                switch (type) {
-
-                    case ADD: {
-
-
-
-                        break;
-                    }
-                    case REMOVE: {
-
-
-
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onPrepare(RecyclerItemAnimator.AnimInfo info) {
-                Logs.add(Logs.Type.V, "info: " + info);
-                switch (RecyclerItemAnimator.getAnimType(info)) {
-
-                    case ADD: {
-
-
-
-                        break;
-                    }
-                    case REMOVE: {
-
-
-
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public ViewPropertyAnimatorCompat onAnimate(RecyclerItemAnimator.AnimInfo info, boolean changeNew) {
-                Logs.add(Logs.Type.V, "info: " + info + ";changeNew: " + changeNew);
-
-                View itemView = info.mHolder.itemView;
-                switch (RecyclerItemAnimator.getAnimType(info)) {
-
-                    case ADD: {
-
-
-
-                        break;
-                    }
-                    case REMOVE: {
-
-
-
-
-                        break;
-                    }
-                }
-                return ViewCompat.animate(itemView);
-            }
-        });
         LinearLayoutManager linearManager = new LinearLayoutManager(getContext());
         linearManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         mPubList = (RecyclerView) rootView.findViewById(R.id.list_publication);
         mPubList.setLayoutManager(linearManager);
-        mPubList.setItemAnimator(itemAnimator);
+        mPubList.setItemAnimator(new DefaultItemAnimator());
+        mPubList.setAdapter(mPubAdapter);
 
         // Initialize notification list (set query loaders)
         String fields = ActualitesTable.COLUMN_ACTU_ID + ',' + // COLUMN_INDEX_ACTU_ID

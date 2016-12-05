@@ -20,7 +20,8 @@ import java.util.Collections;
  * Created by pascal on 26/09/16.
  * Recycler adapter class with DB cursor a data source
  */
-public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
+public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder>
+        implements View.OnClickListener {
 
     @LayoutRes private final int mItemLayout; // Holder view layout Id
     @LayoutRes private final int mRequestLayout; // Holder view old request layout Id (NO_DATA if useless)

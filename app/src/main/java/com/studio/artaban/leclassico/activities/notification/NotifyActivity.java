@@ -1,7 +1,5 @@
 package com.studio.artaban.leclassico.activities.notification;
 
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -29,6 +27,7 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
+import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.services.DataService;
@@ -214,13 +213,16 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     private RecyclerView mNotifyList; // Recycler view containing notification list
 
     //////
-    private class NotifyRecyclerViewAdapter extends RecyclerAdapter implements View.OnClickListener {
+    private class NotifyRecyclerViewAdapter extends RecyclerAdapter {
+
+        private RequestAnimation mRequestAnim; // Request old management (animation + event)
         public NotifyRecyclerViewAdapter() {
             super(R.layout.layout_notification_item, R.layout.layout_old_request, COLUMN_INDEX_NOTIFY_ID);
         }
 
+        //
         private void displayDate(TextView viewDate, String date) {
-            // Display the notification date separator (with notification date formatted as locale user)
+        // Display the notification date separator (with notification date formatted as locale user)
 
             //Logs.add(Logs.Type.V, "viewDate: " + viewDate + ";date: " + date);
             SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
@@ -259,11 +261,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             time.setTextColor(getResources().getColor(R.color.orange));
             return R.color.colorPrimaryProfile;
         }
-
-        // Requesting old entries animations
-        private AnimatorSet mRequestAnim1;
-        private AnimatorSet mRequestAnim2;
-        private AnimatorSet mRequestAnim3;
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
         @Override
@@ -319,74 +316,12 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
 
             if (isRequestHolder(holder, position)) { ////// Request
+
                 Logs.add(Logs.Type.I, "Request item (" + isRequesting() + ')');
+                if (mRequestAnim == null)
+                    mRequestAnim = new RequestAnimation(NotifyActivity.this);
 
-                if (mRequestAnim1 != null) {
-                    mRequestAnim1.removeAllListeners();
-                    mRequestAnim1.end();
-                    mRequestAnim1.cancel();
-                }
-                if (mRequestAnim2 != null) {
-                    mRequestAnim2.removeAllListeners();
-                    mRequestAnim2.end();
-                    mRequestAnim2.cancel();
-                }
-                if (mRequestAnim3 != null) {
-                    mRequestAnim3.removeAllListeners();
-                    mRequestAnim3.end();
-                    mRequestAnim3.cancel();
-                }
-                View request = holder.requestView.findViewById(R.id.layout_more);
-                if (!isRequesting()) {
-
-                    request.setBackground(getResources().getDrawable(R.drawable.select_more_background));
-                    request.setOnClickListener(this);
-
-                    View image1 = holder.requestView.findViewById(R.id.image_1);
-                    image1.clearAnimation();
-                    image1.setAlpha(1);
-                    image1.setScaleX(1);
-                    image1.setScaleY(1);
-
-                    View image2 = holder.requestView.findViewById(R.id.image_2);
-                    image2.clearAnimation();
-                    image2.setAlpha(1);
-                    image2.setScaleX(1);
-                    image2.setScaleY(1);
-
-                    View image3 = holder.requestView.findViewById(R.id.image_3);
-                    image3.clearAnimation();
-                    image3.setAlpha(1);
-                    image3.setScaleX(1);
-                    image3.setScaleY(1);
-
-                } else {
-                    request.setBackground(null);
-                    request.setOnClickListener(null);
-
-                    // Start requesting old notifications animation
-                    if (mRequestAnim1 == null)
-                        mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
-                                R.animator.request_old);
-                    if (mRequestAnim2 == null)
-                        mRequestAnim2 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
-                                R.animator.request_old);
-                    if (mRequestAnim3 == null)
-                        mRequestAnim3 = (AnimatorSet) AnimatorInflater.loadAnimator(NotifyActivity.this,
-                                R.animator.request_old);
-
-                    mRequestAnim1.setTarget(holder.requestView.findViewById(R.id.image_1));
-                    mRequestAnim1.start();
-
-                    long delay = getResources().getInteger(R.integer.duration_request_anim) / 3;
-                    mRequestAnim2.setStartDelay(delay);
-                    mRequestAnim2.setTarget(holder.requestView.findViewById(R.id.image_2));
-                    mRequestAnim2.start();
-
-                    mRequestAnim3.setStartDelay(delay << 1);
-                    mRequestAnim3.setTarget(holder.requestView.findViewById(R.id.image_3));
-                    mRequestAnim3.start();
-                }
+                mRequestAnim.display(getResources(), this, holder.requestView);
                 return;
             }
             ////// Notification

@@ -24,12 +24,12 @@ public final class Tables {
     public static final byte ID_ABONNEMENTS = 2;
     public static final byte ID_ACTUALITES = 3;
     public static final byte ID_ALBUMS = 4;
-    public static final byte ID_COMMENTAIRES = 5;
-    public static final byte ID_EVENEMENTS = 6;
-    public static final byte ID_MESSAGERIE = 7;
-    public static final byte ID_MUSIC = 8;
-    public static final byte ID_PHOTOS = 9;
-    public static final byte ID_PRESENTS = 10;
+    public static final byte ID_EVENEMENTS = 5;
+    public static final byte ID_MESSAGERIE = 6;
+    public static final byte ID_MUSIC = 7;
+    public static final byte ID_PHOTOS = 8;
+    public static final byte ID_COMMENTAIRES = 9; // NB: Must be > ID_ACTUALITES & ID_PHOTOS coz fill
+    public static final byte ID_PRESENTS = 10;    //     comments according publications & photos
     public static final byte ID_VOTES = 11;
     public static final byte ID_NOTIFICATIONS = 12;
 
@@ -49,11 +49,11 @@ public final class Tables {
             case Tables.ID_ABONNEMENTS: return AbonnementsTable.TABLE_NAME;
             case Tables.ID_ACTUALITES: return ActualitesTable.TABLE_NAME;
             case Tables.ID_ALBUMS: return AlbumsTable.TABLE_NAME;
-            case Tables.ID_COMMENTAIRES: return CommentairesTable.TABLE_NAME;
             case Tables.ID_EVENEMENTS: return EvenementsTable.TABLE_NAME;
             case Tables.ID_MESSAGERIE: return MessagerieTable.TABLE_NAME;
             case Tables.ID_MUSIC: return MusicTable.TABLE_NAME;
             case Tables.ID_PHOTOS: return PhotosTable.TABLE_NAME;
+            case Tables.ID_COMMENTAIRES: return CommentairesTable.TABLE_NAME;
             case Tables.ID_PRESENTS: return PresentsTable.TABLE_NAME;
             case Tables.ID_VOTES: return VotesTable.TABLE_NAME;
             case Tables.ID_NOTIFICATIONS: return NotificationsTable.TABLE_NAME;
