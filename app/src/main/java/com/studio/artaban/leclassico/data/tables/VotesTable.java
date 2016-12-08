@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.tables;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -144,14 +145,13 @@ public class VotesTable extends DataTable {
     // JSON keys
 
     @Override
-    public SyncResult synchronize(final ContentResolver resolver, String token, final byte operation,
-                                  @Nullable String pseudo, @Nullable String date, @Nullable Short limit,
+    public SyncResult synchronize(final ContentResolver resolver, final byte operation, Bundle syncData,
                                   @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
-                ";pseudo: " + pseudo + ";date: " + date + ";limit: " + limit + ";postData: " + postData);
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";operation: " + operation +
+                ";syncData: " + syncData + ";postData: " + postData);
 
 
 

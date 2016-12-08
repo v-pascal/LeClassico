@@ -94,14 +94,15 @@ public abstract class DataTable implements IDataTable {
     protected static final String IS_NULL = " is null";
 
     // URL synchronization request data keys
+    public static final String DATA_KEY_TOKEN = "token";
+    public static final String DATA_KEY_LIMIT = "limit";
+    public static final String DATA_KEY_PSEUDO = "pseudo";
+    public static final String DATA_KEY_DATE = "date";
+
     protected static final String DATA_KEY_WEB_SERVICE = "webService";
-    protected static final String DATA_KEY_TOKEN = "token";
     protected static final String DATA_KEY_OPERATION = "operation";
-    protected static final String DATA_KEY_LIMIT = "limit";
     protected static final String DATA_KEY_TABLE_NAME = "tableName";
-    protected static final String DATA_KEY_PSEUDO = "pseudo";
     protected static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
-    protected static final String DATA_KEY_DATE = "date";
     protected static final String DATA_KEY_FIELD_DATE = "dateField";
 
     //////
@@ -221,7 +222,6 @@ public abstract class DataTable implements IDataTable {
         public int updated; // Updated row count
         public int deleted; // deleted row count
     }
-    public abstract SyncResult synchronize(ContentResolver resolver, String token, byte operation,
-                                           @Nullable String pseudo, @Nullable String date, @Nullable Short limit,
+    public abstract SyncResult synchronize(ContentResolver resolver, byte operation, Bundle syncData,
                                            @Nullable ContentValues postData);
 }

@@ -153,25 +153,21 @@ public class AbonnementsTable extends DataTable {
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     @Override
-    public SyncResult synchronize(final ContentResolver resolver, String token, final byte operation,
-                                  @Nullable String pseudo, @Nullable String date, @Nullable Short limit,
+    public SyncResult synchronize(final ContentResolver resolver, final byte operation, Bundle syncData,
                                   @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
-                ";pseudo: " + pseudo + ";date: " + date + ";limit: " + limit + ";postData: " + postData);
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";operation: " + operation +
+                ";syncData: " + syncData + ";postData: " + postData);
 
         final SyncResult syncResult = new SyncResult();
-        Bundle data = new Bundle();
 
-        data.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_FOLLOWERS);
-        data.putString(DATA_KEY_TOKEN, token);
-        data.putByte(DATA_KEY_OPERATION, operation);
-        data.putString(DATA_KEY_PSEUDO, pseudo);
-        data.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
-        data.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
-        String url = getSyncUrlRequest(resolver, data);
+        syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_FOLLOWERS);
+        syncData.putByte(DATA_KEY_OPERATION, operation);
+        syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
+        syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        String url = getSyncUrlRequest(resolver, syncData);
 
         // Send remote DB request
         Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
@@ -265,7 +261,7 @@ public class AbonnementsTable extends DataTable {
 
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
             if ((operation != WebServices.OPERATION_SELECT) && (operation != WebServices.OPERATION_SELECT_OLD))
-                resetSyncInProgress(resolver, data);
+                resetSyncInProgress(resolver, syncData);
             return null;
         }
         return syncResult;

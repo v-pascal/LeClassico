@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.tables.persistent;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -144,8 +145,7 @@ public class LinksTable extends DataTable {
         return null;
     }
     @Override
-    public SyncResult synchronize(ContentResolver resolver, String token, byte operation,
-                                  @Nullable String pseudo, @Nullable String date, @Nullable Short limit,
+    public SyncResult synchronize(ContentResolver resolver, byte operation, Bundle syncData,
                                   @Nullable ContentValues postData) {
         return null;
     }

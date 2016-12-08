@@ -185,6 +185,10 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
         synchronized (mRegister) {
             DataTable table = Database.getTable(Tables.getName(mTableId));
 
+            Bundle syncData = new Bundle();
+            syncData.putString(DataTable.DATA_KEY_TOKEN, dataLogin.token.get());
+            syncData.putString(DataTable.DATA_KEY_PSEUDO, dataLogin.pseudo);
+
             ////// Synchronize inserted rows
             setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                     DataTable.Synchronized.TO_INSERT.getValue());
@@ -192,8 +196,8 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
             ContentValues operationData =
                     table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
             if (operationData.size() > 0) {
-                Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
-                        WebServices.OPERATION_INSERT, dataLogin.pseudo, null, null, operationData);
+                Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_INSERT,
+                        syncData, operationData);
                 notifyChange(); // To update UI synchronization fields (no more in progress status)
 
                 if (result == null) {
@@ -208,8 +212,8 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
 
             operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.pseudo);
             if (operationData.size() > 0) {
-                Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
-                        WebServices.OPERATION_UPDATE, dataLogin.pseudo, null, null, operationData);
+                Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_UPDATE,
+                        syncData, operationData);
                 notifyChange();
 
                 if (result == null) {
@@ -224,8 +228,8 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
 
             operationData = table.syncDeleted(mService.getContentResolver(), dataLogin.pseudo);
             if (operationData.size() > 0) {
-                Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
-                        WebServices.OPERATION_DELETE, dataLogin.pseudo, null, null, operationData);
+                Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_DELETE,
+                        syncData, operationData);
                 notifyChange();
 
                 if (result == null) {

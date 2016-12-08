@@ -372,27 +372,32 @@ public class ConnectFragment extends RevealFragment {
                     }
 
                     ////// Synchronization
+                    Bundle syncData = new Bundle();
+                    syncData.putString(DataTable.DATA_KEY_TOKEN, mToken);
+                    syncData.putString(DataTable.DATA_KEY_PSEUDO, mPseudo);
+
                     for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
                         if (isStopped()) return Boolean.FALSE;
                         DataTable table = Database.getTable(Tables.getName(tableId));
                         publishProgress(tableId);
 
                         // From remote to local DB
-                        Short limit = 0;
-                        if (table.synchronize(resolver, mToken, WebServices.OPERATION_SELECT, mPseudo,
-                                null, limit, null) == null) {
+                        syncData.putShort(DataTable.DATA_KEY_LIMIT, (short)0); // Default limit
+                        if (table.synchronize(resolver, WebServices.OPERATION_SELECT,
+                                syncData, null) == null) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
                             publishProgress(STEP_ERROR);
                             return Boolean.FALSE;
                         }
+                        syncData.remove(DataTable.DATA_KEY_LIMIT);
 
                         // From local to remote DB
                         if (isStopped()) return Boolean.FALSE;
                         ContentValues operationData = table.syncInserted(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
-                                (table.synchronize(resolver, mToken, WebServices.OPERATION_INSERT,
-                                mPseudo, null, null, operationData) == null)) {
+                                (table.synchronize(resolver, WebServices.OPERATION_INSERT,
+                                        syncData, operationData) == null)) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (inserted)");
                             publishProgress(STEP_ERROR);
@@ -401,8 +406,8 @@ public class ConnectFragment extends RevealFragment {
                         if (isStopped()) return Boolean.FALSE;
                         operationData = table.syncUpdated(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
-                                (table.synchronize(resolver, mToken, WebServices.OPERATION_UPDATE,
-                                mPseudo, null, null, operationData) == null)) {
+                                (table.synchronize(resolver, WebServices.OPERATION_UPDATE,
+                                        syncData, operationData) == null)) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (updated)");
                             publishProgress(STEP_ERROR);
@@ -411,8 +416,8 @@ public class ConnectFragment extends RevealFragment {
                         if (isStopped()) return Boolean.FALSE;
                         operationData = table.syncDeleted(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
-                                (table.synchronize(resolver, mToken, WebServices.OPERATION_DELETE,
-                                mPseudo, null, null, operationData) == null)) {
+                                (table.synchronize(resolver, WebServices.OPERATION_DELETE,
+                                        syncData, operationData) == null)) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (deleted)");
                             publishProgress(STEP_ERROR);
