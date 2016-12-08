@@ -30,6 +30,8 @@ import java.util.List;
  */
 public class MessagerieTable extends DataTable {
 
+    private static final short DEFAULT_LIMIT = 10; // Default remote DB query limit
+
     public static class Message extends DataField { /////////////////////////////// Messagerie entry
 
         public Message(short count, long id) { super(count, id); }
@@ -182,13 +184,13 @@ public class MessagerieTable extends DataTable {
 
     @Override
     public SyncResult synchronize(final ContentResolver resolver, String token, final byte operation,
-                                  @Nullable String pseudo, @Nullable Short limit,
+                                  @Nullable String pseudo, @Nullable String date, @Nullable Short limit,
                                   @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
-                ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
+                ";pseudo: " + pseudo + ";date: " + date + ";limit: " + limit + ";postData: " + postData);
 
         final SyncResult syncResult = new SyncResult();
         Bundle data = new Bundle();
@@ -196,7 +198,11 @@ public class MessagerieTable extends DataTable {
         data.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_MESSAGERIE);
         data.putString(DATA_KEY_TOKEN, token);
         data.putByte(DATA_KEY_OPERATION, operation);
+        if (limit != null)
+            data.putShort(DATA_KEY_LIMIT, (limit != 0) ? limit : DEFAULT_LIMIT);
         data.putString(DATA_KEY_PSEUDO, pseudo);
+        if (date != null)
+            data.putString(DATA_KEY_DATE, date);
         data.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
         data.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         String url = getSyncUrlRequest(resolver, data);

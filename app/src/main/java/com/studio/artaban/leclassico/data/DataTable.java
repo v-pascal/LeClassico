@@ -101,6 +101,7 @@ public abstract class DataTable implements IDataTable {
     protected static final String DATA_KEY_TABLE_NAME = "tableName";
     protected static final String DATA_KEY_PSEUDO = "pseudo";
     protected static final String DATA_KEY_FIELD_PSEUDO = "pseudoField";
+    protected static final String DATA_KEY_DATE = "date";
     protected static final String DATA_KEY_FIELD_DATE = "dateField";
 
     //////
@@ -164,14 +165,18 @@ public abstract class DataTable implements IDataTable {
             }
             case WebServices.OPERATION_SELECT_OLD: { ////// Old selection
 
-                if (data.containsKey(DATA_KEY_FIELD_DATE)) {
-                    String date = getMinDate(resolver, data);
-                    if (date == null)
-                        break;
+                // Add old date criteria
+                String date = null;
+                if (data.containsKey(DATA_KEY_DATE))
+                    date = data.getString(DATA_KEY_DATE);
+                else if (data.containsKey(DATA_KEY_FIELD_DATE))
+                    date = getMinDate(resolver, data);
 
-                    Logs.add(Logs.Type.I, "Previous date: " + date);
-                    url += '&' + WebServices.DATA_DATE + '=' + date.replace(' ', 'n');
-                }
+                if (date == null)
+                    break;
+
+                Logs.add(Logs.Type.I, "Previous date: " + date);
+                url += '&' + WebServices.DATA_DATE + '=' + date.replace(' ', 'n');
                 break;
             }
         }
@@ -217,6 +222,6 @@ public abstract class DataTable implements IDataTable {
         public int deleted; // deleted row count
     }
     public abstract SyncResult synchronize(ContentResolver resolver, String token, byte operation,
-                                           @Nullable String pseudo, @Nullable Short limit,
+                                           @Nullable String pseudo, @Nullable String date, @Nullable Short limit,
                                            @Nullable ContentValues postData);
 }

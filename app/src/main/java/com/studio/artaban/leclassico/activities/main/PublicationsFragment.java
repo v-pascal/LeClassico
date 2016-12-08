@@ -139,21 +139,14 @@ public class PublicationsFragment extends MainFragment implements
                 }
                 case R.id.layout_more: {
                     Logs.add(Logs.Type.I, "Old notifications requested");
+
+                    ////// Request old publications to remote DB
                     mQueryLimit += Queries.PUBLICATIONS_OLD_LIMIT;
+                    mPubAdapter.setRequesting(true);
 
-                    int requestCount = mQueryLimit - mQueryCount;
-                    if (requestCount <= 0)
-                        refresh(); // Refresh publication list (with new limitation)
-
-                    else {
-                        Logs.add(Logs.Type.I, "Request old notifications to remote DB");
-                        mPubAdapter.setRequesting(true);
-
-                        ////// Request old publications to remote DB
-                        getActivity().sendBroadcast(DataService
-                                .getIntent(new Intent(DataService.REQUEST_OLD_DATA),
-                                        Tables.ID_ACTUALITES, mPubUri));
-                    }
+                    Intent request = new Intent(DataService.REQUEST_OLD_DATA);
+                    request.putExtra(DataRequest.EXTRA_DATA_DATE, mQueryDate);
+                    getActivity().sendBroadcast(DataService.getIntent(request, Tables.ID_ACTUALITES, mPubUri));
                     break;
                 }
             }
@@ -384,6 +377,7 @@ public class PublicationsFragment extends MainFragment implements
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
     private short mQueryLimit = Queries.PUBLICATIONS_LIST_LIMIT; // DB query limit
+    private String mQueryDate; // Old query date displayed (visible)
 
     // Query column indexes
     private static final int COLUMN_INDEX_ACTU_ID = 0;
@@ -430,6 +424,7 @@ public class PublicationsFragment extends MainFragment implements
                     } else // Remove expected old publications count from limitation
                         mQueryLimit -= Queries.NOTIFICATIONS_OLD_LIMIT;
                 }
+                //else // DB table update will notify cursor (no need to call refresh)
             }
         }
     }
@@ -452,6 +447,16 @@ public class PublicationsFragment extends MainFragment implements
 
         mQueryCount = count;
         mPubLast = lastPub;
+
+        // Get last visible publication date
+        int limit = mQueryLimit;
+        do {
+            mQueryDate = mPubCursor.getString(COLUMN_INDEX_DATE);
+            if (--limit == 0)
+                break; // Only visible item are concerned
+
+        } while (mPubCursor.moveToNext());
+        mPubCursor.moveToFirst();
 
         // Send link data requests (if needed)
         if (Internet.isConnected()) {

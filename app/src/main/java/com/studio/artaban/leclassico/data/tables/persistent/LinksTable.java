@@ -145,7 +145,7 @@ public class LinksTable extends DataTable {
     }
     @Override
     public SyncResult synchronize(ContentResolver resolver, String token, byte operation,
-                                  @Nullable String pseudo, @Nullable Short limit,
+                                  @Nullable String pseudo, @Nullable String date, @Nullable Short limit,
                                   @Nullable ContentValues postData) {
         return null;
     }

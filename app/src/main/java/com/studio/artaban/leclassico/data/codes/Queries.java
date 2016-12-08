@@ -22,9 +22,11 @@ public class Queries {
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////
     // Max entry count to display into a list view at start
+    // NB: All limits must be < *Table.DEFAULT_LIMIT
 
     public static final short NOTIFICATIONS_LIST_LIMIT = 20;
     public static final short PUBLICATIONS_LIST_LIMIT = 5;
+    public static final short COMMENTS_LIST_LIMIT = 5;
 
 
     ////// Older ///////////////////////////////////////////////////////////////////////////////////

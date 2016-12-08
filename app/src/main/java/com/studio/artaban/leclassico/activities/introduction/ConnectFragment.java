@@ -380,7 +380,7 @@ public class ConnectFragment extends RevealFragment {
                         // From remote to local DB
                         Short limit = 0;
                         if (table.synchronize(resolver, mToken, WebServices.OPERATION_SELECT, mPseudo,
-                                limit, null) == null) {
+                                null, limit, null) == null) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
                             publishProgress(STEP_ERROR);
@@ -392,7 +392,7 @@ public class ConnectFragment extends RevealFragment {
                         ContentValues operationData = table.syncInserted(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
                                 (table.synchronize(resolver, mToken, WebServices.OPERATION_INSERT,
-                                mPseudo, null, operationData) == null)) {
+                                mPseudo, null, null, operationData) == null)) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (inserted)");
                             publishProgress(STEP_ERROR);
@@ -402,7 +402,7 @@ public class ConnectFragment extends RevealFragment {
                         operationData = table.syncUpdated(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
                                 (table.synchronize(resolver, mToken, WebServices.OPERATION_UPDATE,
-                                mPseudo, null, operationData) == null)) {
+                                mPseudo, null, null, operationData) == null)) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (updated)");
                             publishProgress(STEP_ERROR);
@@ -412,7 +412,7 @@ public class ConnectFragment extends RevealFragment {
                         operationData = table.syncDeleted(resolver, mPseudo);
                         if ((operationData.size() > 0) &&
                                 (table.synchronize(resolver, mToken, WebServices.OPERATION_DELETE,
-                                mPseudo, null, operationData) == null)) {
+                                mPseudo, null, null, operationData) == null)) {
 
                             Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (deleted)");
                             publishProgress(STEP_ERROR);

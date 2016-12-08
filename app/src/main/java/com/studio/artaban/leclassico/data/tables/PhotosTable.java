@@ -146,14 +146,14 @@ public class PhotosTable extends DataTable {
     private static final String JSON_KEY_FICHIER_ID = COLUMN_FICHIER_ID.substring(4);
 
     @Override
-    public SyncResult synchronize(final ContentResolver resolver, String token, byte operation,
-                                  @Nullable String pseudo, @Nullable Short limit,
+    public SyncResult synchronize(final ContentResolver resolver, String token, final byte operation,
+                                  @Nullable String pseudo, @Nullable String date, @Nullable Short limit,
                                   @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";token: " + token + ";operation: " + operation +
-                ";pseudo: " + pseudo + ";limit: " + limit + ";postData: " + postData);
+                ";pseudo: " + pseudo + ";date: " + date + ";limit: " + limit + ";postData: " + postData);
 
 
 

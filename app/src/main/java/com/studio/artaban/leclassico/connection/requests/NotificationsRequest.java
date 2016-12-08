@@ -56,8 +56,8 @@ public class NotificationsRequest extends DataRequest {
 
             DataTable.SyncResult result = Database.getTable(NotificationsTable.TABLE_NAME)
                     .synchronize(mService.getContentResolver(), dataLogin.token.get(),
-                            WebServices.OPERATION_SELECT_OLD, dataLogin.pseudo, Queries.NOTIFICATIONS_OLD_LIMIT,
-                            null);
+                            WebServices.OPERATION_SELECT_OLD, dataLogin.pseudo, data.getString(EXTRA_DATA_DATE),
+                            Queries.NOTIFICATIONS_OLD_LIMIT, null);
             if (DataTable.SyncResult.hasChanged(result)) {
 
                 Logs.add(Logs.Type.I, "Old notifications received");
@@ -75,7 +75,7 @@ public class NotificationsRequest extends DataRequest {
             // Synchronization (from remote to local DB)
             DataTable.SyncResult result = Database.getTable(NotificationsTable.TABLE_NAME)
                     .synchronize(mService.getContentResolver(), dataLogin.token.get(), WebServices.OPERATION_SELECT,
-                            dataLogin.pseudo, null, null);
+                            dataLogin.pseudo, null, null, null);
             if (DataTable.SyncResult.hasChanged(result)) {
 
                 int newNotify = DataTable.getNewNotification(mService.getContentResolver(), dataLogin.pseudo);

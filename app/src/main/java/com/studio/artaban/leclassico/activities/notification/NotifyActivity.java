@@ -290,21 +290,15 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 }
                 case R.id.layout_more: {
                     Logs.add(Logs.Type.I, "Old notifications requested");
+
+                    ////// Request old notifications to remote DB
                     mQueryLimit += Queries.NOTIFICATIONS_OLD_LIMIT;
+                    mNotifyAdapter.setRequesting(true);
 
-                    int requestCount = mQueryLimit - mQueryCount;
-                    if (requestCount <= 0)
-                        refresh(); // Refresh notification list (with new limitation)
-
-                    else {
-                        Logs.add(Logs.Type.I, "Request old notifications to remote DB");
-                        mNotifyAdapter.setRequesting(true);
-
-                        ////// Request old notifications to remote DB
-                        NotifyActivity.this.sendBroadcast(DataService
-                                .getIntent(new Intent(DataService.REQUEST_OLD_DATA), Tables.ID_NOTIFICATIONS,
-                                (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
-                    }
+                    Intent request = new Intent(DataService.REQUEST_OLD_DATA);
+                    request.putExtra(DataRequest.EXTRA_DATA_DATE, mQueryDate);
+                    NotifyActivity.this.sendBroadcast(DataService.getIntent(request, Tables.ID_NOTIFICATIONS,
+                            (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
                     break;
                 }
             }
@@ -491,6 +485,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
     private short mQueryLimit = Queries.NOTIFICATIONS_LIST_LIMIT; // DB query limit
+    private String mQueryDate; // Old query date displayed (visible)
 
     // Query column indexes
     private static final int COLUMN_INDEX_OBJECT_TYPE = 0;
@@ -539,6 +534,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     } else // Remove expected old notifications count from limitation
                         mQueryLimit -= Queries.NOTIFICATIONS_OLD_LIMIT;
                 }
+                //else // DB table update will notify cursor (no need to call refresh)
             }
         }
     }
@@ -574,10 +570,11 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         int limit = mQueryLimit;
         unreadNotify = false;
         do {
+            mQueryDate = mNotifyCursor.getString(COLUMN_INDEX_DATE); // Get last item date displayed
             if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
                 unreadNotify = true;
             if (--limit == 0)
-                break; // Only visible notifications are concerned
+                break; // Only visible item are concerned
 
         } while (mNotifyCursor.moveToNext());
         mNotifyCursor.moveToFirst();

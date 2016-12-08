@@ -26,6 +26,7 @@ import java.util.TimerTask;
 public abstract class DataRequest implements DataObserver.OnContentListener {
 
     public static final String EXTRA_DATA_URI = "uri";
+    public static final String EXTRA_DATA_DATE = "date";
     // Extra data keys (common)
 
     protected static final long DEFAULT_DELAY = 30000; // DB request task delay (in ms)
@@ -192,7 +193,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                     table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
             if (operationData.size() > 0) {
                 Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
-                        WebServices.OPERATION_INSERT, dataLogin.pseudo, null, operationData);
+                        WebServices.OPERATION_INSERT, dataLogin.pseudo, null, null, operationData);
                 notifyChange(); // To update UI synchronization fields (no more in progress status)
 
                 if (result == null) {
@@ -208,7 +209,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
             operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.pseudo);
             if (operationData.size() > 0) {
                 Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
-                        WebServices.OPERATION_UPDATE, dataLogin.pseudo, null, operationData);
+                        WebServices.OPERATION_UPDATE, dataLogin.pseudo, null, null, operationData);
                 notifyChange();
 
                 if (result == null) {
@@ -224,7 +225,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
             operationData = table.syncDeleted(mService.getContentResolver(), dataLogin.pseudo);
             if (operationData.size() > 0) {
                 Object result = table.synchronize(mService.getContentResolver(), dataLogin.token.get(),
-                        WebServices.OPERATION_DELETE, dataLogin.pseudo, null, operationData);
+                        WebServices.OPERATION_DELETE, dataLogin.pseudo, null, null, operationData);
                 notifyChange();
 
                 if (result == null) {
