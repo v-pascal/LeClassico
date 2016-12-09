@@ -6,6 +6,8 @@ package com.studio.artaban.leclassico.data.codes;
  */
 public final class WebServices {
 
+    public static char LIST_SEPARATOR = 'n';
+
     ////// URL /////////////////////////////////////////////////////////////////////////////////////
 
     public static final String URL_CONNECTION = "/connexion.php"; // Connection web service
@@ -38,6 +40,9 @@ public final class WebServices {
     public static final String DATA_KEYS = "Keys";
     public static final String DATA_STATUS = "Status";
     public static final String DATA_UPDATES = "Updates";
+
+    public static final String DATA_TYPE = "Type";
+    public static final String DATA_IDS = "Ids";
 
     // Connection
     public static final String CONNECTION_DATA_PSEUDO = "psd";

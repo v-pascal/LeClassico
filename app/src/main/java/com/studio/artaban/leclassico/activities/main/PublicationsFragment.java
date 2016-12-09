@@ -601,6 +601,7 @@ public class PublicationsFragment extends MainFragment implements
                         " GROUP BY " + fields +
                         " ORDER BY " + ActualitesTable.COLUMN_DATE + " DESC");
 
+        // TODO: Same as explained in the 'ActualitesTable.getIds' method (about the query above)
         mListLoader.init(getActivity(), Queries.MAIN_PUBLICATIONS_LIST, pubData);
         return rootView;
     }

@@ -144,7 +144,7 @@ public abstract class DataTable implements IDataTable {
     }
 
     protected static String getSyncUrlRequest(ContentResolver resolver, Bundle data) {
-        // Return URL of synchronization request according table data
+    // Return URL of synchronization request according table data
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
         byte operation = data.getByte(DATA_KEY_OPERATION);
@@ -161,7 +161,8 @@ public abstract class DataTable implements IDataTable {
                     break; // No entry (no date criteria)
 
                 Logs.add(Logs.Type.I, "Previous status date: " + statusDate);
-                url += '&' + WebServices.DATA_STATUS_DATE + '=' + statusDate.replace(' ', 'n');
+                url += '&' + WebServices.DATA_STATUS_DATE + '=' +
+                        statusDate.replace(' ', WebServices.LIST_SEPARATOR);
                 //break;
             }
             case WebServices.OPERATION_SELECT_OLD: { ////// Old selection
@@ -177,7 +178,7 @@ public abstract class DataTable implements IDataTable {
                     break;
 
                 Logs.add(Logs.Type.I, "Previous date: " + date);
-                url += '&' + WebServices.DATA_DATE + '=' + date.replace(' ', 'n');
+                url += '&' + WebServices.DATA_DATE + '=' + date.replace(' ', WebServices.LIST_SEPARATOR);
                 break;
             }
         }

@@ -59,6 +59,19 @@ public class CommentairesRequest extends DataRequest {
 
 
 
+            /*
+            if NEW
+
+            StringBuilder ids = new StringBuilder();
+            for (Integer id : syncData.getIntegerArrayList(DATA_KEY_IDS))
+                ids.append((ids.length() == 0)? id.toString():WebServices.LIST_SEPARATOR + id.toString());
+            postData.put(WebServices.DATA_IDS, ids.toString()); // Add IDs to post data
+            postData.put(WebServices.DATA_TYPE, ?); // Add type to post data
+
+            ////// ALSO ADD CODE ABOVE TO OLD REQUEST
+            */
+
+
 
 
         }

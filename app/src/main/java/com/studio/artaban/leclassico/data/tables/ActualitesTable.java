@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -100,6 +101,36 @@ public class ActualitesTable extends DataTable {
     //
     private ActualitesTable() { }
     public static ActualitesTable newInstance() { return new ActualitesTable(); }
+    public static String getIds(ContentResolver resolver, String pseudo) {
+    // Return publication IDs list needed to get associated comments (according user followers)
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver);
+        Cursor idsCursor = resolver.query(Uris.getUri(Uris.ID_RAW_QUERY), null,
+                "SELECT " + COLUMN_ACTU_ID + " FROM " + TABLE_NAME +
+                " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
+                AbonnementsTable.COLUMN_CAMARADE + '=' + COLUMN_PSEUDO + " AND " +
+                AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
+                AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) + " AND " +
+                AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'' +
+                " ORDER BY " + COLUMN_DATE + " DESC", null, null);
+
+        // TODO: If a followed member has published on a wall and if the owner of this wall removes
+        //       him from its followed list, that will cause to hide the publication from this
+        //       result! Should includes the query result used to display profile wall with the
+        //       WHERE clause (see Web service).
+
+        StringBuilder ids = new StringBuilder();
+        if (idsCursor.moveToFirst()) {
+            do {
+                ids.append((ids.length() == 0)?
+                        idsCursor.getInt(0) : WebServices.LIST_SEPARATOR + idsCursor.getInt(0));
+            } while (idsCursor.moveToNext());
+        }
+        idsCursor.close();
+        return ids.toString();
+    }
 
     @Override
     public void create(SQLiteDatabase db) {

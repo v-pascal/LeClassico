@@ -79,6 +79,15 @@ public class PhotosTable extends DataTable {
     //
     private PhotosTable() { }
     public static PhotosTable newInstance() { return new PhotosTable(); }
+    public static String getIds(ContentResolver resolver) {
+
+
+
+
+
+
+        return null;
+    }
 
     @Override
     public void create(SQLiteDatabase db) {

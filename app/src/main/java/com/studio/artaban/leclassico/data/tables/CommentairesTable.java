@@ -2,17 +2,24 @@ package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -21,6 +28,10 @@ import java.util.List;
  * Commentaires database table class
  */
 public class CommentairesTable extends DataTable {
+
+    public static char TYPE_PUBLICATION = 'A';
+    public static char TYPE_PHOTO = 'P';
+    // Types
 
     private static final short DEFAULT_LIMIT = 5; // Default remote DB query limit
 
@@ -153,19 +164,121 @@ public class CommentairesTable extends DataTable {
     }
 
     // JSON keys
-    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_OBJ_TYPE = COLUMN_OBJ_TYPE.substring(4);
     private static final String JSON_KEY_OBJ_ID = COLUMN_OBJ_ID.substring(4);
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_DATE = COLUMN_DATE.substring(4);
+    private static final String JSON_KEY_TEXT = COLUMN_TEXT.substring(4);
+    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
+
+    //////
+    private Internet.DownloadResult sendSyncRequest(String url, @Nullable ContentValues postData,
+                                                    final ContentResolver resolver, final byte operation,
+                                                    final SyncResult syncResult) {
+        // Send remote DB request
+        return Internet.downloadHttpRequest(url, postData, new Internet.OnRequestListener() {
+
+            @Override
+            public boolean onReceiveReply(String response) {
+                //Logs.add(Logs.Type.V, "response: " + response);
+                try {
+
+                    JSONObject reply = new JSONObject(response);
+                    if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
+
+                        if (reply.isNull(TABLE_NAME))
+                            return ((operation == WebServices.OPERATION_SELECT) ||
+                                    (operation == WebServices.OPERATION_SELECT_OLD));
+                        // Already synchronized for selection but error for any other operation
+
+                        Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
+                        JSONArray entries = reply.getJSONArray(TABLE_NAME);
+                        for (int i = 0; i < entries.length(); ++i) {
+
+                            JSONObject entry = (JSONObject) entries.get(i);
+
+                            // Key fields
+                            char type = entry.getString(JSON_KEY_OBJ_TYPE).charAt(0);
+                            int id = entry.getInt(JSON_KEY_OBJ_ID);
+                            String pseudo = entry.getString(JSON_KEY_PSEUDO);
+                            String date = entry.getString(JSON_KEY_DATE);
+
+                            // Data fields
+                            ContentValues values = new ContentValues();
+                            values.put(COLUMN_TEXT, entry.getString(JSON_KEY_TEXT));
+
+                            values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
+
+                            // Check if entry already exists
+                            String selection = COLUMN_OBJ_TYPE + "='" + type + "' AND " +
+                                    COLUMN_OBJ_ID + '=' + id + " AND " +
+                                    COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                                    COLUMN_DATE + "='" + date + '\'';
+                            Cursor cursor = resolver.query(tableUri, new String[]{Constants.DATA_COLUMN_STATUS_DATE},
+                                    selection, null, null);
+                            if (cursor.moveToFirst()) { // DB entry exists
+
+                                if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
+                                    // NB: Web site deletion priority (no status date comparison)
+                                    cursor.close();
+
+                                    ////// Delete entry (definitively)
+                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                            Synchronized.TO_DELETE.getValue());
+                                    resolver.update(tableUri, values, selection, null);
+                                    resolver.delete(tableUri,
+                                            selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
+
+                                    ++syncResult.deleted;
+
+                                } else if (cursor.getString(0)
+                                        .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
+
+                                    ////// Update entry
+                                    cursor.close();
+                                    resolver.update(tableUri, values, selection, null);
+                                    ++syncResult.updated;
+
+                                } else // Nothing to do here (let's synchronize from local to remote DB)
+                                    cursor.close();
+
+                            } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
+
+                                ////// Insert entry into DB
+                                values.put(COLUMN_OBJ_TYPE, String.valueOf(type));
+                                values.put(COLUMN_OBJ_ID, id);
+                                values.put(COLUMN_PSEUDO, pseudo);
+                                values.put(COLUMN_DATE, date);
+                                resolver.insert(tableUri, values);
+
+                                ++syncResult.inserted;
+                            }
+                            //else // Do not add a deleted entry (created & removed when offline)
+                        }
+
+                    } else {
+                        Logs.add(Logs.Type.E, "Synchronization error: #" + reply.getInt(WebServices.JSON_KEY_ERROR));
+                        return false;
+                    }
+
+                } catch (JSONException e) {
+                    Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                    return false;
+                }
+                return true;
+            }
+        });
+    }
 
     @Override
-    public SyncResult synchronize(final ContentResolver resolver, final byte operation, Bundle syncData,
+    public SyncResult synchronize(final ContentResolver resolver, byte operation, Bundle syncData,
                                   @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";operation: " + operation +
                 ";syncData: " + syncData + ";postData: " + postData);
-
-        final SyncResult syncResult = new SyncResult();
 
         syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_PUBLICATIONS);
         syncData.putByte(DATA_KEY_OPERATION, operation);
@@ -174,130 +287,53 @@ public class CommentairesTable extends DataTable {
         syncData.putString(DATA_KEY_FIELD_DATE, COLUMN_DATE);
         String url = getSyncUrlRequest(resolver, syncData);
 
-        syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
-        // NB: Do not use pseudo criteria to get max status date but add it to reset sync fields!
+        Internet.DownloadResult result;
+        SyncResult syncResult = new SyncResult();
+        if (operation == WebServices.OPERATION_SELECT) { ////// All comments
 
+            ContentValues data = new ContentValues();
 
+            // Add IDs & type to post data
+            data.put(WebServices.DATA_IDS, ActualitesTable.getIds(resolver, syncData.getString(DATA_KEY_PSEUDO)));
+            data.put(WebServices.DATA_TYPE, String.valueOf(TYPE_PUBLICATION));
 
+            ////// Get publications comments
+            result = sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT, syncResult);
+            if (result != Internet.DownloadResult.SUCCEEDED) {
+                Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error (A)");
+                return null;
+            }
 
+            // Replace IDs & type from post data
+            data.put(WebServices.DATA_IDS, PhotosTable.getIds(resolver));
+            data.put(WebServices.DATA_TYPE, String.valueOf(TYPE_PHOTO));
 
+            ////// Get photos comments
+            result = sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT, syncResult);
+            if (result != Internet.DownloadResult.SUCCEEDED) {
+                Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error (P)");
+                return null;
+            }
 
-        // Get publications IDs to get only associated comments
+        } else { ////// Specific comments
 
+            if (postData == null)
+                throw new IllegalArgumentException("Missing IDs & Type info into data");
 
+            //////
+            result = sendSyncRequest(url, postData, resolver, operation, syncResult);
+            if (result != Internet.DownloadResult.SUCCEEDED) {
+                Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
 
+                if (operation != WebServices.OPERATION_SELECT_OLD) {
+                    syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+                    // NB: Do not use pseudo criteria to get max status date but add it to reset sync fields!
 
-
-
-        /*
-        // Send remote DB request
-        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
-                new Internet.OnRequestListener() {
-
-                    @Override
-                    public boolean onReceiveReply(String response) {
-                        //Logs.add(Logs.Type.V, "response: " + response);
-                        try {
-
-                            JSONObject reply = new JSONObject(response);
-                            if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
-
-                                if (reply.isNull(TABLE_NAME))
-                                    return ((operation == WebServices.OPERATION_SELECT) ||
-                                            (operation == WebServices.OPERATION_SELECT_OLD));
-                                // Already synchronized for selection but error for any other operation
-
-                                Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
-                                JSONArray entries = reply.getJSONArray(TABLE_NAME);
-                                for (int i = 0; i < entries.length(); ++i) {
-
-                                    JSONObject entry = (JSONObject) entries.get(i);
-
-                                    // Key fields
-                                    int actuId = entry.getInt(JSON_KEY_ACTU_ID);
-
-                                    // Data fields
-                                    ContentValues values = new ContentValues();
-                                    values.put(COLUMN_PSEUDO, entry.getString(JSON_KEY_PSEUDO));
-                                    values.put(COLUMN_DATE, entry.getString(JSON_KEY_DATE));
-                                    if (!entry.isNull(JSON_KEY_CAMARADE))
-                                        values.put(COLUMN_CAMARADE, entry.getString(JSON_KEY_CAMARADE));
-                                    if (!entry.isNull(JSON_KEY_TEXT))
-                                        values.put(COLUMN_TEXT, entry.getString(JSON_KEY_TEXT));
-                                    if (!entry.isNull(JSON_KEY_LINK))
-                                        values.put(COLUMN_LINK, entry.getString(JSON_KEY_LINK));
-                                    if (!entry.isNull(JSON_KEY_FICHIER))
-                                        values.put(COLUMN_FICHIER, entry.getString(JSON_KEY_FICHIER));
-                                    values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
-                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
-
-                                    // Check if entry already exists
-                                    String selection = COLUMN_ACTU_ID + '=' + actuId;
-                                    Cursor cursor = resolver.query(tableUri, new String[]{Constants.DATA_COLUMN_STATUS_DATE},
-                                            selection, null, null);
-                                    if (cursor.moveToFirst()) { // DB entry exists
-
-                                        if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
-                                            // NB: Web site deletion priority (no status date comparison)
-                                            cursor.close();
-
-                                            ////// Delete entry (definitively)
-                                            values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                                    Synchronized.TO_DELETE.getValue());
-                                            resolver.update(tableUri, values, selection, null);
-                                            resolver.delete(tableUri,
-                                                    selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
-
-                                            ++syncResult.deleted;
-
-                                        } else if (cursor.getString(0)
-                                                .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
-
-                                            ////// Update entry
-                                            cursor.close();
-                                            resolver.update(tableUri, values, selection, null);
-                                            ++syncResult.updated;
-
-                                        } else // Nothing to do here (let's synchronize from local to remote DB)
-                                            cursor.close();
-
-                                    } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
-
-                                        ////// Insert entry into DB
-                                        values.put(COLUMN_ACTU_ID, actuId);
-                                        resolver.insert(tableUri, values);
-
-                                        ++syncResult.inserted;
-                                    }
-                                    //else // Do not add a deleted entry (created & removed when offline)
-                                }
-
-                            } else {
-                                Logs.add(Logs.Type.E, "Synchronization error: #" +
-                                        reply.getInt(WebServices.JSON_KEY_ERROR));
-                                return false;
-                            }
-
-                        } catch (JSONException e) {
-                            Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
-                            return false;
-                        }
-                        return true;
-                    }
-                });
-        if (result != Internet.DownloadResult.SUCCEEDED) {
-
-            Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            if ((operation != WebServices.OPERATION_SELECT) && (operation != WebServices.OPERATION_SELECT_OLD))
-                resetSyncInProgress(resolver, data);
-            return null;
+                    resetSyncInProgress(resolver, syncData);
+                }
+                return null;
+            }
         }
-        */
-
-
-
-
-
         return syncResult;
     }
 }
