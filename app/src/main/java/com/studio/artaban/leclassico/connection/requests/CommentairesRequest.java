@@ -67,9 +67,13 @@ public class CommentairesRequest extends DataRequest {
                 ids.append((ids.length() == 0)? id.toString():WebServices.LIST_SEPARATOR + id.toString());
             postData.put(WebServices.DATA_IDS, ids.toString()); // Add IDs to post data
             postData.put(WebServices.DATA_TYPE, ?); // Add type to post data
-
             ////// ALSO ADD CODE ABOVE TO OLD REQUEST
+
+
+            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, ids));
+            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, ids));
             */
+
 
 
 

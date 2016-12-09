@@ -98,6 +98,7 @@ public abstract class DataTable implements IDataTable {
     public static final String DATA_KEY_LIMIT = "limit";
     public static final String DATA_KEY_PSEUDO = "pseudo";
     public static final String DATA_KEY_DATE = "date";
+    public static final String DATA_KEY_STATUS_DATE = "statusDate";
 
     protected static final String DATA_KEY_WEB_SERVICE = "webService";
     protected static final String DATA_KEY_OPERATION = "operation";
@@ -156,7 +157,8 @@ public abstract class DataTable implements IDataTable {
         switch (operation) {
             case WebServices.OPERATION_SELECT: { ////// Selection
 
-                String statusDate = getMaxStatusDate(resolver, data);
+                String statusDate = (data.containsKey(DATA_KEY_STATUS_DATE))?
+                        data.getString(DATA_KEY_STATUS_DATE) : getMaxStatusDate(resolver, data);
                 if (statusDate == null)
                     break; // No entry (no date criteria)
 
@@ -171,7 +173,7 @@ public abstract class DataTable implements IDataTable {
                 String date = null;
                 if (data.containsKey(DATA_KEY_DATE))
                     date = data.getString(DATA_KEY_DATE);
-                else if (data.containsKey(DATA_KEY_FIELD_DATE))
+                else if (data.containsKey(DATA_KEY_FIELD_DATE)) // If existing
                     date = getMinDate(resolver, data);
 
                 if (date == null)

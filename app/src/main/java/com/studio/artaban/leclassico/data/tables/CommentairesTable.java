@@ -172,6 +172,25 @@ public class CommentairesTable extends DataTable {
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     //////
+    private static String getMaxStatusDate(ContentResolver resolver, String ids) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";ids: " + ids);
+
+
+
+
+
+        return null;
+    }
+    private static String getMinDate(ContentResolver resolver, String ids) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";ids: " + ids);
+
+
+
+
+
+        return null;
+    }
+
     private Internet.DownloadResult sendSyncRequest(String url, @Nullable ContentValues postData,
                                                     final ContentResolver resolver, final byte operation,
                                                     final SyncResult syncResult) {
@@ -285,16 +304,24 @@ public class CommentairesTable extends DataTable {
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
         //syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         syncData.putString(DATA_KEY_FIELD_DATE, COLUMN_DATE);
-        String url = getSyncUrlRequest(resolver, syncData);
 
         Internet.DownloadResult result;
         SyncResult syncResult = new SyncResult();
         if (operation == WebServices.OPERATION_SELECT) { ////// All comments
 
-            ContentValues data = new ContentValues();
+            // Get publication IDs list
+            String ids = ActualitesTable.getIds(resolver, syncData.getString(DATA_KEY_PSEUDO));
+            //if (ids == null)
+            //  Cannot be NULL coz there is at least one publication: the Webmaster presentation!
+
+            // Get request URL accordingly
+            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, ids));
+            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, ids));
+            String url = getSyncUrlRequest(resolver, syncData);
 
             // Add IDs & type to post data
-            data.put(WebServices.DATA_IDS, ActualitesTable.getIds(resolver, syncData.getString(DATA_KEY_PSEUDO)));
+            ContentValues data = new ContentValues();
+            data.put(WebServices.DATA_IDS, ids);
             data.put(WebServices.DATA_TYPE, String.valueOf(TYPE_PUBLICATION));
 
             ////// Get publications comments
@@ -304,8 +331,18 @@ public class CommentairesTable extends DataTable {
                 return null;
             }
 
+            // Get publication IDs list
+            ids = PhotosTable.getIds(resolver);
+            if (ids == null)
+                return syncResult; // No photo found
+
+            // Get request URL accordingly
+            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, ids));
+            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, ids));
+            url = getSyncUrlRequest(resolver, syncData);
+
             // Replace IDs & type from post data
-            data.put(WebServices.DATA_IDS, PhotosTable.getIds(resolver));
+            data.put(WebServices.DATA_IDS, ids);
             data.put(WebServices.DATA_TYPE, String.valueOf(TYPE_PHOTO));
 
             ////// Get photos comments
@@ -321,7 +358,8 @@ public class CommentairesTable extends DataTable {
                 throw new IllegalArgumentException("Missing IDs & Type info into data");
 
             //////
-            result = sendSyncRequest(url, postData, resolver, operation, syncResult);
+            result = sendSyncRequest(getSyncUrlRequest(resolver, syncData), postData, resolver,
+                    operation, syncResult);
             if (result != Internet.DownloadResult.SUCCEEDED) {
                 Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
 

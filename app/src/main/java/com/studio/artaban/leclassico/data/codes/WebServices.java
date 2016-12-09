@@ -6,7 +6,7 @@ package com.studio.artaban.leclassico.data.codes;
  */
 public final class WebServices {
 
-    public static char LIST_SEPARATOR = 'n';
+    public static final char LIST_SEPARATOR = 'n';
 
     ////// URL /////////////////////////////////////////////////////////////////////////////////////
 
