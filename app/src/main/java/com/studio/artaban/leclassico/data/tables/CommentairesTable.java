@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -172,23 +173,43 @@ public class CommentairesTable extends DataTable {
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     //////
-    private static String getMaxStatusDate(ContentResolver resolver, String ids) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";ids: " + ids);
+    private static String getMaxStatusDate(ContentResolver resolver, char type, String ids) {
+    // Return newest status date of entries specified by criteria (passed in parameters)
 
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";type: " + type + ";ids: " + ids);
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME),
+                new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ')' },
+                Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue() + " AND " +
+                        COLUMN_OBJ_TYPE + "='" + type + "' AND " +
+                        COLUMN_OBJ_ID + " IN (" + ids.replace(WebServices.LIST_SEPARATOR, ',') + ')',
+                null, null);
 
-
-
-
-        return null;
+        String statusDate = null;
+        if (cursor.moveToFirst())
+            statusDate = cursor.getString(0);
+        cursor.close();
+        return statusDate;
     }
-    private static String getMinDate(ContentResolver resolver, String ids) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";ids: " + ids);
+    private static String getMinDate(ContentResolver resolver, char type, String ids) {
+    // Return oldest date of entries specified by criteria (passed in parameters)
 
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";type: " + type + ";ids: " + ids);
+        Cursor cursor = resolver.query(Uris.getUri(Uris.ID_RAW_QUERY), null,
+                "SELECT min(" + COLUMN_DATE + ")," + COLUMN_OBJ_ID + " FROM " + TABLE_NAME + " WHERE " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue() + " AND " +
+                        COLUMN_OBJ_TYPE + "='" + type + "' AND " +
+                        COLUMN_OBJ_ID + " IN (" + ids.replace(WebServices.LIST_SEPARATOR, ',') + ')' +
+                        " GROUP BY " + COLUMN_OBJ_ID + " ORDER BY " + COLUMN_DATE + " DESC LIMIT 1",
+                null, null);
 
-
-
-
-        return null;
+        // NB: Do not get min date directly as done in the common function coz should return the newest
+        //     date of the last comments. This need is due to the limitation added to the comments
+        //     synchronization query (LIMIT statement).
+        String date = null;
+        if (cursor.moveToFirst())
+            date = cursor.getString(0); // The most recent of the oldest date (see comments above)
+        cursor.close();
+        return date;
     }
 
     private Internet.DownloadResult sendSyncRequest(String url, @Nullable ContentValues postData,
@@ -230,6 +251,7 @@ public class CommentairesTable extends DataTable {
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
                             // Check if entry already exists
+                            // Check if entry already exists
                             String selection = COLUMN_OBJ_TYPE + "='" + type + "' AND " +
                                     COLUMN_OBJ_ID + '=' + id + " AND " +
                                     COLUMN_PSEUDO + "='" + pseudo + "' AND " +
@@ -240,7 +262,6 @@ public class CommentairesTable extends DataTable {
 
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
                                     // NB: Web site deletion priority (no status date comparison)
-                                    cursor.close();
 
                                     ////// Delete entry (definitively)
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
@@ -255,12 +276,11 @@ public class CommentairesTable extends DataTable {
                                         .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
 
                                     ////// Update entry
-                                    cursor.close();
                                     resolver.update(tableUri, values, selection, null);
                                     ++syncResult.updated;
 
-                                } else // Nothing to do here (let's synchronize from local to remote DB)
-                                    cursor.close();
+                                }
+                                //else // Nothing to do here (let's synchronize from local to remote DB)
 
                             } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
@@ -274,6 +294,7 @@ public class CommentairesTable extends DataTable {
                                 ++syncResult.inserted;
                             }
                             //else // Do not add a deleted entry (created & removed when offline)
+                            cursor.close();
                         }
 
                     } else {
@@ -315,8 +336,8 @@ public class CommentairesTable extends DataTable {
             //  Cannot be NULL coz there is at least one publication: the Webmaster presentation!
 
             // Get request URL accordingly
-            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, ids));
-            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, ids));
+            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, TYPE_PUBLICATION, ids));
+            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, TYPE_PUBLICATION, ids));
             String url = getSyncUrlRequest(resolver, syncData);
 
             // Add IDs & type to post data
@@ -337,8 +358,8 @@ public class CommentairesTable extends DataTable {
                 return syncResult; // No photo found
 
             // Get request URL accordingly
-            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, ids));
-            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, ids));
+            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, TYPE_PHOTO, ids));
+            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, TYPE_PHOTO, ids));
             url = getSyncUrlRequest(resolver, syncData);
 
             // Replace IDs & type from post data

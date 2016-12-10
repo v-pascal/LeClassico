@@ -210,7 +210,6 @@ public class AbonnementsTable extends DataTable {
 
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
                                     // NB: Web site deletion priority (no status date comparison)
-                                    cursor.close();
 
                                     ////// Delete entry (definitively)
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
@@ -225,12 +224,11 @@ public class AbonnementsTable extends DataTable {
                                             .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
 
                                     ////// Update entry
-                                    cursor.close();
                                     resolver.update(tableUri, values, selection, null);
                                     ++syncResult.updated;
 
-                                } else // Nothing to do here (let's synchronize from local to remote DB)
-                                    cursor.close();
+                                }
+                                //else // Nothing to do here (let's synchronize from local to remote DB)
 
                             } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
@@ -242,6 +240,7 @@ public class AbonnementsTable extends DataTable {
                                 ++syncResult.inserted;
                             }
                             //else // Do not add a deleted entry (created & removed when offline)
+                            cursor.close();
                         }
 
                     } else {

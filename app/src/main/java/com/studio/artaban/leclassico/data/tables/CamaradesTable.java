@@ -402,7 +402,7 @@ public class CamaradesTable extends DataTable {
                             if (cursor.moveToFirst()) { // DB entry exists
 
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
-                                    cursor.close();
+                                    // NB: Web site deletion priority (no status date comparison)
 
                                     ////// Delete entry (definitively)
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
@@ -535,24 +535,20 @@ public class CamaradesTable extends DataTable {
                                         values.put(Constants.DATA_COLUMN_STATUS_DATE,
                                                 cursor.getString(COLUMN_INDEX_STATUS_DATE));
                                     }
-                                    cursor.close();
                                     resolver.update(tableUri, values, selection, null);
                                     ++syncResult.updated;
                                 }
 
-                            } else {
-                                cursor.close();
+                            } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
-                                if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
+                                ////// Insert entry into DB
+                                values.put(COLUMN_PSEUDO, pseudo);
+                                resolver.insert(tableUri, values);
 
-                                    ////// Insert entry into DB
-                                    values.put(COLUMN_PSEUDO, pseudo);
-                                    resolver.insert(tableUri, values);
-
-                                    ++syncResult.inserted;
-                                }
-                                //else // Do not add a deleted entry (created & removed when offline)
+                                ++syncResult.inserted;
                             }
+                            //else // Do not add a deleted entry (created & removed when offline)
+                            cursor.close();
                         }
 
                     } else {
