@@ -314,7 +314,7 @@ public class PublicationsFragment extends MainFragment implements
             // Set comments count
             ((TextView)holder.rootView.findViewById(R.id.text_comments_count))
                     .setText(getString(R.string.publication_comments_count,
-                            mDataSource.getInt(position, COLUMN_INDEX_COMMENTS_COUNT)));
+                            mDataSource.getInt(position, COLUMN_INDEX_COMMENTS)));
 
             // Set synchronization
             Tools.setSyncView(getActivity(), (TextView) holder.rootView.findViewById(R.id.text_sync_date),
@@ -386,19 +386,19 @@ public class PublicationsFragment extends MainFragment implements
     private static final int COLUMN_INDEX_TEXT = 3;
     private static final int COLUMN_INDEX_LINK = 4;
     private static final int COLUMN_INDEX_FICHIER = 5;
-    private static final int COLUMN_INDEX_STATUS_DATE = 6;
-    private static final int COLUMN_INDEX_SYNC = 7;
-    private static final int COLUMN_INDEX_PUB_ID = 8;
-    private static final int COLUMN_INDEX_LINK_ID = 9;
-    private static final int COLUMN_INDEX_LINK_IMAGE = 10;
-    private static final int COLUMN_INDEX_LINK_TITLE = 11;
-    private static final int COLUMN_INDEX_LINK_DESC = 12;
-    private static final int COLUMN_INDEX_LINK_INFO = 13;
-    private static final int COLUMN_INDEX_PSEUDO = 14;
-    private static final int COLUMN_INDEX_SEX = 15;
-    private static final int COLUMN_INDEX_PROFILE = 16;
-    private static final int COLUMN_INDEX_MEMBER_ID = 17;
-    private static final int COLUMN_INDEX_COMMENTS_COUNT = 18;
+    private static final int COLUMN_INDEX_COMMENTS = 6;
+    private static final int COLUMN_INDEX_STATUS_DATE = 7;
+    private static final int COLUMN_INDEX_SYNC = 8;
+    private static final int COLUMN_INDEX_PUB_ID = 9;
+    private static final int COLUMN_INDEX_LINK_ID = 10;
+    private static final int COLUMN_INDEX_LINK_IMAGE = 11;
+    private static final int COLUMN_INDEX_LINK_TITLE = 12;
+    private static final int COLUMN_INDEX_LINK_DESC = 13;
+    private static final int COLUMN_INDEX_LINK_INFO = 14;
+    private static final int COLUMN_INDEX_PSEUDO = 15;
+    private static final int COLUMN_INDEX_SEX = 16;
+    private static final int COLUMN_INDEX_PROFILE = 17;
+    private static final int COLUMN_INDEX_MEMBER_ID = 18;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -553,12 +553,17 @@ public class PublicationsFragment extends MainFragment implements
         mPubList.setAdapter(mPubAdapter);
 
         // Initialize notification list (set query loaders)
-        String fields = ActualitesTable.COLUMN_ACTU_ID + ',' + // COLUMN_INDEX_ACTU_ID
+        Bundle pubData = new Bundle();
+        pubData.putParcelable(QueryLoader.DATA_KEY_URI, mPubUri);
+        pubData.putString(QueryLoader.DATA_KEY_SELECTION,
+                "SELECT " +
+                        ActualitesTable.COLUMN_ACTU_ID + ',' + // COLUMN_INDEX_ACTU_ID
                         ActualitesTable.COLUMN_CAMARADE + ',' + // COLUMN_INDEX_CAMARADE
                         ActualitesTable.COLUMN_DATE + ',' + // COLUMN_INDEX_DATE
                         ActualitesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_TEXT
                         ActualitesTable.COLUMN_LINK + ',' + // COLUMN_INDEX_LINK
                         ActualitesTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_FICHIER
+                        ActualitesTable.COLUMN_COMMENTS + ',' + // COLUMN_INDEX_COMMENTS
                         ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
                         ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',' + // COLUMN_INDEX_SYNC
                         ActualitesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_PUB_ID
@@ -570,22 +575,12 @@ public class PublicationsFragment extends MainFragment implements
                         CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
                         CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
                         CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
-                        CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID; // COLUMN_INDEX_MEMBER_ID
-
-        Bundle pubData = new Bundle();
-        pubData.putParcelable(QueryLoader.DATA_KEY_URI, mPubUri);
-        pubData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT " +
-                        fields + ',' +
-                        "count(" + CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ')' + // COLUMN_INDEX_COMMENTS_COUNT
+                        CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_MEMBER_ID
                         " FROM " + ActualitesTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
                         CamaradesTable.COLUMN_PSEUDO + '=' + ActualitesTable.COLUMN_PSEUDO +
                         " LEFT JOIN " + LinksTable.TABLE_NAME + " ON " +
                         LinksTable.COLUMN_URL + '=' + ActualitesTable.COLUMN_LINK +
-                        " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
-                        CommentairesTable.COLUMN_OBJ_ID + '=' + ActualitesTable.COLUMN_ACTU_ID + " AND " +
-                        CommentairesTable.COLUMN_OBJ_TYPE + "='" + NotificationsTable.TYPE_PUB_COMMENT + '\'' +
                         " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
                         AbonnementsTable.COLUMN_CAMARADE + '=' + ActualitesTable.COLUMN_PSEUDO + " AND " +
                         AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
@@ -598,7 +593,6 @@ public class PublicationsFragment extends MainFragment implements
                         DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
                         ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
-                        " GROUP BY " + fields +
                         " ORDER BY " + ActualitesTable.COLUMN_DATE + " DESC");
 
         // TODO: Same as explained in the 'ActualitesTable.getIds' method (about the query above)

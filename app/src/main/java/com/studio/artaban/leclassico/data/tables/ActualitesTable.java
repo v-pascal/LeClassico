@@ -86,6 +86,7 @@ public class ActualitesTable extends DataTable {
     public static final String COLUMN_TEXT = "ACT_Text";
     public static final String COLUMN_LINK = "ACT_Link";
     public static final String COLUMN_FICHIER = "ACT_Fichier";
+    public static final String COLUMN_COMMENTS = "ACT_Comments";
     private static final String COLUMN_STATUS_DATE = "ACT_StatusDate";
 
     // Columns index
@@ -95,8 +96,9 @@ public class ActualitesTable extends DataTable {
     private static final short COLUMN_INDEX_TEXT = 4;
     private static final short COLUMN_INDEX_LINK = 5;
     private static final short COLUMN_INDEX_FICHIER = 6;
-    private static final short COLUMN_INDEX_STATUS_DATE = 7;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
+    private static final short COLUMN_INDEX_COMMENTS = 7;
+    private static final short COLUMN_INDEX_STATUS_DATE = 8;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 9;
 
     //
     private ActualitesTable() { }
@@ -146,6 +148,7 @@ public class ActualitesTable extends DataTable {
                 COLUMN_TEXT + " TEXT," +
                 COLUMN_LINK + " TEXT," +
                 COLUMN_FICHIER + " TEXT," +
+                COLUMN_COMMENTS + " INTEGER NOT NULL," +
 
                 Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
@@ -206,6 +209,7 @@ public class ActualitesTable extends DataTable {
     private static final String JSON_KEY_TEXT = COLUMN_TEXT.substring(4);
     private static final String JSON_KEY_LINK = COLUMN_LINK.substring(4);
     private static final String JSON_KEY_FICHIER = COLUMN_FICHIER.substring(4);
+    private static final String JSON_KEY_COMMENTS = COLUMN_COMMENTS.substring(4);
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     @Override
@@ -267,6 +271,8 @@ public class ActualitesTable extends DataTable {
                                 values.put(COLUMN_LINK, entry.getString(JSON_KEY_LINK));
                             if (!entry.isNull(JSON_KEY_FICHIER))
                                 values.put(COLUMN_FICHIER, entry.getString(JSON_KEY_FICHIER));
+                            values.put(COLUMN_COMMENTS, entry.getInt(JSON_KEY_COMMENTS));
+
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
