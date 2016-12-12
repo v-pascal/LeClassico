@@ -41,8 +41,6 @@ import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
-import com.studio.artaban.leclassico.data.tables.CommentairesTable;
-import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
@@ -241,11 +239,13 @@ public class PublicationsFragment extends MainFragment implements
                             .load(Storage.FOLDER_PHOTOS + File.separator + photo,
                                     Constants.APP_URL_PHOTOS + '/' + photo)
                             .placeholder(R.drawable.photos)
-                            .into((ImageView) holder.rootView.findViewById(R.id.image_published), null);
+                            .into(image, null);
+
+                    // TODO: Add a fix to a bug that causes a wrong image size display when scrolling
+                    //       "too" fast (the image size == default earth image size).
 
                 } else { ////// Link
-                    ((ImageView) holder.rootView.findViewById(R.id.image_published))
-                            .setImageDrawable(getResources().getDrawable(R.drawable.earth));
+                    image.setImageDrawable(getResources().getDrawable(R.drawable.earth));
 
                     if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_ID)) {
                         // Link data already downloaded
@@ -373,7 +373,7 @@ public class PublicationsFragment extends MainFragment implements
     //////
     private QueryLoader mListLoader; // Publication list query loader
     private Cursor mPubCursor; // Publications cursor
-    private String mPubLast; // Last publication date received
+    private String mPubLast; // Last publication date received (newest date)
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
     private short mQueryLimit = Queries.PUBLICATIONS_LIST_LIMIT; // DB query limit
@@ -415,13 +415,9 @@ public class PublicationsFragment extends MainFragment implements
 
                 mPubAdapter.setRequesting(false);
                 if (!intent.getBooleanExtra(DataService.EXTRA_DATA_OLD_FOUND, false)) {
-                    if (mQueryCount > (mQueryLimit - Queries.PUBLICATIONS_OLD_LIMIT)) {
-
-                        // Refresh list if no more old remote DB publications but existing in local DB
-                        mQueryLimit = mQueryCount;
-                        refresh();
-
-                    } else // Remove expected old publications count from limitation
+                    if (mQueryCount > (mQueryLimit - Queries.PUBLICATIONS_OLD_LIMIT))
+                        refresh(); // No more old remote DB publications but existing in local DB
+                    else
                         mQueryLimit -= Queries.NOTIFICATIONS_OLD_LIMIT;
                 }
                 //else // DB table update will notify cursor (no need to call refresh)
@@ -433,16 +429,10 @@ public class PublicationsFragment extends MainFragment implements
         Logs.add(Logs.Type.V, null);
         mPubCursor.moveToFirst();
 
-        // Get last publication date received
-        String lastPub;
-        do {
-            lastPub = mPubCursor.getString(COLUMN_INDEX_DATE);
-        } while (mPubCursor.moveToNext());
-        mPubCursor.moveToFirst();
-
         // Update current display data
+        String lastPub = mPubCursor.getString(COLUMN_INDEX_DATE);
         short count = (short) mPubCursor.getCount();
-        if ((mQueryCount != Constants.NO_DATA) && (mPubLast.compareTo(lastPub) == 0))
+        if ((mQueryCount != Constants.NO_DATA) && (mPubLast.compareTo(lastPub) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
         mQueryCount = count;

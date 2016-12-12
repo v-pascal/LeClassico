@@ -91,6 +91,9 @@
             android:name=".activities.publication.PublicationActivity"
             android:label="@string/title_activity_publication"
             android:theme="@style/MainAppTheme"/>
+        <activity
+            android:name=".activities.album.FullPhotoActivity"
+            android:theme="@style/MainAppTheme"/>
 
         <!-- Content providers -->
         <provider

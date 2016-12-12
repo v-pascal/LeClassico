@@ -109,8 +109,6 @@
                         android:id="@+id/image_published"
                         android:background="@color/light_gray"
                         android:adjustViewBounds="true"
-                        android:minHeight="36dp"
-                        android:minWidth="36dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 

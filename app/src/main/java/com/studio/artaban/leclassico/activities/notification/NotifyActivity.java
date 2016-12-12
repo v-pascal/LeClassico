@@ -481,7 +481,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     //////
     private final QueryLoader mListLoader = new QueryLoader(this, this); // User notification list query loader
     private Cursor mNotifyCursor; // Notifications cursor
-    private String mNotifyLast; // Last notification date received
+    private String mNotifyLast; // Last notification date received (newest date)
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
     private short mQueryLimit = Queries.NOTIFICATIONS_LIST_LIMIT; // DB query limit
@@ -525,13 +525,9 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                 mNotifyAdapter.setRequesting(false);
                 if (!intent.getBooleanExtra(DataService.EXTRA_DATA_OLD_FOUND, false)) {
-                    if (mQueryCount > (mQueryLimit - Queries.NOTIFICATIONS_OLD_LIMIT)) {
-
-                        // Refresh list if no more old remote DB notifications but existing in local DB
-                        mQueryLimit = mQueryCount;
-                        refresh();
-
-                    } else // Remove expected old notifications count from limitation
+                    if (mQueryCount > (mQueryLimit - Queries.NOTIFICATIONS_OLD_LIMIT))
+                        refresh(); // No more old remote DB notifications but existing in local DB
+                    else
                         mQueryLimit -= Queries.NOTIFICATIONS_OLD_LIMIT;
                 }
                 //else // DB table update will notify cursor (no need to call refresh)
@@ -544,11 +540,9 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         mNotifyCursor.moveToFirst();
 
         // Get new notification (first unread notifications) + last notification date received
-        String lastNotify;
         int newNotify = 0;
         boolean unreadNotify = true;
         do {
-            lastNotify = mNotifyCursor.getString(COLUMN_INDEX_DATE);
             if ((unreadNotify) && (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD))
                 ++newNotify; // new notification found (unread)
             else
@@ -556,11 +550,13 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
         } while (mNotifyCursor.moveToNext());
         mNotifyCursor.moveToFirst();
-        setNewNotifyInfo(newNotify);
+
+        setNewNotifyInfo(newNotify); // Update new notification(s) info
 
         // Update current display data
+        String lastNotify = mNotifyCursor.getString(COLUMN_INDEX_DATE);
         short count = (short) mNotifyCursor.getCount();
-        if ((mQueryCount != Constants.NO_DATA) && (mNotifyLast.compareTo(lastNotify) == 0))
+        if ((mQueryCount != Constants.NO_DATA) && (mNotifyLast.compareTo(lastNotify) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
         mQueryCount = count;
@@ -814,7 +810,6 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                         MessagerieTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_MSG_ID
                         CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COM_TEXT
                         CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_COMMENT_ID
-
                         " FROM " + NotificationsTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
                         NotificationsTable.COLUMN_OBJECT_FROM + '=' + CamaradesTable.COLUMN_PSEUDO +

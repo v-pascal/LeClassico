@@ -323,7 +323,10 @@ public class CommentairesTable extends DataTable {
         syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_PUBLICATIONS);
         syncData.putByte(DATA_KEY_OPERATION, operation);
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
-        //syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        if ((syncData.containsKey(DATA_KEY_LIMIT)) && (syncData.getShort(DATA_KEY_LIMIT) == 0))
+            syncData.putShort(DATA_KEY_LIMIT, DEFAULT_LIMIT);
+
+        syncData.remove(DATA_KEY_FIELD_PSEUDO); // No pseudo field criteria for this table
         syncData.putString(DATA_KEY_FIELD_DATE, COLUMN_DATE);
 
         Internet.DownloadResult result;

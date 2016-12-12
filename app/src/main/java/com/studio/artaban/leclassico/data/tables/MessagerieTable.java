@@ -196,7 +196,11 @@ public class MessagerieTable extends DataTable {
         syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_MESSAGERIE);
         syncData.putByte(DATA_KEY_OPERATION, operation);
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
+        if ((syncData.containsKey(DATA_KEY_LIMIT)) && (syncData.getShort(DATA_KEY_LIMIT) == 0))
+            syncData.putShort(DATA_KEY_LIMIT, DEFAULT_LIMIT);
+
         syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        syncData.remove(DATA_KEY_FIELD_DATE); // No date field criteria for this table
         String url = getSyncUrlRequest(resolver, syncData);
 
         // Send remote DB request

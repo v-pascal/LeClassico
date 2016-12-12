@@ -226,7 +226,10 @@ public class ActualitesTable extends DataTable {
         syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_PUBLICATIONS);
         syncData.putByte(DATA_KEY_OPERATION, operation);
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
-        //syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        if ((syncData.containsKey(DATA_KEY_LIMIT)) && (syncData.getShort(DATA_KEY_LIMIT) == 0))
+            syncData.putShort(DATA_KEY_LIMIT, DEFAULT_LIMIT);
+
+        syncData.remove(DATA_KEY_FIELD_PSEUDO); // See NB below
         syncData.putString(DATA_KEY_FIELD_DATE, COLUMN_DATE);
         String url = getSyncUrlRequest(resolver, syncData);
 
@@ -272,7 +275,6 @@ public class ActualitesTable extends DataTable {
                             if (!entry.isNull(JSON_KEY_FICHIER))
                                 values.put(COLUMN_FICHIER, entry.getString(JSON_KEY_FICHIER));
                             values.put(COLUMN_COMMENTS, entry.getInt(JSON_KEY_COMMENTS));
-
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 

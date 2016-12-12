@@ -310,7 +310,9 @@ public class CamaradesTable extends DataTable {
         syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_MEMBERS);
         syncData.putByte(DATA_KEY_OPERATION, operation);
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
+
         syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        syncData.remove(DATA_KEY_FIELD_DATE); // No date field criteria for this table
         String url = getSyncUrlRequest(resolver, syncData);
 
         // Send remote DB request
