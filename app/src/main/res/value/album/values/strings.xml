@@ -5,4 +5,8 @@
     <string name="range">Range:</string>
     <string name="comments">Comments:</string>
 
+    <!-- Full screen activity -->
+    <string name="mnu_share">Share</string>
+    <string name="mnu_save">Save</string>
+
 </resources>

@@ -681,7 +681,7 @@ public class MainActivity extends LoggedActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         Logs.add(Logs.Type.V, null);
 
-        getMenuInflater().inflate(R.menu.options_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         if (mNewNotification)
             menu.findItem(R.id.mnu_notification).setIcon(getDrawable(R.drawable.ic_notifications_info_24dp));
         return true;

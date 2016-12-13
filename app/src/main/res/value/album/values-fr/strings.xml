@@ -5,4 +5,8 @@
     <string name="range">Classement:</string>
     <string name="comments">Commentaires:</string>
 
+    <!-- Full screen activity -->
+    <string name="mnu_share">Partager</string>
+    <string name="mnu_save">Sauvegarder</string>
+
 </resources>
