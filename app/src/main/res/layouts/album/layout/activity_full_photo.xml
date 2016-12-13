@@ -9,13 +9,7 @@
     <ImageView
         android:id="@+id/image_full"
         android:adjustViewBounds="true"
-
-
-
-        android:src="@drawable/banner"
-
-
-
+        android:src="@drawable/photos"
         android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

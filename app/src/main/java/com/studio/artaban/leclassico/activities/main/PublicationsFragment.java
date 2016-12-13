@@ -106,7 +106,7 @@ public class PublicationsFragment extends MainFragment implements
 
                     break;
                 }
-                case R.id.image_published: {
+                case R.id.image_display: {
                     int position = (int)sender.getTag(R.id.tag_position);
                     Logs.add(Logs.Type.I, "Display #" + position + " selected");
 
@@ -230,7 +230,9 @@ public class PublicationsFragment extends MainFragment implements
 
             // Set image or link (if any)
             if (type != ActualitesTable.TYPE_TEXT) {
-                holder.rootView.findViewById(R.id.layout_published).setVisibility(View.VISIBLE);
+
+                final View layoutPub = holder.rootView.findViewById(R.id.layout_published);
+                layoutPub.setVisibility(View.VISIBLE);
 
                 holder.rootView.findViewById(R.id.text_url).setVisibility(View.GONE);
                 holder.rootView.findViewById(R.id.image_loading).setVisibility(View.GONE);
@@ -245,7 +247,7 @@ public class PublicationsFragment extends MainFragment implements
 
                     String photo = mDataSource.getString(position, COLUMN_INDEX_FICHIER);
                     image.setTransitionName(photo);
-                    image.setOnClickListener(null);
+                    layoutPub.setOnClickListener(null);
 
                     Glider.with(getContext()).placeholder(R.drawable.photos)
                             .load(Storage.FOLDER_PHOTOS + File.separator + photo,
@@ -260,8 +262,8 @@ public class PublicationsFragment extends MainFragment implements
                                 @Override
                                 public boolean onSetResource(Bitmap resource, ImageView imageView) {
 
-                                    imageView.setTag(R.id.tag_position, position);
-                                    imageView.setOnClickListener(PubRecyclerViewAdapter.this);
+                                    layoutPub.setTag(R.id.tag_position, position);
+                                    layoutPub.setOnClickListener(PubRecyclerViewAdapter.this);
                                     return false;
                                 }
                             });
@@ -272,8 +274,8 @@ public class PublicationsFragment extends MainFragment implements
                 } else { ////// Link
 
                     image.setImageDrawable(getResources().getDrawable(R.drawable.earth));
-                    image.setTag(R.id.tag_position, position);
-                    image.setOnClickListener(this);
+                    layoutPub.setTag(R.id.tag_position, position);
+                    layoutPub.setOnClickListener(this);
 
                     if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_ID)) {
                         // Link data already downloaded
@@ -352,12 +354,12 @@ public class PublicationsFragment extends MainFragment implements
 
             ////// Events
             View imagePseudo = holder.rootView.findViewById(R.id.image_pseudo);
-            View layoutPub = holder.rootView.findViewById(R.id.layout_published);
+            View imageDisplay = holder.rootView.findViewById(R.id.image_display);
 
             imagePseudo.setTag(R.id.tag_pseudo_id, mDataSource.getInt(position, COLUMN_INDEX_MEMBER_ID));
             imagePseudo.setOnClickListener(this);
-            layoutPub.setTag(R.id.tag_position, position);
-            layoutPub.setOnClickListener(this);
+            imageDisplay.setTag(R.id.tag_position, position);
+            imageDisplay.setOnClickListener(this);
         }
     }
 

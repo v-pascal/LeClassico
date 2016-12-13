@@ -1,5 +1,7 @@
 package com.studio.artaban.leclassico.activities.album;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -10,7 +12,10 @@ import android.widget.RelativeLayout;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.tools.Tools;
+
+import java.io.File;
 
 /**
  * Created by pascal on 12/12/16.
@@ -48,7 +53,16 @@ public class FullPhotoActivity extends LoggedActivity {
                 Tools.getStatusBarHeight(getResources()), 0, 0);
 
         // Set transition name to display photo
-        ((ImageView)findViewById(R.id.image_full)).setTransitionName(getIntent().getStringExtra(EXTRA_DATA_NAME));
+        ImageView photo =(ImageView) findViewById(R.id.image_full);
+        photo.setTransitionName(getIntent().getStringExtra(EXTRA_DATA_NAME));
+        Bitmap bmp = BitmapFactory.decodeFile(Storage.get() + Storage.FOLDER_PHOTOS +
+                File.separator + getIntent().getStringExtra(EXTRA_DATA_NAME));
+        if (bmp != null)
+            photo.setImageBitmap(bmp);
+        else {
+            Logs.add(Logs.Type.W, "Failed to load photo: " + getIntent().getStringExtra(EXTRA_DATA_NAME));
+            photo.setImageDrawable(getDrawable(R.drawable.photos));
+        }
     }
 
     @Override
