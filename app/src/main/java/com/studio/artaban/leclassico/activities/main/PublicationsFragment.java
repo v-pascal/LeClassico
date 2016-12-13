@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.album.FullPhotoActivity;
 import com.studio.artaban.leclassico.activities.publication.PublicationActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.animations.RequestAnimation;
@@ -104,7 +106,7 @@ public class PublicationsFragment extends MainFragment implements
 
                     break;
                 }
-                case R.id.image_display: {
+                case R.id.image_published: {
                     int position = (int)sender.getTag(R.id.tag_position);
                     Logs.add(Logs.Type.I, "Display #" + position + " selected");
 
@@ -122,12 +124,19 @@ public class PublicationsFragment extends MainFragment implements
 
                     if (mDataSource.isNull(position, COLUMN_INDEX_LINK)) { // Image clicked
 
+                        String name = mDataSource.getString(position, COLUMN_INDEX_FICHIER);
+                        String title = (!mDataSource.isNull(position, COLUMN_INDEX_TEXT))?
+                                mDataSource.getString(position, COLUMN_INDEX_TEXT):
+                                mDataSource.getString(position, COLUMN_INDEX_FICHIER);
 
+                        ////// Start full screen photo activity
+                        Intent fullScreen = new Intent(getContext(), FullPhotoActivity.class);
+                        fullScreen.putExtra(FullPhotoActivity.EXTRA_DATA_TITLE, title);
+                        fullScreen.putExtra(FullPhotoActivity.EXTRA_DATA_NAME, name);
 
-
-
-
-
+                        ActivityOptions options = ActivityOptions
+                                .makeSceneTransitionAnimation(getActivity(), sender, name);
+                        startActivity(fullScreen, options.toBundle());
 
                     } else // Link clicked
                         startActivity(new Intent(Intent.ACTION_VIEW,
@@ -152,7 +161,7 @@ public class PublicationsFragment extends MainFragment implements
 
         ////// RecyclerAdapter /////////////////////////////////////////////////////////////////////
         @Override
-        public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, final int position) {
             Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
 
             if (isRequestHolder(holder, position)) { ////// Request
@@ -235,17 +244,36 @@ public class PublicationsFragment extends MainFragment implements
                 if (type == ActualitesTable.TYPE_IMAGE) { ////// Image
 
                     String photo = mDataSource.getString(position, COLUMN_INDEX_FICHIER);
+                    image.setTransitionName(photo);
+                    image.setOnClickListener(null);
+
                     Glider.with(getContext()).placeholder(R.drawable.photos)
                             .load(Storage.FOLDER_PHOTOS + File.separator + photo,
                                     Constants.APP_URL_PHOTOS + '/' + photo)
                             .placeholder(R.drawable.photos)
-                            .into(image, null);
+                            .into(image, new Glider.OnLoadListener() {
+                                @Override
+                                public void onLoadFailed(ImageView imageView) {
+
+                                }
+
+                                @Override
+                                public boolean onSetResource(Bitmap resource, ImageView imageView) {
+
+                                    imageView.setTag(R.id.tag_position, position);
+                                    imageView.setOnClickListener(PubRecyclerViewAdapter.this);
+                                    return false;
+                                }
+                            });
 
                     // TODO: Add a fix to a bug that causes a wrong image size display when scrolling
                     //       "too" fast (the image size == default earth image size).
 
                 } else { ////// Link
+
                     image.setImageDrawable(getResources().getDrawable(R.drawable.earth));
+                    image.setTag(R.id.tag_position, position);
+                    image.setOnClickListener(this);
 
                     if (!mDataSource.isNull(position, COLUMN_INDEX_LINK_ID)) {
                         // Link data already downloaded
@@ -325,14 +353,11 @@ public class PublicationsFragment extends MainFragment implements
             ////// Events
             View imagePseudo = holder.rootView.findViewById(R.id.image_pseudo);
             View layoutPub = holder.rootView.findViewById(R.id.layout_published);
-            View imageDisplay = holder.rootView.findViewById(R.id.image_display);
 
             imagePseudo.setTag(R.id.tag_pseudo_id, mDataSource.getInt(position, COLUMN_INDEX_MEMBER_ID));
             imagePseudo.setOnClickListener(this);
             layoutPub.setTag(R.id.tag_position, position);
             layoutPub.setOnClickListener(this);
-            imageDisplay.setTag(R.id.tag_position, position);
-            imageDisplay.setOnClickListener(this);
         }
     }
 

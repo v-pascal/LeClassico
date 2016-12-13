@@ -37,4 +37,19 @@
         <item name="colorAccent">@color/colorAccentMailbox</item>
     </style>
 
+    <!-- Custom themes -->
+    <style name="TransparentAppTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowActivityTransitions">true</item>
+
+        <!-- Transparent toolbar -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+    </style>
+
+    <!-- Custom styles -->
+    <style name="TransparentActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item><!-- Support library -->
+    </style>
 </resources>

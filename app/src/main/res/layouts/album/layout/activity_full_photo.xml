@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:background="@android:color/black"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <!-- Image to display in full screen -->
+    <ImageView
+        android:id="@+id/image_full"
+        android:adjustViewBounds="true"
+
+
+
+        android:src="@drawable/banner"
+
+
+
+        android:layout_centerHorizontal="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!-- Toolbar -->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        app:theme="@style/TransparentActionBar"
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_width="match_parent"/>
+
+</RelativeLayout>

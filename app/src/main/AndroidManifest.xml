@@ -93,7 +93,7 @@
             android:theme="@style/MainAppTheme"/>
         <activity
             android:name=".activities.album.FullPhotoActivity"
-            android:theme="@style/MainAppTheme"/>
+            android:theme="@style/TransparentAppTheme"/>
 
         <!-- Content providers -->
         <provider

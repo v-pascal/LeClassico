@@ -395,7 +395,7 @@ public class MainActivity extends LoggedActivity implements
         setContentView(R.layout.activity_main);
 
         // Set tool & app bars
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 

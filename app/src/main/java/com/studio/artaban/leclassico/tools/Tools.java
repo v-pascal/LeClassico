@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
@@ -147,6 +148,15 @@ public final class Tools { /////////////////////////////////////////////////////
                 })
                 .create()
                 .show();
+    }
+
+    //////
+    private static final int DEFAULT_STATUSBAR_HEIGHT = 25; // Default status bar height (in pixels)
+    public static int getStatusBarHeight(Resources resources) {
+        Logs.add(Logs.Type.V, "resources: " + resources);
+
+        int id = resources.getIdentifier("status_bar_height", "dimen", "android");
+        return (id > 0)? resources.getDimensionPixelSize(id):DEFAULT_STATUSBAR_HEIGHT;
     }
 
     //////
