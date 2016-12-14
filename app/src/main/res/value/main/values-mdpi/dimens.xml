@@ -32,4 +32,7 @@
     <integer name="light_ratio">6</integer>
     <integer name="title_text_size">25</integer>
 
+    <!-- Publication -->
+    <dimen name="pub_margin_top">17dp</dimen>
+
 </resources>

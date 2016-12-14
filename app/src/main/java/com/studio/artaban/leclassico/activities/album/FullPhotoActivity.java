@@ -1,16 +1,20 @@
 package com.studio.artaban.leclassico.activities.album;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.tools.Tools;
@@ -66,12 +70,41 @@ public class FullPhotoActivity extends LoggedActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Logs.add(Logs.Type.V, "menu: " + menu);
+        getMenuInflater().inflate(R.menu.menu_full_photo, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Logs.add(Logs.Type.V, "item: " + item);
-        if (item.getItemId() == android.R.id.home) {
+        switch (item.getItemId()) {
+            case android.R.id.home: { // Back to previous activity
 
-            supportFinishAfterTransition();
-            return true;
+                supportFinishAfterTransition();
+                return true;
+            }
+            case R.id.menu_share: { // Share photo
+                Logs.add(Logs.Type.I, "Share the photo");
+
+                Uri photoUri = Uri.parse(Storage.get() + Storage.FOLDER_PHOTOS +
+                        File.separator + getIntent().getStringExtra(EXTRA_DATA_NAME));
+
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.putExtra(Intent.EXTRA_STREAM, photoUri);
+                share.setType(Uris.getMimeType(photoUri));
+                startActivity(share);
+                return true;
+            }
+            case R.id.menu_save: { // Save photo
+                Logs.add(Logs.Type.I, "Save the photo");
+
+
+
+
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

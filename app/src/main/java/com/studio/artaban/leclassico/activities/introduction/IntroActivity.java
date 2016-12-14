@@ -904,7 +904,6 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         Logs.add(Logs.Type.V, "menu: " + menu);
         getMenuInflater().inflate(R.menu.menu_connect, menu);
 

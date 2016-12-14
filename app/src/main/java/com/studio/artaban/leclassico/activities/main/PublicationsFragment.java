@@ -141,7 +141,6 @@ public class PublicationsFragment extends MainFragment implements
                     } else // Link clicked
                         startActivity(new Intent(Intent.ACTION_VIEW,
                                 Uri.parse(mDataSource.getString(position, COLUMN_INDEX_LINK))));
-
                     break;
                 }
                 case R.id.layout_more: {

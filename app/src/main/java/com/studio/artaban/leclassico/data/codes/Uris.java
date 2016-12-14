@@ -14,6 +14,27 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class Uris {
 
+    private static final String MIMETYPE_IMAGE_JPEG = "image/jpeg";
+    private static final String MIMETYPE_IMAGE_PNG = "image/png";
+    private static final String MIMETYPE_IMAGE_GIF = "image/gif";
+
+    public static String getMimeType(Uri uri) { // Return MIME Type according URI
+        Logs.add(Logs.Type.V, "uri: " + uri);
+
+        String uriFile = uri.getLastPathSegment();
+        if ((uriFile.toUpperCase().substring(uriFile.length() - 4).compareTo(".JPG") == 0) ||
+                (uriFile.toUpperCase().substring(uriFile.length() - 5).compareTo(".JPEG") == 0))
+            return MIMETYPE_IMAGE_JPEG;
+        if (uriFile.toUpperCase().substring(uriFile.length() - 4).compareTo(".PNG") == 0)
+            return MIMETYPE_IMAGE_PNG;
+        if (uriFile.toUpperCase().substring(uriFile.length() - 4).compareTo(".GIF") == 0)
+            return MIMETYPE_IMAGE_GIF;
+
+        // Default image MIME Type (image only)
+        return "image/*";
+    }
+
+    //////
     public static Uri getUri(short id, String... arguments) {
         // Return URI formatted as expected (according ID parameter)
 

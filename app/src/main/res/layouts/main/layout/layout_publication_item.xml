@@ -115,8 +115,10 @@
                     <!-- URL (displayed during loading) -->
                     <TextView
                         android:id="@+id/text_url"
-                        android:padding="@dimen/pub_padding"
-                        android:textSize="@dimen/pub_text_size"
+                        android:paddingStart="@dimen/pub_padding"
+                        android:paddingEnd="@dimen/pub_padding"
+                        android:paddingBottom="@dimen/pub_padding"
+                        android:textSize="@dimen/pub_link_text_size"
                         android:autoLink="web"
                         android:textColorLink="@color/yellow"
                         android:singleLine="true"
@@ -125,7 +127,7 @@
                         android:layout_height="wrap_content"/>
                     <ImageView
                         android:id="@+id/image_loading"
-                        android:src="@drawable/spinner_white_48"
+                        android:src="@drawable/spinner_white_36"
                         android:tint="@color/yellow"
                         android:layout_marginStart="@dimen/pub_padding"
                         android:layout_below="@id/text_url"
@@ -140,6 +142,8 @@
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/pub_title_text_size"
                     android:textStyle="bold|italic"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
                     android:layout_marginStart="@dimen/pub_text_margin"
                     android:layout_marginTop="@dimen/pub_text_margin"
                     android:layout_width="match_parent"
@@ -149,7 +153,7 @@
                 <TextView
                     android:id="@+id/text_link_description"
                     android:textColor="@android:color/black"
-                    android:textSize="@dimen/pub_link_text_size"
+                    android:textSize="@dimen/pub_info_text_size"
                     android:textStyle="italic"
                     android:layout_marginStart="@dimen/pub_text_margin"
                     android:layout_marginTop="@dimen/pub_text_margin"
@@ -159,8 +163,10 @@
                 <!-- Web site info -->
                 <TextView
                     android:id="@+id/text_link_info"
-                    android:textSize="@dimen/pub_link_text_size"
+                    android:textSize="@dimen/pub_info_text_size"
                     android:textStyle="italic"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
                     android:layout_marginStart="@dimen/pub_text_margin"
                     android:layout_marginTop="@dimen/pub_text_margin"
                     android:layout_marginBottom="@dimen/pub_text_margin"

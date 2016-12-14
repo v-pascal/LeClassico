@@ -17,36 +17,12 @@
     <dimen name="service_image_height">24dp</dimen>
     <dimen name="service_cmd_height">44dp</dimen><!-- = service_image_height + (service_cmd_margin * 2) -->
 
-
-
-
-
-
-
-
     <!-- Publication -->
     <dimen name="pub_radius">8dp</dimen>
     <dimen name="pub_elevation">6dp</dimen>
     <dimen name="pub_padding">6dp</dimen>
     <dimen name="pub_comment_text_size">18sp</dimen>
-    <dimen name="pub_margin_top">18dp</dimen>
     <dimen name="pub_margin">8dp</dimen>
     <dimen name="pub_image_margin">2dp</dimen>
-
-
-
-
-    <dimen name="pub_text_size">24sp</dimen>
-    <dimen name="pub_text_margin">8dp</dimen>
-    <dimen name="pub_title_text_size">20sp</dimen>
-    <dimen name="pub_link_text_size">18sp</dimen>
-
-
-
-
-
-
-
-
 
 </resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Publication -->
+
+    <dimen name="pub_text_size">19sp</dimen>
+    <dimen name="pub_title_text_size">12sp</dimen>
+    <dimen name="pub_info_text_size">10sp</dimen>
+    <dimen name="pub_text_margin">6dp</dimen>
+
+</resources>
