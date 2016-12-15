@@ -27,10 +27,10 @@ public final class Tables {
     public static final byte ID_EVENEMENTS = 5;
     public static final byte ID_MESSAGERIE = 6;
     public static final byte ID_MUSIC = 7;
-    public static final byte ID_PHOTOS = 8;
-    public static final byte ID_COMMENTAIRES = 9; // NB: Must be > ID_ACTUALITES & ID_PHOTOS coz fill
-    public static final byte ID_PRESENTS = 10;    //     comments according publications & photos
-    public static final byte ID_VOTES = 11;
+    public static final byte ID_VOTES = 8;
+    public static final byte ID_PHOTOS = 9; // NB: Must be > ID_VOTES coz fill photos with votes criteria
+    public static final byte ID_COMMENTAIRES = 10; // NB: Must be > ID_ACTUALITES & ID_PHOTOS coz fill
+    public static final byte ID_PRESENTS = 11;     //     comments according publications & photos
     public static final byte ID_NOTIFICATIONS = 12;
 
     public static final byte ID_LAST = ID_NOTIFICATIONS;

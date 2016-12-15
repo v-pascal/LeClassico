@@ -61,6 +61,9 @@ public class Uris {
             case ID_MAIN_SHORTCUT: // User/#/Notifications/Shortcut
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME + PATH_SHORTCUT);
+            case ID_MAIN_BEST_PHOTOS:
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_BEST_PHOTOS); // BestPhoto
 
             default:
                 throw new IllegalArgumentException("Unexpected URI id: " + id);
@@ -70,8 +73,10 @@ public class Uris {
     ////// Path ////////////////////////////////////////////////////////////////////////////////////
 
     private static final String PATH_SQL = "SQL"; // SQL path for raw query (reserved)
+    private static final String PATH_BEST_PHOTOS = "BestPhotos"; // Best photos URI path
 
     private static final String PATH_USER = "User/"; // User URI path following with member ID
+
     private static final String PATH_SHORTCUT = "/Shortcut"; // Shortcut URI path
     private static final String PATH_LOCATIONS = "/Locations"; // Locations URI path
 
@@ -80,7 +85,8 @@ public class Uris {
     public static final short ID_RAW_QUERY = 0;          // SQL
     public static final short ID_USER_NOTIFICATIONS = 1; // User/#/Notifications
     public static final short ID_USER_MAILBOX = 2;       // User/#/Messagerie
-    public static final short ID_USER_LOCATIONS = 3;       // User/#/Locations
-    public static final short ID_USER_PUBLICATIONS = 4;       // User/#/Actualites
+    public static final short ID_USER_LOCATIONS = 3;     // User/#/Locations
+    public static final short ID_USER_PUBLICATIONS = 4;  // User/#/Actualites
     public static final short ID_MAIN_SHORTCUT = 5;      // User/#/Notifications/Shortcut
+    public static final short ID_MAIN_BEST_PHOTOS = 6;    // BestPhotos
 }

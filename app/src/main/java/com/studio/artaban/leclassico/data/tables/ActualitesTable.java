@@ -127,7 +127,7 @@ public class ActualitesTable extends DataTable {
         if (idsCursor.moveToFirst()) {
             do {
                 ids.append((ids.length() == 0)?
-                        idsCursor.getInt(0) : WebServices.LIST_SEPARATOR + idsCursor.getInt(0));
+                        idsCursor.getInt(0) : WebServices.LIST_SEPARATOR + String.valueOf(idsCursor.getInt(0)));
             } while (idsCursor.moveToNext());
         }
         idsCursor.close();

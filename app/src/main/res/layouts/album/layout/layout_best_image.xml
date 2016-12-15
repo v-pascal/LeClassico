@@ -19,7 +19,7 @@
 
         <ImageView
             android:id="@+id/image_photo"
-            android:src="@drawable/photos"
+            android:src="@drawable/no_photo"
             android:tint="@android:color/black"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"

@@ -15,9 +15,10 @@ public class Queries {
     public static final int MAIN_SHORTCUT_LAST_FOLLOWED = Tables.ID_MAX + 2;
     public static final int MAIN_SHORTCUT_MAIL_COUNT = Tables.ID_MAX + 3;
     public static final int MAIN_PUBLICATIONS_LIST = Tables.ID_MAX + 4;
+    public static final int MAIN_BEST_PHOTOS = Tables.ID_MAX + 5;
 
     ////// Notifications
-    public static final int NOTIFICATIONS_MAIN_LIST = Tables.ID_MAX + 5;
+    public static final int NOTIFICATIONS_MAIN_LIST = Tables.ID_MAX + 6;
 
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +27,7 @@ public class Queries {
 
     public static final short NOTIFICATIONS_LIST_LIMIT = 20;
     public static final short PUBLICATIONS_LIST_LIMIT = 5;
-    public static final short COMMENTS_LIST_LIMIT = 5;
+    public static final short COMMENTS_LIST_LIMIT = 4;
 
 
     ////// Older ///////////////////////////////////////////////////////////////////////////////////
@@ -34,5 +35,5 @@ public class Queries {
 
     public static final short NOTIFICATIONS_OLD_LIMIT = 5;
     public static final short PUBLICATIONS_OLD_LIMIT = 3;
-
+    public static final short COMMENTS_OLD_LIMIT = 4;
 }

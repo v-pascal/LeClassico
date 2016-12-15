@@ -65,7 +65,7 @@ public class FullPhotoActivity extends LoggedActivity {
             photo.setImageBitmap(bmp);
         else {
             Logs.add(Logs.Type.W, "Failed to load photo: " + getIntent().getStringExtra(EXTRA_DATA_NAME));
-            photo.setImageDrawable(getDrawable(R.drawable.photos));
+            photo.setImageDrawable(getDrawable(R.drawable.no_photo));
         }
     }
 

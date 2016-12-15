@@ -320,7 +320,7 @@ public class CommentairesTable extends DataTable {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";operation: " + operation +
                 ";syncData: " + syncData + ";postData: " + postData);
 
-        syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_PUBLICATIONS);
+        syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_COMMENTS);
         syncData.putByte(DATA_KEY_OPERATION, operation);
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
         if ((syncData.containsKey(DATA_KEY_LIMIT)) && (syncData.getShort(DATA_KEY_LIMIT) == 0))

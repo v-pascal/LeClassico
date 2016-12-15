@@ -26,7 +26,6 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.album.FullPhotoActivity;
 import com.studio.artaban.leclassico.activities.publication.PublicationActivity;
-import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
@@ -144,7 +143,7 @@ public class PublicationsFragment extends MainFragment implements
                     break;
                 }
                 case R.id.layout_more: {
-                    Logs.add(Logs.Type.I, "Old notifications requested");
+                    Logs.add(Logs.Type.I, "Old publications requested");
 
                     ////// Request old publications to remote DB
                     mQueryLimit += Queries.PUBLICATIONS_OLD_LIMIT;
@@ -248,10 +247,10 @@ public class PublicationsFragment extends MainFragment implements
                     image.setTransitionName(photo);
                     layoutPub.setOnClickListener(null);
 
-                    Glider.with(getContext()).placeholder(R.drawable.photos)
+                    Glider.with(getContext()).placeholder(R.drawable.no_photo)
                             .load(Storage.FOLDER_PHOTOS + File.separator + photo,
                                     Constants.APP_URL_PHOTOS + '/' + photo)
-                            .placeholder(R.drawable.photos)
+                            .placeholder(R.drawable.no_photo)
                             .into(image, new Glider.OnLoadListener() {
                                 @Override
                                 public void onLoadFailed(ImageView imageView) {
@@ -379,7 +378,7 @@ public class PublicationsFragment extends MainFragment implements
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
-    public void onLoadFinished(int id, final Cursor cursor) {
+    public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
         if (!cursor.moveToFirst())
             return;
@@ -436,15 +435,15 @@ public class PublicationsFragment extends MainFragment implements
             Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
             if ((intent.getAction().equals(DataService.REQUEST_OLD_DATA)) && // Old request
                     (intent.getBooleanExtra(DataService.EXTRA_DATA_RECEIVED, false)) && // Received
-                    (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI)) // Publication URI
-                            .compareTo(mPubUri) == 0)) {
+                    (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI))
+                            .compareTo(mPubUri) == 0)) { // Publication URI
 
                 mPubAdapter.setRequesting(false);
                 if (!intent.getBooleanExtra(DataService.EXTRA_DATA_OLD_FOUND, false)) {
                     if (mQueryCount > (mQueryLimit - Queries.PUBLICATIONS_OLD_LIMIT))
                         refresh(); // No more old remote DB publications but existing in local DB
                     else
-                        mQueryLimit -= Queries.NOTIFICATIONS_OLD_LIMIT;
+                        mQueryLimit -= Queries.PUBLICATIONS_OLD_LIMIT;
                 }
                 //else // DB table update will notify cursor (no need to call refresh)
             }
@@ -501,22 +500,7 @@ public class PublicationsFragment extends MainFragment implements
             Logs.add(Logs.Type.I, "Query update");
 
             ////// Update publication list
-            RecyclerAdapter.SwapResult swapResult = mPubAdapter.getDataSource().swap(mPubAdapter, mPubCursor,
-                    mQueryLimit, null);
-
-            // Check if only change publication(s) on synchronization fields
-            boolean syncFieldsOnly = swapResult.countChanged > 0;
-            for (int i = 0; i < swapResult.columnChanged.size(); ++i) {
-                if ((swapResult.columnChanged.get(i) != COLUMN_INDEX_SYNC) &&
-                        (swapResult.columnChanged.get(i) != COLUMN_INDEX_STATUS_DATE)) {
-
-                    syncFieldsOnly = false;
-                    break;
-                }
-            }
-            if (syncFieldsOnly) // Disable change animations (only sync fields have changed)
-                ((RecyclerItemAnimator)mPubList.getItemAnimator())
-                        .setDisableChangeAnimations(swapResult.countChanged);
+            mPubAdapter.getDataSource().swap(mPubAdapter, mPubCursor, mQueryLimit, null);
 
         } else {
             Logs.add(Logs.Type.I, "Initial query");
@@ -568,7 +552,7 @@ public class PublicationsFragment extends MainFragment implements
         mPubList.setItemAnimator(new DefaultItemAnimator());
         mPubList.setAdapter(mPubAdapter);
 
-        // Initialize notification list (set query loaders)
+        // Initialize publication list (set query loaders)
         Bundle pubData = new Bundle();
         pubData.putParcelable(QueryLoader.DATA_KEY_URI, mPubUri);
         pubData.putString(QueryLoader.DATA_KEY_SELECTION,
