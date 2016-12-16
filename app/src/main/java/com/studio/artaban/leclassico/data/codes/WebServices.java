@@ -41,13 +41,21 @@ public final class WebServices {
     public static final String DATA_STATUS = "Status";
     public static final String DATA_UPDATES = "Updates";
 
-    public static final String DATA_TYPE = "Type";
-    public static final String DATA_IDS = "Ids";
-
     // Connection
     public static final String CONNECTION_DATA_PSEUDO = "psd";
     public static final String CONNECTION_DATA_PASSWORD = "ccf";
     public static final String CONNECTION_DATA_DATETIME = "odt";
+
+    // Comments
+    public static final String COMMENTS_DATA_TYPE = "Type";
+    public static final String COMMENTS_DATA_IDS = "Ids";
+
+    // Votes
+    public static final String VOTES_DATA_TYPE = "Type";
+
+    // Photos
+    public static final String PHOTOS_DATA_BEST = "Best";
+    public static final String PHOTOS_DATA_FILES = "Files";
 
 
     ////// JSON ////////////////////////////////////////////////////////////////////////////////////

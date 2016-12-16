@@ -20,6 +20,10 @@ import java.util.List;
  */
 public class VotesTable extends DataTable {
 
+    public static final int TYPE_PHOTO = 0;
+    public static final int TYPE_MUSIC = 1;
+    // Types
+
     public static class Grade extends DataField { ////////////////////////////////////// Votes entry
 
         public Grade(short count, long id) { super(count, id); }
@@ -68,6 +72,7 @@ public class VotesTable extends DataTable {
     public static final String COLUMN_TOTAL = "VOT_Total";
     public static final String COLUMN_DATE = "VOT_Date";
     public static final String COLUMN_TYPE = "VOT_Type";
+    private static final String COLUMN_STATUS_DATE = "VOT_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_PSEUDO = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -76,7 +81,8 @@ public class VotesTable extends DataTable {
     private static final short COLUMN_INDEX_TOTAL = 4;
     private static final short COLUMN_INDEX_DATE = 5;
     private static final short COLUMN_INDEX_TYPE = 6;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 7;
+    private static final short COLUMN_INDEX_STATUS_DATE = 7;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
 
     //
     private VotesTable() { }
@@ -96,6 +102,7 @@ public class VotesTable extends DataTable {
                 COLUMN_DATE + " TEXT NOT NULL," +
                 COLUMN_TYPE + " INTEGER NOT NULL," +
 
+                Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
@@ -143,6 +150,7 @@ public class VotesTable extends DataTable {
     }
 
     // JSON keys
+    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     @Override
     public SyncResult synchronize(final ContentResolver resolver, final byte operation, Bundle syncData,
@@ -155,6 +163,8 @@ public class VotesTable extends DataTable {
 
 
 
+
+        //VOTES_DATA_TYPE
 
 
 

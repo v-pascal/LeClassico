@@ -66,6 +66,7 @@ public class PhotosTable extends DataTable {
     public static final String COLUMN_PSEUDO = "PHT_Pseudo";
     public static final String COLUMN_FICHIER = "PHT_Fichier";
     public static final String COLUMN_FICHIER_ID = "PHT_FichierID";
+    public static final String COLUMN_BEST = "PHT_Best";
     private static final String COLUMN_STATUS_DATE = "PHT_StatusDate";
 
     // Columns index
@@ -73,8 +74,9 @@ public class PhotosTable extends DataTable {
     private static final short COLUMN_INDEX_PSEUDO = 2;
     private static final short COLUMN_INDEX_FICHIER = 3;
     private static final short COLUMN_INDEX_FICHIER_ID = 4;
-    private static final short COLUMN_INDEX_STATUS_DATE = 5;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 6;
+    private static final short COLUMN_INDEX_BEST = 5;
+    private static final short COLUMN_INDEX_STATUS_DATE = 6;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 7;
 
     //
     private PhotosTable() { }
@@ -100,6 +102,7 @@ public class PhotosTable extends DataTable {
                 COLUMN_PSEUDO + " TEXT NOT NULL," +
                 COLUMN_FICHIER + " TEXT NOT NULL," +
                 COLUMN_FICHIER_ID + " INTEGER NOT NULL," +
+                COLUMN_BEST + " INTEGER NOT NULL," +
 
                 Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
@@ -166,6 +169,8 @@ public class PhotosTable extends DataTable {
 
 
 
+        //PHOTOS_DATA_BEST
+        //PHOTOS_DATA_FILES
 
 
 

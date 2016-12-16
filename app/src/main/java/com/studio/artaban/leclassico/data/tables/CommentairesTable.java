@@ -345,8 +345,8 @@ public class CommentairesTable extends DataTable {
 
             // Add IDs & type to post data
             ContentValues data = new ContentValues();
-            data.put(WebServices.DATA_IDS, ids);
-            data.put(WebServices.DATA_TYPE, String.valueOf(TYPE_PUBLICATION));
+            data.put(WebServices.COMMENTS_DATA_IDS, ids);
+            data.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(TYPE_PUBLICATION));
 
             ////// Get publications comments
             result = sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT, syncResult);
@@ -366,8 +366,8 @@ public class CommentairesTable extends DataTable {
             url = getSyncUrlRequest(resolver, syncData);
 
             // Replace IDs & type from post data
-            data.put(WebServices.DATA_IDS, ids);
-            data.put(WebServices.DATA_TYPE, String.valueOf(TYPE_PHOTO));
+            data.put(WebServices.COMMENTS_DATA_IDS, ids);
+            data.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(TYPE_PHOTO));
 
             ////// Get photos comments
             result = sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT, syncResult);
