@@ -175,7 +175,7 @@ public class PublicationsFragment extends MainFragment implements
 
             // Set pseudo icon
             boolean female = (!mDataSource.isNull(position, COLUMN_INDEX_SEX)) &&
-                    (mDataSource.getInt(position, COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+                    (mDataSource.getInt(position, COLUMN_INDEX_SEX) == CamaradesTable.GENDER_FEMALE);
             String profile = (!mDataSource.isNull(position, COLUMN_INDEX_PROFILE)) ?
                     mDataSource.getString(position, COLUMN_INDEX_PROFILE) : null;
             Tools.setProfile(getActivity(), (ImageView) holder.rootView.findViewById(R.id.image_pseudo),

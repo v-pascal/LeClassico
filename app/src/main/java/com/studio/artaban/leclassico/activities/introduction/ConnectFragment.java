@@ -290,12 +290,12 @@ public class ConnectFragment extends RevealFragment {
                         String pseudo = null;
 
                         // Offline identification
+                        String selection = "UPPER(" + CamaradesTable.COLUMN_PSEUDO + ")=" +
+                                        DatabaseUtils.sqlEscapeString(mPseudo.toUpperCase()) +
+                                        " AND " + CamaradesTable.COLUMN_CODE_CONF;
                         Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
                                 new String[]{CamaradesTable.COLUMN_PSEUDO, IDataTable.DataField.COLUMN_ID},
-                                "UPPER(" + CamaradesTable.COLUMN_PSEUDO + ")=" +
-                                        DatabaseUtils.sqlEscapeString(mPseudo.toUpperCase()) +
-                                        " AND " + CamaradesTable.COLUMN_CODE_CONF + '=' +
-                                        DatabaseUtils.sqlEscapeString(password),
+                                selection + '=' + DatabaseUtils.sqlEscapeString(password),
                                 null, null);
                         if (result.getCount() > 0) {
                             result.moveToFirst();
@@ -309,6 +309,14 @@ public class ConnectFragment extends RevealFragment {
                             mPseudo = pseudo; // Pseudo as defined in the DB
 
                         else { // Login failed
+
+                            // Check existing local DB but user never logged (offline work not allowed case)
+                            // NB: Check added to avoid to store users password into local DB (security reasons)
+                            if (DataTable.getEntryCount(resolver, CamaradesTable.TABLE_NAME, selection + "=''") > 0) {
+                                if (!publishWaitProgress(STEP_CHECK_INTERNET, true)) return Boolean.FALSE;
+                                publishProgress(STEP_INTERNET_NEEDED);
+                                return Boolean.FALSE;
+                            }
                             publishProgress(STEP_LOGIN_FAILED);
                             return Boolean.FALSE;
                         }

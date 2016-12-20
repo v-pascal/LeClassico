@@ -212,9 +212,9 @@ public class CommentairesTable extends DataTable {
         return date;
     }
 
-    private Internet.DownloadResult sendSyncRequest(String url, @Nullable ContentValues postData,
-                                                    final ContentResolver resolver, final byte operation,
-                                                    final SyncResult syncResult) {
+    private static Internet.DownloadResult sendSyncRequest(String url, @Nullable ContentValues postData,
+                                                           final ContentResolver resolver, final byte operation,
+                                                           final SyncResult syncResult) {
         // Send remote DB request
         return Internet.downloadHttpRequest(url, postData, new Internet.OnRequestListener() {
 
@@ -329,7 +329,6 @@ public class CommentairesTable extends DataTable {
         syncData.remove(DATA_KEY_FIELD_PSEUDO); // No pseudo field criteria for this table
         syncData.putString(DATA_KEY_FIELD_DATE, COLUMN_DATE);
 
-        Internet.DownloadResult result;
         SyncResult syncResult = new SyncResult();
         if (operation == WebServices.OPERATION_SELECT) { ////// All comments
 
@@ -349,8 +348,8 @@ public class CommentairesTable extends DataTable {
             data.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(TYPE_PUBLICATION));
 
             ////// Get publications comments
-            result = sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT, syncResult);
-            if (result != Internet.DownloadResult.SUCCEEDED) {
+            if (sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT,
+                    syncResult) != Internet.DownloadResult.SUCCEEDED) {
                 Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error (A)");
                 return null;
             }
@@ -365,13 +364,16 @@ public class CommentairesTable extends DataTable {
             syncData.putString(DATA_KEY_DATE, getMinDate(resolver, TYPE_PHOTO, ids));
             url = getSyncUrlRequest(resolver, syncData);
 
+            syncData.remove(DATA_KEY_STATUS_DATE);
+            syncData.remove(DATA_KEY_DATE);
+
             // Replace IDs & type from post data
             data.put(WebServices.COMMENTS_DATA_IDS, ids);
             data.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(TYPE_PHOTO));
 
             ////// Get photos comments
-            result = sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT, syncResult);
-            if (result != Internet.DownloadResult.SUCCEEDED) {
+            if (sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT,
+                    syncResult) != Internet.DownloadResult.SUCCEEDED) {
                 Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error (P)");
                 return null;
             }
@@ -382,14 +384,13 @@ public class CommentairesTable extends DataTable {
                 throw new IllegalArgumentException("Missing IDs & Type info into data");
 
             //////
-            result = sendSyncRequest(getSyncUrlRequest(resolver, syncData), postData, resolver,
-                    operation, syncResult);
-            if (result != Internet.DownloadResult.SUCCEEDED) {
-                Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
+            if (sendSyncRequest(getSyncUrlRequest(resolver, syncData), postData, resolver,
+                    operation, syncResult) != Internet.DownloadResult.SUCCEEDED) {
 
+                Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
                 if (operation != WebServices.OPERATION_SELECT_OLD) {
                     syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
-                    // NB: Do not use pseudo criteria to get max status date but add it to reset sync fields!
+                    // NB: Needed to reset sync fields!
 
                     resetSyncInProgress(resolver, syncData);
                 }

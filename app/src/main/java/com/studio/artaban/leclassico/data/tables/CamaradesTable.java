@@ -30,8 +30,9 @@ import java.util.List;
  */
 public class CamaradesTable extends DataTable {
 
-    public static final int MALE = 2;
-    public static final int FEMALE = 1;
+    public static final int GENDER_MALE = 2;
+    public static final int GENDER_FEMALE = 1;
+    // Genders
 
     public static class Friend extends DataField { ///////////////////////////////// Camarades entry
 
@@ -335,7 +336,6 @@ public class CamaradesTable extends DataTable {
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
                         JSONArray entries = reply.getJSONArray(TABLE_NAME);
                         for (int i = 0; i < entries.length(); ++i) {
-
                             JSONObject entry = (JSONObject) entries.get(i);
 
                             // Key field
@@ -343,8 +343,13 @@ public class CamaradesTable extends DataTable {
 
                             // Data fields
                             ContentValues values = new ContentValues();
-                            values.put(COLUMN_CODE_CONF, entry.getString(JSON_KEY_CODE_CONF));
-                            values.put(COLUMN_CODE_CONF_UPD, entry.getString(JSON_KEY_CODE_CONF_UPD));
+                            if (!entry.isNull(JSON_KEY_CODE_CONF)) {
+                                values.put(COLUMN_CODE_CONF, entry.getString(JSON_KEY_CODE_CONF));
+                                values.put(COLUMN_CODE_CONF_UPD, entry.getString(JSON_KEY_CODE_CONF_UPD));
+                            } else {
+                                values.put(COLUMN_CODE_CONF, Constants.UNDEFINED);
+                                values.put(COLUMN_CODE_CONF_UPD, Constants.UNDEFINED);
+                            }
                             if (!entry.isNull(JSON_KEY_NOM))
                                 values.put(COLUMN_NOM, entry.getString(JSON_KEY_NOM));
                             values.put(COLUMN_NOM_UPD, entry.getString(JSON_KEY_NOM_UPD));

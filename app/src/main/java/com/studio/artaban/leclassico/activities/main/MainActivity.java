@@ -187,7 +187,7 @@ public class MainActivity extends LoggedActivity implements
 
                 // Get DB data
                 boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
-                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.GENDER_FEMALE);
                 String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
                         cursor.getString(COLUMN_INDEX_PROFILE) : null;
                 String banner = (!cursor.isNull(COLUMN_INDEX_BANNER))?

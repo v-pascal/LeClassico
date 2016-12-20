@@ -49,7 +49,7 @@ public class MembersFragment extends MainFragment implements QueryLoader.OnResul
 
                 // Set profile icon
                 boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
-                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.FEMALE);
+                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.GENDER_FEMALE);
                 String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
                         cursor.getString(COLUMN_INDEX_PROFILE) : null;
                 mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setIcon(female, profile,
