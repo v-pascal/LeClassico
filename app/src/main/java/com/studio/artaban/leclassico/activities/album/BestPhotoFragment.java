@@ -310,6 +310,13 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
         Bundle bestData = new Bundle();
         bestData.putParcelable(QueryLoader.DATA_KEY_URI, mComUri);
         bestData.putString(QueryLoader.DATA_KEY_SELECTION,
+
+
+
+
+
+
+
                 "SELECT " +
                         CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_COMMENT_ID
                         CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COMMENT_TEXT

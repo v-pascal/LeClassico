@@ -313,7 +313,7 @@ public class ConnectFragment extends RevealFragment {
                             // Check existing local DB but user never logged (offline work not allowed case)
                             // NB: Check added to avoid to store users password into local DB (security reasons)
                             if (DataTable.getEntryCount(resolver, CamaradesTable.TABLE_NAME, selection + "=''") > 0) {
-                                if (!publishWaitProgress(STEP_CHECK_INTERNET, true)) return Boolean.FALSE;
+                                if (isStopped()) return Boolean.FALSE;
                                 publishProgress(STEP_INTERNET_NEEDED);
                                 return Boolean.FALSE;
                             }
@@ -346,7 +346,7 @@ public class ConnectFragment extends RevealFragment {
 
                         @Override
                         public boolean onReceiveReply(String response) {
-                            Logs.add(Logs.Type.V, "response: " + response);
+                            //Logs.add(Logs.Type.V, "response: " + response);
 
                             if (isStopped()) return Boolean.FALSE;
                             return Login.receive(response, loginRes); // Manage method reply below

@@ -73,6 +73,11 @@ public class FullPhotoActivity extends LoggedActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         Logs.add(Logs.Type.V, "menu: " + menu);
         getMenuInflater().inflate(R.menu.menu_full_photo, menu);
+
+
+
+
+
         return true;
     }
 
@@ -85,7 +90,16 @@ public class FullPhotoActivity extends LoggedActivity {
                 supportFinishAfterTransition();
                 return true;
             }
-            case R.id.menu_share: { // Share photo
+            case R.id.mnu_notification: { // Notifications
+
+
+
+
+
+
+                return true;
+            }
+            case R.id.mnu_share: { // Share photo
                 Logs.add(Logs.Type.I, "Share the photo");
 
                 Uri photoUri = Uri.parse(Storage.get() + Storage.FOLDER_PHOTOS +
@@ -97,7 +111,7 @@ public class FullPhotoActivity extends LoggedActivity {
                 startActivity(share);
                 return true;
             }
-            case R.id.menu_save: { // Save photo
+            case R.id.mnu_save: { // Save photo
                 Logs.add(Logs.Type.I, "Save the photo");
 
 

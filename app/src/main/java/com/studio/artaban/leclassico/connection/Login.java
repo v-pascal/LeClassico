@@ -54,7 +54,7 @@ public final class Login {
     }
     public static boolean receive(String response, Reply loginRes) { // Receive login reply
 
-        Logs.add(Logs.Type.V, "response: " + response + ";loginRes: " + loginRes);
+        //Logs.add(Logs.Type.V, "response: " + response + ";loginRes: " + loginRes);
         boolean result = false; ////// Reply error
         try {
 

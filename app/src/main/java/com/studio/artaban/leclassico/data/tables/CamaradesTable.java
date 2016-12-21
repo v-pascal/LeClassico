@@ -336,6 +336,7 @@ public class CamaradesTable extends DataTable {
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
                         JSONArray entries = reply.getJSONArray(TABLE_NAME);
                         for (int i = 0; i < entries.length(); ++i) {
+
                             JSONObject entry = (JSONObject) entries.get(i);
 
                             // Key field

@@ -246,11 +246,9 @@ public class CommentairesTable extends DataTable {
                             // Data fields
                             ContentValues values = new ContentValues();
                             values.put(COLUMN_TEXT, entry.getString(JSON_KEY_TEXT));
-
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
-                            // Check if entry already exists
                             // Check if entry already exists
                             String selection = COLUMN_OBJ_TYPE + "='" + type + "' AND " +
                                     COLUMN_OBJ_ID + '=' + id + " AND " +

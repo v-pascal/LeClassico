@@ -56,7 +56,7 @@ public final class WebServices {
 
     // Photos
     public static final String PHOTOS_DATA_BEST = "Best";
-    public static final String PHOTOS_DATA_FILES = "Files";
+    public static final String PHOTOS_DATA_IDS = "Ids";
 
 
     ////// JSON ////////////////////////////////////////////////////////////////////////////////////

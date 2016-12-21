@@ -4,17 +4,23 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -171,23 +177,19 @@ public class PhotosTable extends DataTable {
     private static Internet.DownloadResult sendSyncRequest(String url, @Nullable ContentValues postData,
                                                            final ContentResolver resolver, final byte operation,
                                                            final SyncResult syncResult) {
-        return null;
-
-        /*
         // Send remote DB request
         return Internet.downloadHttpRequest(url, postData, new Internet.OnRequestListener() {
 
             @Override
             public boolean onReceiveReply(String response) {
-                //Logs.add(Logs.Type.V, "response: " + response);
+                Logs.add(Logs.Type.V, "response: " + response);
                 try {
 
                     JSONObject reply = new JSONObject(response);
                     if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
                         if (reply.isNull(TABLE_NAME))
-                            return ((operation == WebServices.OPERATION_SELECT) ||
-                                    (operation == WebServices.OPERATION_SELECT_OLD));
+                            return (operation == WebServices.OPERATION_SELECT);
                         // Already synchronized for selection but error for any other operation
 
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
@@ -197,24 +199,21 @@ public class PhotosTable extends DataTable {
                             JSONObject entry = (JSONObject) entries.get(i);
 
                             // Key fields
-                            char type = entry.getString(JSON_KEY_OBJ_TYPE).charAt(0);
-                            int id = entry.getInt(JSON_KEY_OBJ_ID);
-                            String pseudo = entry.getString(JSON_KEY_PSEUDO);
-                            String date = entry.getString(JSON_KEY_DATE);
+                            String fichier = entry.getString(JSON_KEY_FICHIER);
+                            int fichierId = entry.getInt(JSON_KEY_FICHIER_ID);
 
                             // Data fields
                             ContentValues values = new ContentValues();
-                            values.put(COLUMN_TEXT, entry.getString(JSON_KEY_TEXT));
-
+                            values.put(COLUMN_ALBUM, entry.getString(JSON_KEY_ALBUM));
+                            values.put(COLUMN_PSEUDO, entry.getString(JSON_KEY_PSEUDO));
+                            if (!entry.isNull(JSON_KEY_BEST))
+                                values.put(COLUMN_BEST, entry.getInt(JSON_KEY_BEST)); // Best
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
                             // Check if entry already exists
-                            // Check if entry already exists
-                            String selection = COLUMN_OBJ_TYPE + "='" + type + "' AND " +
-                                    COLUMN_OBJ_ID + '=' + id + " AND " +
-                                    COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                                    COLUMN_DATE + "='" + date + '\'';
+                            String selection = COLUMN_FICHIER + "='" + fichier + "' AND " +
+                                    COLUMN_FICHIER_ID + '=' + fichierId;
                             Cursor cursor = resolver.query(tableUri, new String[]{Constants.DATA_COLUMN_STATUS_DATE},
                                     selection, null, null);
                             if (cursor.moveToFirst()) { // DB entry exists
@@ -244,10 +243,10 @@ public class PhotosTable extends DataTable {
                             } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
                                 ////// Insert entry into DB
-                                values.put(COLUMN_OBJ_TYPE, String.valueOf(type));
-                                values.put(COLUMN_OBJ_ID, id);
-                                values.put(COLUMN_PSEUDO, pseudo);
-                                values.put(COLUMN_DATE, date);
+                                values.put(COLUMN_FICHIER, fichier);
+                                values.put(COLUMN_FICHIER_ID, fichierId);
+                                if (!values.containsKey(COLUMN_BEST))
+                                    values.put(COLUMN_BEST, 0);
                                 resolver.insert(tableUri, values);
 
                                 ++syncResult.inserted;
@@ -268,7 +267,6 @@ public class PhotosTable extends DataTable {
                 return true;
             }
         });
-        */
     }
     private static String getMaxStatusDate(ContentResolver resolver, String pseudo) {
     // Return the newest photo status date of the connected user albums (if any)
@@ -288,22 +286,36 @@ public class PhotosTable extends DataTable {
         cursor.close();
         return statusDate;
     }
-    private static String resetBestFields(ContentResolver resolver, @Nullable String best) {
+    private static String resetBestFields(ContentResolver resolver, @Nullable String ids) {
     // Set or reset best fields
 
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";best: " + best);
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";best: " + ids);
+        Uri uri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
+        if (ids != null) { // Set or replace best flags
 
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_BEST, 1);
+            resolver.update(uri, values,
+                    COLUMN_FICHIER_ID + " IN (" + ids.replace(WebServices.LIST_SEPARATOR, ','), null);
+            return null;
+        }
+        // Reset best flags (return best photos)
+        StringBuilder best = new StringBuilder();
+        Cursor cursor = resolver.query(uri, new String[]{COLUMN_FICHIER_ID}, COLUMN_BEST + "=1", null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                best.append((best.length() > 0)?
+                        WebServices.LIST_SEPARATOR + String.valueOf(cursor.getInt(COLUMN_INDEX_FICHIER_ID)):
+                        String.valueOf(cursor.getInt(COLUMN_INDEX_FICHIER_ID)));
 
+            } while (cursor.moveToNext());
 
-
-
-        //PHOTOS_DATA_FILES // with LIST_SEPARATOR
-
-
-
-
-
-        return null;
+            // Clear best flags
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_BEST, 0);
+            resolver.update(uri, values, null, null);
+        }
+        return (best.length() > 0)? best.toString():null; // Best photo IDs
     }
 
     @Override
@@ -331,7 +343,7 @@ public class PhotosTable extends DataTable {
             ContentValues data = new ContentValues();
             data.put(WebServices.PHOTOS_DATA_BEST, 1);
             if (best != null)
-                data.put(WebServices.PHOTOS_DATA_FILES, resetBestFields(resolver, null));
+                data.put(WebServices.PHOTOS_DATA_IDS, resetBestFields(resolver, null));
 
             //////
             if (sendSyncRequest(getSyncUrlRequest(resolver, syncData), data, resolver,

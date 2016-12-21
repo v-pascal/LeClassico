@@ -111,6 +111,10 @@ public class AlbumsTable extends DataTable {
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_PSEUDO + " ON " +
+                TABLE_NAME + '(' + COLUMN_PSEUDO + ')');
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -155,6 +159,7 @@ public class AlbumsTable extends DataTable {
     }
 
     // JSON keys
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
 
     @Override
     public SyncResult synchronize(final ContentResolver resolver, final byte operation, Bundle syncData,
