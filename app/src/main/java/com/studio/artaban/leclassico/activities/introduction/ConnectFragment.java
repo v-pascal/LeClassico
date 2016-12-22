@@ -13,9 +13,6 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -312,6 +309,9 @@ public class ConnectFragment extends RevealFragment {
 
                             // Check existing local DB but user never logged (offline work not allowed case)
                             // NB: Check added to avoid to store users password into local DB (security reasons)
+                            // TODO: Check existing local DB but user NOT PREVIOUSLY logged. In synchronization
+                            //       case during an user account update (status date criteria), its login info
+                            //       will be erased. Add behavior to keep login info even if this occurred.
                             if (DataTable.getEntryCount(resolver, CamaradesTable.TABLE_NAME, selection + "=''") > 0) {
                                 if (isStopped()) return Boolean.FALSE;
                                 publishProgress(STEP_INTERNET_NEEDED);

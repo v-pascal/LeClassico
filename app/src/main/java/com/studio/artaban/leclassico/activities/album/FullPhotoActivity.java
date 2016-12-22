@@ -29,7 +29,7 @@ public class FullPhotoActivity extends LoggedActivity {
 
     public static final String EXTRA_DATA_TITLE = "title";
     public static final String EXTRA_DATA_NAME = "name";
-    // Extras data
+    // Extras data (see Login extra data keys)
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
@@ -73,30 +73,19 @@ public class FullPhotoActivity extends LoggedActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         Logs.add(Logs.Type.V, "menu: " + menu);
         getMenuInflater().inflate(R.menu.menu_full_photo, menu);
-
-
-
-
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Logs.add(Logs.Type.V, "item: " + item);
+        if (onNotifyItemSelected(item))
+            return true; // Display notifications
+
         switch (item.getItemId()) {
             case android.R.id.home: { // Back to previous activity
 
                 supportFinishAfterTransition();
-                return true;
-            }
-            case R.id.mnu_notification: { // Notifications
-
-
-
-
-
-
                 return true;
             }
             case R.id.mnu_share: { // Share photo
@@ -113,6 +102,7 @@ public class FullPhotoActivity extends LoggedActivity {
             }
             case R.id.mnu_save: { // Save photo
                 Logs.add(Logs.Type.I, "Save the photo");
+
 
 
 

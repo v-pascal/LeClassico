@@ -19,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -84,9 +85,8 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                 // Notify service & notifications URI to refresh notification list
                 ServiceNotify.update(NotifyActivity.this, 0);
-                getContentResolver().notifyChange(ContentUris.withAppendedId((Uri) getIntent()
-                        .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI), 0), null);
-                        // NB: The 0 appended to URI above permits to avoid multiple 'onChange' method call
+                getContentResolver().notifyChange(ContentUris.withAppendedId(ServiceNotify.URI, 0), null);
+                // NB: The 0 appended to URI above permits to avoid multiple 'onChange' method call
             }
         });
     }
@@ -297,8 +297,8 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                     Intent request = new Intent(DataService.REQUEST_OLD_DATA);
                     request.putExtra(DataRequest.EXTRA_DATA_DATE, mQueryDate);
-                    NotifyActivity.this.sendBroadcast(DataService.getIntent(request, Tables.ID_NOTIFICATIONS,
-                            (Uri) getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)));
+                    NotifyActivity.this.sendBroadcast(DataService.getIntent(request,
+                            Tables.ID_NOTIFICATIONS, ServiceNotify.URI));
                     break;
                 }
             }
@@ -520,8 +520,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             if ((intent.getAction().equals(DataService.REQUEST_OLD_DATA)) && // Old request
                     (intent.getBooleanExtra(DataService.EXTRA_DATA_RECEIVED, false)) && // Received
                     (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI)) // Notification URI
-                            .compareTo((Uri) NotifyActivity.this.getIntent()
-                                    .getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI)) == 0)) {
+                            .compareTo(ServiceNotify.URI) == 0)) {
 
                 mNotifyAdapter.setRequesting(false);
                 if (!intent.getBooleanExtra(DataService.EXTRA_DATA_OLD_FOUND, false)) {
@@ -786,8 +785,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
         // Initialize notification list (set query loaders)
         Bundle queryData = new Bundle();
-        queryData.putParcelable(QueryLoader.DATA_KEY_URI,
-                getIntent().getParcelableExtra(Login.EXTRA_DATA_NOTIFY_URI));
+        queryData.putParcelable(QueryLoader.DATA_KEY_URI, ServiceNotify.URI);
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE
@@ -836,6 +834,12 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                         "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
 
         mListLoader.init(NotifyActivity.this, Queries.NOTIFICATIONS_MAIN_LIST, queryData);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) { // Avoid to add notification menu item
+        Logs.add(Logs.Type.V, "menu: " + menu);
+        return false; // No menu
     }
 
     @Override

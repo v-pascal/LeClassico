@@ -1,6 +1,5 @@
 package com.studio.artaban.leclassico.activities.main;
 
-import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -26,20 +25,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
-import com.studio.artaban.leclassico.activities.notification.NotifyActivity;
 import com.studio.artaban.leclassico.activities.settings.SettingsActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
+import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.services.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
@@ -66,19 +63,6 @@ public class MainActivity extends LoggedActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
         MainFragment.OnFragmentListener {
 
-    private void startNotificationActivity() { // Start notification activity
-        Logs.add(Logs.Type.V, null);
-
-        if (mIsNotification) {
-
-            ////// Start notification activity
-            Intent notifyIntent = new Intent(this, NotifyActivity.class);
-            Login.copyExtraData(getIntent(), notifyIntent);
-            startActivity(notifyIntent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-
-        } else
-            Toast.makeText(this, R.string.no_notification, Toast.LENGTH_SHORT).show();
-    }
     private static int getShortcutID(int section, boolean newItem) {
     // Return shortcut fragment container ID according selected section
 
@@ -173,9 +157,6 @@ public class MainActivity extends LoggedActivity implements
 
     private int mFabTransY = Constants.NO_DATA; // Vertical floating action button translation
 
-    private boolean mNewNotification; // New notification flag (unread)
-    private boolean mIsNotification; // Existing notification flag
-
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
@@ -209,15 +190,15 @@ public class MainActivity extends LoggedActivity implements
                             .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
                 break;
             }
-            case Queries.MAIN_DATA_NEW_NOTIFY: {
+            case Queries.MAIN_DATA_NEW_NOTIFY: { ////// User notifications
 
                 Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
-                mIsNotification = true;
-                boolean prevNewFlag = mNewNotification;
+                ServiceNotify.Existing = true;
+                boolean prevNewFlag = ServiceNotify.Unread;
 
-                mNewNotification = (cursor.getInt(0) == Constants.DATA_UNREAD);
-                if (prevNewFlag != mNewNotification)
-                    invalidateOptionsMenu();
+                ServiceNotify.Unread = (cursor.getInt(0) == Constants.DATA_UNREAD);
+                if (prevNewFlag != ServiceNotify.Unread)
+                    sendBroadcast(new Intent(ServiceNotify.NOTIFICATION_DATA_CHANGE));
                 break;
             }
         }
@@ -287,7 +268,7 @@ public class MainActivity extends LoggedActivity implements
             }
             case R.id.navig_notification: { // Display notification activity
 
-                Logs.add(Logs.Type.I, "Display notification");
+                Logs.add(Logs.Type.I, "Display notifications");
                 startNotificationActivity();
                 break;
             }
@@ -453,7 +434,7 @@ public class MainActivity extends LoggedActivity implements
         // Set URIs to observe DB changes
         mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT, String.valueOf(getIntent()
                 .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
-        Login.notificationURI = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getIntent()
+        ServiceNotify.URI = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getIntent()
                 .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
 
         // Set content view pager
@@ -574,8 +555,7 @@ public class MainActivity extends LoggedActivity implements
                 final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
                 fab.setImageDrawable(getDrawable((section == Constants.MAIN_SECTION_PUBLICATIONS) ?
                         R.drawable.ic_add_white_36dp : R.drawable.ic_check_white_36dp));
-                fab.setVisibility(((section == Constants.MAIN_SECTION_PUBLICATIONS) || (mNewNotification)) ?
-                        View.VISIBLE : View.GONE);
+                fab.setVisibility((section == Constants.MAIN_SECTION_PUBLICATIONS)? View.VISIBLE:View.GONE);
 
                 ViewCompat.animate(fab).cancel();
                 if (mFabTransY == Constants.NO_DATA)
@@ -591,8 +571,8 @@ public class MainActivity extends LoggedActivity implements
 
                                     fab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                                     fab.setTranslationY(factor * mFabTransY);
-                                    fab.setVisibility(((section == Constants.MAIN_SECTION_PUBLICATIONS) ||
-                                            (mNewNotification)) ? View.VISIBLE : View.GONE);
+                                    fab.setVisibility((section == Constants.MAIN_SECTION_PUBLICATIONS)?
+                                            View.VISIBLE : View.GONE);
                                 }
                             });
                 else
@@ -674,27 +654,15 @@ public class MainActivity extends LoggedActivity implements
         mNewNotifyLoader.init(this, Queries.MAIN_DATA_NEW_NOTIFY, notifyData);
 
         // Register new user notifications service
-        sendBroadcast(DataService.getIntent(true, Tables.ID_NOTIFICATIONS, Login.notificationURI));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Logs.add(Logs.Type.V, null);
-
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        if (mNewNotification)
-            menu.findItem(R.id.mnu_notification).setIcon(getDrawable(R.drawable.ic_notifications_info_24dp));
-        return true;
+        sendBroadcast(DataService.getIntent(true, Tables.ID_NOTIFICATIONS, ServiceNotify.URI));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Logs.add(Logs.Type.V, "item: " + item);
-        if (item.getItemId() == R.id.mnu_notification) {
 
-            startNotificationActivity();
-            return true;
-        }
+        if (onNotifyItemSelected(item))
+            return true; // Display notifications
         return super.onOptionsItemSelected(item);
     }
 
@@ -728,7 +696,7 @@ public class MainActivity extends LoggedActivity implements
         Logs.add(Logs.Type.V, null);
 
         // Unregister new user notifications service
-        sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, Login.notificationURI));
+        sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, ServiceNotify.URI));
 
         sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, mShortcutUri));
         sendBroadcast(DataService.getIntent(false, Tables.ID_MESSAGERIE, mShortcutUri));

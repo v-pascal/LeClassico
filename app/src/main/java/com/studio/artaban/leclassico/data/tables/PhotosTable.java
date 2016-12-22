@@ -174,7 +174,7 @@ public class PhotosTable extends DataTable {
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     //////
-    private static Internet.DownloadResult sendSyncRequest(String url, @Nullable ContentValues postData,
+    private static Internet.DownloadResult sendSyncRequest(String url, @Nullable final ContentValues postData,
                                                            final ContentResolver resolver, final byte operation,
                                                            final SyncResult syncResult) {
         // Send remote DB request
@@ -188,9 +188,13 @@ public class PhotosTable extends DataTable {
                     JSONObject reply = new JSONObject(response);
                     if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
-                        if (reply.isNull(TABLE_NAME))
+                        if (reply.isNull(TABLE_NAME)) {
+                            if ((postData != null) && (postData.containsKey(WebServices.PHOTOS_DATA_IDS)))
+                                resetBestFields(resolver, postData.getAsString(WebServices.PHOTOS_DATA_IDS));
+
                             return (operation == WebServices.OPERATION_SELECT);
-                        // Already synchronized for selection but error for any other operation
+                            // Already synchronized for selection but error for any other operation
+                        }
 
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
                         JSONArray entries = reply.getJSONArray(TABLE_NAME);
@@ -304,9 +308,10 @@ public class PhotosTable extends DataTable {
         Cursor cursor = resolver.query(uri, new String[]{COLUMN_FICHIER_ID}, COLUMN_BEST + "=1", null, null);
         if (cursor.moveToFirst()) {
             do {
+                Logs.add(Logs.Type.I, "id: " + cursor.getInt(0));
                 best.append((best.length() > 0)?
-                        WebServices.LIST_SEPARATOR + String.valueOf(cursor.getInt(COLUMN_INDEX_FICHIER_ID)):
-                        String.valueOf(cursor.getInt(COLUMN_INDEX_FICHIER_ID)));
+                        WebServices.LIST_SEPARATOR + String.valueOf(cursor.getInt(0)):
+                        String.valueOf(cursor.getInt(0)));
 
             } while (cursor.moveToNext());
 
@@ -343,7 +348,7 @@ public class PhotosTable extends DataTable {
             ContentValues data = new ContentValues();
             data.put(WebServices.PHOTOS_DATA_BEST, 1);
             if (best != null)
-                data.put(WebServices.PHOTOS_DATA_IDS, resetBestFields(resolver, null));
+                data.put(WebServices.PHOTOS_DATA_IDS, best);
 
             //////
             if (sendSyncRequest(getSyncUrlRequest(resolver, syncData), data, resolver,

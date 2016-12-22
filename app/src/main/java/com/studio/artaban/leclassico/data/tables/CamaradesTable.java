@@ -427,12 +427,15 @@ public class CamaradesTable extends DataTable {
                                     // remote DB fields
                                     boolean removed = false;
 
-                                    if (cursor.getString(COLUMN_INDEX_CODE_CONF_UPD)
-                                            .compareTo(entry.getString(JSON_KEY_CODE_CONF_UPD)) > 0) {
+                                    if ((entry.has(JSON_KEY_CODE_CONF_UPD)) && // Connected user only
+                                            (cursor.getString(COLUMN_INDEX_CODE_CONF_UPD)
+                                                    .compareTo(entry.getString(JSON_KEY_CODE_CONF_UPD)) > 0)) {
                                         values.remove(COLUMN_CODE_CONF);
                                         values.remove(COLUMN_CODE_CONF_UPD);
                                         removed = true;
                                     }
+                                    // NB: See to do comments into 'ConnectFragment' class
+
                                     if (cursor.getString(COLUMN_INDEX_NOM_UPD)
                                             .compareTo(entry.getString(JSON_KEY_NOM_UPD)) > 0) {
                                         values.remove(COLUMN_NOM);

@@ -3,7 +3,6 @@ package com.studio.artaban.leclassico.connection;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Errors;
@@ -22,10 +21,7 @@ public final class Login {
 
     public static final String EXTRA_DATA_PSEUDO = "pseudo";
     public static final String EXTRA_DATA_PSEUDO_ID = "pseudoId";
-    public static final String EXTRA_DATA_NOTIFY_URI = "notifyURI";
     // Extra data keys
-
-    public static Uri notificationURI; // User notifications URI
 
     public static void copyExtraData(Intent from, Intent to) {
     // Put login extras data from an intent to another one (from previous activity to next activity)
@@ -33,7 +29,6 @@ public final class Login {
         Logs.add(Logs.Type.V, "from: " + from + ";to: " + to);
         to.putExtra(EXTRA_DATA_PSEUDO, from.getStringExtra(EXTRA_DATA_PSEUDO));
         to.putExtra(EXTRA_DATA_PSEUDO_ID, from.getIntExtra(EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
-        to.putExtra(EXTRA_DATA_NOTIFY_URI, notificationURI); // Always add notification URI (new notification)
     }
 
     public static class Reply {

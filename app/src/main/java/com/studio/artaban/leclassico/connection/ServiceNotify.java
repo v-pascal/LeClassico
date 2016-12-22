@@ -7,12 +7,14 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.widget.RemoteViews;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -27,13 +29,17 @@ import java.util.Date;
  */
 public final class ServiceNotify {
 
+    public static final String NOTIFICATION_DATA_CHANGE = "com." + Constants.APP_URI_COMPANY + '.' +
+            Constants.APP_URI + ".action.NOTIFICATION_DATA_CHANGE";
+    // Actions
+
+    public static Uri URI; // User notifications URI
+    public static boolean Existing; // Existing notification flag
+    public static boolean Unread; // New notification flag (unread)
+
+    //////
     private static final int SERVICE_NOTIFICATION_REF = 303; // Notification ID
-
-    //
-    private static ServiceNotify ourInstance = new ServiceNotify();
-    private ServiceNotify() { }
-
-    private static Notification mNotify; // Notification
+    private static Notification Notify; // Notification
 
     private static void setDateTime(Context context, RemoteViews views) { // Set current date & time
         Logs.add(Logs.Type.V, "context: " + context + ";views: " + views);
@@ -62,8 +68,8 @@ public final class ServiceNotify {
         if (Preferences.getBoolean(Preferences.SETTINGS_NOTIFY_LIGHT))
             defaults |= Notification.DEFAULT_LIGHTS;
 
-        mNotify.bigContentView.setTextViewText(R.id.notify_text, textBuilder.subSequence(0, textBuilder.length()));
-        mNotify.defaults = (newNotify > 0)? defaults:0;
+        Notify.bigContentView.setTextViewText(R.id.notify_text, textBuilder.subSequence(0, textBuilder.length()));
+        Notify.defaults = (newNotify > 0)? defaults:0;
     }
 
     //////
@@ -96,7 +102,7 @@ public final class ServiceNotify {
         notifyViews.setOnClickPendingIntent(R.id.text_logout, logoutIntent);
 
         //
-        mNotify = new Notification.Builder(service)
+        Notify = new Notification.Builder(service)
                         .setSmallIcon(R.drawable.notification)
                         .setContentTitle(service.getString(R.string.app_name))
                         .setContentText(title)
@@ -104,30 +110,30 @@ public final class ServiceNotify {
                         .setContentIntent(displayIntent)
                         .build();
 
-        mNotify.bigContentView = notifyViews;
+        Notify.bigContentView = notifyViews;
         setTextInfo(service, DataTable.getNewNotification(service.getContentResolver(), pseudo));
-        mNotify.defaults = Notification.DEFAULT_ALL; // Always at connection
-        service.startForeground(SERVICE_NOTIFICATION_REF, mNotify);
+        Notify.defaults = Notification.DEFAULT_ALL; // Always at connection
+        service.startForeground(SERVICE_NOTIFICATION_REF, Notify);
     }
 
     public static void update(Context context, int newNotify) {
         // Update new notification info (count)
 
         Logs.add(Logs.Type.V, "newNotify: " + newNotify);
-        if (mNotify == null)
+        if (Notify == null)
             throw new IllegalStateException("Unexpected update call (not created)");
 
-        setDateTime(context, mNotify.bigContentView); // Update current date & time
+        setDateTime(context, Notify.bigContentView); // Update current date & time
         setTextInfo(context, newNotify); // Update text info (new notification count)
 
         ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE))
-                .notify(SERVICE_NOTIFICATION_REF, mNotify);
+                .notify(SERVICE_NOTIFICATION_REF, Notify);
     }
 
     public static void remove(Service service) {
         Logs.add(Logs.Type.V, "service: " + service);
 
         service.stopForeground(true);
-        mNotify = null;
+        Notify = null;
     }
 }

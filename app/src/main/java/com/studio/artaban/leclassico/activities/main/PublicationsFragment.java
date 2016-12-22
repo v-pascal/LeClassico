@@ -132,6 +132,7 @@ public class PublicationsFragment extends MainFragment implements
                         Intent fullScreen = new Intent(getContext(), FullPhotoActivity.class);
                         fullScreen.putExtra(FullPhotoActivity.EXTRA_DATA_TITLE, title);
                         fullScreen.putExtra(FullPhotoActivity.EXTRA_DATA_NAME, name);
+                        Login.copyExtraData(getActivity().getIntent(), fullScreen);
 
                         ActivityOptions options = ActivityOptions
                                 .makeSceneTransitionAnimation(getActivity(), sender, name);
