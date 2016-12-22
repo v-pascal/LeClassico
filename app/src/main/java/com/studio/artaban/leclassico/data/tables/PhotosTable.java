@@ -182,7 +182,7 @@ public class PhotosTable extends DataTable {
 
             @Override
             public boolean onReceiveReply(String response) {
-                Logs.add(Logs.Type.V, "response: " + response);
+                //Logs.add(Logs.Type.V, "response: " + response);
                 try {
 
                     JSONObject reply = new JSONObject(response);
@@ -300,12 +300,13 @@ public class PhotosTable extends DataTable {
             ContentValues values = new ContentValues();
             values.put(COLUMN_BEST, 1);
             resolver.update(uri, values,
-                    COLUMN_FICHIER_ID + " IN (" + ids.replace(WebServices.LIST_SEPARATOR, ','), null);
+                    COLUMN_FICHIER_ID + " IN (" + ids.replace(WebServices.LIST_SEPARATOR, ',') + ')', null);
             return null;
         }
         // Reset best flags (return best photos)
         StringBuilder best = new StringBuilder();
-        Cursor cursor = resolver.query(uri, new String[]{COLUMN_FICHIER_ID}, COLUMN_BEST + "=1", null, null);
+        Cursor cursor = resolver.query(uri, new String[]{COLUMN_FICHIER_ID}, COLUMN_BEST + "=1",
+                null, COLUMN_FICHIER_ID + " DESC");
         if (cursor.moveToFirst()) {
             do {
                 Logs.add(Logs.Type.I, "id: " + cursor.getInt(0));
