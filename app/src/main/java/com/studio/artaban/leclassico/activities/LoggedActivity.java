@@ -106,7 +106,5 @@ public abstract class LoggedActivity extends AppCompatActivity {
 
         if (!DataService.isRunning())
             finish();
-        else
-            invalidateOptionsMenu(); // Refresh notification info
     }
 }
