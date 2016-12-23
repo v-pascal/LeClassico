@@ -29,9 +29,11 @@ public class PublicationActivity extends LoggedActivity {
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+        if ((!cursor.moveToFirst()) || (onNotifyLoadFinished(id, cursor)))
+            return;
 
 
-        onNotifyLoadFinished(id, cursor); // Refresh notification info
+
 
 
     }

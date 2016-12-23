@@ -352,8 +352,8 @@ public class CommentairesTable extends DataTable {
                 return null;
             }
 
-            // Get publication IDs list
-            ids = PhotosTable.getIds(resolver);
+            // Get photos IDs list (best only)
+            ids = PhotosTable.getBestIds(resolver);
             if (ids == null)
                 return syncResult; // No photo found
 

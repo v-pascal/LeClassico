@@ -91,14 +91,23 @@ public class PhotosTable extends DataTable {
     //
     private PhotosTable() { }
     public static PhotosTable newInstance() { return new PhotosTable(); }
-    public static String getIds(ContentResolver resolver) {
+    public static String getBestIds(ContentResolver resolver) { // Return best photo IDs
 
+        Logs.add(Logs.Type.V, "resolver: " + resolver);
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME),
+                new String[]{COLUMN_FICHIER_ID}, COLUMN_BEST + "=1", null, COLUMN_FICHIER_ID + " DESC");
 
+        StringBuilder ids = new StringBuilder();
+        if (cursor.moveToFirst()) {
+            do {
+                ids.append((ids.length() > 0)?
+                        WebServices.LIST_SEPARATOR + String.valueOf(cursor.getInt(0)):
+                        String.valueOf(cursor.getInt(0)));
 
-
-
-
-        return null;
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return (ids.length() > 0)? ids.toString():null;
     }
 
     @Override
@@ -304,24 +313,15 @@ public class PhotosTable extends DataTable {
             return null;
         }
         // Reset best flags (return best photos)
-        StringBuilder best = new StringBuilder();
-        Cursor cursor = resolver.query(uri, new String[]{COLUMN_FICHIER_ID}, COLUMN_BEST + "=1",
-                null, COLUMN_FICHIER_ID + " DESC");
-        if (cursor.moveToFirst()) {
-            do {
-                Logs.add(Logs.Type.I, "id: " + cursor.getInt(0));
-                best.append((best.length() > 0)?
-                        WebServices.LIST_SEPARATOR + String.valueOf(cursor.getInt(0)):
-                        String.valueOf(cursor.getInt(0)));
-
-            } while (cursor.moveToNext());
+        String best = getBestIds(resolver);
+        if (best != null) {
 
             // Clear best flags
             ContentValues values = new ContentValues();
             values.put(COLUMN_BEST, 0);
             resolver.update(uri, values, null, null);
         }
-        return (best.length() > 0)? best.toString():null; // Best photo IDs
+        return best; // Best photo IDs
     }
 
     @Override

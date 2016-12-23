@@ -29,6 +29,7 @@ import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
+import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.services.DataService;
@@ -116,6 +117,7 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
 
 
+            // COLUMN_INDEX_COMMENT_PSEUDO
             ((TextView)holder.rootView.findViewById(R.id.test))
                     .setText(mDataSource.getString(position, COLUMN_INDEX_COMMENT_TEXT));
 
@@ -140,16 +142,16 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
 
 
+            // COLUMN_INDEX_COMMENT_OBJ_ID
 
-
+            // COLUMN_INDEX_PHOTO_FICHIER
+            // COLUMN_INDEX_PHOTO_ALBUM
 
             ((TextView)mRootView.findViewById(R.id.text_title)).setText("LC0180.jpg");
             ((TextView)mRootView.findViewById(R.id.text_info_album)).setText("Tillate.com");
             ((TextView)mRootView.findViewById(R.id.text_info_provider)).setText("Pascal");
             ((TextView)mRootView.findViewById(R.id.text_info_range)).setText("1/258");
-
-
-
+            // image_photo
 
 
 
@@ -174,18 +176,13 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
     // Query column indexes
     private static final int COLUMN_INDEX_COMMENT_ID = 0;
-    private static final int COLUMN_INDEX_COMMENT_TEXT = 1;
-    private static final int COLUMN_INDEX_COMMENT_DATE = 2;
-    private static final int COLUMN_INDEX_STATUS_DATE = 3; // Comment status date
-    private static final int COLUMN_INDEX_SYNC = 4; // Comment date
-
-
-
-
-
-
-
-
+    private static final int COLUMN_INDEX_COMMENT_OBJ_ID = 1;
+    private static final int COLUMN_INDEX_COMMENT_PSEUDO = 2;
+    private static final int COLUMN_INDEX_COMMENT_TEXT = 3;
+    private static final int COLUMN_INDEX_COMMENT_DATE = 4;
+    private static final int COLUMN_INDEX_PHOTO_ALBUM = 5;
+    private static final int COLUMN_INDEX_PHOTO_PSEUDO = 6;
+    private static final int COLUMN_INDEX_PHOTO_FICHIER = 7;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -313,18 +310,21 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
 
 
-
-
-
-
                 "SELECT " +
                         CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_COMMENT_ID
+                        CommentairesTable.COLUMN_OBJ_ID + ',' + // COLUMN_INDEX_COMMENT_OBJ_ID
+                        CommentairesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_COMMENT_PSEUDO
                         CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COMMENT_TEXT
                         CommentairesTable.COLUMN_DATE + ',' + // COLUMN_INDEX_COMMENT_DATE
-                        CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' + // COLUMN_INDEX_STATUS_DATE
-                        CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + // COLUMN_INDEX_SYNC
+                        PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_PHOTO_ALBUM
+                        PhotosTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PHOTO_PSEUDO
+                        PhotosTable.COLUMN_FICHIER + // COLUMN_INDEX_PHOTO_FICHIER
                         " FROM " + CommentairesTable.TABLE_NAME +
+                        " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
+                        CommentairesTable.COLUMN_OBJ_ID + '=' + PhotosTable.COLUMN_FICHIER_ID +
                         " WHERE " +
+                        PhotosTable.COLUMN_BEST + "=1 AND " +
+                        CommentairesTable.COLUMN_OBJ_TYPE + '=' + CommentairesTable.TYPE_PHOTO + " AND " +
                         CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
                         CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
