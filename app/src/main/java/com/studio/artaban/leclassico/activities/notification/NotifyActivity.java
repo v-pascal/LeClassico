@@ -61,6 +61,8 @@ import java.util.Date;
  */
 public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResultListener {
 
+    // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
+
     public void onRead(View sender) { // Mark unread notification(s) as read
         Logs.add(Logs.Type.V, "sender: " + sender);
 
@@ -85,7 +87,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                 // Notify service & notifications URI to refresh notification list
                 ServiceNotify.update(NotifyActivity.this, 0);
-                getContentResolver().notifyChange(ContentUris.withAppendedId(ServiceNotify.URI, 0), null);
+                getContentResolver().notifyChange(ContentUris.withAppendedId(mNotifyURI, 0), null);
                 // NB: The 0 appended to URI above permits to avoid multiple 'onChange' method call
             }
         });
@@ -298,7 +300,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     Intent request = new Intent(DataService.REQUEST_OLD_DATA);
                     request.putExtra(DataRequest.EXTRA_DATA_DATE, mQueryDate);
                     NotifyActivity.this.sendBroadcast(DataService.getIntent(request,
-                            Tables.ID_NOTIFICATIONS, ServiceNotify.URI));
+                            Tables.ID_NOTIFICATIONS, mNotifyURI));
                     break;
                 }
             }
@@ -520,7 +522,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             if ((intent.getAction().equals(DataService.REQUEST_OLD_DATA)) && // Old request
                     (intent.getBooleanExtra(DataService.EXTRA_DATA_RECEIVED, false)) && // Received
                     (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI)) // Notification URI
-                            .compareTo(ServiceNotify.URI) == 0)) {
+                            .compareTo(mNotifyURI) == 0)) {
 
                 mNotifyAdapter.setRequesting(false);
                 if (!intent.getBooleanExtra(DataService.EXTRA_DATA_OLD_FOUND, false)) {
@@ -785,7 +787,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
         // Initialize notification list (set query loaders)
         Bundle queryData = new Bundle();
-        queryData.putParcelable(QueryLoader.DATA_KEY_URI, ServiceNotify.URI);
+        queryData.putParcelable(QueryLoader.DATA_KEY_URI, mNotifyURI);
         queryData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         NotificationsTable.COLUMN_OBJECT_TYPE + ',' + // COLUMN_INDEX_OBJECT_TYPE

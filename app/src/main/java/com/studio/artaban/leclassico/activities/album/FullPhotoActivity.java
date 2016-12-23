@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.activities.album;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -29,11 +30,23 @@ public class FullPhotoActivity extends LoggedActivity {
 
     public static final String EXTRA_DATA_TITLE = "title";
     public static final String EXTRA_DATA_NAME = "name";
-    // Extras data (see Login extra data keys)
+    // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
     protected void onLoggedResume() {
+
+    }
+
+    //////
+    @Override
+    public void onLoadFinished(int id, Cursor cursor) {
+        Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+        onNotifyLoadFinished(id, cursor); // Refresh notification info
+    }
+
+    @Override
+    public void onLoaderReset() {
 
     }
 

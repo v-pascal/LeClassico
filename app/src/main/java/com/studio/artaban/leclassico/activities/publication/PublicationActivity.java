@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.publication;
 
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -14,11 +15,29 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class PublicationActivity extends LoggedActivity {
 
+    // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
+
     private Uri mPubUri; // Publication URI (needed to update cursor URI)
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
     protected void onLoggedResume() {
+
+    }
+
+    //////
+    @Override
+    public void onLoadFinished(int id, Cursor cursor) {
+        Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+
+
+        onNotifyLoadFinished(id, cursor); // Refresh notification info
+
+
+    }
+
+    @Override
+    public void onLoaderReset() {
 
     }
 

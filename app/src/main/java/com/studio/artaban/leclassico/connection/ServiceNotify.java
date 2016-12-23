@@ -7,14 +7,12 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.widget.RemoteViews;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.introduction.IntroActivity;
-import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -29,15 +27,6 @@ import java.util.Date;
  */
 public final class ServiceNotify {
 
-    public static final String NOTIFICATION_DATA_CHANGE = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.NOTIFICATION_DATA_CHANGE";
-    // Actions
-
-    public static Uri URI; // User notifications URI
-    public static boolean Existing; // Existing notification flag
-    public static boolean Unread; // New notification flag (unread)
-
-    //////
     private static final int SERVICE_NOTIFICATION_REF = 303; // Notification ID
     private static Notification Notify; // Notification
 

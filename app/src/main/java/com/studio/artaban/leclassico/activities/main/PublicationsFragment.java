@@ -95,7 +95,7 @@ public class PublicationsFragment extends MainFragment implements
             Logs.add(Logs.Type.V, "sender: " + sender);
             switch (sender.getId()) {
 
-                case R.id.image_pseudo: {
+                case R.id.image_pseudo: { // Display publication owner profile
                     int pseudoId = (int)sender.getTag(R.id.tag_pseudo_id);
                     Logs.add(Logs.Type.I, "Pseudo #" + pseudoId + " selected");
 
@@ -105,7 +105,7 @@ public class PublicationsFragment extends MainFragment implements
 
                     break;
                 }
-                case R.id.image_display: {
+                case R.id.image_display: { // Display publication activity (with comments)
                     int position = (int)sender.getTag(R.id.tag_position);
                     Logs.add(Logs.Type.I, "Display #" + position + " selected");
 
@@ -143,7 +143,7 @@ public class PublicationsFragment extends MainFragment implements
                                 Uri.parse(mDataSource.getString(position, COLUMN_INDEX_LINK))));
                     break;
                 }
-                case R.id.layout_more: {
+                case R.id.layout_more: { // Old data requested
                     Logs.add(Logs.Type.I, "Old publications requested");
 
                     ////// Request old publications to remote DB

@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.mailbox;
 
+import android.database.Cursor;
 import android.os.Bundle;
 
 import com.studio.artaban.leclassico.activities.LoggedActivity;
@@ -11,9 +12,23 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class MailboxActivity extends LoggedActivity {
 
+    // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
+
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
     protected void onLoggedResume() {
+
+    }
+
+    //////
+    @Override
+    public void onLoadFinished(int id, Cursor cursor) {
+        Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+        onNotifyLoadFinished(id, cursor); // Refresh notification info
+    }
+
+    @Override
+    public void onLoaderReset() {
 
     }
 

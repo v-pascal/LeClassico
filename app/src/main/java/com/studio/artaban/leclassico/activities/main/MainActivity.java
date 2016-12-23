@@ -36,7 +36,6 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.settings.SettingsActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
-import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.services.ServiceBinder;
 import com.studio.artaban.leclassico.data.Constants;
@@ -44,7 +43,6 @@ import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
-import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -62,6 +60,8 @@ import java.io.File;
 public class MainActivity extends LoggedActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
         MainFragment.OnFragmentListener {
+
+    // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
     private static int getShortcutID(int section, boolean newItem) {
     // Return shortcut fragment container ID according selected section
@@ -160,47 +160,33 @@ public class MainActivity extends LoggedActivity implements
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
+
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
+        if ((!cursor.moveToFirst()) || (onNotifyLoadFinished(id, cursor)))
+            return;
 
-        if (!cursor.moveToFirst()) return;
-        switch (id) {
-            case Queries.MAIN_DATA_USER: { ////// User info
+        if (id == Queries.MAIN_DATA_USER) { // User info
+            boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
+                    (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.GENDER_FEMALE);
+            String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
+                    cursor.getString(COLUMN_INDEX_PROFILE) : null;
+            String banner = (!cursor.isNull(COLUMN_INDEX_BANNER))?
+                    cursor.getString(COLUMN_INDEX_BANNER) : null;
+            View navHeader = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
 
-                // Get DB data
-                boolean female = (!cursor.isNull(COLUMN_INDEX_SEX)) &&
-                        (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.GENDER_FEMALE);
-                String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
-                        cursor.getString(COLUMN_INDEX_PROFILE) : null;
-                String banner = (!cursor.isNull(COLUMN_INDEX_BANNER))?
-                        cursor.getString(COLUMN_INDEX_BANNER) : null;
-                View navHeader = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
+            // Profile
+            Tools.setProfile(MainActivity.this,
+                    (ImageView)navHeader.findViewById(R.id.image_profile),
+                    female, profile, R.dimen.profile_size, false);
 
-                // Profile
-                Tools.setProfile(MainActivity.this,
-                        (ImageView)navHeader.findViewById(R.id.image_profile),
-                        female, profile, R.dimen.profile_size, false);
-
-                // Banner
-                if (banner != null)
-                    Glider.with(MainActivity.this)
-                            .load(Storage.FOLDER_PROFILES +
-                                            File.separator + banner,
-                                    Constants.APP_URL_PROFILES + '/' + banner)
-                            .placeholder(R.drawable.banner)
-                            .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
-                break;
-            }
-            case Queries.MAIN_DATA_NEW_NOTIFY: { ////// User notifications
-
-                Logs.add(Logs.Type.I, "New notification(s): " + cursor.getInt(0));
-                ServiceNotify.Existing = true;
-                boolean prevNewFlag = ServiceNotify.Unread;
-
-                ServiceNotify.Unread = (cursor.getInt(0) == Constants.DATA_UNREAD);
-                if (prevNewFlag != ServiceNotify.Unread)
-                    sendBroadcast(new Intent(ServiceNotify.NOTIFICATION_DATA_CHANGE));
-                break;
-            }
+            // Banner
+            if (banner != null)
+                Glider.with(MainActivity.this)
+                        .load(Storage.FOLDER_PROFILES +
+                                        File.separator + banner,
+                                Constants.APP_URL_PROFILES + '/' + banner)
+                        .placeholder(R.drawable.banner)
+                        .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
         }
     }
 
@@ -215,7 +201,6 @@ public class MainActivity extends LoggedActivity implements
     // Query column index
 
     private final QueryLoader mUserLoader = new QueryLoader(this, this); // User data query loader
-    private final QueryLoader mNewNotifyLoader = new QueryLoader(this, this); // New notification query loader
 
     ////// OnNavigationItemSelectedListener ////////////////////////////////////////////////////////
     @Override
@@ -431,10 +416,8 @@ public class MainActivity extends LoggedActivity implements
         String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
 
-        // Set URIs to observe DB changes
+        // Set URI to observe shortcut DB changes
         mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT, String.valueOf(getIntent()
-                .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
-        ServiceNotify.URI = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(getIntent()
                 .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
 
         // Set content view pager
@@ -634,7 +617,7 @@ public class MainActivity extends LoggedActivity implements
                         TabLayout.MODE_SCROLLABLE : TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(mViewPager);
 
-        // Load user & notification data (using query loaders)
+        // Load user info (using query loader)
         Bundle userData = new Bundle();
         userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{
 
@@ -644,17 +627,6 @@ public class MainActivity extends LoggedActivity implements
         });
         userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
         mUserLoader.init(this, Queries.MAIN_DATA_USER, userData);
-
-        Bundle notifyData = new Bundle();
-        notifyData.putParcelable(QueryLoader.DATA_KEY_URI, mShortcutUri);
-        notifyData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT " + NotificationsTable.COLUMN_LU_FLAG + " FROM " + NotificationsTable.TABLE_NAME +
-                        " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" + pseudo +
-                        "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
-        mNewNotifyLoader.init(this, Queries.MAIN_DATA_NEW_NOTIFY, notifyData);
-
-        // Register new user notifications service
-        sendBroadcast(DataService.getIntent(true, Tables.ID_NOTIFICATIONS, ServiceNotify.URI));
     }
 
     @Override
@@ -694,9 +666,6 @@ public class MainActivity extends LoggedActivity implements
     protected void onDestroy() {
         super.onDestroy();
         Logs.add(Logs.Type.V, null);
-
-        // Unregister new user notifications service
-        sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, ServiceNotify.URI));
 
         sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, mShortcutUri));
         sendBroadcast(DataService.getIntent(false, Tables.ID_MESSAGERIE, mShortcutUri));
