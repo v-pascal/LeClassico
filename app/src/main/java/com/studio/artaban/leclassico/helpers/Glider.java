@@ -75,7 +75,6 @@ public class Glider {
         Glide.with(mContext)
             .load(imageUri)
             .asBitmap()
-            .centerCrop()
             .placeholder(mPlaceholderId)
             .into(new BitmapImageViewTarget(imageView) {
 

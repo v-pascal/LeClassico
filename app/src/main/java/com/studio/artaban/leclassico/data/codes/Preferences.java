@@ -3,7 +3,8 @@ package com.studio.artaban.leclassico.data.codes;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.studio.artaban.leclassico.LeClassicoApplication;
+import com.studio.artaban.leclassico.LeClassicoApp;
+import com.studio.artaban.leclassico.data.Constants;
 
 /**
  * Created by pascal on 23/08/16.
@@ -20,6 +21,8 @@ public final class Preferences {
     public static final String CONNECTION_PROGRESS = "connectionProgress"; // Synchronization progress status
     public static final String CONNECTION_ONLINE = "connectionOnline"; // Online connection flag
 
+    public static final String MAIN_BEST_PHOTO = "mainBestPhoto"; // Best photo ID displayed
+
 
     ////// User settings ///////////////////////////////////////////////////////////////////////////
 
@@ -30,7 +33,11 @@ public final class Preferences {
 
     //////
     public static boolean getBoolean(String key) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LeClassicoApplication.getInstance());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LeClassicoApp.getInstance());
         return prefs.getBoolean(key, false);
+    }
+    public static int getInt(String key) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LeClassicoApp.getInstance());
+        return prefs.getInt(key, Constants.NO_DATA);
     }
 }

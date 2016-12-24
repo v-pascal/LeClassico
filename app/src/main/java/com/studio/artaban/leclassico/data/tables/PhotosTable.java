@@ -76,7 +76,8 @@ public class PhotosTable extends DataTable {
     public static final String COLUMN_PSEUDO = "PHT_Pseudo";
     public static final String COLUMN_FICHIER = "PHT_Fichier";
     public static final String COLUMN_FICHIER_ID = "PHT_FichierID";
-    public static final String COLUMN_BEST = "PHT_Best";
+    public static final String COLUMN_BEST = "PHT_Best"; // Additional field (reserved to application)
+    public static final String COLUMN_RANGE = "PHT_Range"; // Additional field (reserved to application)
     private static final String COLUMN_STATUS_DATE = "PHT_StatusDate";
 
     // Columns index
@@ -85,8 +86,9 @@ public class PhotosTable extends DataTable {
     private static final short COLUMN_INDEX_FICHIER = 3;
     private static final short COLUMN_INDEX_FICHIER_ID = 4;
     private static final short COLUMN_INDEX_BEST = 5;
-    private static final short COLUMN_INDEX_STATUS_DATE = 6;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 7;
+    private static final short COLUMN_INDEX_RANGE = 6;
+    private static final short COLUMN_INDEX_STATUS_DATE = 7;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 8;
 
     //
     private PhotosTable() { }
@@ -122,6 +124,7 @@ public class PhotosTable extends DataTable {
                 COLUMN_FICHIER + " TEXT NOT NULL," +
                 COLUMN_FICHIER_ID + " INTEGER NOT NULL," +
                 COLUMN_BEST + " INTEGER NOT NULL," +
+                COLUMN_RANGE + " TEXT NOT NULL," +
 
                 Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
@@ -180,6 +183,7 @@ public class PhotosTable extends DataTable {
     private static final String JSON_KEY_FICHIER = COLUMN_FICHIER.substring(4);
     private static final String JSON_KEY_FICHIER_ID = COLUMN_FICHIER_ID.substring(4);
     private static final String JSON_KEY_BEST = COLUMN_BEST.substring(4);
+    private static final String JSON_KEY_RANGE = COLUMN_RANGE.substring(4);
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     //////
@@ -219,8 +223,10 @@ public class PhotosTable extends DataTable {
                             ContentValues values = new ContentValues();
                             values.put(COLUMN_ALBUM, entry.getString(JSON_KEY_ALBUM));
                             values.put(COLUMN_PSEUDO, entry.getString(JSON_KEY_PSEUDO));
-                            if (!entry.isNull(JSON_KEY_BEST))
-                                values.put(COLUMN_BEST, entry.getInt(JSON_KEY_BEST)); // Best
+                            if (!entry.isNull(JSON_KEY_BEST)) { // Best
+                                values.put(COLUMN_BEST, entry.getInt(JSON_KEY_BEST));
+                                values.put(COLUMN_RANGE, entry.getString(JSON_KEY_RANGE));
+                            }
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
 
@@ -260,6 +266,8 @@ public class PhotosTable extends DataTable {
                                 values.put(COLUMN_FICHIER_ID, fichierId);
                                 if (!values.containsKey(COLUMN_BEST))
                                     values.put(COLUMN_BEST, 0);
+                                if (!values.containsKey(COLUMN_RANGE))
+                                    values.put(COLUMN_RANGE, Constants.UNDEFINED);
                                 resolver.insert(tableUri, values);
 
                                 ++syncResult.inserted;

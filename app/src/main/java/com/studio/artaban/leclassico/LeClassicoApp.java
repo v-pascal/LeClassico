@@ -2,15 +2,23 @@ package com.studio.artaban.leclassico;
 
 import android.app.Application;
 
+import java.util.Random;
+
 /**
  * Created by pascal on 15/07/16.
  * Application class
  */
-public class LeClassicoApplication extends Application {
+public class LeClassicoApp extends Application {
 
-    private static LeClassicoApplication ourInstance;
-    public static LeClassicoApplication getInstance() {
+    private static LeClassicoApp ourInstance;
+    public static LeClassicoApp getInstance() {
         return ourInstance;
+    }
+
+    //
+    private final Random mRandom = new Random();
+    public static Random getRandom() {
+        return ourInstance.mRandom;
     }
 
     //////

@@ -3,7 +3,9 @@ package com.studio.artaban.leclassico.activities.album;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -16,8 +18,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.studio.artaban.leclassico.LeClassicoApp;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
@@ -25,31 +29,30 @@ import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
+import com.studio.artaban.leclassico.helpers.Glider;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
+import com.studio.artaban.leclassico.helpers.Storage;
 import com.studio.artaban.leclassico.services.DataService;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by pascal on 19/11/16.
  * Fragment to display a photo with comments
  */
 public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultListener {
-
-
-
-
-
-
-    private View mRootView; // Fragment root view
 
     private RecyclerView mComList; // Recycler view containing comments list
     private Uri mComUri; // Comments observer URI
@@ -117,7 +120,11 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
 
 
+
+
+
             // COLUMN_INDEX_COMMENT_PSEUDO
+
             ((TextView)holder.rootView.findViewById(R.id.test))
                     .setText(mDataSource.getString(position, COLUMN_INDEX_COMMENT_TEXT));
 
@@ -127,8 +134,14 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
 
 
+
+
+
         }
     }
+
+    private View mRootView; // Fragment root view
+    private int mBestId; // Best photo ID displayed
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -140,18 +153,69 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
         if (id == Queries.MAIN_BEST_PHOTOS) {
             mComCursor = cursor;
 
+            // Get best photo IDs list
+            ArrayList<Integer> ids = new ArrayList<>();
+            do {
+                if (!ids.contains(cursor.getInt(COLUMN_INDEX_COMMENT_OBJ_ID)))
+                    ids.add(cursor.getInt(COLUMN_INDEX_COMMENT_OBJ_ID));
+
+            } while (cursor.moveToNext());
+            cursor.moveToFirst();
+
+            // Select best photo to display (random with online criteria)
+            if ((Internet.isConnected()) || (mBestId == Constants.NO_DATA))
+                mBestId = ids.get(LeClassicoApp.getRandom().nextInt(ids.size()));
+
+            do {
+                if (cursor.getInt(COLUMN_INDEX_COMMENT_OBJ_ID) == mBestId) {
+
+                    String photoFile = cursor.getString(COLUMN_INDEX_PHOTO_FICHIER);
+                    ((TextView)mRootView.findViewById(R.id.text_title)).setText(photoFile);
+                    ((TextView)mRootView.findViewById(R.id.text_info_album))
+                            .setText(cursor.getString(COLUMN_INDEX_PHOTO_ALBUM));
+                    ((TextView)mRootView.findViewById(R.id.text_info_provider))
+                            .setText(cursor.getString(COLUMN_INDEX_PHOTO_PSEUDO));
+                    ((TextView)mRootView.findViewById(R.id.text_info_range))
+                            .setText(cursor.getString(COLUMN_INDEX_PHOTO_RANGE));
+
+                    Glider.with(getContext()).placeholder(R.drawable.no_photo)
+                            .load(Storage.FOLDER_PHOTOS + File.separator + photoFile,
+                                    Constants.APP_URL_PHOTOS + '/' + photoFile)
+                            .into((ImageView) mRootView.findViewById(R.id.image_photo), new Glider.OnLoadListener() {
+
+                                @Override
+                                public void onLoadFailed(ImageView imageView) {
+                                    Logs.add(Logs.Type.V, "imageView: " + imageView);
+
+                                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.no_photo));
+                                    // NB: Done here instead of using placeholder coz the image size setting (width
+                                    //     & height size defined in layouts hierarchy) causes to display a wrong
+                                    //     image scale when succeeded (equal default 'no_photo' image size).
+                                }
+
+                                @Override
+                                public boolean onSetResource(Bitmap resource, final ImageView imageView) {
+                                    return false;
+                                }
+                            });
+                    break;
+                }
+
+            } while (cursor.moveToNext());
+            cursor.moveToFirst();
 
 
-            // COLUMN_INDEX_COMMENT_OBJ_ID
 
-            // COLUMN_INDEX_PHOTO_FICHIER
-            // COLUMN_INDEX_PHOTO_ALBUM
 
-            ((TextView)mRootView.findViewById(R.id.text_title)).setText("LC0180.jpg");
-            ((TextView)mRootView.findViewById(R.id.text_info_album)).setText("Tillate.com");
-            ((TextView)mRootView.findViewById(R.id.text_info_provider)).setText("Pascal");
-            ((TextView)mRootView.findViewById(R.id.text_info_range)).setText("1/258");
-            // image_photo
+
+
+
+
+
+
+
+
+
 
 
 
@@ -183,6 +247,7 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
     private static final int COLUMN_INDEX_PHOTO_ALBUM = 5;
     private static final int COLUMN_INDEX_PHOTO_PSEUDO = 6;
     private static final int COLUMN_INDEX_PHOTO_FICHIER = 7;
+    private static final int COLUMN_INDEX_PHOTO_RANGE = 8;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -291,6 +356,9 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
             Logs.add(Logs.Type.E, "Failed to add background (IO): " + e.getMessage());
         }
 
+        // Restore data
+        mBestId = Preferences.getInt(Preferences.MAIN_BEST_PHOTO);
+
         // Set URI to observe DB changes
         mComUri = Uris.getUri(Uris.ID_MAIN_BEST_PHOTOS);
 
@@ -307,9 +375,6 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
         Bundle bestData = new Bundle();
         bestData.putParcelable(QueryLoader.DATA_KEY_URI, mComUri);
         bestData.putString(QueryLoader.DATA_KEY_SELECTION,
-
-
-
                 "SELECT " +
                         CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_COMMENT_ID
                         CommentairesTable.COLUMN_OBJ_ID + ',' + // COLUMN_INDEX_COMMENT_OBJ_ID
@@ -318,13 +383,14 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
                         CommentairesTable.COLUMN_DATE + ',' + // COLUMN_INDEX_COMMENT_DATE
                         PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_PHOTO_ALBUM
                         PhotosTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PHOTO_PSEUDO
-                        PhotosTable.COLUMN_FICHIER + // COLUMN_INDEX_PHOTO_FICHIER
+                        PhotosTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_PHOTO_FICHIER
+                        PhotosTable.COLUMN_RANGE + // COLUMN_INDEX_PHOTO_RANGE
                         " FROM " + CommentairesTable.TABLE_NAME +
                         " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
+                        CommentairesTable.COLUMN_OBJ_TYPE + "='" + CommentairesTable.TYPE_PHOTO + "' AND " +
                         CommentairesTable.COLUMN_OBJ_ID + '=' + PhotosTable.COLUMN_FICHIER_ID +
                         " WHERE " +
                         PhotosTable.COLUMN_BEST + "=1 AND " +
-                        CommentairesTable.COLUMN_OBJ_TYPE + '=' + CommentairesTable.TYPE_PHOTO + " AND " +
                         CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
                         CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
@@ -333,5 +399,15 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
         mListLoader.init(getActivity(), Queries.MAIN_BEST_PHOTOS, bestData);
 
         return mRootView;
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        Logs.add(Logs.Type.V, null);
+
+        // Store persistent data
+        SharedPreferences prefs = getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
+        prefs.edit().putInt(Preferences.MAIN_BEST_PHOTO, mBestId).apply();
     }
 }

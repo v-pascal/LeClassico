@@ -421,6 +421,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
         // Restore data
         SharedPreferences settings = getSharedPreferences(Constants.APP_PREFERENCE, 0);
+
         mIntroDone = settings.getBoolean(Preferences.INTRODUCTION_DONE, false);
         byte error = (byte)settings.getInt(Preferences.CONNECTION_STEP, 0);
         boolean errorDisplay = settings.getBoolean(Preferences.INTRODUCTION_ERROR_DISPLAY, false);

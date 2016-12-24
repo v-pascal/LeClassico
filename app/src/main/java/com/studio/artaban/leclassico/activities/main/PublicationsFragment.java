@@ -267,9 +267,6 @@ public class PublicationsFragment extends MainFragment implements
                                 }
                             });
 
-                    // TODO: Add a fix to a bug that causes a wrong image size display when scrolling
-                    //       "too" fast (the image size == default earth image size).
-
                 } else { ////// Link
 
                     image.setImageDrawable(getResources().getDrawable(R.drawable.earth));
