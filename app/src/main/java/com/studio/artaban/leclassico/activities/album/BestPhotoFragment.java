@@ -52,7 +52,8 @@ import java.util.ArrayList;
  * Created by pascal on 19/11/16.
  * Fragment to display a photo with comments
  */
-public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultListener {
+public class BestPhotoFragment extends Fragment implements
+        QueryLoader.OnResultListener, RecyclerAdapter.DataView.OnCriteriaListener {
 
     private RecyclerView mComList; // Recycler view containing comments list
     private Uri mComUri; // Comments observer URI
@@ -63,7 +64,7 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
         private RequestAnimation mRequestAnim; // Request old management (animation + event)
         public ComRecyclerViewAdapter() {
-            super(R.layout.layout_comment_item, R.layout.layout_old_request, COLUMN_INDEX_COMMENT_ID);
+            super(R.layout.layout_comment_item, R.layout.layout_old_request_best, COLUMN_INDEX_COMMENT_ID);
         }
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
@@ -107,7 +108,7 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
                 Logs.add(Logs.Type.I, "Request item (" + isRequesting() + ')');
                 if (mRequestAnim == null)
-                    mRequestAnim = new RequestAnimation(getContext());
+                    mRequestAnim = new RequestAnimation(getContext(), false);
 
                 mRequestAnim.display(getResources(), this, holder.requestView);
                 return;
@@ -137,6 +138,7 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
 
 
+
         }
     }
 
@@ -156,8 +158,8 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
             // Get best photo IDs list
             ArrayList<Integer> ids = new ArrayList<>();
             do {
-                if (!ids.contains(cursor.getInt(COLUMN_INDEX_COMMENT_OBJ_ID)))
-                    ids.add(cursor.getInt(COLUMN_INDEX_COMMENT_OBJ_ID));
+                if (!ids.contains(cursor.getInt(COLUMN_INDEX_PHOTO_ID)))
+                    ids.add(cursor.getInt(COLUMN_INDEX_PHOTO_ID));
 
             } while (cursor.moveToNext());
             cursor.moveToFirst();
@@ -167,7 +169,7 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
                 mBestId = ids.get(LeClassicoApp.getRandom().nextInt(ids.size()));
 
             do {
-                if (cursor.getInt(COLUMN_INDEX_COMMENT_OBJ_ID) == mBestId) {
+                if (cursor.getInt(COLUMN_INDEX_PHOTO_ID) == mBestId) {
 
                     String photoFile = cursor.getString(COLUMN_INDEX_PHOTO_FICHIER);
                     ((TextView)mRootView.findViewById(R.id.text_title)).setText(photoFile);
@@ -204,21 +206,6 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
             } while (cursor.moveToNext());
             cursor.moveToFirst();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             refresh(); // Display/Refresh photo comments
         }
     }
@@ -240,10 +227,10 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
 
     // Query column indexes
     private static final int COLUMN_INDEX_COMMENT_ID = 0;
-    private static final int COLUMN_INDEX_COMMENT_OBJ_ID = 1;
-    private static final int COLUMN_INDEX_COMMENT_PSEUDO = 2;
-    private static final int COLUMN_INDEX_COMMENT_TEXT = 3;
-    private static final int COLUMN_INDEX_COMMENT_DATE = 4;
+    private static final int COLUMN_INDEX_COMMENT_PSEUDO = 1;
+    private static final int COLUMN_INDEX_COMMENT_TEXT = 2;
+    private static final int COLUMN_INDEX_COMMENT_DATE = 3;
+    private static final int COLUMN_INDEX_PHOTO_ID = 4;
     private static final int COLUMN_INDEX_PHOTO_ALBUM = 5;
     private static final int COLUMN_INDEX_PHOTO_PSEUDO = 6;
     private static final int COLUMN_INDEX_PHOTO_FICHIER = 7;
@@ -274,13 +261,34 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
         }
     }
 
+    ////// OnCriteriaListener //////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean onCheckEntry(Cursor cursor) { // Return if current comment concerned the best photo
+        return ((!cursor.isNull(COLUMN_INDEX_COMMENT_ID)) &&
+                (cursor.getInt(COLUMN_INDEX_PHOTO_ID) == mBestId));
+    }
+
     private void refresh() { // Display/Refresh photo comment list
         Logs.add(Logs.Type.V, null);
         mComCursor.moveToFirst();
 
         // Update current display data
-        String lastPub = mComCursor.getString(COLUMN_INDEX_COMMENT_DATE);
-        short count = (short) mComCursor.getCount();
+        String lastPub = null;
+        short count = 0;
+        do {
+            if (onCheckEntry(mComCursor)) {
+                if (lastPub == null)
+                    lastPub = mComCursor.getString(COLUMN_INDEX_COMMENT_DATE);
+                ++count;
+            }
+
+        } while (mComCursor.moveToNext());
+        mComCursor.moveToFirst();
+
+        //Logs.add(Logs.Type.I, "Comment count: " + count);
+        if (count == 0)
+            return; // Nothing to display (no comment for this best photo)
+
         if ((mQueryCount != Constants.NO_DATA) && (mComLast.compareTo(lastPub) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
@@ -290,9 +298,11 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
         // Get last visible photo comment date
         int limit = mQueryLimit;
         do {
-            mQueryDate = mComCursor.getString(COLUMN_INDEX_COMMENT_DATE);
-            if (--limit == 0)
-                break; // Only visible item are concerned
+            if (onCheckEntry(mComCursor)) {
+                mQueryDate = mComCursor.getString(COLUMN_INDEX_COMMENT_DATE);
+                if (--limit == 0)
+                    break; // Only visible item are concerned
+            }
 
         } while (mComCursor.moveToNext());
         mComCursor.moveToFirst();
@@ -302,13 +312,13 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
             Logs.add(Logs.Type.I, "Query update");
 
             ////// Update comments list
-            mComAdapter.getDataSource().swap(mComAdapter, mComCursor, mQueryLimit, null);
+            mComAdapter.getDataSource().swap(mComAdapter, mComCursor, mQueryLimit, this, null);
 
         } else {
             Logs.add(Logs.Type.I, "Initial query");
 
             ////// Fill comments list
-            mComAdapter.getDataSource().fill(mComCursor, mQueryLimit);
+            mComAdapter.getDataSource().fill(mComCursor, mQueryLimit, this);
             mComList.scrollToPosition(0);
         }
     }
@@ -357,7 +367,8 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
         }
 
         // Restore data
-        mBestId = Preferences.getInt(Preferences.MAIN_BEST_PHOTO);
+        SharedPreferences settings = getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
+        mBestId = settings.getInt(Preferences.MAIN_BEST_PHOTO, Constants.NO_DATA);
 
         // Set URI to observe DB changes
         mComUri = Uris.getUri(Uris.ID_MAIN_BEST_PHOTOS);
@@ -377,24 +388,24 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
         bestData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " +
                         CommentairesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_COMMENT_ID
-                        CommentairesTable.COLUMN_OBJ_ID + ',' + // COLUMN_INDEX_COMMENT_OBJ_ID
                         CommentairesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_COMMENT_PSEUDO
                         CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COMMENT_TEXT
                         CommentairesTable.COLUMN_DATE + ',' + // COLUMN_INDEX_COMMENT_DATE
+                        PhotosTable.COLUMN_FICHIER_ID + ',' + // COLUMN_INDEX_PHOTO_ID
                         PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_PHOTO_ALBUM
                         PhotosTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PHOTO_PSEUDO
                         PhotosTable.COLUMN_FICHIER + ',' + // COLUMN_INDEX_PHOTO_FICHIER
                         PhotosTable.COLUMN_RANGE + // COLUMN_INDEX_PHOTO_RANGE
-                        " FROM " + CommentairesTable.TABLE_NAME +
-                        " LEFT JOIN " + PhotosTable.TABLE_NAME + " ON " +
+                        " FROM " + PhotosTable.TABLE_NAME +
+                        " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
                         CommentairesTable.COLUMN_OBJ_TYPE + "='" + CommentairesTable.TYPE_PHOTO + "' AND " +
-                        CommentairesTable.COLUMN_OBJ_ID + '=' + PhotosTable.COLUMN_FICHIER_ID +
-                        " WHERE " +
-                        PhotosTable.COLUMN_BEST + "=1 AND " +
+                        CommentairesTable.COLUMN_OBJ_ID + '=' + PhotosTable.COLUMN_FICHIER_ID + " AND " +
                         CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
                         CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
+                        " WHERE " +
+                        PhotosTable.COLUMN_BEST + "=1" +
                         " ORDER BY " + CommentairesTable.COLUMN_DATE + " DESC");
         mListLoader.init(getActivity(), Queries.MAIN_BEST_PHOTOS, bestData);
 
@@ -402,8 +413,8 @@ public class BestPhotoFragment extends Fragment implements QueryLoader.OnResultL
     }
 
     @Override
-    public void onStop(){
-        super.onStop();
+    public void onDestroy(){
+        super.onDestroy();
         Logs.add(Logs.Type.V, null);
 
         // Store persistent data

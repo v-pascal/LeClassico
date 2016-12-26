@@ -315,7 +315,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
                 Logs.add(Logs.Type.I, "Request item (" + isRequesting() + ')');
                 if (mRequestAnim == null)
-                    mRequestAnim = new RequestAnimation(NotifyActivity.this);
+                    mRequestAnim = new RequestAnimation(NotifyActivity.this, true);
 
                 mRequestAnim.display(getResources(), this, holder.requestView);
                 return;
@@ -582,7 +582,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
             ////// Update notification list
             RecyclerAdapter.SwapResult swapResult =
-                    mNotifyAdapter.getDataSource().swap(mNotifyAdapter, mNotifyCursor, mQueryLimit,
+                    mNotifyAdapter.getDataSource().swap(mNotifyAdapter, mNotifyCursor, mQueryLimit, null,
                             new RecyclerAdapter.DataView.OnNotifyChangeListener() {
                         @Override
                         public void onRemoved(ArrayList<ArrayList<Object>> newData, int start, int count) {
@@ -634,7 +634,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             Logs.add(Logs.Type.I, "Initial query");
 
             ////// Fill notification list
-            mNotifyAdapter.getDataSource().fill(mNotifyCursor, mQueryLimit);
+            mNotifyAdapter.getDataSource().fill(mNotifyCursor, mQueryLimit, null);
             mNotifyList.scrollToPosition(0);
 
             do { // Display floating action button according unread notification displayed

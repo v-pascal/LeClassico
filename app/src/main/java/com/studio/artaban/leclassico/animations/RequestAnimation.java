@@ -4,6 +4,8 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.DrawableRes;
+import android.util.TypedValue;
 import android.view.View;
 
 import com.studio.artaban.leclassico.R;
@@ -21,12 +23,20 @@ public class RequestAnimation {
     private AnimatorSet mRequestAnim3;
     // Animations (from resources)
 
-    public RequestAnimation(Context context) {
-        Logs.add(Logs.Type.V, "context: " + context);
+    private boolean mMoreBackground; // Layout more background use flag
+    @DrawableRes private int mBackgroundId; // Background border less resource ID
+
+    public RequestAnimation(Context context, boolean moreBackground) {
+        Logs.add(Logs.Type.V, "context: " + context + ";background: " + moreBackground);
+        mMoreBackground = moreBackground;
 
         mRequestAnim1 = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.request_old);
         mRequestAnim2 = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.request_old);
         mRequestAnim3 = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.request_old);
+
+        TypedValue attrValue = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.selectableItemBackgroundBorderless, attrValue, true);
+        mBackgroundId = attrValue.resourceId;
     }
 
     //////
@@ -51,7 +61,10 @@ public class RequestAnimation {
         View request = requestView.findViewById(R.id.layout_more);
         if (!adapter.isRequesting()) {
 
-            request.setBackground(resources.getDrawable(R.drawable.select_more_background));
+            if (mMoreBackground)
+                request.setBackground(resources.getDrawable(R.drawable.select_more_background));
+            else
+                request.setBackgroundResource(mBackgroundId);
             request.setOnClickListener(adapter);
 
             View image1 = requestView.findViewById(R.id.image_1);

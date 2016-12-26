@@ -136,14 +136,19 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             for (ArrayList<Object> data : mData)
                 data.clear();
         }
-        private static void fill(Cursor cursor, ArrayList<ArrayList<Object>> data, int limit) {
-        // Fill data array according DB cursor
+        private static void fill(Cursor cursor, ArrayList<ArrayList<Object>> data,
+                                 int limit, OnCriteriaListener criteria) {
 
-            Logs.add(Logs.Type.V, "cursor: " + cursor + ";data: " + data + ";limit: " + limit);
+            // Fill data array according DB cursor
+            Logs.add(Logs.Type.V, "cursor: " + cursor + ";data: " + data + ";limit: " + limit +
+                    ";criteria: " + criteria);
+
             if (cursor.moveToFirst()) {
                 do {
-                    ArrayList<Object> record = new ArrayList<>();
+                    if ((criteria != null) && (!criteria.onCheckEntry(cursor)))
+                        continue;
 
+                    ArrayList<Object> record = new ArrayList<>();
                     for (int i = 0; i < cursor.getColumnCount(); ++i) {
                         switch (cursor.getType(i)) {
                             case Cursor.FIELD_TYPE_STRING: record.add(cursor.getString(i)); break;
@@ -185,29 +190,33 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             return Constants.NO_DATA;
         }
 
-        //////
-        public void fill(Cursor cursor, int limit) { // Fill data according initial cursor
-            Logs.add(Logs.Type.V, "cursor: " + cursor + ";limit: " + limit);
+        public interface OnCriteriaListener { //////////////////////////////////////////////////////
+            boolean onCheckEntry(Cursor cursor);
+        }
+        public void fill(Cursor cursor, int limit, OnCriteriaListener criteria) { //////////////////
+
+            // Fill data according initial cursor & criteria
+            Logs.add(Logs.Type.V, "cursor: " + cursor + ";limit: " + limit + ";criteria: " + criteria);
 
             clear();
-            fill(cursor, mData, limit);
+            fill(cursor, mData, limit, criteria);
             mInitialized = true;
         }
 
-        public interface OnNotifyChangeListener {
+        public interface OnNotifyChangeListener { //////////////////////////////////////////////////
 
             void onRemoved(ArrayList<ArrayList<Object>> newData, int start, int count);
             void onInserted(ArrayList<ArrayList<Object>> newData, int start, int count);
             void onMoved(ArrayList<ArrayList<Object>> newData, int prevPos, int newPos);
         }
-        public SwapResult swap(RecyclerAdapter adapter, Cursor cursor,
-                               int limit, OnNotifyChangeListener listener) {
+        public SwapResult swap(RecyclerAdapter adapter, Cursor cursor, int limit,
+                               OnCriteriaListener criteria, OnNotifyChangeListener listener) { /////
 
             // Swap data with new cursor then notify recycler adapter accordingly
             Logs.add(Logs.Type.V, "adapter: " + adapter + ";cursor: " + cursor + ";limit: " + limit +
-                    ";listener: " + listener);
+                    ";criteria: " + criteria + ";listener: " + listener);
             ArrayList<ArrayList<Object>> newData = new ArrayList<>();
-            fill(cursor, newData, limit);
+            fill(cursor, newData, limit, criteria);
 
             SwapResult swapResult = new SwapResult();
 

@@ -167,7 +167,7 @@ public class PublicationsFragment extends MainFragment implements
 
                 Logs.add(Logs.Type.I, "Request item (" + isRequesting() + ')');
                 if (mRequestAnim == null)
-                    mRequestAnim = new RequestAnimation(getContext());
+                    mRequestAnim = new RequestAnimation(getContext(), true);
 
                 mRequestAnim.display(getResources(), this, holder.requestView);
                 return;
@@ -498,13 +498,13 @@ public class PublicationsFragment extends MainFragment implements
             Logs.add(Logs.Type.I, "Query update");
 
             ////// Update publication list
-            mPubAdapter.getDataSource().swap(mPubAdapter, mPubCursor, mQueryLimit, null);
+            mPubAdapter.getDataSource().swap(mPubAdapter, mPubCursor, mQueryLimit, null, null);
 
         } else {
             Logs.add(Logs.Type.I, "Initial query");
 
             ////// Fill publication list
-            mPubAdapter.getDataSource().fill(mPubCursor, mQueryLimit);
+            mPubAdapter.getDataSource().fill(mPubCursor, mQueryLimit, null);
             mPubList.scrollToPosition(0);
         }
     }
