@@ -64,7 +64,7 @@ public class BestPhotoFragment extends Fragment implements
 
         private RequestAnimation mRequestAnim; // Request old management (animation + event)
         public ComRecyclerViewAdapter() {
-            super(R.layout.layout_comment_item, R.layout.layout_old_request_best, COLUMN_INDEX_COMMENT_ID);
+            super(R.layout.layout_best_comment_item, R.layout.layout_old_request_best, COLUMN_INDEX_COMMENT_ID);
         }
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
@@ -73,9 +73,9 @@ public class BestPhotoFragment extends Fragment implements
             Logs.add(Logs.Type.V, "sender: " + sender);
             switch (sender.getId()) {
 
-                case R.id.image_pseudo: {
-                    int pseudoId = (int) sender.getTag(R.id.tag_pseudo_id);
-                    Logs.add(Logs.Type.I, "Pseudo #" + pseudoId + " selected");
+                case R.id.image_remove: { // Remove comment
+                    int commentId = (int) sender.getTag(R.id.tag_comment_id);
+                    Logs.add(Logs.Type.I, "Remove comment #" + commentId);
 
 
 
@@ -83,7 +83,7 @@ public class BestPhotoFragment extends Fragment implements
 
                     break;
                 }
-                case R.id.layout_more: {
+                case R.id.layout_more: { // Old data requested
                     Logs.add(Logs.Type.I, "Old photo comments requested");
 
                     ////// Request old photo comments to remote DB
@@ -126,7 +126,7 @@ public class BestPhotoFragment extends Fragment implements
 
             // COLUMN_INDEX_COMMENT_PSEUDO
 
-            ((TextView)holder.rootView.findViewById(R.id.test))
+            ((TextView)holder.rootView.findViewById(R.id.text_comment))
                     .setText(mDataSource.getString(position, COLUMN_INDEX_COMMENT_TEXT));
 
 
@@ -137,8 +137,11 @@ public class BestPhotoFragment extends Fragment implements
 
 
 
+            // Events
+            ImageView remove = (ImageView) holder.rootView.findViewById(R.id.image_remove);
 
-
+            remove.setTag(R.id.tag_comment_id, mDataSource.getInt(position, COLUMN_INDEX_COMMENT_ID));
+            remove.setOnClickListener(this);
         }
     }
 

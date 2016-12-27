@@ -25,6 +25,7 @@ android {
                      'src/main/res/layouts/settings',
                      'src/main/res/layouts/publication',
                      'src/main/res/layouts/album',
+                     'src/main/res/layouts/profile',
                      'src/main/res/drawables/introduction',
                      'src/main/res/drawables/main',
                      'src/main/res/drawables/notification',

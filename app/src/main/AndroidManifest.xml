@@ -94,6 +94,9 @@
         <activity
             android:name=".activities.album.FullPhotoActivity"
             android:theme="@style/TransparentAppTheme"/>
+        <activity
+            android:name=".activities.profile.ProfileActivity"
+            android:theme="@style/MainAppTheme.NoActionBar"/>
 
         <!-- Content providers -->
         <provider
