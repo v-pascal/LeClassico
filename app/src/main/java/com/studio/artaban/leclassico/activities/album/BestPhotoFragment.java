@@ -406,7 +406,7 @@ public class BestPhotoFragment extends Fragment implements
                         (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
                         " WHERE " +
                         PhotosTable.COLUMN_BEST + "=1" +
-                        " ORDER BY " + CommentairesTable.COLUMN_DATE + " DESC");
+                        " ORDER BY " + CommentairesTable.COLUMN_DATE + " ASC");
         mListLoader.init(getActivity(), Queries.MAIN_BEST_PHOTOS, bestData);
 
         return mRootView;

@@ -145,9 +145,10 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
             if (cursor.moveToFirst()) {
                 do {
-                    if ((criteria != null) && (!criteria.onCheckEntry(cursor)))
+                    if ((criteria != null) && (!criteria.onCheckEntry(cursor))) {
+                        ++limit; // Do not apply limit change (not a valid entry)
                         continue;
-
+                    }
                     ArrayList<Object> record = new ArrayList<>();
                     for (int i = 0; i < cursor.getColumnCount(); ++i) {
                         switch (cursor.getType(i)) {

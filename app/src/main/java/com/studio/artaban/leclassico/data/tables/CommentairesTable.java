@@ -276,7 +276,6 @@ public class CommentairesTable extends DataTable {
                                     ////// Update entry
                                     resolver.update(tableUri, values, selection, null);
                                     ++syncResult.updated;
-
                                 }
                                 //else // Nothing to do here (let's synchronize from local to remote DB)
 
