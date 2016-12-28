@@ -74,23 +74,33 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     }
 
     private static final String ERROR_NO_REQUEST_LAYOUT = "Unexpected method use: No request layout ID";
-    private boolean mRequesting; // Old entries requesting flag
+    public enum RequestFlag {
+        DISPLAYED, // More entry request displayed
+        IN_PROGRESS, // Request entries in progress
+        HIDDEN // No more entries to request (in remote DB)
+    }
+    private RequestFlag mRequesting = RequestFlag.DISPLAYED; // Old entries requesting flag
     public boolean isRequesting() {
-        return mRequesting;
+        return (mRequesting == RequestFlag.IN_PROGRESS);
     }
 
-    public void setRequesting(boolean start) { // Set requesting old entries flag
-        Logs.add(Logs.Type.V, "start: " + start);
+    public void setRequesting(RequestFlag flag) { // Set requesting old entries flag
+        Logs.add(Logs.Type.V, "flag: " + flag);
         if (mRequestLayout == Constants.NO_DATA)
             throw new IllegalStateException(ERROR_NO_REQUEST_LAYOUT);
 
-        mRequesting = start;
+        mRequesting = flag;
         if (mRecyclerView != null) {
-            if ((mRecyclerView.getItemAnimator() != null) &&
-                    (mRecyclerView.getItemAnimator() instanceof RecyclerItemAnimator))
-                ((RecyclerItemAnimator)mRecyclerView.getItemAnimator()).setDisableChangeAnimations(1);
+            if (mRequesting == RequestFlag.HIDDEN)
+                notifyItemRemoved(getItemCount());
+                // NB: Less 1 as below removed coz entry already removed from item count algorithm
+            else {
+                if ((mRecyclerView.getItemAnimator() != null) &&
+                        (mRecyclerView.getItemAnimator() instanceof RecyclerItemAnimator))
+                    ((RecyclerItemAnimator)mRecyclerView.getItemAnimator()).setDisableChangeAnimations(1);
 
-            notifyItemChanged(getItemCount() - 1);
+                notifyItemChanged(getItemCount() - 1);
+            }
         }
     }
     public boolean isRequestHolder(ViewHolder holder, int position) {
@@ -99,6 +109,9 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         Logs.add(Logs.Type.V, "position: " + position);
         if (mRequestLayout == Constants.NO_DATA)
             throw new IllegalStateException(ERROR_NO_REQUEST_LAYOUT);
+
+        if (mRequesting == RequestFlag.HIDDEN)
+            return false; // Always false when hidden
 
         if ((getItemCount() - 1) == position) {
 
@@ -387,7 +400,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     @Override
     public int getItemCount() {
         return (!mDataSource.mInitialized)?
-                0:mDataSource.getCount() + ((mRequestLayout != Constants.NO_DATA)? 1:0);
+                0:mDataSource.getCount() + (((mRequestLayout != Constants.NO_DATA) &&
+                    (mRequesting != RequestFlag.HIDDEN))? 1:0);
     }
 
     @Override

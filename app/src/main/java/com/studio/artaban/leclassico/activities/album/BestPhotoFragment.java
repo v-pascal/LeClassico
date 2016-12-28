@@ -94,7 +94,7 @@ public class BestPhotoFragment extends Fragment implements
 
                     ////// Request old photo comments to remote DB
                     mQueryLimit += Queries.COMMENTS_OLD_LIMIT;
-                    mComAdapter.setRequesting(true);
+                    mComAdapter.setRequesting(RequestFlag.IN_PROGRESS);
 
                     Intent request = new Intent(DataService.REQUEST_OLD_DATA);
                     request.putExtra(DataRequest.EXTRA_DATA_DATE, mQueryDate);
@@ -258,14 +258,24 @@ public class BestPhotoFragment extends Fragment implements
                     (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI))
                             .compareTo(mComUri) == 0)) { // Comment URI
 
-                mComAdapter.setRequesting(false);
-                if (!intent.getBooleanExtra(DataService.EXTRA_DATA_OLD_FOUND, false)) {
-                    if (mQueryCount > (mQueryLimit - Queries.COMMENTS_OLD_LIMIT))
-                        refresh(); // No more old remote DB photo comments but existing in local DB
-                    else
-                        mQueryLimit -= Queries.COMMENTS_OLD_LIMIT;
+                switch ((DataRequest.Result)intent.getSerializableExtra(DataService.EXTRA_DATA_REQUEST_RESULT)) {
+                    case NOT_FOUND: { // Old entries not found
+                        if (mQueryCount > (mQueryLimit - Queries.COMMENTS_OLD_LIMIT))
+                            refresh(); // No more old remote DB photo comments but existing in local DB
+                        else
+                            mQueryLimit -= Queries.COMMENTS_OLD_LIMIT;
+                        //break;
+                    }
+                    case FOUND: { // Old entries found
+                        mComAdapter.setRequesting(RecyclerAdapter.RequestFlag.DISPLAYED);
+                        // DB table update will notify cursor (no need to call refresh)
+                        break;
+                    }
+                    case NO_MORE: { // No more old entries into remote DB
+                        mComAdapter.setRequesting(RecyclerAdapter.RequestFlag.HIDDEN);
+                        break;
+                    }
                 }
-                //else // DB table update will notify cursor (no need to call refresh)
             }
         }
     }

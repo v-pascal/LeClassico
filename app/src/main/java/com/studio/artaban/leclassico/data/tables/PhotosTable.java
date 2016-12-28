@@ -335,8 +335,8 @@ public class PhotosTable extends DataTable {
     }
 
     @Override
-    public SyncResult synchronize(ContentResolver resolver, byte operation, Bundle syncData,
-                                  @Nullable ContentValues postData) {
+    public @Nullable SyncResult synchronize(ContentResolver resolver, byte operation,
+                                            Bundle syncData, @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)

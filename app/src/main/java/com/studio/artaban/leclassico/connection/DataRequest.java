@@ -29,6 +29,12 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     public static final String EXTRA_DATA_DATE = "date";
     // Extra data keys (common)
 
+    public enum Result {
+
+        NOT_FOUND, // Old entries not found
+        FOUND, // Old entries found
+        NO_MORE // No more old entries into remote DB
+    }
     protected static final long DEFAULT_DELAY = 30000; // DB request task delay (in ms)
 
     //////
@@ -174,7 +180,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     public abstract void register(Bundle data);
     public abstract void unregister(Uri uri);
 
-    public abstract boolean request(Bundle data); // Update data from remote to local DB
+    public abstract Result request(Bundle data); // Update data from remote to local DB
     public void synchronize() { // Update data from local to remote DB
         Logs.add(Logs.Type.V, "mTableId: " + mTableId);
 

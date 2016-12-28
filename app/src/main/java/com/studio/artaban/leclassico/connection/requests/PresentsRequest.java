@@ -36,11 +36,11 @@ public class PresentsRequest extends DataRequest {
     }
 
     @Override
-    public boolean request(Bundle data) { // Update data from remote to local DB
+    public Result request(Bundle data) { // Update data from remote to local DB
 
         Logs.add(Logs.Type.V, "data: " + data);
         if (!Internet.isConnected())
-            return false; // Nothing to do (without connection)
+            return Result.NOT_FOUND; // Nothing to do (without connection)
 
         // Get login info
         Login.Reply dataLogin = new Login.Reply();
@@ -53,15 +53,15 @@ public class PresentsRequest extends DataRequest {
 
 
 
-
-        } else { ////// New or data updates requested
-
-
-
-
-
-
+            return Result.NO_MORE; // No more old entries
         }
-        return false;
+        ////// New or data updates requested
+
+
+
+
+
+
+        return Result.NOT_FOUND; // Unused
     }
 }

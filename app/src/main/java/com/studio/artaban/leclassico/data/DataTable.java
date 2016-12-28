@@ -225,6 +225,6 @@ public abstract class DataTable implements IDataTable {
         public int updated; // Updated row count
         public int deleted; // deleted row count
     }
-    public abstract SyncResult synchronize(ContentResolver resolver, byte operation, Bundle syncData,
-                                           @Nullable ContentValues postData);
+    public abstract @Nullable SyncResult synchronize(ContentResolver resolver, byte operation,
+                                                     Bundle syncData, @Nullable ContentValues postData);
 }

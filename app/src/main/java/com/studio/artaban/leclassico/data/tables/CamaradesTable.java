@@ -298,8 +298,8 @@ public class CamaradesTable extends DataTable {
     // TODO: Replace JSON keys by column indexes
 
     @Override
-    public SyncResult synchronize(final ContentResolver resolver, final byte operation, Bundle syncData,
-                                  @Nullable ContentValues postData) {
+    public @Nullable SyncResult synchronize(final ContentResolver resolver, final byte operation,
+                                            Bundle syncData, @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)

@@ -53,7 +53,7 @@ import java.util.TimerTask;
 public class DataService extends Service implements Internet.OnConnectivityListener {
 
     public static final String EXTRA_DATA_RECEIVED = "received";
-    public static final String EXTRA_DATA_OLD_FOUND = "oldFound";
+    public static final String EXTRA_DATA_REQUEST_RESULT = "requestResult";
 
     private static final String EXTRA_DATA_TOKEN = "token";
     private static final String EXTRA_DATA_TIME_LAG = "timeLag";
@@ -195,13 +195,13 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                         Logs.add(Logs.Type.E, "Olb request delay interrupted");
                     }
                     // Request old entries
-                    boolean found = mDataRequests.get(msg.what).request((Bundle)msg.obj);
+                    DataRequest.Result result = mDataRequests.get(msg.what).request((Bundle)msg.obj);
 
                     // Send old request finished info (received)
                     Intent received = new Intent(REQUEST_OLD_DATA);
                     received.putExtra(EXTRA_DATA_TABLE_ID, (byte)msg.what);
                     received.putExtra(EXTRA_DATA_RECEIVED, true);
-                    received.putExtra(EXTRA_DATA_OLD_FOUND, found);
+                    received.putExtra(EXTRA_DATA_REQUEST_RESULT, result);
                     received.putExtra(DataRequest.EXTRA_DATA_URI,
                             ((Bundle)msg.obj).getParcelable(DataRequest.EXTRA_DATA_URI));
 

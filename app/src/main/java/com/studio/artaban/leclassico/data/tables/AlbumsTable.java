@@ -162,8 +162,8 @@ public class AlbumsTable extends DataTable {
     private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
 
     @Override
-    public SyncResult synchronize(final ContentResolver resolver, final byte operation, Bundle syncData,
-                                  @Nullable ContentValues postData) {
+    public @Nullable SyncResult synchronize(ContentResolver resolver, byte operation,
+                                            Bundle syncData, @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
         // updated entry count & NO_DATA if error)
