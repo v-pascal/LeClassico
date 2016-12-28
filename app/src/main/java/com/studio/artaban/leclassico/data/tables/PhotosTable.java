@@ -134,6 +134,8 @@ public class PhotosTable extends DataTable {
         // Add indexes
         db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_FICHIER_ID + " ON " +
                 TABLE_NAME + '(' + COLUMN_FICHIER_ID + ')');
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_BEST + " ON " +
+                TABLE_NAME + '(' + COLUMN_BEST + ')');
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
