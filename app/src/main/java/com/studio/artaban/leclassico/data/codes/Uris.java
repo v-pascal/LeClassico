@@ -58,6 +58,9 @@ public class Uris {
             case ID_USER_PUBLICATIONS: // User/#/Actualites
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + ActualitesTable.TABLE_NAME);
+            case ID_USER_PROFILE: // User/#/Profile
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_USER + arguments[0] + PATH_PROFILE);
             case ID_MAIN_SHORTCUT: // User/#/Notifications/Shortcut
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME + PATH_SHORTCUT);
@@ -79,6 +82,7 @@ public class Uris {
 
     private static final String PATH_SHORTCUT = "/Shortcut"; // Shortcut URI path
     private static final String PATH_LOCATIONS = "/Locations"; // Locations URI path
+    private static final String PATH_PROFILE = "/Profile"; // Profile URI path
 
     ////// URI /////////////////////////////////////////////////////////////////////////////////////
 
@@ -87,6 +91,7 @@ public class Uris {
     public static final short ID_USER_MAILBOX = 2;       // User/#/Messagerie
     public static final short ID_USER_LOCATIONS = 3;     // User/#/Locations
     public static final short ID_USER_PUBLICATIONS = 4;  // User/#/Actualites
-    public static final short ID_MAIN_SHORTCUT = 5;      // User/#/Notifications/Shortcut
-    public static final short ID_MAIN_BEST_PHOTOS = 6;    // BestPhotos
+    public static final short ID_USER_PROFILE = 5;       // User/#/Profile
+    public static final short ID_MAIN_SHORTCUT = 6;      // User/#/Notifications/Shortcut
+    public static final short ID_MAIN_BEST_PHOTOS = 7;   // BestPhotos
 }

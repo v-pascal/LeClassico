@@ -1,10 +1,12 @@
 <resources><!-- Album -->
 
-    <!-- Photo dimensions -->
+    <!-- Best photo -->
     <dimen name="best_background_radius">9dp</dimen>
     <dimen name="best_icon_padding">5dp</dimen>
     <dimen name="best_title_text_size">21sp</dimen>
     <dimen name="best_header_height">41dp</dimen><!-- == photo_icon_padding + 36dp -->
     <dimen name="best_album_text_size">17sp</dimen>
+    <dimen name="best_comment_size">18sp</dimen>
+    <dimen name="best_comment_cmd_size">26dp</dimen>
 
 </resources>

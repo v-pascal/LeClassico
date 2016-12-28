@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.activities.album;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,7 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
+import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
@@ -33,6 +36,7 @@ import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.PhotosTable;
 import com.studio.artaban.leclassico.helpers.Glider;
@@ -47,6 +51,8 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by pascal on 19/11/16.
@@ -101,7 +107,7 @@ public class BestPhotoFragment extends Fragment implements
 
         ////// RecyclerAdapter /////////////////////////////////////////////////////////////////////
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(ViewHolder holder, final int position) {
             Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
 
             if (isRequestHolder(holder, position)) { ////// Request
@@ -114,32 +120,31 @@ public class BestPhotoFragment extends Fragment implements
                 return;
             }
             ////// Comment
+            String pseudo = mDataSource.getString(position, COLUMN_INDEX_COMMENT_PSEUDO);
+            TextView comment = (TextView)holder.rootView.findViewById(R.id.text_comment);
+            comment.setText(pseudo + ": " + mDataSource.getString(position, COLUMN_INDEX_COMMENT_TEXT));
 
+            Linkify.addLinks(comment, Pattern.compile('^' + pseudo + ':', 0), Constants.DATA_CONTENT_SCHEME,
+                    null, new Linkify.TransformFilter() {
+                        @Override
+                        public String transformUrl(Matcher match, String url) {
 
+                            // content://com.studio.artaban.provider.leclassico/User/#/Profile
+                            return Uris.getUri(Uris.ID_USER_PROFILE, String.valueOf(mDataSource.getInt(position,
+                                    COLUMN_INDEX_COMMENT_PSEUDO_ID))).toString();
+                        }
+                    });
 
-
-
-
-
-
-
-
-            // COLUMN_INDEX_COMMENT_PSEUDO
-
-            ((TextView)holder.rootView.findViewById(R.id.text_comment))
-                    .setText(mDataSource.getString(position, COLUMN_INDEX_COMMENT_TEXT));
-
-
-
-
-
-
-
-
-
-            // Events
+            // Check remove command visibility (only available if connected user == comment owner)
             ImageView remove = (ImageView) holder.rootView.findViewById(R.id.image_remove);
+            if (mDataSource.getInt(position, COLUMN_INDEX_COMMENT_PSEUDO_ID) !=
+                    getActivity().getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)) {
 
+                remove.setVisibility(View.GONE);
+                return; // No need to add remove event
+            }
+            ////// Events
+            remove.setVisibility(View.VISIBLE);
             remove.setTag(R.id.tag_comment_id, mDataSource.getInt(position, COLUMN_INDEX_COMMENT_ID));
             remove.setOnClickListener(this);
         }
@@ -233,11 +238,12 @@ public class BestPhotoFragment extends Fragment implements
     private static final int COLUMN_INDEX_COMMENT_PSEUDO = 1;
     private static final int COLUMN_INDEX_COMMENT_TEXT = 2;
     private static final int COLUMN_INDEX_COMMENT_DATE = 3;
-    private static final int COLUMN_INDEX_PHOTO_ID = 4;
-    private static final int COLUMN_INDEX_PHOTO_ALBUM = 5;
-    private static final int COLUMN_INDEX_PHOTO_PSEUDO = 6;
-    private static final int COLUMN_INDEX_PHOTO_FICHIER = 7;
-    private static final int COLUMN_INDEX_PHOTO_RANGE = 8;
+    private static final int COLUMN_INDEX_COMMENT_PSEUDO_ID = 4;
+    private static final int COLUMN_INDEX_PHOTO_ID = 5;
+    private static final int COLUMN_INDEX_PHOTO_ALBUM = 6;
+    private static final int COLUMN_INDEX_PHOTO_PSEUDO = 7;
+    private static final int COLUMN_INDEX_PHOTO_FICHIER = 8;
+    private static final int COLUMN_INDEX_PHOTO_RANGE = 9;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -394,6 +400,7 @@ public class BestPhotoFragment extends Fragment implements
                         CommentairesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_COMMENT_PSEUDO
                         CommentairesTable.COLUMN_TEXT + ',' + // COLUMN_INDEX_COMMENT_TEXT
                         CommentairesTable.COLUMN_DATE + ',' + // COLUMN_INDEX_COMMENT_DATE
+                        CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_COMMENT_PSEUDO_ID
                         PhotosTable.COLUMN_FICHIER_ID + ',' + // COLUMN_INDEX_PHOTO_ID
                         PhotosTable.COLUMN_ALBUM + ',' + // COLUMN_INDEX_PHOTO_ALBUM
                         PhotosTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PHOTO_PSEUDO
@@ -407,12 +414,32 @@ public class BestPhotoFragment extends Fragment implements
                         DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
                         CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
+                        " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
+                        CamaradesTable.COLUMN_PSEUDO + '=' + CommentairesTable.COLUMN_PSEUDO +
                         " WHERE " +
                         PhotosTable.COLUMN_BEST + "=1" +
                         " ORDER BY " + CommentairesTable.COLUMN_DATE + " ASC");
         mListLoader.init(getActivity(), Queries.MAIN_BEST_PHOTOS, bestData);
 
         return mRootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+
+        // Register old request receiver
+        getContext().registerReceiver(mOldReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+
+        // Unregister old request receiver
+        getContext().unregisterReceiver(mOldReceiver);
     }
 
     @Override

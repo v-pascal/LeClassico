@@ -96,7 +96,16 @@
             android:theme="@style/TransparentAppTheme"/>
         <activity
             android:name=".activities.profile.ProfileActivity"
-            android:theme="@style/MainAppTheme.NoActionBar"/>
+            android:theme="@style/MainAppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data
+                    android:scheme="content"
+                    android:host="com.studio.artaban.provider.leclassico"
+                    android:pathPattern="/User/.*/Profile"/>
+            </intent-filter>
+        </activity>
 
         <!-- Content providers -->
         <provider

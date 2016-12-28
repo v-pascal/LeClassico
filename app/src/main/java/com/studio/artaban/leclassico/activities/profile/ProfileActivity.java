@@ -46,23 +46,22 @@ public class ProfileActivity extends LoggedActivity {
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Set toolbar
 
 
 
 
 
 
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        // Get pseudo ID
+        if (getIntent().getData() != null)
+            mId = Integer.valueOf(getIntent().getData().getPathSegments().get(1));
+        else {
 
 
 
-
-
-
-        // Get pseudo ID & cursor URI
-        //mId = getIntent().getIntExtra(EXTRA_DATA_ID, Constants.NO_DATA);
-        //mPubUri = getIntent().getParcelableExtra(EXTRA_DATA_URI);
+        }
 
 
 

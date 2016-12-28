@@ -4,7 +4,5 @@
     <!-- Best photo -->
     <dimen name="best_comment_margin">8dp</dimen>
     <dimen name="best_comment_info_margin">6dp</dimen>
-    <dimen name="best_comment_size">24sp</dimen>
-    <dimen name="best_comment_cmd_size">32dp</dimen>
 
 </resources>
