@@ -68,6 +68,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
             @Override
             public void onAnimationEnd(View view) {
                 animation.setListener(null);
+
                 ViewCompat.setTranslationX(view, 0);
                 ViewCompat.setTranslationY(view, 0);
                 dispatchMoveFinished(info.mHolder);
@@ -98,6 +99,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
             @Override
             public void onAnimationEnd(View view) {
                 animation.setListener(null);
+
                 mMaker.onCancel(AnimType.CHANGE, view);
                 dispatchChangeFinished(holder, !changeNew);
                 mStartedChanges.remove(holder);
@@ -116,6 +118,7 @@ public class RecyclerItemAnimator extends SimpleItemAnimator {
     private void endChangeAnimation(List<ChangeInfo> changeList, ViewHolder item) {
         //Logs.add(Logs.Type.V, "changeList: " + changeList + ";item: " + item);
         for (int i = changeList.size() - 1; i > Constants.NO_DATA; --i) {
+
             ChangeInfo changeInfo = changeList.get(i);
             if ((endChangeAnimationIfNeeded(changeInfo, item)) &&
                     (changeInfo.mHolder == null) && (changeInfo.mNewHolder == null))

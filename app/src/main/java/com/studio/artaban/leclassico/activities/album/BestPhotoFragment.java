@@ -70,7 +70,7 @@ public class BestPhotoFragment extends Fragment implements
 
         private RequestAnimation mRequestAnim; // Request old management (animation + event)
         public ComRecyclerViewAdapter() {
-            super(R.layout.layout_best_comment_item, R.layout.layout_old_request_best, COLUMN_INDEX_COMMENT_ID);
+            super(R.layout.layout_best_comment_item, R.layout.layout_old_request_best, false, COLUMN_INDEX_COMMENT_ID);
         }
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ public class BestPhotoFragment extends Fragment implements
 
         ////// RecyclerAdapter /////////////////////////////////////////////////////////////////////
         @Override
-        public void onBindViewHolder(ViewHolder holder, final int position) {
+        public void onBindViewHolder(ViewHolder holder, int position) {
             Logs.add(Logs.Type.V, "holder: " + holder + ";position: " + position);
 
             if (isRequestHolder(holder, position)) { ////// Request
@@ -119,18 +119,21 @@ public class BestPhotoFragment extends Fragment implements
                 mRequestAnim.display(getResources(), this, holder.requestView);
                 return;
             }
+            position = getAscPosition(position);
+
             ////// Comment
             String pseudo = mDataSource.getString(position, COLUMN_INDEX_COMMENT_PSEUDO);
             TextView comment = (TextView)holder.rootView.findViewById(R.id.text_comment);
             comment.setText(pseudo + ": " + mDataSource.getString(position, COLUMN_INDEX_COMMENT_TEXT));
 
+            final int item = position;
             Linkify.addLinks(comment, Pattern.compile('^' + pseudo + ':', 0), Constants.DATA_CONTENT_SCHEME,
                     null, new Linkify.TransformFilter() {
                         @Override
                         public String transformUrl(Matcher match, String url) {
 
                             // content://com.studio.artaban.provider.leclassico/User/#/Profile
-                            return Uris.getUri(Uris.ID_USER_PROFILE, String.valueOf(mDataSource.getInt(position,
+                            return Uris.getUri(Uris.ID_USER_PROFILE, String.valueOf(mDataSource.getInt(item,
                                     COLUMN_INDEX_COMMENT_PSEUDO_ID))).toString();
                         }
                     });

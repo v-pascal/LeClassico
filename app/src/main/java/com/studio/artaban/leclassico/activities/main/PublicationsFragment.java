@@ -76,7 +76,7 @@ public class PublicationsFragment extends MainFragment implements
 
         private RequestAnimation mRequestAnim; // Request old management (animation + event)
         public PubRecyclerViewAdapter() {
-            super(R.layout.layout_publication_item, R.layout.layout_old_request, COLUMN_INDEX_PUB_ID);
+            super(R.layout.layout_publication_item, R.layout.layout_old_request, true, COLUMN_INDEX_PUB_ID);
         }
 
         private void displayURL(RecyclerAdapter.ViewHolder holder, int position) {

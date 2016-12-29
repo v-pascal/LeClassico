@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
               android:gravity="top"
-              android:paddingTop="@dimen/best_comment_info_margin"
+              android:paddingBottom="@dimen/best_comment_info_margin"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 

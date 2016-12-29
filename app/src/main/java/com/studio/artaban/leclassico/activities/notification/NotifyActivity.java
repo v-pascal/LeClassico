@@ -219,7 +219,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
         private RequestAnimation mRequestAnim; // Request old management (animation + event)
         public NotifyRecyclerViewAdapter() {
-            super(R.layout.layout_notification_item, R.layout.layout_old_request, COLUMN_INDEX_NOTIFY_ID);
+            super(R.layout.layout_notification_item, R.layout.layout_old_request, true, COLUMN_INDEX_NOTIFY_ID);
         }
 
         //

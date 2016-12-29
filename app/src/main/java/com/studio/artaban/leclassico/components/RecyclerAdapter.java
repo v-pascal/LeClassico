@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.LinearLayout;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
@@ -27,7 +28,12 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     @LayoutRes private final int mRequestLayout; // Holder view old request layout Id (NO_DATA if useless)
 
     protected final DataView mDataSource; // Data source
-    private RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView; // Attached recycler view
+
+    private final boolean mDescending; // Descending list ordered flag (request item location)
+    public int getAscPosition(int position) { // Return valid position index according order & request flags
+        return ((!mDescending) && (mRequesting != RequestFlag.HIDDEN))? position - 1:position;
+    }
 
     ////// AppearanceAnimatorMaker /////////////////////////////////////////////////////////////////
 
@@ -56,12 +62,13 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public RecyclerAdapter(@LayoutRes int itemLayout, @LayoutRes int requestLayout, int key) {
+    public RecyclerAdapter(@LayoutRes int itemLayout, @LayoutRes int requestLayout, boolean desc, int key) {
         Logs.add(Logs.Type.V, "layout: " + itemLayout + ";requestLayout: " + requestLayout +
-                ";key: " + key);
+                ";desc: " + desc + ";key: " + key);
 
         mItemLayout = itemLayout;
         mRequestLayout = requestLayout;
+        mDescending = desc;
         mDataSource = new DataView(key);
     }
 
@@ -92,14 +99,14 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         mRequesting = flag;
         if (mRecyclerView != null) {
             if (mRequesting == RequestFlag.HIDDEN)
-                notifyItemRemoved(getItemCount());
-                // NB: Less 1 as below removed coz entry already removed from item count algorithm
+                notifyItemRemoved((!mDescending)? 0:getItemCount());
+                // NB: Less 1 as below removed coz entry already removed from 'getItemCount' result
             else {
                 if ((mRecyclerView.getItemAnimator() != null) &&
                         (mRecyclerView.getItemAnimator() instanceof RecyclerItemAnimator))
                     ((RecyclerItemAnimator)mRecyclerView.getItemAnimator()).setDisableChangeAnimations(1);
 
-                notifyItemChanged(getItemCount() - 1);
+                notifyItemChanged((!mDescending)? 0:getItemCount() - 1);
             }
         }
     }
@@ -113,7 +120,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         if (mRequesting == RequestFlag.HIDDEN)
             return false; // Always false when hidden
 
-        if ((getItemCount() - 1) == position) {
+        if (((mDescending) && ((getItemCount() - 1) == position)) ||
+                ((!mDescending) && (position == 0))) {
 
             holder.rootView.setVisibility(View.GONE);
             holder.requestView.setVisibility(View.VISIBLE);
@@ -394,7 +402,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 .inflate(R.layout.layout_recycler_item, parent, false);
 
         view.setTag(Boolean.TRUE); // Needed to avoid first display animation
-        return new ViewHolder(view, mItemLayout, mRequestLayout);
+        return new ViewHolder(view, mItemLayout, mRequestLayout, mDescending);
     }
 
     @Override
@@ -432,7 +440,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         public View rootView; // Holder item root view
         public View requestView; // Holder request root view
 
-        public ViewHolder(View view, @LayoutRes int layoutItem, @LayoutRes int layoutRequest) {
+        public ViewHolder(View view, @LayoutRes int layoutItem, @LayoutRes int layoutRequest,
+                          boolean descending) {
             super(view);
 
             ViewStub stub = (ViewStub)view.findViewById(R.id.layout_item);
@@ -442,6 +451,9 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             if (layoutRequest != Constants.NO_DATA) {
                 stub = (ViewStub)view.findViewById(R.id.layout_request);
                 stub.setLayoutResource(layoutRequest);
+
+                if (!descending) // Remove bottom margin when ascending order
+                    ((LinearLayout.LayoutParams)stub.getLayoutParams()).setMargins(0, 0, 0, 0);
                 requestView = stub.inflate();
             }
         }
