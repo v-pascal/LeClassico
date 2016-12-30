@@ -109,6 +109,7 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                 ((TextView)mRootView.findViewById(R.id.text_info)).setTextColor(Color.WHITE);
                 break;
             }
+            case R.id.shortcut_events_bottom:
             case R.id.shortcut_new_event:
             case R.id.shortcut_events: { ////// Events (+new)
                 mRootView.findViewById(R.id.image_icon).setVisibility(View.GONE);

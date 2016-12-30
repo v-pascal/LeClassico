@@ -53,4 +53,13 @@
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="windowActionBarOverlay">true</item><!-- Support library -->
     </style>
+    <style name="EventCalendarStyle" parent="android:Widget.CalendarView">
+        <item name="android:showWeekNumber">false</item>
+        <item name="android:dateTextAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:weekDayTextAppearance">@style/EventCalendarWeekTextStyle</item>
+    </style>
+    <style name="EventCalendarWeekTextStyle" parent="@android:style/TextAppearance.Large">
+        <item name="android:textColor">@color/colorPrimaryMain</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>
