@@ -93,6 +93,8 @@ public class CamaradesTable extends DataTable {
     public static final String COLUMN_VILLE_UPD = "CAM_VilleUPD";
     public static final String COLUMN_POSTAL = "CAM_Postal";
     public static final String COLUMN_POSTAL_UPD = "CAM_PostalUPD";
+    public static final String COLUMN_PHONE = "CAM_Phone";
+    public static final String COLUMN_PHONE_UPD = "CAM_PhoneUPD";
     public static final String COLUMN_EMAIL = "CAM_Email";
     public static final String COLUMN_EMAIL_UPD = "CAM_EmailUPD";
     public static final String COLUMN_HOBBIES = "CAM_Hobbies";
@@ -133,28 +135,30 @@ public class CamaradesTable extends DataTable {
     private static final short COLUMN_INDEX_VILLE_UPD = 15;
     private static final short COLUMN_INDEX_POSTAL = 16;
     private static final short COLUMN_INDEX_POSTAL_UPD = 17;
-    private static final short COLUMN_INDEX_EMAIL = 18;
-    private static final short COLUMN_INDEX_EMAIL_UPD = 19;
-    private static final short COLUMN_INDEX_HOBBIES = 20;
-    private static final short COLUMN_INDEX_HOBBIES_UPD = 21;
-    private static final short COLUMN_INDEX_A_PROPOS = 22;
-    private static final short COLUMN_INDEX_A_PROPOS_UPD = 23;
-    private static final short COLUMN_INDEX_LOG_DATE = 24;
-    private static final short COLUMN_INDEX_LOG_DATE_UPD = 25;
-    private static final short COLUMN_INDEX_ADMIN = 26;
-    private static final short COLUMN_INDEX_ADMIN_UPD = 27;
-    private static final short COLUMN_INDEX_PROFILE = 28;
-    private static final short COLUMN_INDEX_PROFILE_UPD = 29;
-    private static final short COLUMN_INDEX_BANNER = 30;
-    private static final short COLUMN_INDEX_BANNER_UPD = 31;
-    private static final short COLUMN_INDEX_LOCATED = 32;
-    private static final short COLUMN_INDEX_LOCATED_UPD = 33;
-    private static final short COLUMN_INDEX_LATITUDE = 34;
-    private static final short COLUMN_INDEX_LATITUDE_UPD = 35;
-    private static final short COLUMN_INDEX_LONGITUDE = 36;
-    private static final short COLUMN_INDEX_LONGITUDE_UPD = 37;
-    private static final short COLUMN_INDEX_STATUS_DATE = 38;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 39;
+    private static final short COLUMN_INDEX_PHONE = 18;
+    private static final short COLUMN_INDEX_PHONE_UPD = 19;
+    private static final short COLUMN_INDEX_EMAIL = 20;
+    private static final short COLUMN_INDEX_EMAIL_UPD = 21;
+    private static final short COLUMN_INDEX_HOBBIES = 22;
+    private static final short COLUMN_INDEX_HOBBIES_UPD = 23;
+    private static final short COLUMN_INDEX_A_PROPOS = 24;
+    private static final short COLUMN_INDEX_A_PROPOS_UPD = 25;
+    private static final short COLUMN_INDEX_LOG_DATE = 26;
+    private static final short COLUMN_INDEX_LOG_DATE_UPD = 27;
+    private static final short COLUMN_INDEX_ADMIN = 28;
+    private static final short COLUMN_INDEX_ADMIN_UPD = 29;
+    private static final short COLUMN_INDEX_PROFILE = 30;
+    private static final short COLUMN_INDEX_PROFILE_UPD = 31;
+    private static final short COLUMN_INDEX_BANNER = 32;
+    private static final short COLUMN_INDEX_BANNER_UPD = 33;
+    private static final short COLUMN_INDEX_LOCATED = 34;
+    private static final short COLUMN_INDEX_LOCATED_UPD = 35;
+    private static final short COLUMN_INDEX_LATITUDE = 36;
+    private static final short COLUMN_INDEX_LATITUDE_UPD = 37;
+    private static final short COLUMN_INDEX_LONGITUDE = 38;
+    private static final short COLUMN_INDEX_LONGITUDE_UPD = 39;
+    private static final short COLUMN_INDEX_STATUS_DATE = 40;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 41;
 
     //
     private CamaradesTable() { }
@@ -184,6 +188,8 @@ public class CamaradesTable extends DataTable {
                 COLUMN_VILLE_UPD + " TEXT NOT NULL," +
                 COLUMN_POSTAL + " TEXT," +
                 COLUMN_POSTAL_UPD + " TEXT NOT NULL," +
+                COLUMN_PHONE + " TEXT," +
+                COLUMN_PHONE_UPD + " TEXT NOT NULL," +
                 COLUMN_EMAIL + " TEXT," +
                 COLUMN_EMAIL_UPD + " TEXT NOT NULL," +
                 COLUMN_HOBBIES + " TEXT," +
@@ -274,6 +280,8 @@ public class CamaradesTable extends DataTable {
     private static final String JSON_KEY_VILLE_UPD = COLUMN_VILLE_UPD.substring(4);
     private static final String JSON_KEY_POSTAL = COLUMN_POSTAL.substring(4);
     private static final String JSON_KEY_POSTAL_UPD = COLUMN_POSTAL_UPD.substring(4);
+    private static final String JSON_KEY_PHONE = COLUMN_PHONE.substring(4);
+    private static final String JSON_KEY_PHONE_UPD = COLUMN_PHONE_UPD.substring(4);
     private static final String JSON_KEY_EMAIL = COLUMN_EMAIL.substring(4);
     private static final String JSON_KEY_EMAIL_UPD = COLUMN_EMAIL_UPD.substring(4);
     private static final String JSON_KEY_HOBBIES = COLUMN_HOBBIES.substring(4);
@@ -372,6 +380,9 @@ public class CamaradesTable extends DataTable {
                             if (!entry.isNull(JSON_KEY_POSTAL))
                                 values.put(COLUMN_POSTAL, entry.getString(JSON_KEY_POSTAL));
                             values.put(COLUMN_POSTAL_UPD, entry.getString(JSON_KEY_POSTAL_UPD));
+                            if (!entry.isNull(JSON_KEY_PHONE))
+                                values.put(COLUMN_PHONE, entry.getString(JSON_KEY_PHONE));
+                            values.put(COLUMN_PHONE_UPD, entry.getString(JSON_KEY_PHONE_UPD));
                             if (!entry.isNull(JSON_KEY_EMAIL))
                                 values.put(COLUMN_EMAIL, entry.getString(JSON_KEY_EMAIL));
                             values.put(COLUMN_EMAIL_UPD, entry.getString(JSON_KEY_EMAIL_UPD));
@@ -476,6 +487,12 @@ public class CamaradesTable extends DataTable {
                                             .compareTo(entry.getString(JSON_KEY_POSTAL_UPD)) > 0) {
                                         values.remove(COLUMN_POSTAL);
                                         values.remove(COLUMN_POSTAL_UPD);
+                                        removed = true;
+                                    }
+                                    if (cursor.getString(COLUMN_INDEX_PHONE_UPD)
+                                            .compareTo(entry.getString(JSON_KEY_PHONE_UPD)) > 0) {
+                                        values.remove(COLUMN_PHONE);
+                                        values.remove(COLUMN_PHONE_UPD);
                                         removed = true;
                                     }
                                     if (cursor.getString(COLUMN_INDEX_EMAIL_UPD)

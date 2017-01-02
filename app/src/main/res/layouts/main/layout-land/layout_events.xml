@@ -9,26 +9,4 @@
 
 
 
-
-
-    <CalendarView
-        android:id="@+id/calendar"
-        style="@style/EventCalendarStyle"
-        android:minHeight="300dp"
-        android:layout_weight="3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"/>
-
-
-
-
-    <View
-        android:background="@color/red"
-        android:layout_weight="4"
-        android:layout_width="0dp"
-        android:layout_height="48dp"/>
-
-
-
-
 </LinearLayout>

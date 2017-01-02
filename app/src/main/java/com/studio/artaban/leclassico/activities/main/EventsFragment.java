@@ -1,20 +1,14 @@
 package com.studio.artaban.leclassico.activities.main;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.CalendarView;
-import android.widget.LinearLayout;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
-
-import java.util.Calendar;
 
 /**
  * Created by pascal on 05/09/16.
@@ -41,7 +35,7 @@ public class EventsFragment extends MainFragment {
 
 
 
-
+        /*
         // Set calendar
         final CalendarView calendar = (CalendarView)rootView.findViewById(R.id.calendar);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -64,6 +58,7 @@ public class EventsFragment extends MainFragment {
         calendar.setMinDate(date.getTimeInMillis());
         date.set(Calendar.DAY_OF_MONTH, 31);
         calendar.setMaxDate(date.getTimeInMillis());
+        */
 
 
 
@@ -72,11 +67,14 @@ public class EventsFragment extends MainFragment {
 
 
 
+
+        /*
         // Set bottom shortcut
         if (getChildFragmentManager().findFragmentById(R.id.shortcut_events_bottom) == null) {
             getChildFragmentManager().beginTransaction().add(R.id.shortcut_events_bottom, new ShortcutFragment()).commit();
             getChildFragmentManager().executePendingTransactions();
         }
+        */
         return rootView;
     }
 }

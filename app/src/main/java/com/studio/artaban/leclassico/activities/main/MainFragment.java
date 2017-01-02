@@ -2,7 +2,6 @@ package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.studio.artaban.leclassico.services.DataService;
@@ -17,11 +16,6 @@ import java.util.Hashtable;
  * Main fragment class (MainActivity parent fragment)
  */
 public abstract class MainFragment extends Fragment {
-
-    private static final String DATA_KEY_QUERY_COUNT = "queryCount";
-    private static final String DATA_KEY_QUERY_ID = "queryID";
-    private static final String DATA_KEY_QUERY_OLD = "queryOld";
-    // Data keys
 
     public static Fragment newInstance(int section) {
 
@@ -66,12 +60,6 @@ public abstract class MainFragment extends Fragment {
     }
     protected OnFragmentListener mListener; // Activity listener
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    protected short mQueryCount; // DB query result count
-    protected int mQueryID = Constants.NO_DATA; // Max record Id (used to check if new entries)
-    protected short mQueryOld; // DB old entries requested
-
     ////// Fragment ////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onAttach(Context context) {
@@ -82,29 +70,6 @@ public abstract class MainFragment extends Fragment {
             mListener = (OnFragmentListener) context;
         else
             throw new RuntimeException(context.toString() + " must implement 'OnFragmentListener'");
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Restore data
-        if (savedInstanceState != null) {
-            mQueryCount = savedInstanceState.getShort(DATA_KEY_QUERY_COUNT);
-            mQueryID = savedInstanceState.getInt(DATA_KEY_QUERY_ID);
-            mQueryOld = savedInstanceState.getShort(DATA_KEY_QUERY_OLD);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-
-        outState.putShort(DATA_KEY_QUERY_COUNT, mQueryCount);
-        outState.putInt(DATA_KEY_QUERY_ID, mQueryID);
-        outState.putShort(DATA_KEY_QUERY_OLD, mQueryOld);
-
-        Logs.add(Logs.Type.V, "outState: " + outState);
-        super.onSaveInstanceState(outState);
     }
 
     @Override

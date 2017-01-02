@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -64,6 +65,9 @@ public class Uris {
             case ID_MAIN_SHORTCUT: // User/#/Notifications/Shortcut
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME + PATH_SHORTCUT);
+            case ID_USER_MEMBERS: // User/#/Camarades
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_USER + arguments[0] + '/' + CamaradesTable.TABLE_NAME);
             case ID_MAIN_BEST_PHOTOS:
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_BEST_PHOTOS); // BestPhoto
@@ -92,6 +96,7 @@ public class Uris {
     public static final short ID_USER_LOCATIONS = 3;     // User/#/Locations
     public static final short ID_USER_PUBLICATIONS = 4;  // User/#/Actualites
     public static final short ID_USER_PROFILE = 5;       // User/#/Profile
-    public static final short ID_MAIN_SHORTCUT = 6;      // User/#/Notifications/Shortcut
-    public static final short ID_MAIN_BEST_PHOTOS = 7;   // BestPhotos
+    public static final short ID_USER_MEMBERS = 6;       // User/#/Camarades
+    public static final short ID_MAIN_SHORTCUT = 7;      // User/#/Notifications/Shortcut
+    public static final short ID_MAIN_BEST_PHOTOS = 8;   // BestPhotos
 }

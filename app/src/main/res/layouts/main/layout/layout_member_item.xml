@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!-- First letter -->
+    <TextView
+        android:id="@+id/text_letter"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/user_info_text_size"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/user_info_height"/>
+
+    <!-- Profile -->
+    <ImageView
+        android:id="@+id/image_pseudo"
+        android:clickable="true"
+        android:layout_width="@dimen/user_item_height"
+        android:layout_height="@dimen/user_item_height">
+
+        <tag android:id="@+id/tag_pseudo_id"/>
+    </ImageView>
+
+    <!-- Member info -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+
+        <!-- Pseudo -->
+        <TextView
+            android:id="@+id/text_pseudo"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/user_info_text_size"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/user_text_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/user_info_height"/>
+
+        <!-- Info -->
+        <TextView
+            android:id="@+id/text_info"
+            android:textSize="@dimen/user_date_text_size"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/user_text_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/user_date_height"/>
+
+    </LinearLayout>
+
+    <!-- Follwed -->
+    <ImageView
+        android:id="@+id/image_followed"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:tint="@android:color/darker_gray"
+        android:clickable="true"
+        android:layout_marginStart="@dimen/user_text_margin"
+        android:layout_width="@dimen/user_item_height"
+        android:layout_height="@dimen/user_item_height">
+
+        <tag android:id="@id/tag_pseudo_id"/>
+    </ImageView>
+
+</LinearLayout>
