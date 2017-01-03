@@ -538,7 +538,7 @@ public class PublicationsFragment extends MainFragment implements
         // Restore data
         if (savedInstanceState != null)
             mLinkRequests = savedInstanceState.getIntegerArrayList(DATA_KEY_LINK_REQUESTS);
-        else
+        if (mLinkRequests == null)
             mLinkRequests = new ArrayList<>();
 
         // Set shortcut data (default)

@@ -59,4 +59,8 @@
     <string name="shortcut_events"><u>Evénements</u></string>
     <string name="shortcut_location">Géolocaliser de vos amis</string>
 
+    <!-- Members -->
+    <string name="admin_privilege">Privilèges administrateur</string>
+    <string name="no_admin_privilege">Privilèges utilisateur</string>
+
 </resources>

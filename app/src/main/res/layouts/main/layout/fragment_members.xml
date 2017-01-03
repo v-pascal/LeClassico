@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:background="@drawable/background_members"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 android:background="@drawable/background_members"
+                                                 android:fitsSystemWindows="true"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent">
     <!-- Members list -->
     <ListView
         android:id="@android:id/list"
+        android:divider="@null"
+        android:listSelector="@android:color/transparent"
+        android:cacheColorHint="@android:color/transparent"
+        android:nestedScrollingEnabled="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:dividerHeight="1dp"/>
+        android:layout_height="match_parent"/>
 
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

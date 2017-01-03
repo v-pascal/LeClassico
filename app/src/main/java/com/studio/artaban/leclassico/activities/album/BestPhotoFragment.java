@@ -199,11 +199,15 @@ public class BestPhotoFragment extends Fragment implements
                                 @Override
                                 public void onLoadFailed(ImageView imageView) {
                                     Logs.add(Logs.Type.V, "imageView: " + imageView);
+                                    try {
+                                        imageView.setImageDrawable(getResources().getDrawable(R.drawable.no_photo));
+                                        // NB: Done here instead of using placeholder coz the image size setting (width
+                                        //     & height size defined in layouts hierarchy) causes to display a wrong
+                                        //     image scale when succeeded (equal default 'no_photo' image size).
 
-                                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.no_photo));
-                                    // NB: Done here instead of using placeholder coz the image size setting (width
-                                    //     & height size defined in layouts hierarchy) causes to display a wrong
-                                    //     image scale when succeeded (equal default 'no_photo' image size).
+                                    } catch (IllegalStateException e) {
+                                        Logs.add(Logs.Type.E, "Activity not attached");
+                                    }
                                 }
 
                                 @Override

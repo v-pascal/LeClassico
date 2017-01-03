@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
+              android:padding="@dimen/member_item_padding"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
@@ -8,12 +9,11 @@
     <TextView
         android:id="@+id/text_letter"
         android:textColor="@android:color/black"
-        android:textSize="@dimen/user_info_text_size"
-        android:textStyle="bold"
-        android:gravity="center_vertical"
+        android:textSize="@dimen/member_letter_size"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="@dimen/user_info_height"/>
+        android:layout_height="wrap_content"/>
 
     <!-- Profile -->
     <ImageView
@@ -28,7 +28,7 @@
     <!-- Member info -->
     <LinearLayout
         android:orientation="vertical"
-        android:layout_weight="2"
+        android:layout_weight="3"
         android:layout_width="0dp"
         android:layout_height="wrap_content">
 
@@ -54,14 +54,14 @@
             android:layout_marginStart="@dimen/user_text_margin"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/user_date_height"/>
-
     </LinearLayout>
 
     <!-- Follwed -->
     <ImageView
         android:id="@+id/image_followed"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:tint="@android:color/darker_gray"
+        android:src="@drawable/followed"
+        android:tint="@color/light_gray"
+        android:background="@drawable/member_followed_background"
         android:clickable="true"
         android:layout_marginStart="@dimen/user_text_margin"
         android:layout_width="@dimen/user_item_height"

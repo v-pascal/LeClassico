@@ -63,4 +63,8 @@
     <string name="shortcut_events"><u>Events</u></string>
     <string name="shortcut_location">Friends location</string>
 
+    <!-- Members -->
+    <string name="admin_privilege">Admin privilege</string>
+    <string name="no_admin_privilege">User privilege</string>
+
 </resources>
