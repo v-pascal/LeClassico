@@ -417,7 +417,7 @@ public class MainActivity extends LoggedActivity implements
         ((TextView)navigation.getHeaderView(0).findViewById(R.id.text_pseudo)).setText(pseudo);
 
         // Set URI to observe shortcut DB changes
-        mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT, String.valueOf(getIntent()
+        mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT_NOTIFY, String.valueOf(getIntent()
                 .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
 
         // Set content view pager

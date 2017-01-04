@@ -12,13 +12,14 @@ public class Queries {
     public static final int MAIN_DATA_USER = Tables.ID_CAMARADES; // Table query
     public static final int MAIN_SHORTCUT_MAIL_COUNT = Tables.ID_MAX;
     public static final int MAIN_SHORTCUT_NOTIFY_COUNT = Tables.ID_MAX + 1;
-    public static final int MAIN_PUBLICATIONS_LIST = Tables.ID_MAX + 2;
-    public static final int MAIN_BEST_PHOTOS = Tables.ID_MAX + 3;
-    public static final int MAIN_MEMBERS_LIST = Tables.ID_MAX + 4;
+    public static final int MAIN_SHORTCUT_LAST_FOLLOWED = Tables.ID_MAX + 2;
+    public static final int MAIN_PUBLICATIONS_LIST = Tables.ID_MAX + 3;
+    public static final int MAIN_BEST_PHOTOS = Tables.ID_MAX + 4;
+    public static final int MAIN_MEMBERS_LIST = Tables.ID_MAX + 5;
 
     ////// Notifications
-    public static final int NOTIFICATIONS_NEW_INFO = Tables.ID_MAX + 5;
-    public static final int NOTIFICATIONS_MAIN_LIST = Tables.ID_MAX + 6;
+    public static final int NOTIFICATIONS_NEW_INFO = Tables.ID_MAX + 6;
+    public static final int NOTIFICATIONS_MAIN_LIST = Tables.ID_MAX + 7;
 
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////

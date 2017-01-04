@@ -466,6 +466,7 @@ public class BestPhotoFragment extends Fragment implements
 
         // Store persistent data
         SharedPreferences prefs = getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
-        prefs.edit().putInt(Preferences.MAIN_BEST_PHOTO, mBestId).apply();
+        prefs.edit().putInt(Preferences.MAIN_BEST_PHOTO, mBestId).commit();
+        // NB: Use 'commit' method instead of 'apply' above coz not working here (in 'onDestroy' method)
     }
 }

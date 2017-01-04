@@ -62,9 +62,12 @@ public class Uris {
             case ID_USER_PROFILE: // User/#/Profile
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + PATH_PROFILE);
-            case ID_MAIN_SHORTCUT: // User/#/Notifications/Shortcut
+            case ID_MAIN_SHORTCUT_NOTIFY: // User/#/Notifications/Shortcut
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME + PATH_SHORTCUT);
+            case ID_MAIN_SHORTCUT_MEMBER: // User/#/Camarades/Shortcut
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_USER + arguments[0] + '/' + CamaradesTable.TABLE_NAME + PATH_SHORTCUT);
             case ID_USER_MEMBERS: // User/#/Camarades
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + CamaradesTable.TABLE_NAME);
@@ -90,13 +93,14 @@ public class Uris {
 
     ////// URI /////////////////////////////////////////////////////////////////////////////////////
 
-    public static final short ID_RAW_QUERY = 0;          // SQL
-    public static final short ID_USER_NOTIFICATIONS = 1; // User/#/Notifications
-    public static final short ID_USER_MAILBOX = 2;       // User/#/Messagerie
-    public static final short ID_USER_LOCATIONS = 3;     // User/#/Locations
-    public static final short ID_USER_PUBLICATIONS = 4;  // User/#/Actualites
-    public static final short ID_USER_PROFILE = 5;       // User/#/Profile
-    public static final short ID_USER_MEMBERS = 6;       // User/#/Camarades
-    public static final short ID_MAIN_SHORTCUT = 7;      // User/#/Notifications/Shortcut
-    public static final short ID_MAIN_BEST_PHOTOS = 8;   // BestPhotos
+    public static final short ID_RAW_QUERY = 0;            // SQL
+    public static final short ID_USER_NOTIFICATIONS = 1;   // User/#/Notifications
+    public static final short ID_USER_MAILBOX = 2;         // User/#/Messagerie
+    public static final short ID_USER_LOCATIONS = 3;       // User/#/Locations
+    public static final short ID_USER_PUBLICATIONS = 4;    // User/#/Actualites
+    public static final short ID_USER_PROFILE = 5;         // User/#/Profile
+    public static final short ID_USER_MEMBERS = 6;         // User/#/Camarades
+    public static final short ID_MAIN_SHORTCUT_NOTIFY = 7; // User/#/Notifications/Shortcut
+    public static final short ID_MAIN_SHORTCUT_MEMBER = 8; // User/#/Camarades/Shortcut
+    public static final short ID_MAIN_BEST_PHOTOS = 9;     // BestPhotos
 }
