@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
@@ -47,6 +48,7 @@ public class DataProvider extends ContentProvider {
     private static final String MIME_TYPE = "vnd.android.cursor.dir/vnd." + Constants.APP_URI_COMPANY +
             '.' + Constants.APP_URI + '.';
     public static final String SINGLE_ROW = "/#";
+    public static final String FILTER_ROW = "/*";
 
     private static final UriMatcher URI_MATCHER_SINGLE;
     private static final UriMatcher URI_MATCHER;
@@ -123,10 +125,9 @@ public class DataProvider extends ContentProvider {
             table = Tables.getName((byte) URI_MATCHER.match(uri));
 
         Cursor result;
-        if (table == null) // Raw query (for multiple table queries)
-            result = mDB.getDB().rawQuery(selection, selectionArgs);
+        if (table == null) // Raw or specific query
+            result = Queries.get(mDB.getDB(), uri, projection, selection, selectionArgs, sortOrder);
         else {
-
             builder.setTables(table);
             result = builder.query(mDB.getDB(), projection, selection, selectionArgs, null, null, sortOrder);
         }

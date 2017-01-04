@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
@@ -328,25 +327,22 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
 
         Bundle membersData = new Bundle();
         membersData.putParcelable(QueryLoader.DATA_KEY_URI, mListUri);
-        membersData.putString(QueryLoader.DATA_KEY_SELECTION,
-                "SELECT " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_ID
-                        CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
-                        CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
-                        CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
-                        CamaradesTable.COLUMN_PHONE + ',' + // COLUMN_INDEX_PHONE
-                        CamaradesTable.COLUMN_EMAIL + ',' + // COLUMN_INDEX_EMAIL
-                        CamaradesTable.COLUMN_VILLE + ',' + // COLUMN_INDEX_TOWN
-                        CamaradesTable.COLUMN_NOM + ',' + // COLUMN_INDEX_NAME
-                        CamaradesTable.COLUMN_ADRESSE + ',' + // COLUMN_INDEX_ADDRESS
-                        CamaradesTable.COLUMN_ADMIN + ',' + // COLUMN_INDEX_ADMIN
-                        AbonnementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_FOLLOWED
-                        " FROM " + CamaradesTable.TABLE_NAME +
-                        " LEFT JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
-                        AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO + " AND " +
-                        AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'' +
-                        " WHERE " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + "<>" + pseudoId +
-                        " ORDER BY " + CamaradesTable.COLUMN_PSEUDO + " ASC");
         mListLoader.init(getActivity(), Queries.MAIN_MEMBERS_LIST, membersData);
+
+
+
+
+
+        /*
+        Bundle membersData = new Bundle();
+        membersData.putParcelable(QueryLoader.DATA_KEY_URI, mListUri);
+        membersData.putString(QueryLoader.DATA_KEY_URI_FILTER, "Pasc");
+        mLastLoader.restart(getActivity(), Queries.MAIN_MEMBERS_LIST, membersData);
+        */
+
+
+
+
 
         setListAdapter(null);
         return rootView;

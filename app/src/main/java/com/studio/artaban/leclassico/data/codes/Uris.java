@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.data.codes;
 
+import android.content.UriMatcher;
 import android.net.Uri;
 
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -36,6 +37,15 @@ public class Uris {
     }
 
     //////
+    public static short getId(Uri uri) { // Return URI id
+        Logs.add(Logs.Type.V, "uri: " + uri);
+
+        int id = URI_MATCHER.match(uri);
+        if (id != UriMatcher.NO_MATCH)
+            return (short)id;
+
+        return ID_RAW_QUERY; // Raw query
+    }
     public static Uri getUri(short id, String... arguments) {
         // Return URI formatted as expected (according ID parameter)
 
@@ -103,4 +113,15 @@ public class Uris {
     public static final short ID_MAIN_SHORTCUT_NOTIFY = 7; // User/#/Notifications/Shortcut
     public static final short ID_MAIN_SHORTCUT_MEMBER = 8; // User/#/Camarades/Shortcut
     public static final short ID_MAIN_BEST_PHOTOS = 9;     // BestPhotos
+
+    ////// URI Matcher /////////////////////////////////////////////////////////////////////////////
+
+    private static UriMatcher URI_MATCHER;
+    static { // Queries URI
+
+        URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+        URI_MATCHER.addURI(DataProvider.CONTENT_URI, // User/#/Camarades
+                PATH_USER + "#/" + CamaradesTable.TABLE_NAME + DataProvider.FILTER_ROW, ID_USER_MEMBERS);
+    }
+
 }

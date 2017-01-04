@@ -26,7 +26,7 @@ public class QueryLoader {
     public static final String DATA_KEY_SORT_ORDER = "sortOrder"; // Query order (table query reserved)
 
     public static final String DATA_KEY_URI = "uri";
-    public static final String DATA_KEY_ROW_ID = "rowId";
+    public static final String DATA_KEY_URI_FILTER = "uriFilter";
 
     //////
     public interface OnResultListener {
@@ -57,21 +57,22 @@ public class QueryLoader {
             mLoaderId = id;
 
             Uri queryURI;
-            if ((id > 0) && (id <= Tables.ID_LAST) && (!args.containsKey(DATA_KEY_URI))) // Table query
+            if ((id > 0) && (id <= Tables.ID_LAST) && (!args.containsKey(DATA_KEY_URI))) // Table URI
                 queryURI = Uri.parse(DataProvider.CONTENT_URI + Tables.getName((byte) id));
-            else if (args.containsKey(DATA_KEY_URI)) { // Raw query
-                if ((args.containsKey(DATA_KEY_PROJECTION)) || (args.containsKey(DATA_KEY_SORT_ORDER)))
-                    throw new IllegalArgumentException("Unexpected table query fields found (raw query)");
-
+            else if (args.containsKey(DATA_KEY_URI))
                 queryURI = args.getParcelable(DATA_KEY_URI);
+            else
+                throw new IllegalArgumentException("Missing URI");
 
-            } else
-                throw new IllegalArgumentException("Missing URI (raw query)");
-
-            // Check to add row or query ID into the URI
-            if (args.containsKey(DATA_KEY_ROW_ID))
-                queryURI = ContentUris.withAppendedId(queryURI, args.getLong(DATA_KEY_ROW_ID));
-
+            // Check to add row ID or query filter into the URI
+            if (args.containsKey(DATA_KEY_URI_FILTER)) {
+                if (args.get(DATA_KEY_URI_FILTER) instanceof Long)
+                    queryURI = ContentUris.withAppendedId(queryURI, args.getLong(DATA_KEY_URI_FILTER));
+                else if (args.get(DATA_KEY_URI_FILTER) instanceof String)
+                    queryURI = Uri.withAppendedPath(queryURI, Uri.encode(args.getString(DATA_KEY_URI_FILTER)));
+                else
+                    throw new IllegalArgumentException("Unexpected URI filter type");
+            }
             return new CursorLoader(mContext, queryURI,
                     args.getStringArray(DATA_KEY_PROJECTION),
                     args.getString(DATA_KEY_SELECTION, null),
