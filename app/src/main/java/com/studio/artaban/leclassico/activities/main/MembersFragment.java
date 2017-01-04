@@ -41,7 +41,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
 
     private static class ViewHolder {
 
-        TextView letter; // First letter view
+        TextView character; // Alphabetic char view
         ImageView profile; // Profile image view
         TextView pseudo; // Pseudo text view
         TextView info; // Info text view (phone, email, or...)
@@ -87,7 +87,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
             View rootView = LayoutInflater.from(context).inflate(R.layout.layout_member_item, null);
 
             ViewHolder holder = new ViewHolder();
-            holder.letter = (TextView) rootView.findViewById(R.id.text_letter);
+            holder.character = (TextView) rootView.findViewById(R.id.text_letter);
             holder.profile = (ImageView) rootView.findViewById(R.id.image_pseudo);
             holder.pseudo = (TextView) rootView.findViewById(R.id.text_pseudo);
             holder.info = (TextView) rootView.findViewById(R.id.text_info);
@@ -101,7 +101,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
             return rootView;
         }
         @Override
-        public void bindView(View view, Context context, Cursor cursor) {
+        public void bindView(final View view, Context context, Cursor cursor) {
             //Logs.add(Logs.Type.V, "view: " + view + ";context: " + context + ";cursor: " + cursor);
             ViewHolder holder = (ViewHolder) view.getTag();
 
@@ -117,20 +117,20 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
             String pseudo = cursor.getString(COLUMN_INDEX_PSEUDO);
             String letter = String.valueOf(pseudo.charAt(0)).toUpperCase();
 
+            holder.character.setTranslationY(0);
             if (cursor.getPosition() > 0) {
+
                 cursor.move(-1);
-                if (String.valueOf(cursor.getString(COLUMN_INDEX_PSEUDO).charAt(0)).toUpperCase()
-                        .charAt(0) != letter.charAt(0))
-                    holder.letter.setText(letter);
-                else
-                    holder.letter.setText(null);
+                holder.character.setText(letter);
+                holder.character.setVisibility((String.valueOf(cursor.getString(COLUMN_INDEX_PSEUDO)
+                        .charAt(0)).toUpperCase().charAt(0) != letter.charAt(0))? View.VISIBLE:View.INVISIBLE);
 
-                // Back to current position
-                cursor.move(1);
+                cursor.move(1); // Back to current position
+
+            } else {
+                holder.character.setText(letter);
+                holder.character.setVisibility(View.VISIBLE);
             }
-            else
-                holder.letter.setText(letter);
-
             // Set pseudo & info
             holder.pseudo.setText(pseudo);
             if (!cursor.isNull(COLUMN_INDEX_PHONE))
@@ -176,8 +176,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
         if (id == Queries.MAIN_MEMBERS_LIST) {
             String lastMember = null;
 
-            // Find the last member followed (using status date)
-            do {
+            do { // Find the last member followed (using status date)
                 if (!cursor.isNull(COLUMN_INDEX_FOLLOWED_DATE)) {
                     String statusDate = cursor.getString(COLUMN_INDEX_FOLLOWED_DATE);
                     if ((lastMember == null) || ((statusDate.compareTo(lastMember)) > 0))
@@ -187,8 +186,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
             } while (cursor.moveToNext());
             cursor.moveToFirst();
 
-            // Display last member into shortcut
-            do {
+            do { // Display last member into shortcut
                 if ((!cursor.isNull(COLUMN_INDEX_FOLLOWED_DATE)) &&
                         (cursor.getString(COLUMN_INDEX_FOLLOWED_DATE).compareTo(lastMember) == 0)) {
                     try {
@@ -217,8 +215,15 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
             // Refresh members list
             if (getListAdapter() == null) {
                 setListAdapter(new MembersAdapter(getContext(), cursor, false));
+
+                getListView().setClipChildren(false);
+                getListView().setClipToPadding(false);
                 getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
-                    private int mLetterItem; // Item position that displays the letter on top
+                    // Needed to move alphabetic char order on displayed on top (according user scroll)
+
+                    private ViewHolder mCharItem; // Item holder that displays the alphabetic char
+                    private int mCharPosition; // Item position that displays the alphabetic char
+                    private char mCharLetter; // Alphabetic letter displayed (on top)
 
                     @Override
                     public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -226,107 +231,29 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                     }
 
                     @Override
-                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                                         int totalItemCount) {
                         //Logs.add(Logs.Type.V, "view: " + view + ";firstVisibleItem: " + firstVisibleItem +
-                        //        ";visibleItemCount: " + visibleItemCount + ";totalItemCount: " + totalItemCount);
-
-
-
+                        //        ";visibleItemCount: " + visibleItemCount +
+                        //        ";totalItemCount: " + totalItemCount);
 
                         if (view.getChildAt(0) != null) {
-                            //Logs.add(Logs.Type.E, "item: " + firstVisibleItem + " Y:" + view.getChildAt(0).getY());
+                            View itemView = view.getChildAt(0);
+                            View nextView = view.getChildAt(1);
+
+                            if ((mCharItem == null) || (mCharPosition != firstVisibleItem)) {
+                                mCharItem = (ViewHolder) itemView.getTag();
+                                mCharItem.character.setVisibility(View.VISIBLE);
+                                mCharLetter = mCharItem.character.getText().charAt(0);
+
+                                if ((mCharPosition >= firstVisibleItem) && (nextView != null) && (((ViewHolder)nextView.getTag()).character.getText().charAt(0) == mCharLetter))
+                                    ((ViewHolder)nextView.getTag()).character.setVisibility(View.INVISIBLE);
+                            }
+                            mCharItem.character.setTranslationY(((nextView != null) &&
+                                    (((ViewHolder)nextView.getTag()).character.getText().charAt(0) == mCharLetter))?
+                                    -itemView.getY() : 0);
+                            mCharPosition = firstVisibleItem;
                         }
-
-
-
-                        /*
-01-03 17:06:58.703 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:0.0
-01-03 17:06:58.728 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:0.0
-01-03 17:07:08.265 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:0.0
-01-03 17:07:09.469 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-2.0
-01-03 17:07:09.524 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-7.0
-01-03 17:07:09.593 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-10.0
-01-03 17:07:09.620 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-14.0
-01-03 17:07:09.648 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-19.0
-01-03 17:07:09.688 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-23.0
-01-03 17:07:09.705 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-26.0
-01-03 17:07:09.756 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-27.0
-01-03 17:07:09.771 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-28.0
-01-03 17:07:09.785 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-28.0
-01-03 17:07:09.799 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-29.0
-01-03 17:07:09.813 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-29.0
-01-03 17:07:09.832 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-29.0
-01-03 17:07:09.845 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-29.0
-01-03 17:07:09.856 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-29.0
-01-03 17:07:09.868 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-29.0
-01-03 17:07:09.884 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-29.0
-01-03 17:07:21.199 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-29.0
-01-03 17:07:21.607 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-30.0
-01-03 17:07:21.622 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-33.0
-01-03 17:07:21.662 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-35.0
-01-03 17:07:21.717 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-39.0
-01-03 17:07:21.745 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-44.0
-01-03 17:07:21.774 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 0 Y:-51.0
-01-03 17:07:21.788 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-3.0
-01-03 17:07:21.815 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-6.0
-01-03 17:07:21.829 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-10.0
-01-03 17:07:21.856 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-14.0
-01-03 17:07:21.884 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-17.0
-01-03 17:07:21.943 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-22.0
-01-03 17:07:21.993 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-25.0
-01-03 17:07:22.034 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-30.0
-01-03 17:07:22.054 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-33.0
-01-03 17:07:22.063 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-38.0
-01-03 17:07:22.077 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-44.0
-01-03 17:07:22.086 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-47.0
-01-03 17:07:22.093 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 1 Y:-49.0
-01-03 17:07:22.103 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-3.0
-01-03 17:07:22.116 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-8.0
-01-03 17:07:22.133 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-13.0
-01-03 17:07:22.144 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-17.0
-01-03 17:07:22.178 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-21.0
-01-03 17:07:22.185 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-28.0
-01-03 17:07:22.197 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-30.0
-01-03 17:07:22.204 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-30.0
-01-03 17:07:22.220 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-34.0
-01-03 17:07:22.233 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-36.0
-01-03 17:07:22.244 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-37.0
-01-03 17:07:22.261 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-39.0
-01-03 17:07:22.278 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-41.0
-01-03 17:07:22.291 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-42.0
-01-03 17:07:22.304 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-43.0
-01-03 17:07:22.321 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-44.0
-01-03 17:07:22.340 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-45.0
-01-03 17:07:22.356 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-45.0
-01-03 17:07:22.371 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-46.0
-01-03 17:07:22.384 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-46.0
-01-03 17:07:22.396 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-47.0
-01-03 17:07:22.410 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-47.0
-01-03 17:07:22.421 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-47.0
-01-03 17:07:22.434 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-47.0
-01-03 17:07:22.446 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-47.0
-01-03 17:07:22.461 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-47.0
-01-03 17:07:22.473 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-47.0
-01-03 17:07:34.684 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 2 Y:-51.0
-01-03 17:07:34.699 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 3 Y:-11.0
-01-03 17:07:34.722 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 3 Y:-27.0
-01-03 17:07:34.735 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 3 Y:-51.0
-01-03 17:07:34.740 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 3 Y:-51.0
-01-03 17:07:34.765 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 4 Y:-33.0
-01-03 17:07:34.803 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 6 Y:-40.0
-01-03 17:07:34.806 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 6 Y:-44.0
-01-03 17:07:34.809 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 6 Y:-44.0
-01-03 17:07:34.830 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 8 Y:-4.0
-01-03 17:07:34.869 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 9 Y:-31.0
-01-03 17:07:34.875 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 9 Y:-31.0
-01-03 17:07:34.934 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 13 Y:-43.0
-01-03 17:07:34.971 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 14 Y:-19.0
-01-03 17:07:34.976 28686-28686/ E/LeClassico: [.activities.main.MembersFragment$1]{onScroll} item: 14 Y:-19.0
-
-                         */
-
-
-
                     }
                 });
 
