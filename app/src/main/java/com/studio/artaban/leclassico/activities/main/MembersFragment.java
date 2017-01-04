@@ -264,7 +264,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
         setListAdapter(null);
     }
 
-    // Query column indexes
+    // Query column indexes (both query loaders)
     private static final int COLUMN_INDEX_ID = 0; // & Shortcut status date
     private static final int COLUMN_INDEX_PSEUDO = 1;
     private static final int COLUMN_INDEX_SEX = 2;
@@ -344,7 +344,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                         " LEFT JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
                         AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO + " AND " +
                         AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'' +
-                        " WHERE " + CamaradesTable.COLUMN_PSEUDO + "<>'" + pseudo + '\'' +
+                        " WHERE " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + "<>" + pseudoId +
                         " ORDER BY " + CamaradesTable.COLUMN_PSEUDO + " ASC");
         mListLoader.init(getActivity(), Queries.MAIN_MEMBERS_LIST, membersData);
 

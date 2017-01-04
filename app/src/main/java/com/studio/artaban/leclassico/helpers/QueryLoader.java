@@ -45,7 +45,8 @@ public class QueryLoader {
     }
 
     //
-    private final LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+    private final LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks =
+            new LoaderManager.LoaderCallbacks<Cursor>() {
 
         private int mLoaderId; // Query loader ID
 
@@ -63,8 +64,8 @@ public class QueryLoader {
                     throw new IllegalArgumentException("Unexpected table query fields found (raw query)");
 
                 queryURI = args.getParcelable(DATA_KEY_URI);
-            }
-            else
+
+            } else
                 throw new IllegalArgumentException("Missing URI (raw query)");
 
             // Check to add row or query ID into the URI
