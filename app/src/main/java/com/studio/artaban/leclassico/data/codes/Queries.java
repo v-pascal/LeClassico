@@ -4,50 +4,64 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import com.studio.artaban.leclassico.data.IDataTable;
+import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
  * Created by pascal on 07/09/16.
- * Query ID & limit (see QueryLoader class)
+ * Queries, IDs & limits (see QueryLoader class)
  */
 public class Queries {
 
     public static Cursor get(SQLiteDatabase db, Uri uri, String[] projection, String selection,
-                             String[] selectionArgs, String sortOrder) { // Get query result according URI
+                             String[] selectionArgs, String sortOrder) { // Return query result according URI
 
         Logs.add(Logs.Type.V, "uri: " + uri + ";selection: " + selection);
         switch (Uris.getId(uri)) {
             case Uris.ID_USER_MEMBERS: { // MAIN_MEMBERS_LIST
 
+                Logs.add(Logs.Type.I, "Members list query");
+                int pseudoId = Integer.valueOf(uri.getPathSegments().get(1)); // User/#/Camarades/Shortcut
+                Cursor cursor = db.query(CamaradesTable.TABLE_NAME, new String[]{CamaradesTable.COLUMN_PSEUDO},
+                        IDataTable.DataField.COLUMN_ID + '=' + pseudoId, null, null, null, null);
 
+                // Get user pseudo
+                String pseudo;
+                if (cursor.moveToFirst())
+                    pseudo = cursor.getString(0);
+                else
+                    throw new IllegalArgumentException("Wrong user ID");
+                cursor.close();
 
-                /*
-                membersData.putString(QueryLoader.DATA_KEY_SELECTION,
-                        "SELECT " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' + // COLUMN_INDEX_ID
-                                CamaradesTable.COLUMN_PSEUDO + ',' + // COLUMN_INDEX_PSEUDO
-                                CamaradesTable.COLUMN_SEXE + ',' + // COLUMN_INDEX_SEX
-                                CamaradesTable.COLUMN_PROFILE + ',' + // COLUMN_INDEX_PROFILE
-                                CamaradesTable.COLUMN_PHONE + ',' + // COLUMN_INDEX_PHONE
-                                CamaradesTable.COLUMN_EMAIL + ',' + // COLUMN_INDEX_EMAIL
-                                CamaradesTable.COLUMN_VILLE + ',' + // COLUMN_INDEX_TOWN
-                                CamaradesTable.COLUMN_NOM + ',' + // COLUMN_INDEX_NAME
-                                CamaradesTable.COLUMN_ADRESSE + ',' + // COLUMN_INDEX_ADDRESS
-                                CamaradesTable.COLUMN_ADMIN + ',' + // COLUMN_INDEX_ADMIN
-                                AbonnementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + // COLUMN_INDEX_FOLLOWED
-                                " FROM " + CamaradesTable.TABLE_NAME +
-                                " LEFT JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
-                                AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO + " AND " +
-                                AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'' +
-                                " WHERE " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + "<>" + pseudoId +
-                                " ORDER BY " + CamaradesTable.COLUMN_PSEUDO + " ASC");
-                                */
+                // Get filter criteria (if any)
+                String filterSelection = "";
+                if ((uri.getPathSegments().size() > 3) && (!uri.getPathSegments().get(3).isEmpty()))
+                    filterSelection = " AND upper(" + CamaradesTable.COLUMN_PSEUDO + ") LIKE '" +
+                            Uri.decode(uri.getPathSegments().get(3)).toUpperCase() + "%'";
 
-
-
-
+                return db.rawQuery("SELECT " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +
+                        CamaradesTable.COLUMN_PSEUDO + ',' +
+                        CamaradesTable.COLUMN_SEXE + ',' +
+                        CamaradesTable.COLUMN_PROFILE + ',' +
+                        CamaradesTable.COLUMN_PHONE + ',' +
+                        CamaradesTable.COLUMN_EMAIL + ',' +
+                        CamaradesTable.COLUMN_VILLE + ',' +
+                        CamaradesTable.COLUMN_NOM + ',' +
+                        CamaradesTable.COLUMN_ADRESSE + ',' +
+                        CamaradesTable.COLUMN_ADMIN + ',' +
+                        AbonnementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID +
+                        " FROM " + CamaradesTable.TABLE_NAME +
+                        " LEFT JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
+                        AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO + " AND " +
+                        AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'' +
+                        " WHERE " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + "<>" + pseudoId +
+                        filterSelection +
+                        " ORDER BY " + CamaradesTable.COLUMN_PSEUDO + " ASC", null);
             }
             case Uris.ID_RAW_QUERY:
-            default: { // Raw query
+            default: { // Raw query (for multiple table selection)
                 return db.rawQuery(selection, selectionArgs);
             }
         }

@@ -34,6 +34,12 @@ import com.studio.artaban.leclassico.tools.Tools;
  */
 public class MembersFragment extends ListFragment implements QueryLoader.OnResultListener {
 
+    public void updateFilter(String filter) { // Update member filter (pseudo)
+        Logs.add(Logs.Type.V, "filter: " + filter);
+        refresh(filter);
+    }
+
+    //////
     private MainFragment.OnFragmentListener mListener; // Activity listener
 
     private Uri mListUri; // Member list query URI
@@ -251,7 +257,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                     });
 
                 } else
-                    ((CursorAdapter) getListAdapter()).notifyDataSetChanged();
+                    ((CursorAdapter) getListAdapter()).swapCursor(cursor);
                 break;
             }
         }
@@ -263,7 +269,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
         setListAdapter(null);
     }
 
-    // Query column indexes (both query loaders)
+    // Query column indexes for both query loaders (see 'Queries' class ID_USER_MEMBERS query)
     private static final int COLUMN_INDEX_ID = 0; // & Shortcut status date
     private static final int COLUMN_INDEX_PSEUDO = 1;
     private static final int COLUMN_INDEX_SEX = 2;
@@ -275,6 +281,15 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
     private static final int COLUMN_INDEX_ADDRESS = 8;
     private static final int COLUMN_INDEX_ADMIN = 9;
     private static final int COLUMN_INDEX_FOLLOWED = 10;
+
+    private void refresh(String filter) { // Refresh query loader
+        //Logs.add(Logs.Type.V, "filter: " + filter);
+
+        Bundle membersData = new Bundle();
+        membersData.putParcelable(QueryLoader.DATA_KEY_URI, mListUri);
+        membersData.putString(QueryLoader.DATA_KEY_URI_FILTER, filter);
+        mListLoader.restart(getActivity(), Queries.MAIN_MEMBERS_LIST, membersData);
+    }
 
     ////// MainFragment ////////////////////////////////////////////////////////////////////////////
     @Override
@@ -329,23 +344,17 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
         membersData.putParcelable(QueryLoader.DATA_KEY_URI, mListUri);
         mListLoader.init(getActivity(), Queries.MAIN_MEMBERS_LIST, membersData);
 
-
-
-
-
-        /*
-        Bundle membersData = new Bundle();
-        membersData.putParcelable(QueryLoader.DATA_KEY_URI, mListUri);
-        membersData.putString(QueryLoader.DATA_KEY_URI_FILTER, "Pasc");
-        mLastLoader.restart(getActivity(), Queries.MAIN_MEMBERS_LIST, membersData);
-        */
-
-
-
-
-
         setListAdapter(null);
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+
+        // Refresh query loader with existing filter (if any)
+        refresh(mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).getFilter());
     }
 
     @Override

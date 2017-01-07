@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.codes;
 import android.content.UriMatcher;
 import android.net.Uri;
 
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -72,12 +73,12 @@ public class Uris {
             case ID_USER_PROFILE: // User/#/Profile
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + PATH_PROFILE);
-            case ID_MAIN_SHORTCUT_NOTIFY: // User/#/Notifications/Shortcut
+            case ID_MAIN_SHORTCUT_NOTIFY: // User/#/Shortcut/Notifications
                 return Uri.parse(DataProvider.CONTENT_URI +
-                        PATH_USER + arguments[0] + '/' + NotificationsTable.TABLE_NAME + PATH_SHORTCUT);
-            case ID_MAIN_SHORTCUT_MEMBER: // User/#/Camarades/Shortcut
+                        PATH_USER + arguments[0] + PATH_SHORTCUT + NotificationsTable.TABLE_NAME);
+            case ID_MAIN_SHORTCUT_MEMBER: // User/#/Shortcut/Camarades
                 return Uri.parse(DataProvider.CONTENT_URI +
-                        PATH_USER + arguments[0] + '/' + CamaradesTable.TABLE_NAME + PATH_SHORTCUT);
+                        PATH_USER + arguments[0] + PATH_SHORTCUT + CamaradesTable.TABLE_NAME);
             case ID_USER_MEMBERS: // User/#/Camarades
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + CamaradesTable.TABLE_NAME);
@@ -96,8 +97,7 @@ public class Uris {
     private static final String PATH_BEST_PHOTOS = "BestPhotos"; // Best photos URI path
 
     private static final String PATH_USER = "User/"; // User URI path following with member ID
-
-    private static final String PATH_SHORTCUT = "/Shortcut"; // Shortcut URI path
+    private static final String PATH_SHORTCUT = "/Shortcut/"; // Shortcut URI path
     private static final String PATH_LOCATIONS = "/Locations"; // Locations URI path
     private static final String PATH_PROFILE = "/Profile"; // Profile URI path
 
@@ -110,17 +110,19 @@ public class Uris {
     public static final short ID_USER_PUBLICATIONS = 4;    // User/#/Actualites
     public static final short ID_USER_PROFILE = 5;         // User/#/Profile
     public static final short ID_USER_MEMBERS = 6;         // User/#/Camarades
-    public static final short ID_MAIN_SHORTCUT_NOTIFY = 7; // User/#/Notifications/Shortcut
-    public static final short ID_MAIN_SHORTCUT_MEMBER = 8; // User/#/Camarades/Shortcut
+    public static final short ID_MAIN_SHORTCUT_NOTIFY = 7; // User/#/Shortcut/Notifications
+    public static final short ID_MAIN_SHORTCUT_MEMBER = 8; // User/#/Shortcut/Camarades
     public static final short ID_MAIN_BEST_PHOTOS = 9;     // BestPhotos
 
     ////// URI Matcher /////////////////////////////////////////////////////////////////////////////
 
-    private static UriMatcher URI_MATCHER;
+    private static final UriMatcher URI_MATCHER;
     static { // Queries URI
 
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        URI_MATCHER.addURI(DataProvider.CONTENT_URI, // User/#/Camarades
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Camarades
+                PATH_USER + "#/" + CamaradesTable.TABLE_NAME, ID_USER_MEMBERS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Camarades/*
                 PATH_USER + "#/" + CamaradesTable.TABLE_NAME + DataProvider.FILTER_ROW, ID_USER_MEMBERS);
     }
 

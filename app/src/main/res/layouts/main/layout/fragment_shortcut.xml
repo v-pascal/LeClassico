@@ -93,6 +93,7 @@
             android:textColorHint="@color/colorPublication"
             android:textColor="@android:color/white"
             android:textSize="@dimen/notify_search_size"
+            android:singleLine="true"
             android:inputType="text"
             android:visibility="invisible"
             android:paddingStart="@dimen/shortcut_tiny_text_margin"

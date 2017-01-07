@@ -59,7 +59,7 @@ import java.io.File;
  */
 public class MainActivity extends LoggedActivity implements
         NavigationView.OnNavigationItemSelectedListener, QueryLoader.OnResultListener,
-        MainFragment.OnFragmentListener {
+        MainFragment.OnFragmentListener, ShortcutFragment.OnShortcutListener {
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
@@ -79,6 +79,21 @@ public class MainActivity extends LoggedActivity implements
                 return R.id.shortcut_members;
             default:
                 throw new IllegalArgumentException("Unexpected section");
+        }
+    }
+
+    ////// OnShortcutListener //////////////////////////////////////////////////////////////////////
+    @Override
+    public void onMemberSearch(String search) {
+        //Logs.add(Logs.Type.V, "search: " + search);
+        try {
+            ((MembersFragment) getSupportFragmentManager()
+                    .findFragmentByTag(MainFragment.getFragmentTag(mViewPager.getId(), Constants.MAIN_SECTION_MEMBERS)))
+                    .updateFilter(search);
+        } catch (ClassCastException e) {
+            Logs.add(Logs.Type.E, "Wrong fragment found");
+        } catch (NullPointerException e) {
+            Logs.add(Logs.Type.W, "Activity not attached");
         }
     }
 
@@ -448,7 +463,6 @@ public class MainActivity extends LoggedActivity implements
             private int mPositionPublications;
             private int mPositionEvents;
             private int mPositionMembers;
-            private int mPositionNotifications;
             // Shortcut positions
 
             private void translateShortcut(int section) { // Update & translate shortcut position
@@ -463,7 +477,6 @@ public class MainActivity extends LoggedActivity implements
                         mPositionPublications = mShortcutWidth;
                         mPositionEvents = mShortcutWidth * 2;
                         mPositionMembers = mShortcutWidth * 3;
-                        mPositionNotifications = mShortcutWidth * 4;
                         break;
                     }
                     case Constants.MAIN_SECTION_PUBLICATIONS: { ////// Publications
@@ -472,7 +485,6 @@ public class MainActivity extends LoggedActivity implements
                         mPositionPublications = 0;
                         mPositionEvents = mShortcutWidth;
                         mPositionMembers = mShortcutWidth * 2;
-                        mPositionNotifications = mShortcutWidth * 3;
                         break;
                     }
                     case Constants.MAIN_SECTION_EVENTS: { ////// Events
@@ -481,7 +493,6 @@ public class MainActivity extends LoggedActivity implements
                         mPositionPublications = -mShortcutWidth;
                         mPositionEvents = 0;
                         mPositionMembers = mShortcutWidth;
-                        mPositionNotifications = mShortcutWidth * 2;
                         break;
                     }
                     case Constants.MAIN_SECTION_MEMBERS: { ////// Members
@@ -490,7 +501,6 @@ public class MainActivity extends LoggedActivity implements
                         mPositionPublications = mShortcutWidth * -2;
                         mPositionEvents = -mShortcutWidth;
                         mPositionMembers = 0;
-                        mPositionNotifications = mShortcutWidth;
                         break;
                     }
                 }

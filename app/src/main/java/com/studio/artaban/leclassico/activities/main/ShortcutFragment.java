@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.SpannableStringBuilder;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +25,10 @@ import com.studio.artaban.leclassico.tools.Tools;
  * Created by pascal on 03/09/16.
  * Main activity shortcut fragment class
  */
-public class ShortcutFragment extends Fragment implements View.OnClickListener {
+public class ShortcutFragment extends Fragment implements View.OnClickListener, TextWatcher {
+
+    private static final String DATA_KEY_SEARCHING = "searching";
+    // Data keys
 
     public void setMessage(SpannableStringBuilder message) { // Set message text
         Logs.add(Logs.Type.V, "message: " + message);
@@ -49,9 +54,24 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
         Tools.setDateTime(getContext(), date, time, dateTime);
     }
 
+    public String getFilter() { // Return current member filter (if any)
+        Logs.add(Logs.Type.V, null);
+        return ((EditText) mRootView.findViewById(R.id.edit_search)).getText().toString();
+    }
+
     //////
     private View mRootView; // Fragment root view
     private boolean mSearching; // Search flag (search edit box display)
+
+    private void searching(View search) {
+        Logs.add(Logs.Type.V, "search: " + search);
+        mSearching = true;
+
+        ((ImageView)mRootView.findViewById(R.id.button_search))
+                .setImageDrawable(getResources().getDrawable(R.drawable.close));
+        search.setVisibility(View.VISIBLE);
+        search.requestFocus();
+    }
 
     ////// OnClickListener /////////////////////////////////////////////////////////////////////////
     @Override
@@ -73,25 +93,58 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
             search.setVisibility(View.INVISIBLE);
 
         } else {
-            mSearching = true;
-
-            ((ImageView)mRootView.findViewById(R.id.button_search))
-                    .setImageDrawable(getResources().getDrawable(R.drawable.close));
-            search.setVisibility(View.VISIBLE);
-            search.requestFocus();
+            searching(search);
 
             // Force displaying keyboard
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         }
     }
 
+    ////// TextWatcher /////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable edit) {
+        //Logs.add(Logs.Type.V, "edit: " + edit);
+        if (mListener != null)
+            mListener.onMemberSearch(edit.toString());
+    }
+
+    //////
+    private OnShortcutListener mListener; // Activity listener
+    public interface OnShortcutListener {
+        void onMemberSearch(String filter);
+    }
+
     ////// ShortcutFragment ////////////////////////////////////////////////////////////////////////
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Logs.add(Logs.Type.V, null);
 
+        if (context instanceof OnShortcutListener)
+            mListener = (OnShortcutListener)context;
+        else
+            throw new RuntimeException(context.toString() + " must implement 'OnShortcutListener'");
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
                 ";savedInstanceState: " + savedInstanceState);
         mRootView = inflater.inflate(R.layout.fragment_shortcut, container, false);
+
+        // Restore data
+        if ((savedInstanceState != null) && (savedInstanceState.getBoolean(DATA_KEY_SEARCHING)))
+            searching(mRootView.findViewById(R.id.edit_search));
 
         // Set UI components according section displayed (id)
         switch (getId()) {
@@ -133,9 +186,26 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener {
                 search.setVisibility(View.VISIBLE);
                 mRootView.findViewById(R.id.button_search).setOnClickListener(this);
                 mRootView.findViewById(R.id.layout_search).setOnClickListener(this);
+                ((EditText)mRootView.findViewById(R.id.edit_search)).addTextChangedListener(this);
                 break;
             }
         }
         return mRootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putBoolean(DATA_KEY_SEARCHING, mSearching);
+
+        Logs.add(Logs.Type.V, "outState: " + outState);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Logs.add(Logs.Type.V, null);
+        mListener = null;
     }
 }

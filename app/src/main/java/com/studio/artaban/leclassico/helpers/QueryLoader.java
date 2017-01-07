@@ -38,7 +38,6 @@ public class QueryLoader {
     private final OnResultListener mListener; // Query loader result listener
 
     public QueryLoader(Context context, OnResultListener listener) {
-
         Logs.add(Logs.Type.V, "context: " + context + ";listener: " + listener);
         mContext = context;
         mListener = listener;
