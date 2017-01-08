@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.tools.Tools;
 
@@ -40,10 +43,13 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener, 
         ((TextView) mRootView.findViewById(R.id.text_info))
                 .setText(info, TextView.BufferType.SPANNABLE);
     }
-    public void setIcon(boolean female, String profile, int size) { // Set profile icon
+    public void setIcon(int pseudoId, boolean female, String profile, int size) { // Set profile icon info
         Logs.add(Logs.Type.V, "female: " + female + ";profile: " + profile);
-        Tools.setProfile(getActivity(), (ImageView) mRootView.findViewById(R.id.image_icon),
-                female, profile, size, false);
+        ImageView iconPseudo = (ImageView) mRootView.findViewById(R.id.image_icon);
+
+        iconPseudo.setTag(R.id.tag_pseudo_id, pseudoId);
+        iconPseudo.setOnClickListener(this);
+        Tools.setProfile(getActivity(), iconPseudo, female, profile, size, true);
     }
     public void setDate(boolean start, String dateTime) { // Set start or end date
         Logs.add(Logs.Type.V, "start: " + start + ";dateTime: " + dateTime);
@@ -78,25 +84,41 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener, 
     public void onClick(View sender) { // Search clicked (display or hide search edit box)
 
         Logs.add(Logs.Type.V, "sender: " + sender);
-        View search = mRootView.findViewById(R.id.edit_search);
-        InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        switch (sender.getId()) {
+            case R.id.image_icon: { ////// Display last member followed profile
 
-        if ((sender.getId() == R.id.button_search) && (mSearching)) {
-            mSearching = false;
+                int pseudoId = (int)sender.getTag(R.id.tag_pseudo_id);
+                Logs.add(Logs.Type.I, "Display last member followed #" + pseudoId);
 
-            ((ImageView)mRootView.findViewById(R.id.button_search))
-                    .setImageDrawable(getResources().getDrawable(R.drawable.search));
+                ////// Start profile activity
+                Intent profile = new Intent(getActivity(), ProfileActivity.class);
+                profile.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
+                startActivity(profile);
+                break;
+            }
+            default: {
+                View search = mRootView.findViewById(R.id.edit_search);
+                InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-            imm.hideSoftInputFromWindow(search.getWindowToken(), 0); // Hide keyboard (if displayed)
-            ((EditText) search).setText(null);
-            search.clearFocus();
-            search.setVisibility(View.INVISIBLE);
+                if ((sender.getId() == R.id.button_search) && (mSearching)) {
+                    mSearching = false;
 
-        } else {
-            searching(search);
+                    ((ImageView)mRootView.findViewById(R.id.button_search))
+                            .setImageDrawable(getResources().getDrawable(R.drawable.search));
 
-            // Force displaying keyboard
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                    imm.hideSoftInputFromWindow(search.getWindowToken(), 0); // Hide keyboard (if displayed)
+                    ((EditText) search).setText(null);
+                    search.clearFocus();
+                    search.setVisibility(View.INVISIBLE);
+
+                } else {
+                    searching(search);
+
+                    // Force displaying keyboard
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                }
+                break;
+            }
         }
     }
 

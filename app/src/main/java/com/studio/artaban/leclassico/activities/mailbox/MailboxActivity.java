@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 
 import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -46,11 +47,9 @@ public class MailboxActivity extends LoggedActivity {
         // Get pseudo ID
         if (getIntent().getData() != null)
             mId = Integer.valueOf(getIntent().getData().getPathSegments().get(1));
-        else {
-
-
-
-        }
+        else
+            mId = getIntent().getIntExtra(EXTRA_DATA_ID, Constants.NO_DATA);
+        Logs.add(Logs.Type.I, "Pseudo #" + mId);
 
 
 

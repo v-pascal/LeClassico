@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.album;
 
+import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -59,7 +60,7 @@ import java.util.regex.Pattern;
  * Fragment to display a photo with comments
  */
 public class BestPhotoFragment extends Fragment implements
-        QueryLoader.OnResultListener, RecyclerAdapter.DataView.OnCriteriaListener {
+        QueryLoader.OnResultListener, RecyclerAdapter.DataView.OnCriteriaListener, View.OnClickListener {
 
     private RecyclerView mComList; // Recycler view containing comments list
     private Uri mComUri; // Comments observer URI
@@ -152,9 +153,26 @@ public class BestPhotoFragment extends Fragment implements
             remove.setOnClickListener(this);
         }
     }
-
     private View mRootView; // Fragment root view
+
     private int mBestId; // Best photo ID displayed
+    private String mBestFile; // Best photo file displayed
+
+    ////// View.OnClickListener ////////////////////////////////////////////////////////////////////
+    @Override
+    public void onClick(View sender) { // Display best photo in full screen
+        Logs.add(Logs.Type.V, "sender: " + sender);
+
+        ////// Start full screen photo activity
+        Intent fullScreen = new Intent(getContext(), FullPhotoActivity.class);
+        fullScreen.putExtra(FullPhotoActivity.EXTRA_DATA_TITLE, mBestFile);
+        fullScreen.putExtra(FullPhotoActivity.EXTRA_DATA_NAME, mBestFile);
+        Login.copyExtraData(getActivity().getIntent(), fullScreen);
+
+        ActivityOptions options = ActivityOptions
+                .makeSceneTransitionAnimation(getActivity(), sender, mBestFile);
+        startActivity(fullScreen, options.toBundle());
+    }
 
     ////// OnResultListener ////////////////////////////////////////////////////////////////////////
     @Override
@@ -176,14 +194,20 @@ public class BestPhotoFragment extends Fragment implements
             cursor.moveToFirst();
 
             // Select best photo to display (random with online criteria)
-            if ((Internet.isConnected()) || (mBestId == Constants.NO_DATA))
-                mBestId = ids.get(LeClassicoApp.getRandom().nextInt(ids.size()));
+            if ((Internet.isConnected()) || (mBestId == Constants.NO_DATA)) {
+                int bestId = ids.get(LeClassicoApp.getRandom().nextInt(ids.size()));
 
+                if (mBestId == Constants.NO_DATA) { // Store persistent data
+                    SharedPreferences prefs = getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
+                    prefs.edit().putInt(Preferences.MAIN_BEST_PHOTO, bestId).apply();
+                }
+                mBestId = bestId;
+            }
             do {
                 if (cursor.getInt(COLUMN_INDEX_PHOTO_ID) == mBestId) {
 
-                    String photoFile = cursor.getString(COLUMN_INDEX_PHOTO_FICHIER);
-                    ((TextView)mRootView.findViewById(R.id.text_title)).setText(photoFile);
+                    mBestFile = cursor.getString(COLUMN_INDEX_PHOTO_FICHIER);
+                    ((TextView)mRootView.findViewById(R.id.text_title)).setText(mBestFile);
                     ((TextView)mRootView.findViewById(R.id.text_info_album))
                             .setText(cursor.getString(COLUMN_INDEX_PHOTO_ALBUM));
                     ((TextView)mRootView.findViewById(R.id.text_info_provider))
@@ -192,14 +216,15 @@ public class BestPhotoFragment extends Fragment implements
                             .setText(cursor.getString(COLUMN_INDEX_PHOTO_RANGE));
 
                     Glider.with(getContext()).placeholder(R.drawable.no_photo)
-                            .load(Storage.FOLDER_PHOTOS + File.separator + photoFile,
-                                    Constants.APP_URL_PHOTOS + '/' + photoFile)
+                            .load(Storage.FOLDER_PHOTOS + File.separator + mBestFile,
+                                    Constants.APP_URL_PHOTOS + '/' + mBestFile)
                             .into((ImageView) mRootView.findViewById(R.id.image_photo), new Glider.OnLoadListener() {
 
                                 @Override
                                 public void onLoadFailed(ImageView imageView) {
                                     Logs.add(Logs.Type.V, "imageView: " + imageView);
                                     try {
+                                        imageView.setOnClickListener(null);
                                         imageView.setImageDrawable(getResources().getDrawable(R.drawable.no_photo));
                                         // NB: Done here instead of using placeholder coz the image size setting (width
                                         //     & height size defined in layouts hierarchy) causes to display a wrong
@@ -211,7 +236,11 @@ public class BestPhotoFragment extends Fragment implements
                                 }
 
                                 @Override
-                                public boolean onSetResource(Bitmap resource, final ImageView imageView) {
+                                public boolean onSetResource(Bitmap resource, ImageView imageView) {
+                                    Logs.add(Logs.Type.V, "resource: " + resource + ";imageView: " + imageView);
+
+                                    imageView.setTransitionName(mBestFile);
+                                    imageView.setOnClickListener(BestPhotoFragment.this);
                                     return false;
                                 }
                             });
@@ -457,16 +486,5 @@ public class BestPhotoFragment extends Fragment implements
 
         // Unregister old request receiver
         getContext().unregisterReceiver(mOldReceiver);
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        Logs.add(Logs.Type.V, null);
-
-        // Store persistent data
-        SharedPreferences prefs = getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
-        prefs.edit().putInt(Preferences.MAIN_BEST_PHOTO, mBestId).commit();
-        // NB: Use 'commit' method instead of 'apply' above coz not working here (in 'onDestroy' method)
     }
 }

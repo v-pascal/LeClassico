@@ -35,6 +35,7 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.location.LocationActivity;
+import com.studio.artaban.leclassico.activities.mailbox.MailboxActivity;
 import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.activities.settings.SettingsActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
@@ -239,6 +240,7 @@ public class MainActivity extends LoggedActivity implements
     private void onSelectNavItem() {
 
         Logs.add(Logs.Type.V, "mNavItemSelected: " + mNavItemSelected);
+        int pseudoId = getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA);
         switch (mNavItemSelected) {
 
             case R.id.navig_profile: { // Display user profile
@@ -246,8 +248,7 @@ public class MainActivity extends LoggedActivity implements
 
                 ////// Start profile activity
                 Intent profile = new Intent(this, ProfileActivity.class);
-                profile.putExtra(LoggedActivity.EXTRA_DATA_ID,
-                        getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
+                profile.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
                 startActivity(profile);
                 break;
             }
@@ -256,18 +257,17 @@ public class MainActivity extends LoggedActivity implements
 
                 ////// Start location activity
                 Intent location = new Intent(this, LocationActivity.class);
-                location.putExtra(LoggedActivity.EXTRA_DATA_ID,
-                        getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
+                location.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
                 startActivity(location);
                 break;
             }
             case R.id.navig_mailbox: { // Display mailbox activity
                 Logs.add(Logs.Type.I, "Display mailbox");
 
-
-
-
-
+                ////// Start mailbox activity
+                Intent mailBox = new Intent(this, MailboxActivity.class);
+                mailBox.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
+                startActivity(mailBox);
                 break;
             }
             case R.id.navig_notification: { // Display notification activity

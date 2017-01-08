@@ -106,13 +106,14 @@ public class PublicationsFragment extends MainFragment implements
                     startActivity(profile);
                     break;
                 }
+                case R.id.pub_card:
                 case R.id.image_display: { // Display publication activity (with comments)
-                    int position = (int)sender.getTag(R.id.tag_position);
-                    Logs.add(Logs.Type.I, "Display #" + position + " selected");
+                    int commentId = (int)sender.getTag(R.id.tag_comment_id);
+                    Logs.add(Logs.Type.I, "Display #" + commentId + " selected");
 
                     ////// Start publication activity
                     Intent pub = new Intent(getContext(), PublicationActivity.class);
-                    pub.putExtra(LoggedActivity.EXTRA_DATA_ID, mDataSource.getInt(position, COLUMN_INDEX_PUB_ID));
+                    pub.putExtra(LoggedActivity.EXTRA_DATA_ID, commentId);
                     pub.putExtra(LoggedActivity.EXTRA_DATA_URI, mPubUri);
 
                     startActivity(pub);
@@ -351,11 +352,14 @@ public class PublicationsFragment extends MainFragment implements
 
             ////// Events
             View imagePseudo = holder.rootView.findViewById(R.id.image_pseudo);
+            View cardView = holder.rootView.findViewById(R.id.pub_card);
             View imageDisplay = holder.rootView.findViewById(R.id.image_display);
 
             imagePseudo.setTag(R.id.tag_pseudo_id, mDataSource.getInt(position, COLUMN_INDEX_MEMBER_ID));
             imagePseudo.setOnClickListener(this);
-            imageDisplay.setTag(R.id.tag_position, position);
+            cardView.setTag(R.id.tag_comment_id, mDataSource.getInt(position, COLUMN_INDEX_PUB_ID));
+            cardView.setOnClickListener(this);
+            imageDisplay.setTag(R.id.tag_comment_id, mDataSource.getInt(position, COLUMN_INDEX_PUB_ID));
             imageDisplay.setOnClickListener(this);
         }
     }

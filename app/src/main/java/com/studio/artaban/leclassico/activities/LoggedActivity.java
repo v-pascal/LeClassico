@@ -31,14 +31,15 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public abstract class LoggedActivity extends AppCompatActivity implements QueryLoader.OnResultListener {
 
-    public static final String EXTRA_DATA_ID = "id";
+    public static final String EXTRA_DATA_ID = "id"; // WARNING: Data can be != than Login.EXTRA_DATA_PSEUDO_ID
     public static final String EXTRA_DATA_URI = "uri";
     // Extra data keys
 
     protected int mId; // ID (pseudo, publication, etc)
 
-    protected Uri mNotifyURI; // User notifications URI
-    // NB: Not private coz used in 'NotifyActivity'
+    protected static Uri mNotifyURI; // User notifications URI
+    // NB: Not private coz used in 'NotifyActivity' +
+    //     Static coz Login.EXTRA_DATA_PSEUDO_ID extras login data not always defined (called from link)
 
     private final QueryLoader mNewNotifyLoader = new QueryLoader(this, this); // New notification query loader
     private boolean mNotifyExists; // Existing notification flag
@@ -49,7 +50,6 @@ public abstract class LoggedActivity extends AppCompatActivity implements QueryL
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             Logs.add(Logs.Type.V, "context: " + context + ";intent: " + intent);
             if (intent.getAction().equals(DataService.REQUEST_LOGOUT)) ////// Logout requested
                 finish(); // Finish activity
@@ -58,8 +58,8 @@ public abstract class LoggedActivity extends AppCompatActivity implements QueryL
 
     //////
     protected void startNotificationActivity() { // Start notification activity
-        Logs.add(Logs.Type.V, null);
 
+        Logs.add(Logs.Type.V, null);
         if (mNotifyExists) {
 
             ////// Start notification activity
@@ -111,8 +111,11 @@ public abstract class LoggedActivity extends AppCompatActivity implements QueryL
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
 
         // Set URI to observe notification DB changes (if not already done)
-        mNotifyURI = Uris.getUri(Uris.ID_USER_NOTIFICATIONS,
-                String.valueOf(getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
+        if (mNotifyURI == null)
+            mNotifyURI = Uris.getUri(Uris.ID_USER_NOTIFICATIONS,
+                    String.valueOf(getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
+                    // NB: The first logged activity started is the 'MainActivity' which always
+                    //     contains extras login data
 
         // Load notification info (using query loader)
         Bundle notifyData = new Bundle();

@@ -204,8 +204,8 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                             (cursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.GENDER_FEMALE);
                     String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
                             cursor.getString(COLUMN_INDEX_PROFILE) : null;
-                    mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).setIcon(female, profile,
-                            R.dimen.shortcut_height);
+                    mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false)
+                            .setIcon(cursor.getInt(COLUMN_INDEX_ID), female, profile, R.dimen.shortcut_height);
 
                 } catch (NullPointerException e) {
                     Logs.add(Logs.Type.F, "Activity not attached");
