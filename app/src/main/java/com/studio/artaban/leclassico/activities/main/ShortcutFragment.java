@@ -63,7 +63,7 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener, 
     private View mRootView; // Fragment root view
     private boolean mSearching; // Search flag (search edit box display)
 
-    private void searching(View search) {
+    private void searching(View search) { // Start searching member (filter on pseudo)
         Logs.add(Logs.Type.V, "search: " + search);
         mSearching = true;
 

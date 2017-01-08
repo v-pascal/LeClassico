@@ -20,6 +20,7 @@
     <string name="title_activity_mailbox">Boite aux lettres</string>
     <string name="title_activity_location">Géolocalisation</string>
     <string name="title_activity_publication">Publication</string>
+    <string name="title_activity_profile">Profile</string>
 
     <string name="error">Erreur</string>
     <string name="warning">Attention</string>

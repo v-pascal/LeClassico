@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
@@ -274,10 +275,10 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     int pseudoId = (int)sender.getTag(R.id.tag_pseudo_id);
                     Logs.add(Logs.Type.I, "Pseudo #" + pseudoId + " selected");
 
-
-
-
-
+                    ////// Start profile activity
+                    Intent profile = new Intent(NotifyActivity.this, ProfileActivity.class);
+                    profile.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
+                    startActivity(profile);
                     break;
                 }
                 case R.id.layout_data: {

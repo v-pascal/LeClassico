@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -18,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Uris;
@@ -72,10 +75,10 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                 case R.id.image_pseudo: { // Display profile
                     Logs.add(Logs.Type.V, "Display profile #" + pseudoId);
 
-
-
-
-
+                    ////// Start profile activity
+                    Intent profile = new Intent(getActivity(), ProfileActivity.class);
+                    profile.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
+                    startActivity(profile);
                     break;
                 }
                 case R.id.image_followed: { // Change followed status

@@ -34,6 +34,8 @@ import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.location.LocationActivity;
+import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.activities.settings.SettingsActivity;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.services.DataService;
@@ -242,19 +244,21 @@ public class MainActivity extends LoggedActivity implements
             case R.id.navig_profile: { // Display user profile
                 Logs.add(Logs.Type.I, "Display profile");
 
-
-
-
-
+                ////// Start profile activity
+                Intent profile = new Intent(this, ProfileActivity.class);
+                profile.putExtra(LoggedActivity.EXTRA_DATA_ID,
+                        getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
+                startActivity(profile);
                 break;
             }
             case R.id.navig_location: { // Display location activity
                 Logs.add(Logs.Type.I, "Display location");
 
-
-
-
-
+                ////// Start location activity
+                Intent location = new Intent(this, LocationActivity.class);
+                location.putExtra(LoggedActivity.EXTRA_DATA_ID,
+                        getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
+                startActivity(location);
                 break;
             }
             case R.id.navig_mailbox: { // Display mailbox activity

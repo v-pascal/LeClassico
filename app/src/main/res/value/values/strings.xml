@@ -25,6 +25,7 @@
     <string name="title_activity_mailbox">Mailbox</string>
     <string name="title_activity_location">Locations</string>
     <string name="title_activity_publication">Publication</string>
+    <string name="title_activity_profile">Profile</string>
 
     <string name="error">Error</string>
     <string name="warning">Warning</string>

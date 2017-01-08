@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.album.FullPhotoActivity;
+import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.activities.publication.PublicationActivity;
 import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
@@ -99,10 +100,10 @@ public class PublicationsFragment extends MainFragment implements
                     int pseudoId = (int)sender.getTag(R.id.tag_pseudo_id);
                     Logs.add(Logs.Type.I, "Pseudo #" + pseudoId + " selected");
 
-
-
-
-
+                    ////// Start profile activity
+                    Intent profile = new Intent(getActivity(), ProfileActivity.class);
+                    profile.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
+                    startActivity(profile);
                     break;
                 }
                 case R.id.image_display: { // Display publication activity (with comments)
