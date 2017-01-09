@@ -41,7 +41,7 @@
     <string name="confirm_quit">Do you really want to quit application and therefore logout?</string>
 
     <!-- Formats -->
-    <string name="format_date">dd/MM</string>
+    <string name="format_date" translatable="false">dd/MM</string>
     <string name="format_time" translatable="false">HH:mm</string>
 
     <!-- Synchronization -->

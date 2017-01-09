@@ -4,7 +4,7 @@
     <item name="pseudo_shadow" format="float" type="dimen">2.375</item>
     <item name="pseudo_radius" format="float" type="dimen">1.875</item>
     <item name="profile_radius" format="float" type="dimen">26.0</item>
-    <dimen name="profile_border_radius">15dp</dimen>
+    <dimen name="profile_border_radius">16dp</dimen>
     <dimen name="shortcut_background_radius">7dp</dimen>
     <dimen name="appbar_title_size">17sp</dimen>
 

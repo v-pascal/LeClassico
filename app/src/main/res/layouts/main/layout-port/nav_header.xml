@@ -6,7 +6,7 @@
 
     <!-- Banner -->
     <ImageView
-        android:id="@+id/image_banner"
+        android:id="@+id/image_header_banner"
         android:layout_width="match_parent"
         android:layout_height="144dp"
         android:scaleType="centerCrop"
@@ -15,7 +15,7 @@
 
     <!-- Profile -->
     <ImageView
-        android:id="@+id/image_profile"
+        android:id="@+id/image_header_profile"
         android:layout_width="@dimen/profile_size"
         android:layout_height="@dimen/profile_size"
         android:src="@drawable/man"

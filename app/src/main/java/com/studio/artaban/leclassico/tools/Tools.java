@@ -67,8 +67,8 @@ public final class Tools { /////////////////////////////////////////////////////
                                         imageView.setBackground(
                                                 new RippleDrawable(ColorStateList.valueOf(activity
                                                         .getResources().getColor(R.color.black_transparent)),
-                                                activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
-                                                activity.getDrawable(R.drawable.man)));
+                                                        activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
+                                                        activity.getDrawable(R.drawable.man)));
                                     }
                                 }
 
@@ -82,17 +82,23 @@ public final class Tools { /////////////////////////////////////////////////////
                                                     resource);
                                     TypedValue radius = new TypedValue();
                                     activity.getResources().getValue(R.dimen.profile_radius, radius, true);
-                                    float factor = activity.getResources().getDimension(size) /
-                                            activity.getResources().getDisplayMetrics().density;
-                                    radiusBmp.setCornerRadius(radius.getFloat() * (factor /
-                                            PROFILE_SIZE_RADIUS_FACTOR));
-
+                                    try {
+                                        float factor = activity.getResources().getDimension(size) /
+                                                activity.getResources().getDisplayMetrics().density;
+                                        radiusBmp.setCornerRadius(radius.getFloat() * (factor /
+                                                PROFILE_SIZE_RADIUS_FACTOR));
+                                    } catch (Resources.NotFoundException e) {
+                                        radiusBmp.setCornerRadius(radius.getFloat() * (size /
+                                                PROFILE_SIZE_RADIUS_FACTOR));
+                                        // NB: Useful to manage specific profile size (e.g drawer
+                                        //     layout profile icon size)
+                                    }
                                     if (clickable) { // Check to display a ripple effect
                                         imageView.setImageDrawable(null); // Remove placeholder
                                         imageView.setBackground(
                                                 new RippleDrawable(ColorStateList.valueOf(activity
                                                         .getResources().getColor(R.color.black_transparent)),
-                                                radiusBmp, radiusBmp));
+                                                        radiusBmp, radiusBmp));
                                     } else
                                         imageView.setImageDrawable(radiusBmp);
                                     return true;
@@ -100,11 +106,13 @@ public final class Tools { /////////////////////////////////////////////////////
                             });
         else if (!clickable)
             view.setImageDrawable(activity.getDrawable((female) ? R.drawable.woman : R.drawable.man));
-        else
+        else {
+            view.setImageDrawable(null); // Remove previous drawable (if any)
             view.setBackground(new RippleDrawable(ColorStateList.valueOf(activity.getResources()
                     .getColor(R.color.black_transparent)),
                     activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
                     activity.getDrawable(R.drawable.man)));
+        }
     }
 
     //////

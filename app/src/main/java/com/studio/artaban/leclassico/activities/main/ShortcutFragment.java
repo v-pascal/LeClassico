@@ -44,7 +44,7 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener, 
                 .setText(info, TextView.BufferType.SPANNABLE);
     }
     public void setIcon(int pseudoId, boolean female, String profile, int size) { // Set profile icon info
-        Logs.add(Logs.Type.V, "female: " + female + ";profile: " + profile);
+        Logs.add(Logs.Type.V, "pseudoId: " + pseudoId + ";female: " + female + ";profile: " + profile);
         ImageView iconPseudo = (ImageView) mRootView.findViewById(R.id.image_icon);
 
         iconPseudo.setTag(R.id.tag_pseudo_id, pseudoId);

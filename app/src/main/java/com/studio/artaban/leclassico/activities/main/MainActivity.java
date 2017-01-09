@@ -194,8 +194,10 @@ public class MainActivity extends LoggedActivity implements
 
             // Profile
             Tools.setProfile(MainActivity.this,
-                    (ImageView)navHeader.findViewById(R.id.image_profile),
-                    female, profile, R.dimen.profile_size, false);
+                    (ImageView)navHeader.findViewById(R.id.image_header_profile),
+                    female, profile, 45, false);
+                    // NB: 45 instead of 'R.dimen.profile_size' to manage specific drawer layout
+                    //     profile icon size (see 'Tools.setProfile' method definition)
 
             // Banner
             if (banner != null)
@@ -204,7 +206,7 @@ public class MainActivity extends LoggedActivity implements
                                         File.separator + banner,
                                 Constants.APP_URL_PROFILES + '/' + banner)
                         .placeholder(R.drawable.banner)
-                        .into((ImageView) navHeader.findViewById(R.id.image_banner), null);
+                        .into((ImageView) navHeader.findViewById(R.id.image_header_banner), null);
         }
     }
 

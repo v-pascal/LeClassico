@@ -6,7 +6,7 @@
 
     <!-- Banner -->
     <ImageView
-        android:id="@+id/image_banner"
+        android:id="@+id/image_header_banner"
         android:layout_width="match_parent"
         android:layout_height="104dp"
         android:src="@drawable/banner"
@@ -15,7 +15,7 @@
 
     <!-- Profile -->
     <ImageView
-        android:id="@+id/image_profile"
+        android:id="@+id/image_header_profile"
         android:layout_width="@dimen/profile_size"
         android:layout_height="@dimen/profile_size"
         android:background="@drawable/profile_border"
@@ -28,7 +28,7 @@
     <TextView
         style="@style/NavHeaderTextStyle"
         android:id="@+id/text_pseudo"
-        android:layout_toEndOf="@id/image_profile"
+        android:layout_toEndOf="@id/image_header_profile"
         android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>
