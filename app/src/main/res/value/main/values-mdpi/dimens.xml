@@ -35,4 +35,8 @@
     <!-- Publication -->
     <dimen name="pub_margin_top">17dp</dimen>
 
+    <!-- Members -->
+    <dimen name="member_item_padding">8dp</dimen>
+    <dimen name="member_letter_size">34sp</dimen>
+
 </resources>

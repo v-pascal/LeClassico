@@ -18,7 +18,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -123,6 +122,7 @@ public final class Internet {
 
             URL urlFile = new URL(url);
             httpConnection = (HttpURLConnection)urlFile.openConnection();
+            httpConnection.setConnectTimeout(DEFAULT_ONLINE_TIMEOUT);
             httpConnection.connect();
 
             if (httpConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
@@ -211,6 +211,7 @@ public final class Internet {
 
             URL urlRequest = new URL(url);
             httpConnection = (HttpURLConnection)urlRequest.openConnection();
+            httpConnection.setConnectTimeout(DEFAULT_ONLINE_TIMEOUT);
             if (postData != null) {
 
                 httpConnection.setRequestMethod("POST");

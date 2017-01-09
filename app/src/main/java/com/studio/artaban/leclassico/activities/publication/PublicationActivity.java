@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.activities.publication;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
@@ -55,10 +56,7 @@ public class PublicationActivity extends LoggedActivity {
 
 
 
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
 
 
@@ -73,6 +71,26 @@ public class PublicationActivity extends LoggedActivity {
 
 
 
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Logs.add(Logs.Type.V, "item: " + item);
+
+
+
+        //if (onNotifyItemSelected(item))
+        //    return true; // Display notifications
+
+
+
+        switch (item.getItemId()) {
+            case android.R.id.home: { // Back to previous activity
+
+                supportFinishAfterTransition();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

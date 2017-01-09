@@ -194,15 +194,9 @@ public class BestPhotoFragment extends Fragment implements
             cursor.moveToFirst();
 
             // Select best photo to display (random with online criteria)
-            if ((Internet.isConnected()) || (mBestId == Constants.NO_DATA)) {
-                int bestId = ids.get(LeClassicoApp.getRandom().nextInt(ids.size()));
+            if ((Internet.isConnected()) || (mBestId == Constants.NO_DATA))
+                mBestId = ids.get(LeClassicoApp.getRandom().nextInt(ids.size()));
 
-                if (mBestId == Constants.NO_DATA) { // Store persistent data
-                    SharedPreferences prefs = getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
-                    prefs.edit().putInt(Preferences.MAIN_BEST_PHOTO, bestId).apply();
-                }
-                mBestId = bestId;
-            }
             do {
                 if (cursor.getInt(COLUMN_INDEX_PHOTO_ID) == mBestId) {
 
@@ -238,6 +232,12 @@ public class BestPhotoFragment extends Fragment implements
                                 @Override
                                 public boolean onSetResource(Bitmap resource, ImageView imageView) {
                                     Logs.add(Logs.Type.V, "resource: " + resource + ";imageView: " + imageView);
+
+                                    // Store persistent data (if not already done)
+                                    SharedPreferences prefs =
+                                            getContext().getSharedPreferences(Constants.APP_PREFERENCE, 0);
+                                    if (!prefs.contains(Preferences.MAIN_BEST_PHOTO))
+                                        prefs.edit().putInt(Preferences.MAIN_BEST_PHOTO, mBestId).apply();
 
                                     imageView.setTransitionName(mBestFile);
                                     imageView.setOnClickListener(BestPhotoFragment.this);
