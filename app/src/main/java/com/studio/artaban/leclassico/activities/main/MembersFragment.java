@@ -205,7 +205,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                     String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
                             cursor.getString(COLUMN_INDEX_PROFILE) : null;
                     mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false)
-                            .setIcon(cursor.getInt(COLUMN_INDEX_ID), female, profile, R.dimen.shortcut_height);
+                            .setIcon(cursor.getInt(COLUMN_INDEX_ID), female, profile);
 
                 } catch (NullPointerException e) {
                     Logs.add(Logs.Type.F, "Activity not attached");

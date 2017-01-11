@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -67,6 +68,54 @@ public class PublicationsFragment extends MainFragment implements
     private static final String DATA_KEY_LINK_REQUESTS = "linkRequests";
     // Data keys
 
+    private SpannableStringBuilder getInfo(String pseudo, short type, @ColorRes int color) {
+    // Return publication info text: [User (with color)] has published [publication type]
+
+        //Logs.add(Logs.Type.V, "pseudo: " + pseudo + ";type: " + type + ";color: " + color);
+        int pseudoPos = getResources().getInteger(R.integer.publication_info_pseudo_pos);
+
+        SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.publication_info,
+                pseudo, getResources().getStringArray(R.array.publication_types)[type]));
+        info.setSpan(new ForegroundColorSpan(getResources().getColor(color)),
+                pseudoPos, pseudoPos + pseudo.length(), 0);
+        return info;
+    }
+
+    //
+    private static class ShortcutData {
+
+        int pseudoId; // ID of the user that has published the last post
+        boolean female; // Last published user gender
+        String profile; // Last published user profile (icon)
+
+        SpannableStringBuilder message; // Last published type
+        SpannableStringBuilder info; // Last published comment text
+    }
+    private ShortcutData getShortcutData() { // Return shortcut data according publication cursor
+        Logs.add(Logs.Type.V, null);
+        ShortcutData result = new ShortcutData();
+
+        result.pseudoId = mPubCursor.getInt(COLUMN_INDEX_MEMBER_ID);
+        result.female = (!mPubCursor.isNull(COLUMN_INDEX_SEX)) &&
+                (mPubCursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.GENDER_FEMALE);
+        result.profile = (!mPubCursor.isNull(COLUMN_INDEX_PROFILE)) ?
+                mPubCursor.getString(COLUMN_INDEX_PROFILE) : null;
+
+        short type = Tools.getPubType(mPubCursor, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER);
+        result.message = getInfo(mPubCursor.getString(COLUMN_INDEX_PSEUDO), type, R.color.yellow);
+        result.info = new SpannableStringBuilder((!mPubCursor.isNull(COLUMN_INDEX_TEXT))?
+                mPubCursor.getString(COLUMN_INDEX_TEXT) : getString(R.string.no_publication_text));
+        return result;
+    }
+
+    private void fillShortcut(ShortcutData data, boolean newPub) { // Fill shortcut info (with data)
+        Logs.add(Logs.Type.V, "data: " + data + "newPub: " + newPub);
+
+        ShortcutFragment shortcut = mListener.onGetShortcut(Constants.MAIN_SECTION_PUBLICATIONS, newPub);
+        shortcut.setIcon(data.pseudoId, data.female, data.profile);
+        shortcut.setMessage(data.message);
+        shortcut.setInfo(data.info);
+    }
     private RecyclerView mPubList; // Recycler view containing publication list
     private Uri mPubUri; // Publications observer URI
     // Recycler view adapter (with cursor management)
@@ -191,14 +240,9 @@ public class PublicationsFragment extends MainFragment implements
                             View.VISIBLE : View.GONE);
 
             // Set publication header (info, date & type icon)
-            String pseudo = mDataSource.getString(position, COLUMN_INDEX_PSEUDO);
             short type = Tools.getPubType(mDataSource, position, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER);
-            int pseudoPos = getResources().getInteger(R.integer.publication_info_pseudo_pos);
-
-            SpannableStringBuilder info = new SpannableStringBuilder(getString(R.string.publication_info,
-                    pseudo, getResources().getStringArray(R.array.publication_types)[type]));
-            info.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimaryProfile)),
-                    pseudoPos, pseudoPos + pseudo.length(), 0);
+            SpannableStringBuilder info = getInfo(mDataSource.getString(position, COLUMN_INDEX_PSEUDO),
+                    type, R.color.colorPrimaryProfile);
 
             ((TextView)holder.rootView.findViewById(R.id.text_info)).setText(info, TextView.BufferType.SPANNABLE);
             ((ImageView)holder.rootView.findViewById(R.id.image_type))
@@ -467,12 +511,33 @@ public class PublicationsFragment extends MainFragment implements
         Logs.add(Logs.Type.V, null);
         mPubCursor.moveToFirst();
 
+        // Get shortcut data (according new cursor)
+        final ShortcutData shortcutData = getShortcutData();
+
         // Update current display data
         String lastPub = mPubCursor.getString(COLUMN_INDEX_DATE);
         short count = (short) mPubCursor.getCount();
-        if ((mQueryCount != Constants.NO_DATA) && (mPubLast.compareTo(lastPub) != 0))
+        boolean newEntries = false;
+
+        if ((mQueryCount != Constants.NO_DATA) && (mPubLast.compareTo(lastPub) != 0)) {
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
+            // Update shortcut (apply animation)
+            fillShortcut(shortcutData, true);
+            mListener.onAnimateShortcut(Constants.MAIN_SECTION_PUBLICATIONS,
+                    new OnFragmentListener.OnAnimationListener() {
+
+                @Override
+                public void onCopyNewToPrevious(ShortcutFragment previous) {
+                    Logs.add(Logs.Type.V, "previous: " + previous);
+
+                    previous.setIcon(shortcutData.pseudoId, shortcutData.female, shortcutData.profile);
+                    previous.setMessage(shortcutData.message);
+                    previous.setInfo(shortcutData.info);
+                }
+            });
+            newEntries = true;
+        }
         mQueryCount = count;
         mPubLast = lastPub;
 
@@ -507,6 +572,9 @@ public class PublicationsFragment extends MainFragment implements
             } while (mPubCursor.moveToNext());
             mPubCursor.moveToFirst();
         }
+
+        if (!newEntries) // Fill shortcut info (if not already done)
+            fillShortcut(shortcutData, false);
 
         //////
         if (mPubAdapter.isInitialized()) { // Check if not the initial query

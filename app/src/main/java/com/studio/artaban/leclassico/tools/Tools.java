@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
@@ -255,6 +256,19 @@ public final class Tools { /////////////////////////////////////////////////////
             return ActualitesTable.TYPE_LINK;
 
         if (!data.isNull(rank, imageIndex))
+            return ActualitesTable.TYPE_IMAGE;
+
+        return ActualitesTable.TYPE_TEXT;
+    }
+    public static short getPubType(Cursor data, int linkIndex, int imageIndex) {
+    // Return the wall type resource string ID according notification link & image fields
+    // NB: Same as method above but with cursor as data
+
+        Logs.add(Logs.Type.V, "cursor: " + data + ";linkIndex: " + linkIndex + ";imageIndex: " + imageIndex);
+        if (!data.isNull(linkIndex))
+            return ActualitesTable.TYPE_LINK;
+
+        if (!data.isNull(imageIndex))
             return ActualitesTable.TYPE_IMAGE;
 
         return ActualitesTable.TYPE_TEXT;

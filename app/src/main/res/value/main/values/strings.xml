@@ -6,6 +6,7 @@
     <string name="home_info">New messages: %1$d - New notifications: %2$d</string><!-- @integer/home_info_mail_pos & home_info_notify_pos -->
     <string name="no_publication">No publication</string>
     <string name="no_publication_info">No followed member has published yet</string>
+    <string name="no_publication_text">[Without comment]</string>
     <string name="no_event">No event</string>
     <string name="no_event_info">No event announced</string>
     <string name="last_event_info">Last event announced</string>

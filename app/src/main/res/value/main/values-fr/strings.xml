@@ -6,6 +6,7 @@
     <string name="home_info">Nouveaux messages: %1$d - Nouvelles notifications: %2$d</string>
     <string name="no_publication">Aucune publication</string>
     <string name="no_publication_info">Rien n\'a été publié par les membres suivis</string>
+    <string name="no_publication_text">[Sans commentaire]</string>
     <string name="no_event">Aucun événement</string>
     <string name="no_event_info">Pas d\'événement annoncé</string>
     <string name="last_event_info">Dernier événement annoncé</string>

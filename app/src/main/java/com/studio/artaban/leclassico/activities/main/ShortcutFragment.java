@@ -43,13 +43,13 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener, 
         ((TextView) mRootView.findViewById(R.id.text_info))
                 .setText(info, TextView.BufferType.SPANNABLE);
     }
-    public void setIcon(int pseudoId, boolean female, String profile, int size) { // Set profile icon info
+    public void setIcon(int pseudoId, boolean female, String profile) { // Set profile icon info
         Logs.add(Logs.Type.V, "pseudoId: " + pseudoId + ";female: " + female + ";profile: " + profile);
         ImageView iconPseudo = (ImageView) mRootView.findViewById(R.id.image_icon);
 
         iconPseudo.setTag(R.id.tag_pseudo_id, pseudoId);
         iconPseudo.setOnClickListener(this);
-        Tools.setProfile(getActivity(), iconPseudo, female, profile, size, true);
+        Tools.setProfile(getActivity(), iconPseudo, female, profile, R.dimen.shortcut_height, true);
     }
     public void setDate(boolean start, String dateTime) { // Set start or end date
         Logs.add(Logs.Type.V, "start: " + start + ";dateTime: " + dateTime);
