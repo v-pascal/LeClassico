@@ -87,6 +87,7 @@ public class PublicationsFragment extends MainFragment implements
         int pseudoId; // ID of the user that has published the last post
         boolean female; // Last published user gender
         String profile; // Last published user profile (icon)
+        String date; // Date of the last publication
 
         SpannableStringBuilder message; // Last published type
         SpannableStringBuilder info; // Last published comment text
@@ -100,6 +101,7 @@ public class PublicationsFragment extends MainFragment implements
                 (mPubCursor.getInt(COLUMN_INDEX_SEX) == CamaradesTable.GENDER_FEMALE);
         result.profile = (!mPubCursor.isNull(COLUMN_INDEX_PROFILE)) ?
                 mPubCursor.getString(COLUMN_INDEX_PROFILE) : null;
+        result.date = mPubCursor.getString(COLUMN_INDEX_DATE);
 
         short type = Tools.getPubType(mPubCursor, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER);
         result.message = getInfo(mPubCursor.getString(COLUMN_INDEX_PSEUDO), type, R.color.yellow);
@@ -115,6 +117,7 @@ public class PublicationsFragment extends MainFragment implements
         shortcut.setIcon(data.pseudoId, data.female, data.profile);
         shortcut.setMessage(data.message);
         shortcut.setInfo(data.info);
+        shortcut.setDate(false, data.date);
     }
     private RecyclerView mPubList; // Recycler view containing publication list
     private Uri mPubUri; // Publications observer URI
