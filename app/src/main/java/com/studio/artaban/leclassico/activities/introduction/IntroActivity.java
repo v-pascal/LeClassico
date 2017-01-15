@@ -340,6 +340,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static final int DELAY_REVEAL_FRAGMENT = 300; // Delay of displaying or hiding fragment
+    private boolean mLogging; // Login started flag
 
     //////
     public void onNextStep(View sender) { // Next step click event
@@ -359,6 +360,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
 
         Logs.add(Logs.Type.V, "sender: " + sender);
         if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
+            mLogging = false;
 
             // Cancel connection task
             getSupportFragmentManager().popBackStack();
@@ -366,8 +368,14 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
             replaceButtonIcon(false);
 
         } else {
+            if (mLogging)
+                return;
+            mLogging = true;
+            // NB: Needed to avoid to start login progression several times (can occurred coz using
+            //     reveal fragment take a few time)
 
-            LoginFragment login = (LoginFragment)getSupportFragmentManager().findFragmentByTag(LoginFragment.TAG);
+            LoginFragment login = (LoginFragment)getSupportFragmentManager()
+                    .findFragmentByTag(LoginFragment.TAG);
             final String pseudo = login.getPseudo();
             final String password = login.getPassword();
 

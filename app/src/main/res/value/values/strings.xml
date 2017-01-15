@@ -43,6 +43,7 @@
     <!-- Formats -->
     <string name="format_date" translatable="false">dd/MM</string>
     <string name="format_time" translatable="false">HH:mm</string>
+    <string name="format_year" translatable="false">*yyyy</string>
 
     <!-- Synchronization -->
     <string name="to_synchronize">To synchronize</string>

@@ -36,6 +36,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -125,8 +126,15 @@ public final class Tools { /////////////////////////////////////////////////////
         DateFormat paramFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
         try {
             Date paramDate = paramFormat.parse(dateTime);
+            Date now = new Date();
+
+            Calendar calendarParam = Calendar.getInstance();
+            Calendar calendarNow = Calendar.getInstance();
+            calendarParam.setTime(paramDate);
+            calendarNow.setTime(now);
             DateFormat dateFormat = new SimpleDateFormat(context.getString(R.string.format_date));
-            DateFormat timeFormat = new SimpleDateFormat(context.getString(R.string.format_time));
+            DateFormat timeFormat = new SimpleDateFormat(context.getString((calendarParam.get(Calendar.YEAR) !=
+                    calendarNow.get(Calendar.YEAR))? R.string.format_year:R.string.format_time));
 
             String dateText = dateFormat.format(paramDate);
             date.setText((dateText.compareTo(dateFormat.format(new Date())) != 0)?
