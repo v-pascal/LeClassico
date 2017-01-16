@@ -84,17 +84,11 @@ public final class Tools { /////////////////////////////////////////////////////
                                                     resource);
                                     TypedValue radius = new TypedValue();
                                     activity.getResources().getValue(R.dimen.profile_radius, radius, true);
-                                    try {
-                                        float factor = activity.getResources().getDimension(size) /
-                                                activity.getResources().getDisplayMetrics().density;
-                                        radiusBmp.setCornerRadius(radius.getFloat() * (factor /
-                                                PROFILE_SIZE_RADIUS_FACTOR));
-                                    } catch (Resources.NotFoundException e) {
-                                        radiusBmp.setCornerRadius(radius.getFloat() * (size /
-                                                PROFILE_SIZE_RADIUS_FACTOR));
-                                        // NB: Useful to manage specific profile size (e.g drawer
-                                        //     layout profile icon size)
-                                    }
+                                    float factor = activity.getResources().getDimension(size) /
+                                            activity.getResources().getDisplayMetrics().density;
+                                    radiusBmp.setCornerRadius(radius.getFloat() * (factor /
+                                            PROFILE_SIZE_RADIUS_FACTOR));
+
                                     if (clickable) { // Check to display a ripple effect
                                         imageView.setImageDrawable(null); // Remove placeholder
                                         imageView.setBackground(

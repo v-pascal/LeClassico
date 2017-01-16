@@ -68,13 +68,11 @@ public class EventsFragment extends MainFragment {
 
 
 
-        /*
         // Set bottom shortcut
         if (getChildFragmentManager().findFragmentById(R.id.shortcut_events_bottom) == null) {
             getChildFragmentManager().beginTransaction().add(R.id.shortcut_events_bottom, new ShortcutFragment()).commit();
             getChildFragmentManager().executePendingTransactions();
         }
-        */
         return rootView;
     }
 }

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:background="@drawable/calendar_background"
+                android:padding="@dimen/calendar_radius"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <!-- Year -->
+    <LinearLayout
+        android:id="@+id/layout_year"
+        android:orientation="horizontal"
+        android:layout_marginStart="@dimen/calendar_radius"
+        android:layout_marginEnd="@dimen/calendar_radius"
+        android:layout_marginBottom="@dimen/calendar_radius"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Previous year -->
+        <ImageView
+            android:id="@+id/image_prev_year"
+            android:src="@drawable/select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Current year -->
+        <FrameLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/text_year"
+
+
+
+                android:text="2017"
+
+
+
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </FrameLayout>
+
+        <!-- Next year -->
+        <ImageView
+            android:id="@+id/image_next_year"
+            android:src="@drawable/select"
+            android:scaleX="-1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Month & Days -->
+    <RelativeLayout
+        android:background="@drawable/calendar_inner_background"
+        android:layout_below="@id/layout_year"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Month -->
+        <LinearLayout
+            android:id="@+id/layout_month"
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/calendar_radius"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Previous month -->
+            <ImageView
+                android:id="@+id/image_prev_month"
+                android:src="@drawable/select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <!-- Current month -->
+            <FrameLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/text_month"
+
+
+
+                    android:text="MARS"
+
+
+
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </FrameLayout>
+
+            <!-- Next month -->
+            <ImageView
+                android:id="@+id/image_next_month"
+                android:src="@drawable/select"
+                android:scaleX="-1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view_separator"
+            android:background="@color/colorPublicationDark"
+            android:layout_marginStart="@dimen/calendar_radius"
+            android:layout_marginEnd="@dimen/calendar_radius"
+            android:layout_marginBottom="@dimen/calendar_radius"
+            android:layout_below="@id/layout_month"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"/>
+
+        <!-- Days -->
+        <TableLayout
+            android:stretchColumns="*"
+            android:padding="@dimen/calendar_radius"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:layout_below="@id/view_separator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Days label -->
+            <TableRow
+                android:id="@+id/row_days_label"
+                android:layout_width="0dp">
+
+                <TextView
+
+
+                    android:text="L"
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="M"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="M"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="J"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="V"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="S"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="D"
+
+
+
+                    android:layout_gravity="center"/>
+            </TableRow>
+
+            <!-- Weeks -->
+            <TableRow
+                android:id="@+id/row_week_1"
+                android:layout_width="0dp">
+
+                <TextView
+
+
+
+                    android:text="1"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="2"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="3"
+                    android:textSize="10sp"
+                    android:layout_height="72dp"
+
+
+
+                    android:background="@drawable/calendar_ripple"
+                    android:gravity="center"
+                    android:scaleX="1.4"
+                    android:scaleY="1.4"
+                    android:clickable="true"
+                    android:layout_width="match_parent"/>
+                <TextView
+
+
+
+                    android:text="4"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="5"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="6"
+
+
+
+                    android:layout_gravity="center"/>
+                <TextView
+
+
+
+                    android:text="7"
+
+
+
+                    android:layout_gravity="center"/>
+            </TableRow>
+
+
+        </TableLayout>
+    </RelativeLayout>
+</RelativeLayout>

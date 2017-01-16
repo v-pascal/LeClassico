@@ -5,6 +5,7 @@
     <item name="pseudo_radius" format="float" type="dimen">1.5</item>
     <item name="profile_radius" format="float" type="dimen">8.0</item>
     <dimen name="profile_border_radius">10dp</dimen>
+    <dimen name="profile_drawer_size">144dp</dimen>
     <dimen name="shortcut_background_radius">10dp</dimen>
     <dimen name="appbar_title_size">18sp</dimen>
 
@@ -34,6 +35,18 @@
 
     <!-- Publication -->
     <dimen name="pub_margin_top">18dp</dimen>
+
+
+
+
+
+    <!-- Events -->
+    <dimen name="calendar_radius">8dp</dimen>
+
+
+
+
+
 
     <!-- Members -->
     <dimen name="member_item_padding">8dp</dimen>

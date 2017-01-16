@@ -371,11 +371,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
             if (mLogging)
                 return;
             mLogging = true;
-            // NB: Needed to avoid to start login progression several times (can occurred coz using
+            // NB: Needed to avoid to start login fragment several times (can occurred coz using
             //     reveal fragment take a few time)
 
-            LoginFragment login = (LoginFragment)getSupportFragmentManager()
-                    .findFragmentByTag(LoginFragment.TAG);
+            LoginFragment login = (LoginFragment)getSupportFragmentManager().findFragmentByTag(LoginFragment.TAG);
             final String pseudo = login.getPseudo();
             final String password = login.getPassword();
 

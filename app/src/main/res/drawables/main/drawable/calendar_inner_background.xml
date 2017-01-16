@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/colorPublication"/>
+    <corners
+        android:bottomRightRadius="@dimen/calendar_radius"
+        android:bottomLeftRadius="@dimen/calendar_radius"
+        android:topLeftRadius="@dimen/calendar_radius"
+        android:topRightRadius="@dimen/calendar_radius"/>
+</shape>

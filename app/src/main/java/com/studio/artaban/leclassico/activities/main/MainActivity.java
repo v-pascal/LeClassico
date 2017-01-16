@@ -195,9 +195,7 @@ public class MainActivity extends LoggedActivity implements
             // Profile
             Tools.setProfile(MainActivity.this,
                     (ImageView)navHeader.findViewById(R.id.image_header_profile),
-                    female, profile, 45, false);
-                    // NB: 45 instead of 'R.dimen.profile_size' to manage specific drawer layout
-                    //     profile icon size (see 'Tools.setProfile' method definition)
+                    female, profile, R.dimen.profile_drawer_size, false);
 
             // Banner
             if (banner != null)
