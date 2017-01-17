@@ -64,6 +64,31 @@
     <string name="shortcut_events"><u>Events</u></string>
     <string name="shortcut_location">Friends location</string>
 
+    <!-- Events -->
+    <string-array name="calendar_months">
+        <item>JANUARY</item>
+        <item>FEBRUARY</item>
+        <item>MARCH</item>
+        <item>APRIL</item>
+        <item>MAY</item>
+        <item>JUNE</item>
+        <item>JULY</item>
+        <item>AUGUST</item>
+        <item>SEPTEMBER</item>
+        <item>OCTOBER</item>
+        <item>NOVEMBER</item>
+        <item>DECEMBER</item>
+    </string-array>
+    <string-array name="calendar_days">
+        <item>S</item>
+        <item>M</item>
+        <item>T</item>
+        <item>W</item>
+        <item>T</item>
+        <item>F</item>
+        <item>S</item>
+    </string-array>
+
     <!-- Members -->
     <string name="admin_privilege">Admin privilege</string>
     <string name="no_admin_privilege">User privilege</string>

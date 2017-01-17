@@ -42,6 +42,10 @@
 
     <!-- Events -->
     <dimen name="calendar_radius">8dp</dimen>
+    <dimen name="calendar_text_size">26sp</dimen>
+    <dimen name="calendar_select_height">36dp</dimen><!-- Must be > height of calendar_text_size -->
+    <dimen name="calendar_day_size">18sp</dimen>
+    <dimen name="event_margin">12dp</dimen>
 
 
 

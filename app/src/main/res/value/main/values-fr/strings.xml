@@ -60,6 +60,31 @@
     <string name="shortcut_events"><u>Evénements</u></string>
     <string name="shortcut_location">Géolocaliser de vos amis</string>
 
+    <!-- Events -->
+    <string-array name="calendar_months">
+        <item>JANVIER</item>
+        <item>FEVRIER</item>
+        <item>MARS</item>
+        <item>AVRIL</item>
+        <item>MAI</item>
+        <item>JUIN</item>
+        <item>JUILLET</item>
+        <item>AOUT</item>
+        <item>SEPTEMBRE</item>
+        <item>OCTOBRE</item>
+        <item>NOVEMBRE</item>
+        <item>DECEMBRE</item>
+    </string-array>
+    <string-array name="calendar_days">
+        <item>L</item>
+        <item>M</item>
+        <item>M</item>
+        <item>J</item>
+        <item>V</item>
+        <item>S</item>
+        <item>D</item>
+    </string-array>
+
     <!-- Members -->
     <string name="admin_privilege">Privilèges administrateur</string>
     <string name="no_admin_privilege">Privilèges utilisateur</string>
