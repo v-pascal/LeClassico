@@ -14,6 +14,7 @@
     <!-- Bottom shortcut -->
     <FrameLayout
         android:id="@+id/shortcut_events_bottom"
+        android:layout_margin="@dimen/event_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

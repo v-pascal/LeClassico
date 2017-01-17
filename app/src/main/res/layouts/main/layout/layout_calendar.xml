@@ -3,11 +3,11 @@
                 android:background="@drawable/calendar_background"
                 android:padding="@dimen/calendar_radius"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
-    <!-- Year -->
+    <!-- Month & Year -->
     <LinearLayout
-        android:id="@+id/layout_year"
+        android:id="@+id/layout_month"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/calendar_radius"
         android:layout_marginEnd="@dimen/calendar_radius"
@@ -15,30 +15,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Previous year -->
+        <!-- Previous month -->
         <ImageView
-            android:id="@+id/image_prev_year"
+            android:id="@+id/image_prev_month"
             android:src="@drawable/select"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:layout_width="@dimen/calendar_select_height"
             android:layout_height="@dimen/calendar_select_height"/>
 
-        <!-- Current year -->
+        <!-- Current month -->
         <FrameLayout
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/text_year"
-
-
-
-                android:text="2017"
-
-
-
+                android:id="@+id/text_month"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
                 android:textSize="@dimen/calendar_text_size"
@@ -47,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"/>
             <TextView
-                android:id="@+id/text_year_update"
+                android:id="@+id/text_month_update"
                 android:visibility="gone"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
@@ -60,7 +53,7 @@
 
         <!-- Next year -->
         <ImageView
-            android:id="@+id/image_next_year"
+            android:id="@+id/image_next_month"
             android:src="@drawable/select"
             android:scaleX="-1"
             android:background="?android:attr/selectableItemBackgroundBorderless"
@@ -69,73 +62,78 @@
             android:layout_height="@dimen/calendar_select_height"/>
     </LinearLayout>
 
-    <!-- Month & Days -->
+    <!-- Calendar -->
     <RelativeLayout
         android:background="@drawable/calendar_inner_background"
-        android:layout_below="@id/layout_year"
+        android:paddingBottom="@dimen/calendar_radius"
+        android:layout_below="@id/layout_month"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Month -->
+        <!-- Days label -->
         <LinearLayout
-            android:id="@+id/layout_month"
+            android:id="@+id/layout_days_label"
             android:orientation="horizontal"
             android:layout_margin="@dimen/calendar_radius"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Previous month -->
-            <ImageView
-                android:id="@+id/image_prev_month"
-                android:src="@drawable/select"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:layout_width="@dimen/calendar_select_height"
-                android:layout_height="@dimen/calendar_select_height"/>
-
-            <!-- Current month -->
-            <FrameLayout
+            <TextView
+                android:textColor="@color/colorPublicationDark"
+                android:textStyle="bold"
+                android:textSize="@dimen/calendar_day_size"
+                android:gravity="center_horizontal"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/text_month"
-
-
-
-                    android:text="MARS"
-
-
-
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/calendar_text_size"
-                    android:gravity="center_vertical"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"/>
-                <TextView
-                    android:id="@+id/text_month_update"
-                    android:visibility="gone"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/calendar_text_size"
-                    android:gravity="center_vertical"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"/><!-- To animate selection -->
-            </FrameLayout>
-
-            <!-- Next month -->
-            <ImageView
-                android:id="@+id/image_next_month"
-                android:src="@drawable/select"
-                android:scaleX="-1"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:layout_width="@dimen/calendar_select_height"
-                android:layout_height="@dimen/calendar_select_height"/>
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:textColor="@color/colorPublicationDark"
+                android:textStyle="bold"
+                android:textSize="@dimen/calendar_day_size"
+                android:gravity="center_horizontal"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:textColor="@color/colorPublicationDark"
+                android:textStyle="bold"
+                android:textSize="@dimen/calendar_day_size"
+                android:gravity="center_horizontal"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:textColor="@color/colorPublicationDark"
+                android:textStyle="bold"
+                android:textSize="@dimen/calendar_day_size"
+                android:gravity="center_horizontal"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:textColor="@color/colorPublicationDark"
+                android:textStyle="bold"
+                android:textSize="@dimen/calendar_day_size"
+                android:gravity="center_horizontal"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:textColor="@color/colorPublicationDark"
+                android:textStyle="bold"
+                android:textSize="@dimen/calendar_day_size"
+                android:gravity="center_horizontal"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:textColor="@color/colorPublicationDark"
+                android:textStyle="bold"
+                android:textSize="@dimen/calendar_day_size"
+                android:gravity="center_horizontal"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <View
@@ -143,7 +141,7 @@
             android:background="@color/colorPublicationDark"
             android:layout_marginStart="@dimen/calendar_radius"
             android:layout_marginEnd="@dimen/calendar_radius"
-            android:layout_below="@id/layout_month"
+            android:layout_below="@id/layout_days_label"
             android:layout_width="match_parent"
             android:layout_height="2dp"/>
 

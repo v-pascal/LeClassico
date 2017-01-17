@@ -7,46 +7,6 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content">
 
-    <!-- Days label -->
-    <TableRow android:layout_width="0dp">
-
-        <TextView
-            android:textColor="@color/colorPublicationDark"
-            android:textStyle="bold"
-            android:textSize="@dimen/calendar_day_size"
-            android:layout_gravity="center"/>
-        <TextView
-            android:textColor="@color/colorPublicationDark"
-            android:textStyle="bold"
-            android:textSize="@dimen/calendar_day_size"
-            android:layout_gravity="center"/>
-        <TextView
-            android:textColor="@color/colorPublicationDark"
-            android:textStyle="bold"
-            android:textSize="@dimen/calendar_day_size"
-            android:layout_gravity="center"/>
-        <TextView
-            android:textColor="@color/colorPublicationDark"
-            android:textStyle="bold"
-            android:textSize="@dimen/calendar_day_size"
-            android:layout_gravity="center"/>
-        <TextView
-            android:textColor="@color/colorPublicationDark"
-            android:textStyle="bold"
-            android:textSize="@dimen/calendar_day_size"
-            android:layout_gravity="center"/>
-        <TextView
-            android:textColor="@color/colorPublicationDark"
-            android:textStyle="bold"
-            android:textSize="@dimen/calendar_day_size"
-            android:layout_gravity="center"/>
-        <TextView
-            android:textColor="@color/colorPublicationDark"
-            android:textStyle="bold"
-            android:textSize="@dimen/calendar_day_size"
-            android:layout_gravity="center"/>
-    </TableRow>
-
     <!-- Weeks -->
     <TableRow android:layout_width="0dp"><!-- Week #1 -->
 
@@ -55,7 +15,7 @@
 
 
             android:text="1"
-            android:layout_height="58dp"
+
 
 
 
@@ -64,13 +24,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="2"
-            android:layout_height="match_parent"
 
 
 
@@ -79,13 +39,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="3"
-            android:layout_height="match_parent"
 
 
 
@@ -94,13 +54,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="4"
-            android:layout_height="match_parent"
 
 
 
@@ -109,13 +69,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="5"
-            android:layout_height="match_parent"
 
 
 
@@ -124,13 +84,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="6"
-            android:layout_height="match_parent"
 
 
 
@@ -139,13 +99,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="7"
-            android:layout_height="match_parent"
 
 
 
@@ -154,6 +114,7 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
     </TableRow>
     <TableRow android:layout_width="0dp"><!-- Week #2 -->
@@ -163,7 +124,6 @@
 
 
             android:text="8"
-            android:layout_height="58dp"
 
 
 
@@ -172,13 +132,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="9"
-            android:layout_height="match_parent"
 
 
 
@@ -187,13 +147,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="10"
-            android:layout_height="match_parent"
 
 
 
@@ -202,13 +162,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="11"
-            android:layout_height="match_parent"
 
 
 
@@ -217,13 +177,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="12"
-            android:layout_height="match_parent"
 
 
 
@@ -232,13 +192,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="13"
-            android:layout_height="match_parent"
 
 
 
@@ -247,13 +207,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="14"
-            android:layout_height="match_parent"
 
 
 
@@ -262,6 +222,7 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
     </TableRow>
     <TableRow android:layout_width="0dp"><!-- Week #3 -->
@@ -271,7 +232,6 @@
 
 
             android:text="15"
-            android:layout_height="58dp"
 
 
 
@@ -280,13 +240,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="16"
-            android:layout_height="match_parent"
 
 
 
@@ -295,13 +255,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="17"
-            android:layout_height="match_parent"
 
 
 
@@ -310,13 +270,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="18"
-            android:layout_height="match_parent"
 
 
 
@@ -325,13 +285,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="19"
-            android:layout_height="match_parent"
 
 
 
@@ -340,13 +300,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="20"
-            android:layout_height="match_parent"
 
 
 
@@ -355,13 +315,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="21"
-            android:layout_height="match_parent"
 
 
 
@@ -370,6 +330,7 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
     </TableRow>
     <TableRow android:layout_width="0dp"><!-- Week #4 -->
@@ -379,7 +340,6 @@
 
 
             android:text="22"
-            android:layout_height="58dp"
 
 
 
@@ -388,13 +348,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="23"
-            android:layout_height="match_parent"
 
 
 
@@ -403,13 +363,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="24"
-            android:layout_height="match_parent"
 
 
 
@@ -418,13 +378,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="25"
-            android:layout_height="match_parent"
 
 
 
@@ -433,13 +393,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="26"
-            android:layout_height="match_parent"
 
 
 
@@ -448,13 +408,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="27"
-            android:layout_height="match_parent"
 
 
 
@@ -463,13 +423,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="28"
-            android:layout_height="match_parent"
 
 
 
@@ -478,6 +438,7 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
     </TableRow>
     <TableRow android:layout_width="0dp"><!-- Week #5 -->
@@ -487,7 +448,6 @@
 
 
             android:text="29"
-            android:layout_height="58dp"
 
 
 
@@ -496,13 +456,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="30"
-            android:layout_height="58dp"
 
 
 
@@ -511,13 +471,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="31"
-            android:layout_height="58dp"
 
 
 
@@ -526,13 +486,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="32"
-            android:layout_height="58dp"
 
 
 
@@ -541,13 +501,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="33"
-            android:layout_height="58dp"
 
 
 
@@ -556,13 +516,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="34"
-            android:layout_height="58dp"
 
 
 
@@ -571,13 +531,13 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
 
 
 
             android:text="35"
-            android:layout_height="58dp"
 
 
 
@@ -586,6 +546,7 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"/>
     </TableRow>
 

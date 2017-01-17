@@ -2,16 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/layout_events"
               android:orientation="horizontal"
-              android:gravity="center_vertical"
+              android:gravity="top"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
     <!-- Calendar -->
     <com.studio.artaban.leclassico.components.EventCalendar
+        android:id="@+id/event_calendar"
         android:layout_margin="@dimen/event_margin"
         android:layout_weight="3"
         android:layout_width="0dp"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"/>
 
     <!-- Previous event -->
 

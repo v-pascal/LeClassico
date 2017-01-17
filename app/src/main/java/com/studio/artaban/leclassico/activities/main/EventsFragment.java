@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.components.EventCalendar;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -62,6 +63,12 @@ public class EventsFragment extends MainFragment {
 
 
 
+
+
+
+        // Set calendar
+        EventCalendar calendar = (EventCalendar) rootView.findViewById(R.id.event_calendar);
+        calendar.selectPeriod("", null);
 
 
 
