@@ -11,107 +11,43 @@
     <TableRow android:layout_width="0dp"><!-- Week #1 -->
 
         <TextView
-
-
-
-            android:text="1"
-
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="2"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="3"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="4"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="5"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="6"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="7"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
@@ -120,106 +56,43 @@
     <TableRow android:layout_width="0dp"><!-- Week #2 -->
 
         <TextView
-
-
-
-            android:text="8"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="9"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="10"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="11"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="12"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="13"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="14"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
@@ -228,106 +101,43 @@
     <TableRow android:layout_width="0dp"><!-- Week #3 -->
 
         <TextView
-
-
-
-            android:text="15"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="16"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="17"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="18"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="19"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="20"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="21"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
@@ -336,106 +146,43 @@
     <TableRow android:layout_width="0dp"><!-- Week #4 -->
 
         <TextView
-
-
-
-            android:text="22"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="23"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="24"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="25"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="26"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="27"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="28"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
@@ -444,106 +191,88 @@
     <TableRow android:layout_width="0dp"><!-- Week #5 -->
 
         <TextView
-
-
-
-            android:text="29"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="30"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="31"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="32"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="33"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="34"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
-
-
-
-            android:text="35"
-
-
-
-            android:background="@drawable/calendar_ripple"
             android:clickable="true"
-            android:textColor="@android:color/black"
+            android:textSize="@dimen/calendar_day_size"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+    </TableRow>
+    <TableRow android:layout_width="0dp"><!-- Week #6 -->
+
+        <TextView
+            android:clickable="true"
+            android:textSize="@dimen/calendar_day_size"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+        <TextView
+            android:clickable="true"
+            android:textSize="@dimen/calendar_day_size"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+        <TextView
+            android:clickable="true"
+            android:textSize="@dimen/calendar_day_size"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+        <TextView
+            android:clickable="true"
+            android:textSize="@dimen/calendar_day_size"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+        <TextView
+            android:clickable="true"
+            android:textSize="@dimen/calendar_day_size"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+        <TextView
+            android:clickable="true"
+            android:textSize="@dimen/calendar_day_size"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+        <TextView
+            android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
             android:gravity="center"
             android:layout_height="match_parent"

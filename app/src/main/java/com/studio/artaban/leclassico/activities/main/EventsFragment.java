@@ -1,10 +1,14 @@
 package com.studio.artaban.leclassico.activities.main;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.EventCalendar;
@@ -16,6 +20,24 @@ import com.studio.artaban.leclassico.helpers.Logs;
  * Events fragment class (MainActivity)
  */
 public class EventsFragment extends MainFragment {
+
+
+
+
+
+    private ViewPager mEventPager; // Events list view
+    public static class EventFragment extends Fragment {
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_event, container, false);
+            ((TextView) rootView.findViewById(R.id.test)).setText(String.valueOf(getArguments().getInt("test")));
+            return rootView;
+        }
+    }
+
+
+
 
     ////// MainFragment ////////////////////////////////////////////////////////////////////////////
     @Override
@@ -68,7 +90,30 @@ public class EventsFragment extends MainFragment {
 
         // Set calendar
         EventCalendar calendar = (EventCalendar) rootView.findViewById(R.id.event_calendar);
-        calendar.selectPeriod("", null);
+        calendar.selectPeriod("2017-01-24 11:15:30", "2017-02-18 11:15:30");
+
+
+
+
+        mEventPager = (ViewPager) rootView.findViewById(R.id.pager_events);
+        mEventPager.setAdapter(new FragmentPagerAdapter(getActivity().getSupportFragmentManager()) {
+            @Override
+            public Fragment getItem(int section) {
+                Logs.add(Logs.Type.V, "section: " + section);
+
+                EventFragment fragment = new EventFragment();
+                Bundle data = new Bundle();
+                data.putInt("test", section);
+                fragment.setArguments(data);
+
+                return fragment;
+            }
+
+            @Override
+            public int getCount() {
+                return 3;
+            }
+        });
 
 
 

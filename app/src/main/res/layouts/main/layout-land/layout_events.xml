@@ -4,33 +4,50 @@
               android:orientation="horizontal"
               android:gravity="top"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="wrap_content">
 
     <!-- Calendar -->
     <com.studio.artaban.leclassico.components.EventCalendar
         android:id="@+id/event_calendar"
         android:layout_margin="@dimen/event_margin"
-        android:layout_weight="3"
+        android:layout_weight="4"
         android:layout_width="0dp"
         android:layout_height="wrap_content"/>
 
     <!-- Previous event -->
-
-
-
+    <ImageView
+        android:id="@+id/image_prev_event"
+        android:src="@drawable/arrow"
+        android:tint="@android:color/black"
+        android:scaleType="fitXY"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:layout_marginTop="@dimen/event_margin"
+        android:layout_marginBottom="@dimen/event_margin"
+        android:layout_width="28dp"
+        android:layout_height="match_parent"/>
 
     <!-- Event -->
     <android.support.v4.view.ViewPager
         android:id="@+id/pager_events"
         android:layout_margin="@dimen/event_margin"
-        android:layout_weight="4"
+        android:layout_weight="7"
         android:layout_width="0dp"
         android:layout_height="match_parent"/>
 
     <!-- Next event -->
-
-
-
-
+    <ImageView
+        android:id="@+id/image_next_event"
+        android:src="@drawable/arrow"
+        android:tint="@android:color/black"
+        android:scaleType="fitXY"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:scaleX="-1"
+        android:layout_marginTop="@dimen/event_margin"
+        android:layout_marginBottom="@dimen/event_margin"
+        android:layout_marginEnd="@dimen/event_margin"
+        android:layout_width="28dp"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
