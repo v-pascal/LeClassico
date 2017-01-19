@@ -61,7 +61,7 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
         // ...and to select a date
         final TableLayout month = (TableLayout) rootView.findViewById(R.id.layout_days);
         addDaysListener(month);
-        TableLayout monthUpdate = (TableLayout) rootView.findViewById(R.id.layout_days_update);
+        final TableLayout monthUpdate = (TableLayout) rootView.findViewById(R.id.layout_days_update);
         addDaysListener(monthUpdate);
 
         addView(rootView); // Add calendar layout
@@ -74,15 +74,21 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
                 Logs.add(Logs.Type.V, null);
                 month.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                for (int i = 0; i < 6; ++i) { // Loop on 6 weeks
-                    TableRow week = (TableRow) month.getChildAt(i);
-                    TableRow.LayoutParams params = (TableRow.LayoutParams) week.getChildAt(0).getLayoutParams();
-                    params.height = month.getWidth() / 7;
+                mDaysWidth = month.getWidth(); // B4 'setDaysSize' calls
+                setDaysHeight(month);
+                setDaysHeight(monthUpdate);
+            }
+        });
 
-                    week.getChildAt(0).setLayoutParams(params);
-                    // NB: Only set first day height coz the others will match parent height accordingly
-                }
-                mDaysWidth = month.getWidth();
+        // Get month & year text width
+        final View monthYear = findViewById(R.id.text_month);
+        monthYear.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Logs.add(Logs.Type.V, null);
+                monthYear.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                mMonthWidth = monthYear.getWidth();
             }
         });
     }
@@ -97,10 +103,22 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
                 week.getChildAt(i).setOnClickListener(this);
         }
     }
+    private void setDaysHeight(TableLayout month) { // Set days height according calendar width
+        Logs.add(Logs.Type.V, "month: " + month);
+
+        for (int i = 0; i < 6; ++i) { // Loop on 6 weeks
+            TableRow week = (TableRow) month.getChildAt(i);
+            TableRow.LayoutParams params = (TableRow.LayoutParams) week.getChildAt(0).getLayoutParams();
+            params.height = mDaysWidth / 7;
+
+            week.getChildAt(0).setLayoutParams(params);
+            // NB: Only set first day height coz the others will match parent height accordingly
+        }
+    }
     private byte mMonth = Constants.NO_DATA; // Month displayed
     private short mYear = Constants.NO_DATA; // Year of the month displayed
 
-    private static final int ANIMATION_DURATION = 700; // Animation duration in ms
+    private static final int ANIMATION_DURATION = 300; // Animation duration in ms
     private enum AnimDirection {
 
         NONE, // Same month & year (no animation)
@@ -116,7 +134,7 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
         Logs.add(Logs.Type.V, "direction: " + direction);
 
         TableLayout days = (TableLayout) findViewById((!mDaysUpdate)? R.id.layout_days:R.id.layout_days_update);
-        TableLayout daysUpdate = (TableLayout) findViewById((!mDaysUpdate)? R.id.layout_days_update:R.id.layout_days);
+        final TableLayout daysUpdate = (TableLayout) findViewById((!mDaysUpdate)? R.id.layout_days_update:R.id.layout_days);
 
         days.clearAnimation();
         daysUpdate.clearAnimation();
@@ -124,7 +142,7 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
 
         //
         TranslateAnimation animDays = new TranslateAnimation(0,
-                (direction == AnimDirection.BEFORE) ? -mDaysWidth : mDaysWidth, 0, 0);
+                (direction == AnimDirection.BEFORE) ? mDaysWidth : -mDaysWidth, 0, 0);
         animDays.setDuration(ANIMATION_DURATION);
         animDays.setFillAfter(true);
         animDays.setAnimationListener(new Animation.AnimationListener() {
@@ -137,6 +155,9 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
             public void onAnimationEnd(Animation animation) {
                 Logs.add(Logs.Type.V, "animation: " + animation);
                 mDaysUpdate = !mDaysUpdate;
+
+                daysUpdate.bringToFront();
+                // NB: Needed to be able to display ripple effect correctly
             }
 
             @Override
@@ -164,7 +185,7 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
 
         //
         TranslateAnimation animMonth = new TranslateAnimation(0,
-                (direction == AnimDirection.BEFORE) ? -mMonthWidth : mMonthWidth, 0, 0);
+                (direction == AnimDirection.BEFORE) ? mMonthWidth : -mMonthWidth, 0, 0);
         animMonth.setDuration(ANIMATION_DURATION);
         animMonth.setFillAfter(true);
         animMonth.setAnimationListener(new Animation.AnimationListener() {
@@ -197,24 +218,8 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
         if (direction == AnimDirection.NONE)
             throw new IllegalArgumentException("No animation need");
 
-        if (mMonthWidth == Constants.NO_DATA) {
-            final View monthYear = findViewById(R.id.text_month);
-            monthYear.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    Logs.add(Logs.Type.V, null);
-                    monthYear.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                    mMonthWidth = monthYear.getWidth();
-                    animateDays(direction);
-                    animateMonth(direction);
-                }
-            });
-
-        } else {
-            animateDays(direction);
-            animateMonth(direction);
-        }
+        animateDays(direction);
+        animateMonth(direction);
     }
     private Date mStartDate;
     private Date mEndDate;

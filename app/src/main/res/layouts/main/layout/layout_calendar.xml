@@ -35,9 +35,8 @@
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
                 android:textSize="@dimen/calendar_text_size"
-                android:gravity="center_vertical"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
             <TextView
                 android:id="@+id/text_month_update"
@@ -45,9 +44,8 @@
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
                 android:textSize="@dimen/calendar_text_size"
-                android:gravity="center_vertical"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"/><!-- To animate selection -->
         </FrameLayout>
 

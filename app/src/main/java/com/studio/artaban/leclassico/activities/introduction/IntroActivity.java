@@ -899,6 +899,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
         Logs.add(Logs.Type.V, null);
         if (mLogoutRequested) { // Logout requested (back to connect activity)
             mLogoutRequested = false;
+            mLogging = false;
 
             getSupportFragmentManager().popBackStack(); // Remove progress fragment
             getSupportFragmentManager()
