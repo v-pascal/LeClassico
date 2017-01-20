@@ -24,7 +24,7 @@
         android:clickable="true"
         android:layout_marginTop="@dimen/event_margin"
         android:layout_marginBottom="@dimen/event_margin"
-        android:layout_width="28dp"
+        android:layout_width="@dimen/event_select_width"
         android:layout_height="match_parent"/>
 
     <!-- Event -->
@@ -47,7 +47,7 @@
         android:layout_marginTop="@dimen/event_margin"
         android:layout_marginBottom="@dimen/event_margin"
         android:layout_marginEnd="@dimen/event_margin"
-        android:layout_width="28dp"
+        android:layout_width="@dimen/event_select_width"
         android:layout_height="match_parent"/>
 
 </LinearLayout>

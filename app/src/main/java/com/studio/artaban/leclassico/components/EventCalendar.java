@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.components;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -31,6 +32,9 @@ import java.util.Date;
 /**
  * Created by pascal on 16/01/17.
  * Calendar view
+ * Managing:
+ * _ Date & Period selection
+ * _ Previous & next month selection
  */
 public class EventCalendar extends FrameLayout implements View.OnClickListener, View.OnTouchListener {
 
@@ -127,7 +131,7 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
     }
     private int mMonthWidth = Constants.NO_DATA; // Month & Year text view width
     private int mDaysWidth; // Calendar view width
-    private boolean mMonthUpdate; // Month view display flag (true for R.id.text_month_update)
+    private volatile boolean mMonthUpdate; // Month view display flag (true for R.id.text_month_update)
     private boolean mDaysUpdate; // Calendar view display flag (true for R.id.layout_days_update)
 
     private void animateDays(AnimDirection direction) {
@@ -456,5 +460,28 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
             }
         }
         return false;
+    }
+
+    //////
+    private long mChangeDuration; // Duration of the change month request (pressing month selection)
+    private static final long FAST_CHANGE_LIMIT = 1500; // Duration limit B4 starting fast change (in ms)
+
+    private final ChangeMonthTask mChangeTask = new ChangeMonthTask(); // Task to change month quiclky
+    private class ChangeMonthTask extends AsyncTask<Boolean, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Boolean... params) {
+            Logs.add(Logs.Type.V, "params[0]: " + params[0]);
+
+
+
+
+            //mMonthUpdate
+
+
+
+
+            return null;
+        }
     }
 }

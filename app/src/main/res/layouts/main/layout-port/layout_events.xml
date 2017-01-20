@@ -1,10 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/layout_events"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <!-- Calendar -->
+    <com.studio.artaban.leclassico.components.EventCalendar
+        android:id="@+id/event_calendar"
+        android:layout_margin="@dimen/event_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
+    <!-- Previous event -->
+    <ImageView
+        android:id="@+id/image_prev_event"
+        android:src="@drawable/arrow"
+        android:tint="@android:color/black"
+        android:scaleType="fitXY"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:layout_below="@id/event_calendar"
+        android:layout_marginStart="@dimen/event_margin"
+        android:layout_marginBottom="@dimen/event_margin"
+        android:layout_width="@dimen/event_select_width"
+        android:layout_height="@dimen/event_height"/>
 
+    <!-- Event -->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager_events"
+        android:layout_marginTop="@dimen/event_margin"
+        android:layout_marginBottom="@dimen/event_margin"
+        android:layout_marginStart="@dimen/event_horizontal_margin"
+        android:layout_marginEnd="@dimen/event_horizontal_margin"
+        android:layout_below="@id/event_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
+    <!-- Next event -->
+    <ImageView
+        android:id="@+id/image_next_event"
+        android:src="@drawable/arrow"
+        android:tint="@android:color/black"
+        android:scaleType="fitXY"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:scaleX="-1"
+        android:layout_below="@id/event_calendar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="@dimen/event_margin"
+        android:layout_marginEnd="@dimen/event_margin"
+        android:layout_width="@dimen/event_select_width"
+        android:layout_height="@dimen/event_height"/>
 
 </RelativeLayout>
