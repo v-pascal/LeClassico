@@ -3,7 +3,6 @@
              android:stretchColumns="*"
              android:paddingTop="@dimen/calendar_radius"
              android:paddingStart="@dimen/calendar_radius"
-             android:paddingEnd="@dimen/calendar_radius"
              android:layout_width="match_parent"
              android:layout_height="wrap_content">
 

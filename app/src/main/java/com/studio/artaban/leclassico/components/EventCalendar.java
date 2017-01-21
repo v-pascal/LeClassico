@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -131,7 +132,7 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
     }
     private int mMonthWidth = Constants.NO_DATA; // Month & Year text view width
     private int mDaysWidth; // Calendar view width
-    private volatile boolean mMonthUpdate; // Month view display flag (true for R.id.text_month_update)
+    private boolean mMonthUpdate; // Month view display flag (true for R.id.text_month_update)
     private boolean mDaysUpdate; // Calendar view display flag (true for R.id.layout_days_update)
 
     private void animateDays(AnimDirection direction) {
@@ -394,68 +395,76 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
     @Override
     public boolean onTouch(View sender, MotionEvent event) {
         //Logs.add(Logs.Type.V, "sender: " + sender + ";event: " + event);
-        switch (sender.getId()) {
+        switch (event.getActionMasked()) {
 
-            case R.id.image_prev_month: {
+            case MotionEvent.ACTION_DOWN: {
+                if (mPointerId == Constants.NO_DATA) {
+                    mPointerId = event.getPointerId(0);
 
+                    AnimDirection direction;
+                    switch (sender.getId()) {
 
+                        case R.id.image_prev_month: {
+                            Logs.add(Logs.Type.I, "Select previous month");
+                            mFastRunnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    Logs.add(Logs.Type.V, null);
 
-                if ((event.getAction() == MotionEvent.ACTION_UP) ||
-                        (event.getAction() == MotionEvent.ACTION_CANCEL)) {
+                                    mFastTask = new ChangeMonthTask();
+                                    mFastTask.execute(Boolean.FALSE); // Fast previous
+                                }
+                            };
 
+                            setPreviousMonth();
+                            direction = AnimDirection.BEFORE;
+                            break;
+                        }
+                        case R.id.image_next_month: {
+                            Logs.add(Logs.Type.I, "Select next month");
+                            mFastRunnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    Logs.add(Logs.Type.V, null);
 
-                    --mMonth;
-                    if (mMonth < 0) {
-                        mMonth = 11;
-                        --mYear;
+                                    mFastTask = new ChangeMonthTask();
+                                    mFastTask.execute(Boolean.TRUE); // Fast next
+                                }
+                            };
+
+                            setNextMonth();
+                            direction = AnimDirection.AFTER;
+                            break;
+                        }
+                        default:
+                            throw new RuntimeException("Unexpected touch view event");
                     }
-
-
-
                     fillCalendar(false);
                     fillMonth(false);
-                    animateCalendar(AnimDirection.BEFORE);
+                    animateCalendar(direction); // Animate selection change
 
-
-
-
-
+                    // Start fast change request
+                    mFastHandler.postDelayed(mFastRunnable, FAST_CHANGE_LIMIT);
                 }
-
-
-
                 break;
             }
-            case R.id.image_next_month: {
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP: {
+                if (mPointerId == Constants.NO_DATA)
+                    break;
 
+                for (int i = 0; i < event.getPointerCount(); ++i) {
+                    if (event.getPointerId(i) == mPointerId) {
+                        Logs.add(Logs.Type.I, "Finish change month selection");
 
-
-
-                if ((event.getAction() == MotionEvent.ACTION_UP) ||
-                        (event.getAction() == MotionEvent.ACTION_CANCEL)) {
-
-
-                    ++mMonth;
-                    if (mMonth == 12) {
-                        mMonth = 0;
-                        ++mYear;
+                        mFastHandler.removeCallbacks(mFastRunnable); // Cancel fast change request
+                        if ((mFastTask != null) && (mFastTask.getStatus() == AsyncTask.Status.RUNNING))
+                            mFastTask.cancel(true); // Stop fast change feature
+                        else // Fast change feature not started
+                            mPointerId = Constants.NO_DATA;
+                        break;
                     }
-
-                    fillCalendar(false);
-                    fillMonth(false);
-                    animateCalendar(AnimDirection.AFTER);
-
-
-
-
-
-
                 }
-
-
-
-
-
                 break;
             }
         }
@@ -463,25 +472,81 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
     }
 
     //////
-    private long mChangeDuration; // Duration of the change month request (pressing month selection)
-    private static final long FAST_CHANGE_LIMIT = 1500; // Duration limit B4 starting fast change (in ms)
+    private void setPreviousMonth() {
+        Logs.add(Logs.Type.V, null);
 
-    private final ChangeMonthTask mChangeTask = new ChangeMonthTask(); // Task to change month quiclky
-    private class ChangeMonthTask extends AsyncTask<Boolean, Void, Void> {
+        --mMonth;
+        if (mMonth < 0) {
+            mMonth = 11;
+            --mYear;
+        }
+    }
+    private void setNextMonth() {
+        Logs.add(Logs.Type.V, null);
+
+        ++mMonth;
+        if (mMonth == 12) {
+            mMonth = 0;
+            ++mYear;
+        }
+    }
+    private int mPointerId = Constants.NO_DATA; // ID of the touch event pointer
+
+    private final Handler mFastHandler = new Handler(); // Handler used to check fast change limit elapsed
+    private Runnable mFastRunnable; // Fast month search process
+    private static final long FAST_CHANGE_LIMIT = 1500; // Duration limit B4 starting fast change (in ms)
+    // NB: Constant above must be > ANIMATION_DURATION
+
+    private ChangeMonthTask mFastTask; // Task to change month quickly
+    private class ChangeMonthTask extends AsyncTask<Boolean, Boolean, Boolean> {
+
+        private static final int FAST_CHANGE_DURATION = 100; // Fast change month duration (in ms)
 
         @Override
-        protected Void doInBackground(Boolean... params) {
-            Logs.add(Logs.Type.V, "params[0]: " + params[0]);
+        protected synchronized Boolean doInBackground(Boolean... direction) {
+            Logs.add(Logs.Type.V, "direction[0]: " + direction[0]);
+            try {
+                do {
+                    publishProgress(direction[0]); // Change month in UI thread
+                    Thread.sleep(FAST_CHANGE_DURATION, 0);
 
+                    // Wait UI thread do the job
+                    wait();
 
+                } while (!isCancelled());
 
+            } catch (InterruptedException e) {
+                Logs.add(Logs.Type.I, "Fast change feature interrupted");
+            }
+            return direction[0];
+        }
 
-            //mMonthUpdate
+        @Override
+        protected void onProgressUpdate(Boolean... direction) {
+            //Logs.add(Logs.Type.V, "direction[0]: " + direction[0]);
 
+            if (direction[0])
+                setNextMonth();
+            else
+                setPreviousMonth();
+            fillMonth(true);
 
+            // Notify background thread job done
+            synchronized (this) {
+                notify();
+            }
+        }
 
+        @Override
+        protected void onCancelled(Boolean direction) {
+            Logs.add(Logs.Type.V, "direction: " + direction);
+            mPointerId = Constants.NO_DATA;
 
-            return null;
+            fillCalendar(false);
+            fillMonth(false);
+
+            // Animate selection change (last one)
+            animateCalendar((direction) ? AnimDirection.AFTER : AnimDirection.BEFORE);
         }
     }
 }
