@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/layout_events"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
     <!-- Calendar -->
     <com.studio.artaban.leclassico.components.EventCalendar
@@ -28,13 +28,12 @@
     <!-- Event -->
     <android.support.v4.view.ViewPager
         android:id="@+id/pager_events"
-        android:layout_marginTop="@dimen/event_margin"
         android:layout_marginBottom="@dimen/event_margin"
         android:layout_marginStart="@dimen/event_horizontal_margin"
         android:layout_marginEnd="@dimen/event_horizontal_margin"
         android:layout_below="@id/event_calendar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="@dimen/event_height"/>
 
     <!-- Next event -->
     <ImageView
