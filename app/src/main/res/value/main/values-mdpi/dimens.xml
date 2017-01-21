@@ -36,6 +36,14 @@
     <!-- Publication -->
     <dimen name="pub_margin_top">17dp</dimen>
 
+    <!-- Events -->
+    <dimen name="calendar_radius">8dp</dimen>
+    <dimen name="calendar_select_height">34dp</dimen><!-- Must be > height of calendar_text_size -->
+    <dimen name="event_margin">15dp</dimen>
+    <dimen name="event_select_width">26dp</dimen>
+    <dimen name="event_height">386dp</dimen>
+    <dimen name="event_horizontal_margin">56dp</dimen><!-- = 2 * event_margin + event_select_width -->
+
     <!-- Members -->
     <dimen name="member_item_padding">8dp</dimen>
     <dimen name="member_letter_size">34sp</dimen>

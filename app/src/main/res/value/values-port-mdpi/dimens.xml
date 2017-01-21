@@ -4,4 +4,8 @@
     <!-- Publication -->
     <dimen name="pub_link_text_size">20sp</dimen>
 
+    <!-- Events -->
+    <dimen name="calendar_text_size">22sp</dimen>
+    <dimen name="calendar_day_size">23sp</dimen>
+
 </resources>

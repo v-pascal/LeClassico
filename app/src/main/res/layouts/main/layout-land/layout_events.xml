@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/layout_events"
               android:orientation="horizontal"
-              android:gravity="top"
+              android:gravity="center_vertical"
+              android:minHeight="@dimen/event_height"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
@@ -10,7 +11,7 @@
     <com.studio.artaban.leclassico.components.EventCalendar
         android:id="@+id/event_calendar"
         android:layout_margin="@dimen/event_margin"
-        android:layout_weight="4"
+        android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"/>
 
@@ -31,7 +32,7 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/pager_events"
         android:layout_margin="@dimen/event_margin"
-        android:layout_weight="7"
+        android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent"/>
 
