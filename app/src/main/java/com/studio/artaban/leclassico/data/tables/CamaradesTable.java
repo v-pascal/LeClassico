@@ -431,8 +431,8 @@ public class CamaradesTable extends DataTable {
                                             selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
 
                                     ++syncResult.deleted;
-                                }
-                                else { ////// Update entry
+
+                                } else { ////// Update entry
 
                                     // Remove fields that must not be synchronized yet coz updated after
                                     // remote DB fields

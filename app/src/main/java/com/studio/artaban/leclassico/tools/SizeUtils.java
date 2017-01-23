@@ -3,8 +3,6 @@ package com.studio.artaban.leclassico.tools;
 import android.app.Activity;
 import android.graphics.Point;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import com.studio.artaban.leclassico.helpers.Logs;
 

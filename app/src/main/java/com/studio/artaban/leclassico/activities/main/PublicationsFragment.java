@@ -575,7 +575,6 @@ public class PublicationsFragment extends MainFragment implements
             } while (mPubCursor.moveToNext());
             mPubCursor.moveToFirst();
         }
-
         if (!newEntries) // Fill shortcut info (if not already done)
             fillShortcut(shortcutData, false);
 

@@ -18,6 +18,7 @@ public final class WebServices {
     public static final String URL_PUBLICATIONS = "/actualites.php"; // Publications web service
     public static final String URL_COMMENTS = "/commentaires.php"; // Comments web service
     public static final String URL_PHOTOS = "/photos.php"; // Photos web service
+    public static final String URL_EVENTS = "/evenements.php"; // Events web service
 
 
     ////// DB Operations ///////////////////////////////////////////////////////////////////////////

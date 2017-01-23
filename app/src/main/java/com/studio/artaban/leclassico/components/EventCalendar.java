@@ -372,6 +372,24 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
             Logs.add(Logs.Type.E, "Unexpected date format: " + start + " | " + end);
         }
     }
+    public void selectToday() { // Update today marker (current day changed)
+        Logs.add(Logs.Type.V, null);
+        if (mMonth == Constants.NO_DATA)
+            return; // Nothing to update
+
+        // Check selected month & year matches with current date
+        Calendar calendar = Calendar.getInstance();
+        if ((mMonth == (byte)calendar.get(Calendar.MONTH)) && (mYear == (short)calendar.get(Calendar.YEAR)))
+            fillCalendar(true); // Update
+    }
+
+    public interface OnSelectListener {
+        void onDateSelected(String date);
+    }
+    private OnSelectListener mListener; // Calendar selection listener
+    public void setOnSelectListener(OnSelectListener listener) {
+        mListener = listener;
+    }
 
     ////// OnClickListener /////////////////////////////////////////////////////////////////////////
     @Override
@@ -383,12 +401,10 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
             // NB: Call 'selectPeriod' method one time (at least)
 
         short day = (short)sender.getTag();
-
-
-
-
-
-
+        if (mListener != null)
+            mListener.onDateSelected(mYear + '-' + mMonth + '-' + day + " 00:00:00");
+        else
+            Logs.add(Logs.Type.D, "No date selection listener defined");
     }
 
     ////// OnTouchListener /////////////////////////////////////////////////////////////////////////

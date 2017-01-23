@@ -85,6 +85,9 @@ public class Uris {
             case ID_MAIN_BEST_PHOTOS:
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_BEST_PHOTOS); // BestPhoto
+            case ID_MAIN_EVENTS:
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_EVENTS); // Events
 
             default:
                 throw new IllegalArgumentException("Unexpected URI id: " + id);
@@ -95,6 +98,7 @@ public class Uris {
 
     private static final String PATH_SQL = "SQL"; // SQL path for raw query (reserved)
     private static final String PATH_BEST_PHOTOS = "BestPhotos"; // Best photos URI path
+    private static final String PATH_EVENTS = "Events"; // Events URI path
 
     private static final String PATH_USER = "User/"; // User URI path following with member ID
     private static final String PATH_SHORTCUT = "/Shortcut/"; // Shortcut URI path
@@ -113,6 +117,7 @@ public class Uris {
     public static final short ID_MAIN_SHORTCUT_NOTIFY = 7; // User/#/Shortcut/Notifications
     public static final short ID_MAIN_SHORTCUT_MEMBER = 8; // User/#/Shortcut/Camarades
     public static final short ID_MAIN_BEST_PHOTOS = 9;     // BestPhotos
+    public static final short ID_MAIN_EVENTS = 10;         // Events
 
     ////// URI Matcher /////////////////////////////////////////////////////////////////////////////
 
@@ -125,5 +130,4 @@ public class Uris {
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Camarades/*
                 PATH_USER + "#/" + CamaradesTable.TABLE_NAME + DataProvider.FILTER_ROW, ID_USER_MEMBERS);
     }
-
 }

@@ -2,15 +2,24 @@ package com.studio.artaban.leclassico.data.tables;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -70,6 +79,8 @@ public class EvenementsTable extends DataTable {
     public static final String COLUMN_LIEU_UPD = "EVE_LieuUPD";
     public static final String COLUMN_DATE = "EVE_Date";
     public static final String COLUMN_DATE_UPD = "EVE_DateUPD";
+    public static final String COLUMN_DATE_END = "EVE_DateEnd";
+    public static final String COLUMN_DATE_END_UPD = "EVE_DateEndUPD";
     public static final String COLUMN_FLYER = "EVE_Flyer";
     public static final String COLUMN_FLYER_UPD = "EVE_FlyerUPD";
     public static final String COLUMN_REMARK = "EVE_Remark";
@@ -85,12 +96,14 @@ public class EvenementsTable extends DataTable {
     private static final short COLUMN_INDEX_LIEU_UPD = 6;
     private static final short COLUMN_INDEX_DATE = 7;
     private static final short COLUMN_INDEX_DATE_UPD = 8;
-    private static final short COLUMN_INDEX_FLYER = 9;
-    private static final short COLUMN_INDEX_FLYER_UPD = 10;
-    private static final short COLUMN_INDEX_REMARK = 11;
-    private static final short COLUMN_INDEX_REMARK_UPD = 12;
-    private static final short COLUMN_INDEX_STATUS_DATE = 13;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 14;
+    private static final short COLUMN_INDEX_DATE_END = 9;
+    private static final short COLUMN_INDEX_DATE_END_UPD = 10;
+    private static final short COLUMN_INDEX_FLYER = 11;
+    private static final short COLUMN_INDEX_FLYER_UPD = 12;
+    private static final short COLUMN_INDEX_REMARK = 13;
+    private static final short COLUMN_INDEX_REMARK_UPD = 14;
+    private static final short COLUMN_INDEX_STATUS_DATE = 15;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 16;
 
     //
     private EvenementsTable() { }
@@ -111,6 +124,8 @@ public class EvenementsTable extends DataTable {
                 COLUMN_LIEU_UPD + " TEXT NOT NULL," +
                 COLUMN_DATE + " TEXT NOT NULL," +
                 COLUMN_DATE_UPD + " TEXT NOT NULL," +
+                COLUMN_DATE_END + " TEXT NOT NULL," +
+                COLUMN_DATE_END_UPD + " TEXT NOT NULL," +
                 COLUMN_FLYER + " TEXT," +
                 COLUMN_FLYER_UPD + " TEXT NOT NULL," +
                 COLUMN_REMARK + " TEXT," +
@@ -164,9 +179,24 @@ public class EvenementsTable extends DataTable {
     }
 
     // JSON keys
+    private static final String JSON_KEY_EVENT_ID = COLUMN_EVENT_ID.substring(4);
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_NOM = COLUMN_NOM.substring(4);
+    private static final String JSON_KEY_NOM_UPD = COLUMN_NOM_UPD.substring(4);
+    private static final String JSON_KEY_LIEU = COLUMN_LIEU.substring(4);
+    private static final String JSON_KEY_LIEU_UPD = COLUMN_LIEU_UPD.substring(4);
+    private static final String JSON_KEY_DATE = COLUMN_DATE.substring(4);
+    private static final String JSON_KEY_DATE_UPD = COLUMN_DATE_UPD.substring(4);
+    private static final String JSON_KEY_DATE_END = COLUMN_DATE_END.substring(4);
+    private static final String JSON_KEY_DATE_END_UPD = COLUMN_DATE_END_UPD.substring(4);
+    private static final String JSON_KEY_FLYER = COLUMN_FLYER.substring(4);
+    private static final String JSON_KEY_FLYER_UPD = COLUMN_FLYER_UPD.substring(4);
+    private static final String JSON_KEY_REMARK = COLUMN_REMARK.substring(4);
+    private static final String JSON_KEY_REMARK_UPD = COLUMN_REMARK_UPD.substring(4);
+    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     @Override
-    public @Nullable SyncResult synchronize(ContentResolver resolver, byte operation,
+    public @Nullable SyncResult synchronize(final ContentResolver resolver, final byte operation,
                                             Bundle syncData, @Nullable ContentValues postData) {
 
         // Synchronize data from remote to local DB (return inserted, deleted or
@@ -174,13 +204,169 @@ public class EvenementsTable extends DataTable {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";operation: " + operation +
                 ";syncData: " + syncData + ";postData: " + postData);
 
-
-
-
-
-
-
         final SyncResult syncResult = new SyncResult();
+
+        syncData.putString(DATA_KEY_WEB_SERVICE, WebServices.URL_EVENTS);
+        syncData.putByte(DATA_KEY_OPERATION, operation);
+        syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
+
+        syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        syncData.remove(DATA_KEY_FIELD_DATE); // No date field criteria for this table
+        String url = getSyncUrlRequest(resolver, syncData);
+
+        // Send remote DB request
+        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
+                new Internet.OnRequestListener() {
+
+                    @Override
+                    public boolean onReceiveReply(String response) {
+                        //Logs.add(Logs.Type.V, "response: " + response);
+                        try {
+
+                            JSONObject reply = new JSONObject(response);
+                            if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
+
+                                if (reply.isNull(TABLE_NAME))
+                                    return (operation == WebServices.OPERATION_SELECT);
+                                    // Already synchronized for selection but error for any other operation
+
+                                Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
+                                JSONArray entries = reply.getJSONArray(TABLE_NAME);
+                                for (int i = 0; i < entries.length(); ++i) {
+
+                                    JSONObject entry = (JSONObject) entries.get(i);
+
+                                    // Key fields
+                                    int eventId = entry.getInt(JSON_KEY_EVENT_ID);
+
+                                    // Data fields
+                                    ContentValues values = new ContentValues();
+                                    values.put(COLUMN_PSEUDO, entry.getString(JSON_KEY_PSEUDO));
+                                    if (!entry.isNull(JSON_KEY_NOM))
+                                        values.put(COLUMN_NOM, entry.getString(JSON_KEY_NOM));
+                                    values.put(COLUMN_NOM_UPD, entry.getString(JSON_KEY_NOM_UPD));
+                                    if (!entry.isNull(JSON_KEY_LIEU))
+                                        values.put(COLUMN_LIEU, entry.getString(JSON_KEY_LIEU));
+                                    values.put(COLUMN_LIEU_UPD, entry.getString(JSON_KEY_LIEU_UPD));
+                                    if (!entry.isNull(JSON_KEY_DATE))
+                                        values.put(COLUMN_DATE, entry.getString(JSON_KEY_DATE));
+                                    values.put(COLUMN_DATE_UPD, entry.getString(JSON_KEY_DATE_UPD));
+                                    if (!entry.isNull(JSON_KEY_DATE_END))
+                                        values.put(COLUMN_DATE_END, entry.getString(JSON_KEY_DATE_END));
+                                    values.put(COLUMN_DATE_END_UPD, entry.getString(JSON_KEY_DATE_END_UPD));
+                                    if (!entry.isNull(JSON_KEY_FLYER))
+                                        values.put(COLUMN_FLYER, entry.getString(JSON_KEY_FLYER));
+                                    values.put(COLUMN_FLYER_UPD, entry.getString(JSON_KEY_FLYER_UPD));
+                                    if (!entry.isNull(JSON_KEY_REMARK))
+                                        values.put(COLUMN_REMARK, entry.getString(JSON_KEY_REMARK));
+                                    values.put(COLUMN_REMARK_UPD, entry.getString(JSON_KEY_REMARK_UPD));
+
+                                    values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
+                                    values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
+
+                                    // Check if entry already exists
+                                    String selection = COLUMN_EVENT_ID + '=' + eventId;
+                                    Cursor cursor = resolver.query(tableUri, null, selection, null, null);
+                                    if (cursor.moveToFirst()) { // DB entry exists
+
+                                        if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
+                                            // NB: Web site deletion priority (no status date comparison)
+
+                                            ////// Delete entry (definitively)
+                                            values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                                    Synchronized.TO_DELETE.getValue());
+                                            resolver.update(tableUri, values, selection, null);
+                                            resolver.delete(tableUri,
+                                                    selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
+
+                                            ++syncResult.deleted;
+
+                                        } else { ////// Update entry
+
+                                            // Remove fields that must not be synchronized yet coz updated after
+                                            // remote DB fields
+                                            boolean removed = false;
+
+                                            if (cursor.getString(COLUMN_INDEX_NOM_UPD)
+                                                    .compareTo(entry.getString(JSON_KEY_NOM_UPD)) > 0) {
+                                                values.remove(COLUMN_NOM);
+                                                values.remove(COLUMN_NOM_UPD);
+                                                removed = true;
+                                            }
+                                            if (cursor.getString(COLUMN_INDEX_LIEU_UPD)
+                                                    .compareTo(entry.getString(JSON_KEY_LIEU_UPD)) > 0) {
+                                                values.remove(COLUMN_LIEU);
+                                                values.remove(COLUMN_LIEU_UPD);
+                                                removed = true;
+                                            }
+                                            if (cursor.getString(COLUMN_INDEX_DATE_UPD)
+                                                    .compareTo(entry.getString(JSON_KEY_DATE_UPD)) > 0) {
+                                                values.remove(COLUMN_DATE);
+                                                values.remove(COLUMN_DATE_UPD);
+                                                removed = true;
+                                            }
+                                            if (cursor.getString(COLUMN_INDEX_DATE_END_UPD)
+                                                    .compareTo(entry.getString(JSON_KEY_DATE_END_UPD)) > 0) {
+                                                values.remove(COLUMN_DATE_END);
+                                                values.remove(COLUMN_DATE_END_UPD);
+                                                removed = true;
+                                            }
+                                            if (cursor.getString(COLUMN_INDEX_FLYER_UPD)
+                                                    .compareTo(entry.getString(JSON_KEY_FLYER_UPD)) > 0) {
+                                                values.remove(COLUMN_FLYER);
+                                                values.remove(COLUMN_FLYER_UPD);
+                                                removed = true;
+                                            }
+                                            if (cursor.getString(COLUMN_INDEX_REMARK_UPD)
+                                                    .compareTo(entry.getString(JSON_KEY_REMARK_UPD)) > 0) {
+                                                values.remove(COLUMN_REMARK);
+                                                values.remove(COLUMN_REMARK_UPD);
+                                                removed = true;
+                                            }
+
+                                            if (removed) { // Keep local synchronized & status date fields
+
+                                                values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
+                                                        cursor.getInt(COLUMN_INDEX_SYNCHRONIZED));
+                                                values.put(Constants.DATA_COLUMN_STATUS_DATE,
+                                                        cursor.getString(COLUMN_INDEX_STATUS_DATE));
+                                            }
+                                            resolver.update(tableUri, values, selection, null);
+                                            ++syncResult.updated;
+                                        }
+
+                                    } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
+
+                                        ////// Insert entry into DB
+                                        values.put(COLUMN_EVENT_ID, eventId);
+                                        resolver.insert(tableUri, values);
+
+                                        ++syncResult.inserted;
+                                    }
+                                    //else // Do not add a deleted entry (created & removed when offline)
+                                    cursor.close();
+                                }
+
+                            } else {
+                                Logs.add(Logs.Type.E, "Synchronization error: #" +
+                                        reply.getInt(WebServices.JSON_KEY_ERROR));
+                                return false;
+                            }
+
+                        } catch (JSONException e) {
+                            Logs.add(Logs.Type.F, "Unexpected connection reply: " + e.getMessage());
+                            return false;
+                        }
+                        return true;
+                    }
+                });
+        if (result != Internet.DownloadResult.SUCCEEDED) {
+
+            Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
+            if (operation != WebServices.OPERATION_SELECT)
+                resetSyncInProgress(resolver, syncData);
+            return null;
+        }
         return syncResult;
     }
 }
