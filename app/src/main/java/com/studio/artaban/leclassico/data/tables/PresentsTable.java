@@ -64,6 +64,7 @@ public class PresentsTable extends DataTable {
     // Columns
     public static final String COLUMN_EVENT_ID = "PRE_EventID";
     public static final String COLUMN_PSEUDO = "PRE_Pseudo";
+    private static final String COLUMN_STATUS_DATE = "PRE_StatusDate";
 
     // Columns index
     private static final short COLUMN_INDEX_EVENT_ID = 1; // DataField.COLUMN_INDEX_ID + 1
@@ -87,6 +88,10 @@ public class PresentsTable extends DataTable {
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
 
                 ");");
+
+        // Add indexes
+        db.execSQL("CREATE INDEX " + TABLE_NAME + JSON_KEY_EVENT_ID + " ON " +
+                TABLE_NAME + '(' + COLUMN_EVENT_ID + ')');
     }
     @Override
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -131,6 +136,9 @@ public class PresentsTable extends DataTable {
     }
 
     // JSON keys
+    private static final String JSON_KEY_EVENT_ID = COLUMN_EVENT_ID.substring(4);
+    private static final String JSON_KEY_PSEUDO = COLUMN_PSEUDO.substring(4);
+    private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     @Override
     public @Nullable SyncResult synchronize(ContentResolver resolver, byte operation,

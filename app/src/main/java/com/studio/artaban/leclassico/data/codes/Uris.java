@@ -123,11 +123,18 @@ public class Uris {
 
     private static final UriMatcher URI_MATCHER;
     static { // Queries URI
-
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+
+        ////// ID_USER_MEMBERS
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Camarades
                 PATH_USER + "#/" + CamaradesTable.TABLE_NAME, ID_USER_MEMBERS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Camarades/*
                 PATH_USER + "#/" + CamaradesTable.TABLE_NAME + DataProvider.FILTER_ROW, ID_USER_MEMBERS);
+
+        ////// ID_MAIN_EVENTS
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // Events
+                PATH_EVENTS, ID_MAIN_EVENTS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // Events/*
+                PATH_EVENTS + DataProvider.FILTER_ROW, ID_MAIN_EVENTS);
     }
 }
