@@ -88,6 +88,8 @@
         <item>F</item>
         <item>S</item>
     </string-array>
+    <string name="no_previous_event">No existing previous event</string>
+    <string name="no_next_event">No existing next event</string>
 
     <!-- Members -->
     <string name="admin_privilege">Admin privilege</string>

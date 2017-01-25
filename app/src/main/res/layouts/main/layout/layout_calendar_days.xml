@@ -13,42 +13,49 @@
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
@@ -58,42 +65,49 @@
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
@@ -103,42 +117,49 @@
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
@@ -148,42 +169,49 @@
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
@@ -193,42 +221,49 @@
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
@@ -238,42 +273,49 @@
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
         <TextView
             android:clickable="true"
             android:textSize="@dimen/calendar_day_size"
+            android:textStyle="bold"
             android:gravity="center"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>

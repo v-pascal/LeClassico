@@ -84,6 +84,8 @@
         <item>S</item>
         <item>D</item>
     </string-array>
+    <string name="no_previous_event">Aucun évènement précédent</string>
+    <string name="no_next_event">Aucun évènement suivant</string>
 
     <!-- Members -->
     <string name="admin_privilege">Privilèges administrateur</string>

@@ -92,7 +92,7 @@ public class Queries {
                         EvenementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
                         " GROUP BY " + fields +
-                        " ORDER BY " + EvenementsTable.COLUMN_DATE + " DESC", null);
+                        " ORDER BY " + EvenementsTable.COLUMN_DATE + " ASC", null);
             }
             case Uris.ID_RAW_QUERY:
             default: { // Raw query (for multiple table selection)

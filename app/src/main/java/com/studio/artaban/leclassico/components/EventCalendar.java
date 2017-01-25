@@ -2,7 +2,6 @@ package com.studio.artaban.leclassico.components;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -239,7 +238,6 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
         text.setTag((short) day);
         text.setText(String.valueOf(day));
         text.setTextColor(Color.BLACK);
-        text.setTypeface(null, Typeface.NORMAL);
 
         // Set day background
         Calendar calendar = Calendar.getInstance();
@@ -249,7 +247,6 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
                 (calendar.get(Calendar.DAY_OF_MONTH) == day)) { // Mark current day
 
             text.setBackground(getResources().getDrawable(R.drawable.calendar_ripple_current));
-            text.setTypeface(null, Typeface.BOLD);
             text.setTextColor(Color.WHITE);
             marked = true;
         }
@@ -273,7 +270,6 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
                 if (marked) // Today
                     text.setTextColor((startPeriod)? Color.RED:getResources().getColor(R.color.colorAccentProfile));
                 else {
-                    text.setTypeface(null, (startPeriod)? Typeface.BOLD:Typeface.NORMAL);
                     text.setTextColor((startPeriod)? Color.WHITE:Color.BLACK);
                     text.setBackground(getResources().getDrawable((startPeriod) ?
                             R.drawable.calendar_start_background : R.drawable.calendar_ripple_period));

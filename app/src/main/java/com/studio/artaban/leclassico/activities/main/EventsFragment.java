@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.EventCalendar;
@@ -89,29 +90,6 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
             return found;
         }
-        private int getEventPosition() { // Return cursor position lag according if event does not exist...
-            Logs.add(Logs.Type.V, null);
-            int position = 0; // ...and return NO_DATA if any event exists at selected date
-
-            // NB: Needed coz cursor entries are not the only items displayed in the list. Item that
-            //     marks no event info at selected date must be defined as well (if the case)
-            do {
-                int compare = mEventDate.substring(0, 10)
-                        .compareTo(mCursor.getString(COLUMN_INDEX_DATE).substring(0, 10));
-                if (compare == 0) {
-                    position = Constants.NO_DATA;
-                    break;
-                }
-                if (compare < 0)
-                    break;
-
-                ++position;
-
-            } while (mCursor.moveToNext());
-            mCursor.moveToFirst();
-
-            return position;
-        }
 
         //////
         @Override
@@ -121,7 +99,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             EventFragment event = new EventFragment();
             Bundle data = new Bundle();
             data.putInt(EventFragment.ARG_KEY_POSITION, position);
-            data.putInt(EventFragment.ARG_KEY_CURSOR_POSITION, getEventPosition());
+            data.putInt(EventFragment.ARG_KEY_CURSOR_POSITION, mEventLag);
             event.setArguments(data);
             return event;
         }
@@ -145,10 +123,12 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                 Logs.add(Logs.Type.I, "Previous event selected");
                 if (mEventsPager.getCurrentItem() != 0)
                     mEventsPager.setCurrentItem(mEventsPager.getCurrentItem() - 1, false);
-                else { // Inform user no previous event
+                else {
+                    // Inform user no previous event
+                    Toast.makeText(getContext(), R.string.no_previous_event, Toast.LENGTH_SHORT).show();
 
-
-
+                    // TODO: Get previous event from remote DB
+                    return;
                 }
                 break;
             }
@@ -156,25 +136,18 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                 Logs.add(Logs.Type.I, "Next event selected");
                 if (mAdapter.getCount() > (mEventsPager.getCurrentItem() + 1))
                     mEventsPager.setCurrentItem(mEventsPager.getCurrentItem() + 1, false);
-                else { // Inform user no next event
+                else {
+                    // Inform user no next event
+                    Toast.makeText(getContext(), R.string.no_next_event, Toast.LENGTH_SHORT).show();
 
-
-
+                    // TODO: Get next event from remote DB
+                    return;
                 }
                 break;
             }
         }
         // Select date into calendar
-
-
-
-
-        mCalendar.selectPeriod(null, null);
-
-
-
-
-
+        selectCalendarDate();
     }
 
     ////// OnPageChangeListener ////////////////////////////////////////////////////////////////////
@@ -185,19 +158,45 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
     @Override
     public void onPageSelected(int position) {
-        Logs.add(Logs.Type.V, "position: " + position);
-
-
-
-
-
-
 
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        //Logs.add(Logs.Type.V, "state: " + state);
+        switch (state) {
+            case ViewPager.SCROLL_STATE_DRAGGING: {
+                mDraggingItem = mEventsPager.getCurrentItem();
+                break;
+            }
+            case ViewPager.SCROLL_STATE_IDLE: {
+                if (mDraggingItem != mEventsPager.getCurrentItem())
+                    selectCalendarDate();
+                break;
+            }
+        }
+    }
 
+    //
+    private int mDraggingItem; // Item index when user starts changing event by dragging pager view
+    private void selectCalendarDate() { // Select date period into calendar (according selected event)
+        Logs.add(Logs.Type.V, null);
+
+        if (mEventsPager.getCurrentItem() == mEventLag)
+            mCalendar.selectPeriod(mEventDate, null);
+        else {
+            if (!mCursor.move(mEventsPager.getCurrentItem()))
+                throw new RuntimeException("Unexpected event selected");
+
+            mCalendar.selectPeriod(mCursor.getString(COLUMN_INDEX_DATE), mCursor.getString(COLUMN_INDEX_DATE_END));
+
+            // Update bottom shortcut info
+
+
+
+
+            mCursor.moveToFirst();
+        }
     }
 
     ////// OnSelectListener ////////////////////////////////////////////////////////////////////////
@@ -218,25 +217,31 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         if (id == Queries.MAIN_EVENTS_LIST) {
             mCursor = cursor;
 
-            int eventPosition = 0; // Event position of the selected date (in the list)
-            if (mEventDate == null) { // Select today (default)
-
-                Calendar calendar = Calendar.getInstance();
-                mEventDate = String.valueOf(calendar.get(Calendar.YEAR)) + '-' +
+            Calendar calendar = Calendar.getInstance();
+            String today = String.valueOf(calendar.get(Calendar.YEAR)) + '-' +
                         String.format("%02d", calendar.get(Calendar.MONTH) + 1) + '-' +
                         calendar.get(Calendar.DAY_OF_MONTH) + " 00:00:00";
 
-            }
+            if (mEventDate == null) // Select today (default)
+                mEventDate = today;
+
             // Check existing event at selected date
             String endDate = null;
+            mEventLag = 0;
+
+            int eventPosition = 0; // Event position in the list of the selected date (even if not exists)
             do {
                 int compare = mEventDate.substring(0, 10)
                         .compareTo(cursor.getString(COLUMN_INDEX_DATE).substring(0, 10));
                 if (compare == 0) {
+                    mEventLag = Constants.NO_DATA; // Event found (no events cursor lag)
                     endDate = cursor.getString(COLUMN_INDEX_DATE_END);
 
-                    // Set shortcut info
+                    // Set shortcuts info (bottom shortcut as well)
+                    if (mEventDate.compareTo(today) == 0) { // Set top shortcut info (today)
 
+
+                    }
 
 
 
@@ -248,14 +253,19 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                 if (compare < 0)
                     break;
 
+                ++mEventLag;
                 ++eventPosition;
 
             } while (cursor.moveToNext());
             cursor.moveToFirst();
 
-            // Select date (calendar & shortcut)
+            // Select date (calendar & shortcuts)
             mCalendar.selectPeriod(mEventDate, endDate);
-            if (endDate == null) { // Check set shortcut info (no event)
+            if (endDate == null) { // Check set shortcuts info with "no event" (bottom shortcut as well)
+                if (mEventDate.compareTo(today) == 0) { // Set top shortcut info (today)
+
+
+                }
 
 
 
@@ -280,6 +290,9 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     private Cursor mCursor; // Events list query cursor
 
     private String mEventDate; // Selected event date (today as default)
+    private int mEventLag; // Index from which a cursor lag is needed when no selected date event is found
+    // NB: Member above needed coz if no event is found at the selected date an event item with
+    //     the "no event" info is added (adding an index lag between events list & events cursor)
 
     // Query column indexes
     private static final int COLUMN_INDEX_ID = 0;
