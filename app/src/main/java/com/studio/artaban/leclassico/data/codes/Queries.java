@@ -71,6 +71,7 @@ public class Queries {
                 // TODO: Get date filter criteria to return events that follow N month B4 and after it
 
                 String fields = EvenementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +
+                        EvenementsTable.COLUMN_FLYER + ',' +
                         EvenementsTable.COLUMN_NOM + ',' +
                         EvenementsTable.COLUMN_DATE + ',' +
                         EvenementsTable.COLUMN_DATE_END + ',' +

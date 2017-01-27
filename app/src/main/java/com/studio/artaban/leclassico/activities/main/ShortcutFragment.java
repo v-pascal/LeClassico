@@ -192,6 +192,9 @@ public class ShortcutFragment extends Fragment implements View.OnClickListener, 
                         .getDrawable(R.drawable.event_date_background));
                 mRootView.findViewById(R.id.layout_end_date).setBackground(getResources()
                         .getDrawable(R.drawable.event_date_background));
+                if (getId() == R.id.shortcut_events_bottom)
+                    mRootView.findViewById(R.id.layout_data).setBackground(getResources()
+                            .getDrawable(R.drawable.publication_background));
                 ((TextView)mRootView.findViewById(R.id.end_date)).setTextColor(Color.WHITE);
                 ((TextView)mRootView.findViewById(R.id.end_time)).setTextColor(Color.WHITE);
                 ((TextView)mRootView.findViewById(R.id.text_message)).setGravity(Gravity.CENTER);

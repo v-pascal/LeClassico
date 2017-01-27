@@ -44,6 +44,36 @@
     <dimen name="event_height">420dp</dimen>
     <dimen name="event_horizontal_margin">60dp</dimen><!-- = 2 * event_margin + event_select_width -->
 
+
+
+
+    <dimen name="event_info_height">24dp</dimen>
+    <dimen name="event_command_height">48dp</dimen>
+
+
+
+
+    <dimen name="event_text_size">18sp</dimen>
+
+
+
+
+    <dimen name="event_title_size">28sp</dimen>
+    <item name="event_shadow_delta" format="float" type="dimen">2.0</item>
+    <item name="event_shadow_radius" format="float" type="dimen">1.5</item>
+    <dimen name="event_info_margin">6dp</dimen>
+    <dimen name="event_remark_margin">54dp</dimen><!-- = event_command_height + event_info_margin -->
+
+
+
+
+
+
+
+
+
+
+
     <!-- Members -->
     <dimen name="member_item_padding">8dp</dimen>
     <dimen name="member_letter_size">36sp</dimen>

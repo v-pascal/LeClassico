@@ -38,32 +38,52 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     //////
     public static class EventFragment extends Fragment { ///////////////////////////////////////////
 
-        public static final String ARG_KEY_POSITION = "position";
-        public static final String ARG_KEY_CURSOR_POSITION = "cursorPosition";
+        public static final String ARG_KEY_EVENT_ID = "eventID";
+        public static final String ARG_KEY_FLYER = "flyer";
+        public static final String ARG_KEY_TITLE = "title";
+        public static final String ARG_KEY_DATE_START = "dateStart";
+        public static final String ARG_KEY_DATE_END = "dateEnd";
+        public static final String ARG_KEY_LOCATION = "location";
+        public static final String ARG_KEY_MEMBERS = "members";
+        public static final String ARG_KEY_REMARK = "remark";
 
         //////
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            //Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
+            //        ";savedInstanceState: " + savedInstanceState);
             View rootView = inflater.inflate(R.layout.fragment_event, container, false);
 
+            if (getArguments().getInt(ARG_KEY_EVENT_ID) == Constants.NO_DATA) { // No event on selected date
+                // Flyer
+
+
+
+
+                // Schedule
 
 
 
 
 
-
-            ((TextView) rootView.findViewById(R.id.test1))
-                    .setText(String.valueOf(getArguments().getInt(ARG_KEY_POSITION)));
-            ((TextView) rootView.findViewById(R.id.test2))
-                    .setText(String.valueOf(getArguments().getInt(ARG_KEY_CURSOR_POSITION)));
+            } else {
+                // Flyer
 
 
 
 
+                // Schedule
 
 
 
 
+            }
+            // Set event info: Title, location, members count & remark
+            ((TextView) rootView.findViewById(R.id.text_title)).setText(getArguments().getString(ARG_KEY_TITLE));
+            ((TextView) rootView.findViewById(R.id.text_location)).setText(getArguments().getString(ARG_KEY_LOCATION));
+            ((TextView) rootView.findViewById(R.id.text_info)).setText(getArguments().getString(ARG_KEY_REMARK));
+            ((TextView) rootView.findViewById(R.id.text_members))
+                    .setText(String.valueOf(getArguments().getInt(ARG_KEY_MEMBERS)));
 
             return rootView;
         }
@@ -75,7 +95,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         }
 
         private boolean isEventExists() { // Return if one event exists at selected date
-            Logs.add(Logs.Type.V, null);
+            //Logs.add(Logs.Type.V, null);
             boolean found = false;
 
             do {
@@ -95,11 +115,34 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         @Override
         public Fragment getItem(int position) {
             Logs.add(Logs.Type.V, "section: " + position);
-
-            EventFragment event = new EventFragment();
             Bundle data = new Bundle();
-            data.putInt(EventFragment.ARG_KEY_POSITION, position);
-            data.putInt(EventFragment.ARG_KEY_CURSOR_POSITION, mEventLag);
+
+            if (mEventLag == position) { // Check "no event" page
+                data.putInt(EventFragment.ARG_KEY_EVENT_ID, Constants.NO_DATA);
+                data.putString(EventFragment.ARG_KEY_DATE_START, mEventDate);
+
+
+
+
+
+
+            } else {
+                // Position cursor offset to event position (according date selection)
+                if ((mEventLag != Constants.NO_DATA) && (mEventLag < position))
+                    --position; // -1 to skip "no event" page
+                mCursor.move(position);
+
+                data.putInt(EventFragment.ARG_KEY_EVENT_ID, mCursor.getInt(COLUMN_INDEX_ID));
+                data.putString(EventFragment.ARG_KEY_FLYER, mCursor.getString(COLUMN_INDEX_FLYER));
+                data.putString(EventFragment.ARG_KEY_TITLE, mCursor.getString(COLUMN_INDEX_NOM));
+                data.putString(EventFragment.ARG_KEY_DATE_START, mCursor.getString(COLUMN_INDEX_DATE));
+                data.putString(EventFragment.ARG_KEY_DATE_END, mCursor.getString(COLUMN_INDEX_DATE_END));
+                data.putString(EventFragment.ARG_KEY_LOCATION, mCursor.getString(COLUMN_INDEX_LIEU));
+                data.putInt(EventFragment.ARG_KEY_MEMBERS, mCursor.getInt(COLUMN_INDEX_PRESENT_MEMBERS));
+                data.putString(EventFragment.ARG_KEY_REMARK, mCursor.getString(COLUMN_INDEX_REMARK));
+                mCursor.moveToFirst();
+            }
+            EventFragment event = new EventFragment();
             event.setArguments(data);
             return event;
         }
@@ -182,21 +225,39 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     private void selectCalendarDate() { // Select date period into calendar (according selected event)
         Logs.add(Logs.Type.V, null);
 
-        if (mEventsPager.getCurrentItem() == mEventLag)
+        if (mEventsPager.getCurrentItem() == mEventLag) {
             mCalendar.selectPeriod(mEventDate, null);
-        else {
+            resetShortcut();
+
+        } else {
             if (!mCursor.move(mEventsPager.getCurrentItem()))
                 throw new RuntimeException("Unexpected event selected");
 
             mCalendar.selectPeriod(mCursor.getString(COLUMN_INDEX_DATE), mCursor.getString(COLUMN_INDEX_DATE_END));
 
             // Update bottom shortcut info
-
-
-
-
+            updateShortcut((ShortcutFragment) getChildFragmentManager().findFragmentById(R.id.shortcut_events_bottom));
             mCursor.moveToFirst();
         }
+    }
+
+    private void updateShortcut(ShortcutFragment shortcut) { // Update shortcut info with cursor info
+        Logs.add(Logs.Type.V, "shortcut: " + shortcut);
+
+        shortcut.setDate(true, mCursor.getString(COLUMN_INDEX_DATE));
+        shortcut.setDate(false, mCursor.getString(COLUMN_INDEX_DATE_END));
+        shortcut.setMessage(new SpannableStringBuilder(mCursor.getString(COLUMN_INDEX_NOM)));
+        shortcut.setInfo(new SpannableStringBuilder(mCursor.getString(COLUMN_INDEX_LIEU)));
+    }
+    private void resetShortcut() { // Display no event info into bottom shortcut
+        Logs.add(Logs.Type.V, null);
+
+        ShortcutFragment shortcut = (ShortcutFragment) getChildFragmentManager()
+                .findFragmentById(R.id.shortcut_events_bottom);
+        shortcut.setDate(true, null);
+        shortcut.setDate(false, null);
+        shortcut.setMessage(new SpannableStringBuilder(getString(R.string.no_event)));
+        shortcut.setInfo(new SpannableStringBuilder(getString(R.string.no_event_info)));
     }
 
     ////// OnSelectListener ////////////////////////////////////////////////////////////////////////
@@ -235,19 +296,18 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                         .compareTo(cursor.getString(COLUMN_INDEX_DATE).substring(0, 10));
                 if (compare == 0) {
                     mEventLag = Constants.NO_DATA; // Event found (no events cursor lag)
-                    endDate = cursor.getString(COLUMN_INDEX_DATE_END);
+                    endDate = cursor.getString(COLUMN_INDEX_DATE_END); // NB: Always != NULL
 
                     // Set shortcuts info (bottom shortcut as well)
                     if (mEventDate.compareTo(today) == 0) { // Set top shortcut info (today)
-
-
+                        try {
+                            updateShortcut(mListener.onGetShortcut(Constants.MAIN_SECTION_EVENTS, false));
+                        } catch (NullPointerException e) {
+                            Logs.add(Logs.Type.F, "Activity not attached");
+                        }
                     }
-
-
-
-
-
-
+                    updateShortcut((ShortcutFragment) getChildFragmentManager()
+                            .findFragmentById(R.id.shortcut_events_bottom));
                     break; // Stop at first event found
                 }
                 if (compare < 0)
@@ -261,17 +321,21 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
             // Select date (calendar & shortcuts)
             mCalendar.selectPeriod(mEventDate, endDate);
+
             if (endDate == null) { // Check set shortcuts info with "no event" (bottom shortcut as well)
                 if (mEventDate.compareTo(today) == 0) { // Set top shortcut info (today)
+                    try {
+                        ShortcutFragment shortcut = mListener.onGetShortcut(Constants.MAIN_SECTION_EVENTS, false);
+                        shortcut.setDate(true, null);
+                        shortcut.setDate(false, null);
+                        shortcut.setMessage(new SpannableStringBuilder(getString(R.string.no_event)));
+                        shortcut.setInfo(new SpannableStringBuilder(getString(R.string.no_event_info)));
 
-
+                    } catch (NullPointerException e) {
+                        Logs.add(Logs.Type.F, "Activity not attached");
+                    }
                 }
-
-
-
-
-
-
+                resetShortcut();
             }
             mAdapter.notifyDataSetChanged();
             mEventsPager.setCurrentItem(eventPosition, false);
@@ -282,6 +346,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     public void onLoaderReset() {
         Logs.add(Logs.Type.V, null);
         mCursor = null;
+        mAdapter.notifyDataSetChanged();
     }
 
     //////
@@ -296,12 +361,13 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
     // Query column indexes
     private static final int COLUMN_INDEX_ID = 0;
-    private static final int COLUMN_INDEX_NOM = 1;
-    private static final int COLUMN_INDEX_DATE = 2;
-    private static final int COLUMN_INDEX_DATE_END = 3;
-    private static final int COLUMN_INDEX_LIEU = 4;
-    private static final int COLUMN_INDEX_REMARK = 5;
-    private static final int COLUMN_INDEX_PRESENT_MEMBERS = 6;
+    private static final int COLUMN_INDEX_FLYER = 1;
+    private static final int COLUMN_INDEX_NOM = 2;
+    private static final int COLUMN_INDEX_DATE = 3;
+    private static final int COLUMN_INDEX_DATE_END = 4;
+    private static final int COLUMN_INDEX_LIEU = 5;
+    private static final int COLUMN_INDEX_REMARK = 6;
+    private static final int COLUMN_INDEX_PRESENT_MEMBERS = 7;
 
     private void refresh() { // Refresh query loader
         //Logs.add(Logs.Type.V, "date: " + date);

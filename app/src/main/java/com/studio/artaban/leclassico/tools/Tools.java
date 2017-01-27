@@ -117,6 +117,12 @@ public final class Tools { /////////////////////////////////////////////////////
     // i.e: --/-- for the date & --:-- for the time
 
         Logs.add(Logs.Type.V, "context: " + context + ";date: " + date + ";time: " + time);
+        if (dateTime == null) { // Check to reset date & time fields
+
+            date.setText(context.getString(R.string.format_date_default));
+            time.setText(context.getString(R.string.format_time_default));
+            return;
+        }
         DateFormat paramFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
         try {
             Date paramDate = paramFormat.parse(dateTime);
