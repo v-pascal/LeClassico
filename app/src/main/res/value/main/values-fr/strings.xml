@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Main -->
 
+    <string name="from">Du: %1$s</string>
+    <string name="to">Au: %1$s</string>
+
     <!-- Shortcut -->
     <string name="home_connected">Membre %1$s connecté!</string>
     <string name="home_info">Nouveaux messages: %1$d - Nouvelles notifications: %2$d</string>

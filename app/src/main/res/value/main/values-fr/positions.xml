@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Main -->
 
+    <integer name="from_pos">4</integer>
+    <integer name="to_pos">4</integer>
+
     <!-- Notifications -->
     <integer name="notify_shared_message_pseudo_pos">0</integer>
     <integer name="notify_shared_info_album_pos">17</integer>

@@ -28,6 +28,7 @@ public class FullPhotoActivity extends LoggedActivity {
 
     public static final String EXTRA_DATA_TITLE = "title";
     public static final String EXTRA_DATA_NAME = "name";
+    public static final String EXTRA_DATA_FLYER = "flyer";
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
@@ -69,7 +70,8 @@ public class FullPhotoActivity extends LoggedActivity {
         // Set transition name to display photo
         ImageView photo =(ImageView) findViewById(R.id.image_full);
         photo.setTransitionName(getIntent().getStringExtra(EXTRA_DATA_NAME));
-        Bitmap bmp = BitmapFactory.decodeFile(Storage.get() + Storage.FOLDER_PHOTOS +
+        Bitmap bmp = BitmapFactory.decodeFile(Storage.get() +
+                ((!getIntent().hasExtra(EXTRA_DATA_FLYER))? Storage.FOLDER_PHOTOS:Storage.FOLDER_FLYERS) +
                 File.separator + getIntent().getStringExtra(EXTRA_DATA_NAME));
         if (bmp != null)
             photo.setImageBitmap(bmp);

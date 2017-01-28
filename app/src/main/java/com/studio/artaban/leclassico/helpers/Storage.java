@@ -20,6 +20,7 @@ public final class Storage {
     public static final String FOLDER_PROFILES = File.separator + "Profiles";
     public static final String FOLDER_PHOTOS = File.separator + "Photos";
     public static final String FOLDER_LINKS = File.separator + "Links";
+    public static final String FOLDER_FLYERS = File.separator + "Flyers";
 
     //
     private static String FOLDER; // Application working folder path
@@ -134,6 +135,7 @@ public final class Storage {
         createFolder(FOLDER + Storage.FOLDER_PROFILES);
         createFolder(FOLDER + Storage.FOLDER_PHOTOS);
         createFolder(FOLDER + Storage.FOLDER_LINKS);
+        createFolder(FOLDER + Storage.FOLDER_FLYERS);
         return true;
     }
 }

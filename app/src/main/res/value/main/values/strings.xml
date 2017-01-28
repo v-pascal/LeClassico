@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Main -->
 
+    <string name="from">From: %1$s</string>
+    <string name="to">To: %1$s</string>
+
     <!-- Shortcut -->
     <string name="home_connected">Member %1$s connected!</string><!-- @integer/home_connected_pseudo_pos -->
     <string name="home_info">New messages: %1$d - New notifications: %2$d</string><!-- @integer/home_info_mail_pos & home_info_notify_pos -->

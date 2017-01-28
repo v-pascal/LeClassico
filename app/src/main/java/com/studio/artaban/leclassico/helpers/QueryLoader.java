@@ -81,8 +81,8 @@ public class QueryLoader {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
             Logs.add(Logs.Type.V, "data: " + data);
+
             if (mListener != null)
                 mListener.onLoadFinished(mLoaderId, data);
             else
@@ -91,12 +91,16 @@ public class QueryLoader {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-
             Logs.add(Logs.Type.V, null);
-            if (mListener != null)
-                mListener.onLoaderReset();
-            else
-                Logs.add(Logs.Type.W, "No result listener (onLoaderReset)");
+            try {
+                if (mListener != null)
+                    mListener.onLoaderReset();
+                else
+                    Logs.add(Logs.Type.W, "No result listener (onLoaderReset)");
+
+            } catch (IllegalStateException e) {
+                Logs.add(Logs.Type.E, "No activity");
+            }
         }
     };
 

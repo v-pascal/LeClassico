@@ -6,28 +6,20 @@
 
     <!-- Flyer -->
     <FrameLayout
+        android:id="@+id/layout_flyer"
+        android:background="@color/light_gray"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp">
 
-
-
-
-
         <ImageView
             android:id="@+id/image_flyer"
-            android:background="@color/light_gray"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
+            android:src="@drawable/no_flyer"
+            android:clickable="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-        <!--
-            android:src="@drawable/no_flyer"
-         -->
-
-
-
-
 
         <!-- Event title -->
         <TextView
@@ -60,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/event_info_height"/>
         <TextView
-            android:id="@+id/text_hourly_label"
+            android:id="@+id/text_hourly"
             android:textColor="@android:color/black"
             android:textSize="@dimen/event_text_size"
             android:singleLine="true"
@@ -181,6 +173,8 @@
             android:id="@+id/image_display"
             android:tint="@android:color/black"
             android:src="@drawable/ic_open_in_new_white_48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/image_hourly"
             android:layout_marginTop="@dimen/event_info_margin"
@@ -188,5 +182,4 @@
             android:layout_height="@dimen/event_command_height"/>
 
     </RelativeLayout>
-
 </LinearLayout>

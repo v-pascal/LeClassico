@@ -398,7 +398,9 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
 
         short day = (short)sender.getTag();
         if (mListener != null)
-            mListener.onDateSelected(mYear + '-' + mMonth + '-' + day + " 00:00:00");
+            mListener.onDateSelected(String.valueOf(mYear) + '-' +
+                    String.format("%02d", mMonth + 1) + '-' +
+                    String.format("%02d", day) + Constants.NO_TIME);
         else
             Logs.add(Logs.Type.D, "No date selection listener defined");
     }

@@ -7,6 +7,7 @@ package com.studio.artaban.leclassico.data;
 public final class Constants {
 
     public static final int NO_DATA = -1; // No value (integer)
+    public static final String NO_TIME = " 00:00:00"; // No time format
     public static final String UNDEFINED = ""; // Empty string == undefined (not NULL)
 
     ////// Application /////////////////////////////////////////////////////////////////////////////
@@ -19,6 +20,7 @@ public final class Constants {
     public static final String APP_WEBSERVICES = APP_WEBSITE + "WebServices"; // LeClassico web services URL
     public static final String APP_URL_PROFILES = APP_WEBSITE + "Profiles"; // LeClassico profile URL
     public static final String APP_URL_PHOTOS = APP_WEBSITE + "Photos"; // LeClassico photos URL
+    public static final String APP_URL_FLYERS = APP_WEBSITE + "Flyers"; // LeClassico flyers URL
 
     // Preference keys
     public static final String APP_PREFERENCE = APP_NAME + "Preferences"; // Application preference

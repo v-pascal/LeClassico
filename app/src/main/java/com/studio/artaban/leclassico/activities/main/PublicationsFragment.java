@@ -300,7 +300,6 @@ public class PublicationsFragment extends MainFragment implements
                     Glider.with(getContext()).placeholder(R.drawable.no_photo)
                             .load(Storage.FOLDER_PHOTOS + File.separator + photo,
                                     Constants.APP_URL_PHOTOS + '/' + photo)
-                            .placeholder(R.drawable.no_photo)
                             .into(image, new Glider.OnLoadListener() {
                                 @Override
                                 public void onLoadFailed(ImageView imageView) {
