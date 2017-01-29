@@ -335,8 +335,16 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
 
         DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
         try {
-            mStartDate = dateFormat.parse(start);
-            mEndDate = (end != null)? dateFormat.parse(end):null;
+            Date startDate = dateFormat.parse(start);
+            Date endDate = (end != null) ? dateFormat.parse(end) : null;
+
+            if (mStartDate != null) { // Check change needs
+                if ((mStartDate.compareTo(startDate) == 0) && (((endDate == null) && (mEndDate == null)) ||
+                        ((endDate != null) && (mEndDate != null) && (mEndDate.compareTo(endDate) == 0))))
+                    return; // Nothing to do
+            }
+            mStartDate = startDate;
+            mEndDate = endDate;
 
             // Display month & year (start date)
             Calendar calendar = Calendar.getInstance();
@@ -488,7 +496,6 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
     //////
     private void setPreviousMonth() {
         Logs.add(Logs.Type.V, null);
-
         --mMonth;
         if (mMonth < 0) {
             mMonth = 11;
@@ -497,7 +504,6 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
     }
     private void setNextMonth() {
         Logs.add(Logs.Type.V, null);
-
         ++mMonth;
         if (mMonth == 12) {
             mMonth = 0;

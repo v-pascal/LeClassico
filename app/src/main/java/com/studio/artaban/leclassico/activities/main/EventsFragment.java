@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -206,7 +206,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         }
     }
     private EventPagerAdapter mAdapter; // Events list adapter
-    private class EventPagerAdapter extends FragmentPagerAdapter { /////////////////////////////////
+    private class EventPagerAdapter extends FragmentStatePagerAdapter { ////////////////////////////
         public EventPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -267,7 +267,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         public int getItemPosition(Object object) {
             Logs.add(Logs.Type.V, null);
             return POSITION_NONE;
-            // NB: Needed to refresh all page at data change notification (e.i Internet connection)
+            // NB: Needed to refresh all page at data change notification (e.g Internet connection)
         }
     }
 
@@ -361,7 +361,12 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             resetShortcut();
 
         } else {
-            if (!mCursor.move(mEventsPager.getCurrentItem()))
+            // Position cursor offset to event position (according date selection)
+            int cursorPos = mEventsPager.getCurrentItem();
+            if ((mEventLag != Constants.NO_DATA) && (mEventLag < cursorPos))
+                --cursorPos; // -1 to skip "no event" page
+
+            if (!mCursor.move(cursorPos))
                 throw new RuntimeException("Unexpected event selected");
 
             mCalendar.selectPeriod(mCursor.getString(COLUMN_INDEX_DATE), mCursor.getString(COLUMN_INDEX_DATE_END));
@@ -388,7 +393,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         shortcut.setDate(true, null);
         shortcut.setDate(false, null);
         shortcut.setMessage(new SpannableStringBuilder(getString(R.string.no_event)));
-        shortcut.setInfo(new SpannableStringBuilder(getString(R.string.no_event_info)));
+        shortcut.setInfo(new SpannableStringBuilder(getString(R.string.no_event_selection)));
     }
 
     ////// OnSelectListener ////////////////////////////////////////////////////////////////////////
@@ -451,7 +456,6 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             cursor.moveToFirst();
 
             // Select date (calendar & shortcuts)
-            //Logs.add(Logs.Type.I, "Event lag: " + mEventLag);
             mCalendar.selectPeriod(mEventDate, endDate);
 
             if (endDate == null) { // Check set shortcuts info with "no event" (bottom shortcut as well)
@@ -532,8 +536,10 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         mCalendar = (EventCalendar) rootView.findViewById(R.id.event_calendar);
         mCalendar.setOnSelectListener(this);
         mEventsPager = (ViewPager) rootView.findViewById(R.id.pager_events);
-        mEventsPager.setAdapter(mAdapter);
         mEventsPager.addOnPageChangeListener(this);
+        mEventsPager.setAdapter(mAdapter);
+        mEventDate = null;
+        mCursor = null;
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_event));

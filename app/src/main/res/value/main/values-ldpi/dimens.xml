@@ -73,7 +73,6 @@
 
 
 
-
     <!-- Members -->
     <dimen name="member_item_padding">8dp</dimen>
     <dimen name="member_letter_size">36sp</dimen>

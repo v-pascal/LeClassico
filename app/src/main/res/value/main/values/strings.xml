@@ -12,6 +12,7 @@
     <string name="no_publication_text">[Without comment]</string>
     <string name="no_event">No event</string>
     <string name="no_event_info">No event announced today</string>
+    <string name="no_event_selection">No event announced at this date</string>
     <string name="last_event_info">Last event announced</string>
     <string name="last_followed_info">Last followed member</string>
     <string name="no_notification">No notification</string>
