@@ -55,6 +55,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     //////
     public static class EventFragment extends Fragment implements View.OnClickListener { ///////////
 
+        public static final String ARG_KEY_POSITION = "position";
         public static final String ARG_KEY_EVENT_ID = "eventID";
         public static final String ARG_KEY_FLYER = "flyer";
         public static final String ARG_KEY_TITLE = "title";
@@ -202,6 +203,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                 rootView.findViewById(R.id.image_flyer).setOnClickListener(this);
                 rootView.findViewById(R.id.image_display).setOnClickListener(this);
             }
+            rootView.setTag(getArguments().getInt(ARG_KEY_POSITION)); // Add tag to be able to find it
             return rootView;
         }
     }
@@ -233,7 +235,9 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             Logs.add(Logs.Type.V, "section: " + position);
             Bundle data = new Bundle();
 
-            if (mEventLag == position) { // Check "no event" page
+            data.putInt(EventFragment.ARG_KEY_POSITION, position);
+            if (mEventLag == position) {
+                // "no event" page found
                 data.putInt(EventFragment.ARG_KEY_EVENT_ID, Constants.NO_DATA);
                 data.putString(EventFragment.ARG_KEY_DATE_START, mEventDate);
 
@@ -265,7 +269,6 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
         @Override
         public int getItemPosition(Object object) {
-            Logs.add(Logs.Type.V, null);
             return POSITION_NONE;
             // NB: Needed to refresh all page at data change notification (e.g Internet connection)
         }
@@ -332,7 +335,11 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
     @Override
     public void onPageSelected(int position) {
+        //Logs.add(Logs.Type.V, "position: " + position);
 
+        mCurrentItem = position;
+        if ((!refreshEventPage(position + 1)) && (position > 0))
+            refreshEventPage(position - 1);
     }
 
     @Override
@@ -353,6 +360,40 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
     //
     private int mDraggingItem; // Item index when user starts changing event by dragging pager view
+    private int mCurrentItem; // Current event index selected
+
+    private int mRefreshItem = Constants.NO_DATA; // Event page index to refresh
+    // NB: Member needed to fix issue that store fragment state of the last selected page
+    //     with oldest content (need to refresh page below)
+
+    private boolean refreshEventPage(int nextSelection) { // Refresh next page B4 selection (see above)
+        //Logs.add(Logs.Type.V, "nextSelection: " + nextSelection);
+
+        if ((mCursor != null) && (mRefreshItem == nextSelection)) {
+            mRefreshItem = Constants.NO_DATA;
+
+            Logs.add(Logs.Type.E, "Refresh event page: " + nextSelection);
+            ViewGroup page = (ViewGroup) mEventsPager.findViewWithTag(nextSelection);
+
+
+
+
+
+
+            //((TextView) page.findViewById(R.id.text_info)).setText("Ola");
+
+
+
+
+
+
+
+
+            return true;
+        }
+        return false;
+    }
+
     private void selectCalendarDate() { // Select date period into calendar (according selected event)
         Logs.add(Logs.Type.V, null);
 
@@ -474,6 +515,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                 resetShortcut();
             }
             mAdapter.notifyDataSetChanged();
+            refreshEventPage(eventPosition); // Do it now (B4 selection)
             mEventsPager.setCurrentItem(eventPosition, false);
         }
     }
@@ -521,7 +563,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         Logs.add(Logs.Type.V, "context: " + context);
 
         mEventsLoader = new QueryLoader(context, this);
-        mAdapter = new EventPagerAdapter(getActivity().getSupportFragmentManager());
+        mAdapter = new EventPagerAdapter(getChildFragmentManager());
         Internet.addConnectivityListener(this);
     }
 
@@ -533,13 +575,13 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         View rootView = inflater.inflate(R.layout.fragment_events, container, false);
         rootView.setTag(Constants.MAIN_SECTION_EVENTS);
 
+        mEventDate = null;
+        mCursor = null;
         mCalendar = (EventCalendar) rootView.findViewById(R.id.event_calendar);
         mCalendar.setOnSelectListener(this);
         mEventsPager = (ViewPager) rootView.findViewById(R.id.pager_events);
         mEventsPager.addOnPageChangeListener(this);
         mEventsPager.setAdapter(mAdapter);
-        mEventDate = null;
-        mCursor = null;
 
         // Set shortcut data (default)
         SpannableStringBuilder data = new SpannableStringBuilder(getString(R.string.no_event));
@@ -565,5 +607,14 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             getChildFragmentManager().executePendingTransactions();
         }
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Logs.add(Logs.Type.V, null);
+
+        mRefreshItem = mCurrentItem;
+        // NB: See assigned member declaration comments
     }
 }

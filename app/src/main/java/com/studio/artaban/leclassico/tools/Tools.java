@@ -7,9 +7,11 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
+import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -47,11 +49,11 @@ public final class Tools { /////////////////////////////////////////////////////
 
     private static float PROFILE_SIZE_RADIUS_FACTOR = 80f;
     public static void setProfile(final Activity activity, ImageView view, final boolean female,
-                                  String profile, final int size, final boolean clickable) {
+                                  String profile, @DimenRes final int size, final boolean clickable) {
     // Display profile image using 'Glider' class (expected user profile & gender)
 
-        Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
-                ";profile: " + profile + ";clickable: " + clickable);
+        //Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
+        //        ";profile: " + profile + ";clickable: " + clickable);
         if (profile != null)
             Glider.with(activity)
                     .load(Storage.FOLDER_PROFILES +
@@ -78,10 +80,10 @@ public final class Tools { /////////////////////////////////////////////////////
                                 public boolean onSetResource(Bitmap resource, ImageView imageView) {
                                     //Logs.add(Logs.Type.V, "resource: " + resource +
                                     //        ";imageView: " + imageView);
-
                                     RoundedBitmapDrawable radiusBmp =
                                             RoundedBitmapDrawableFactory.create(activity.getResources(),
                                                     resource);
+
                                     TypedValue radius = new TypedValue();
                                     activity.getResources().getValue(R.dimen.profile_radius, radius, true);
                                     float factor = activity.getResources().getDimension(size) /
@@ -108,6 +110,51 @@ public final class Tools { /////////////////////////////////////////////////////
                     .getColor(R.color.black_transparent)),
                     activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
                     activity.getDrawable(R.drawable.man)));
+        }
+    }
+    private static RoundedBitmapDrawable getHeaderBmp(Activity activity, Bitmap resource) {
+        Logs.add(Logs.Type.V, "activity: " + activity + ";resource: " + resource);
+        RoundedBitmapDrawable radiusBmp =
+                RoundedBitmapDrawableFactory.create(activity.getResources(),
+                        resource);
+
+        radiusBmp.setCornerRadius(activity.getResources().getDimension(R.dimen.profile_border_radius));
+        return radiusBmp;
+    }
+    public static void setHeaderProfile(final Activity activity, ImageView view,
+                                        final boolean female, String profile) {
+    // Display header profile image using 'Glider' class (expected user profile & gender)
+    // NB: Needed coz default profile image radius does not match with header profile radius
+
+        Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
+                ";profile: " + profile);
+        if (profile != null)
+            Glider.with(activity)
+                    .load(Storage.FOLDER_PROFILES +
+                                    File.separator + profile,
+                            Constants.APP_URL_PROFILES + '/' + profile)
+                    .into(view, new Glider.OnLoadListener() {
+
+                        @Override
+                        public void onLoadFailed(ImageView imageView) {
+                            Logs.add(Logs.Type.V, "imageView: " + imageView);
+                            Bitmap defaultImage = BitmapFactory.decodeResource(activity.getResources(),
+                                    (female) ? R.drawable.woman : R.drawable.man);
+                            imageView.setImageDrawable(getHeaderBmp(activity, defaultImage));
+                        }
+
+                        @Override
+                        public boolean onSetResource(Bitmap resource, ImageView imageView) {
+                            Logs.add(Logs.Type.V, "resource: " + resource + ";imageView: " + imageView);
+                            RoundedBitmapDrawable radiusBmp = getHeaderBmp(activity, resource);
+                            imageView.setImageDrawable(radiusBmp);
+                            return true;
+                        }
+                    });
+        else {
+            Bitmap defaultImage = BitmapFactory.decodeResource(activity.getResources(),
+                    (female) ? R.drawable.woman : R.drawable.man);
+            view.setImageDrawable(getHeaderBmp(activity, defaultImage));
         }
     }
 

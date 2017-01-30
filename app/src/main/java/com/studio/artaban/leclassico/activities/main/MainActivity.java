@@ -193,9 +193,9 @@ public class MainActivity extends LoggedActivity implements
             View navHeader = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
 
             // Profile
-            Tools.setProfile(MainActivity.this,
+            Tools.setHeaderProfile(MainActivity.this,
                     (ImageView)navHeader.findViewById(R.id.image_header_profile),
-                    female, profile, R.dimen.profile_drawer_size, false);
+                    female, profile);
 
             // Banner
             if (banner != null)
