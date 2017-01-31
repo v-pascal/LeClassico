@@ -108,6 +108,7 @@ public final class Storage {
                 file.delete();
         }
     }
+
     public static boolean createFolder(String folder) {
         Logs.add(Logs.Type.V, "folder: " + folder);
 

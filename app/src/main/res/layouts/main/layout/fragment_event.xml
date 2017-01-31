@@ -19,7 +19,11 @@
             android:src="@drawable/no_flyer"
             android:clickable="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+
+            <tag android:id="@+id/tag_flyer"/>
+            <tag android:id="@+id/tag_title"/>
+        </ImageView>
 
         <!-- Event title -->
         <TextView
@@ -39,6 +43,7 @@
 
     <!-- Info -->
     <RelativeLayout
+        android:id="@+id/layout_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -182,4 +187,15 @@
             android:layout_height="@dimen/event_command_height"/>
 
     </RelativeLayout>
+
+    <!-- No event info -->
+    <TextView
+        android:id="@+id/text_no_event"
+        android:visibility="gone"
+        android:textSize="@dimen/event_title_size"
+        android:textColor="@android:color/black"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

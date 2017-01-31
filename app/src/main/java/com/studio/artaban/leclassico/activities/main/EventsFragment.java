@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.activities.main;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -65,7 +66,114 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         public static final String ARG_KEY_MEMBERS = "members";
         public static final String ARG_KEY_REMARK = "remark";
 
-        private boolean mFlyerLoaded; // Flyer loaded flag
+        public static void createView(Context context, Resources resources,
+                                      View rootView, final Bundle data) { // Fill event info into UI
+            //Logs.add(Logs.Type.V, "context: " + context + ";resources: " + resources +
+            //        ";rootView: " + rootView + ";data: " + data);
+
+            ImageView flyer = (ImageView) rootView.findViewById(R.id.image_flyer);
+            flyer.setTag(R.id.tag_flyer, data.getString(ARG_KEY_FLYER));
+            flyer.setTag(R.id.tag_title, data.getString(ARG_KEY_TITLE));
+
+            DateFormat selected = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+            if (data.getInt(ARG_KEY_EVENT_ID) == Constants.NO_DATA) { // No event on selected date
+
+                rootView.findViewById(R.id.layout_data).setVisibility(View.GONE);
+                rootView.findViewById(R.id.layout_flyer).setBackground(null);
+
+                // Display "no event" image (as flyer)
+                int padding = (int)resources.getDimension(R.dimen.event_no_padding);
+                flyer.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                flyer.setImageDrawable(resources.getDrawable(R.drawable.no_event));
+                flyer.setPadding(padding, padding, padding, padding);
+                flyer.setClickable(false);
+
+                // Display selected date with "no event" message
+                StringBuilder info = new StringBuilder();
+                DateFormat display = android.text.format.DateFormat.getLongDateFormat(context);
+                try {
+                    Date selectedDate = selected.parse(data.getString(ARG_KEY_DATE_START));
+                    info.append(display.format(selectedDate));
+                    info.append('\n');
+
+                } catch (ParseException e) {
+                    Logs.add(Logs.Type.E, "Wrong selected date & time format: " +
+                            data.getString(ARG_KEY_DATE_START));
+                }
+                info.append(context.getString(R.string.no_event));
+
+                //
+                TextView noEvent = (TextView) rootView.findViewById(R.id.text_no_event);
+                noEvent.setVisibility(View.VISIBLE);
+                noEvent.setText(info.toString());
+
+            } else {
+                rootView.findViewById(R.id.layout_data).setVisibility(View.VISIBLE);
+                rootView.findViewById(R.id.text_no_event).setVisibility(View.GONE);
+                rootView.findViewById(R.id.layout_flyer)
+                        .setBackground(resources.getDrawable(R.color.light_gray));
+                flyer.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                flyer.setImageDrawable(resources.getDrawable(R.drawable.no_flyer));
+                flyer.setPadding(0, 0, 0, 0);
+                flyer.setClickable(true);
+
+                // Flyer
+                final String flyerName = data.getString(ARG_KEY_FLYER);
+                if (flyerName != null)
+                    Glider.with(context).placeholder(R.drawable.no_flyer)
+                            .load(Storage.FOLDER_FLYERS + File.separator + flyerName,
+                                    Constants.APP_URL_FLYERS + '/' + flyerName)
+                            .into(flyer, new Glider.OnLoadListener() {
+                                        @Override
+                                        public void onLoadFailed(ImageView imageView) {
+
+                                        }
+
+                                        @Override
+                                        public boolean onSetResource(Bitmap resource, ImageView imageView) {
+                                            imageView.setTransitionName(flyerName);
+                                            return false;
+                                        }
+                                    });
+
+                // Schedule (e.i from start date to end date)
+                SpannableStringBuilder hourly = new SpannableStringBuilder();
+                DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+                DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+                try {
+                    Date startDate = selected.parse(data.getString(ARG_KEY_DATE_START));
+                    hourly.append(context.getString(R.string.from, dateFormat.format(startDate)));
+                    hourly.append(' ');
+                    hourly.append(timeFormat.format(startDate));
+
+                } catch (ParseException e) {
+                    Logs.add(Logs.Type.E, "Wrong start date & time format: " + data.getString(ARG_KEY_DATE_START));
+                    hourly.append(context.getString(R.string.from, data.getString(ARG_KEY_DATE_START)));
+                }
+                hourly.append(' ');
+                hourly.setSpan(new StyleSpan(Typeface.BOLD), 0, resources.getInteger(R.integer.from_pos), 0);
+                int endPos = hourly.length();
+                try {
+                    Date endDate = selected.parse(data.getString(ARG_KEY_DATE_END));
+                    hourly.append(context.getString(R.string.to, dateFormat.format(endDate)));
+                    hourly.append(' ');
+                    hourly.append(timeFormat.format(endDate));
+
+                } catch (ParseException e) {
+                    Logs.add(Logs.Type.E, "Wrong end date & time format: " + data.getString(ARG_KEY_DATE_END));
+                    hourly.append(context.getString(R.string.to, data.getString(ARG_KEY_DATE_END)));
+                }
+                hourly.setSpan(new StyleSpan(Typeface.BOLD), endPos, endPos + resources.getInteger(R.integer.to_pos), 0);
+                ((TextView) rootView.findViewById(R.id.text_hourly)).setText(hourly, TextView.BufferType.SPANNABLE);
+
+                // Set info: Title, location, members count & remark
+                ((TextView) rootView.findViewById(R.id.text_title)).setText(data.getString(ARG_KEY_TITLE));
+                ((TextView) rootView.findViewById(R.id.text_location)).setText(data.getString(ARG_KEY_LOCATION));
+                ((TextView) rootView.findViewById(R.id.text_info)).setText(data.getString(ARG_KEY_REMARK));
+                ((TextView) rootView.findViewById(R.id.text_members))
+                        .setText(String.valueOf(data.getInt(ARG_KEY_MEMBERS)));
+            }
+        }
 
         ////// OnClickListener
         @Override
@@ -75,11 +183,12 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
                 case R.id.image_flyer: {
                     Logs.add(Logs.Type.I, "Display flyer in fullscreen");
-                    if (!mFlyerLoaded)
-                        return; // Flyer image not loaded
 
-                    String name = getArguments().getString(ARG_KEY_FLYER);
-                    String title = getArguments().getString(ARG_KEY_TITLE);
+                    String name = (String) sender.getTag(R.id.tag_flyer);
+                    String title = (String) sender.getTag(R.id.tag_title);
+                    if ((name == null) || (!new File(Storage.get() + Storage.FOLDER_FLYERS +
+                            File.separator + name).exists()))
+                        return; // No flyer | Flyer image not loaded
 
                     ////// Start full screen photo activity
                     Intent fullScreen = new Intent(getContext(), FullPhotoActivity.class);
@@ -98,7 +207,6 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
 
 
-
                     //getArguments().getInt(ARG_KEY_EVENT_ID)
 
 
@@ -114,95 +222,16 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             //Logs.add(Logs.Type.V, "inflater: " + inflater + ";container: " + container +
             //        ";savedInstanceState: " + savedInstanceState);
-            View rootView;
 
-            DateFormat selected = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
-            if (getArguments().getInt(ARG_KEY_EVENT_ID) == Constants.NO_DATA) { // No event on selected date
-                rootView = inflater.inflate(R.layout.fragment_no_event, container, false);
-                StringBuilder info = new StringBuilder();
+            ////// Create event view
+            Bundle data = getArguments();
+            View rootView = inflater.inflate(R.layout.fragment_event, container, false);
+            createView(getContext(), getResources(), rootView, data);
 
-                // Display selected date with "no event" message
-                DateFormat display = android.text.format.DateFormat.getLongDateFormat(getContext());
-                try {
-                    Date selectedDate = selected.parse(getArguments().getString(ARG_KEY_DATE_START));
-                    info.append(display.format(selectedDate));
-                    info.append('\n');
+            ////// Events
+            rootView.findViewById(R.id.image_flyer).setOnClickListener(this);
+            rootView.findViewById(R.id.image_display).setOnClickListener(this);
 
-                } catch (ParseException e) {
-                    Logs.add(Logs.Type.E, "Wrong selected date & time format: " +
-                            getArguments().getString(ARG_KEY_DATE_START));
-                }
-                info.append(getContext().getString(R.string.no_event));
-                ((TextView) rootView.findViewById(R.id.text_info)).setText(info.toString());
-
-            } else {
-                rootView = inflater.inflate(R.layout.fragment_event, container, false);
-
-                // Flyer
-                final String flyer = getArguments().getString(ARG_KEY_FLYER);
-                if (flyer != null)
-                    Glider.with(getContext()).placeholder(R.drawable.no_flyer)
-                            .load(Storage.FOLDER_FLYERS + File.separator + flyer,
-                                    Constants.APP_URL_FLYERS + '/' + flyer)
-                            .into((ImageView) rootView.findViewById(R.id.image_flyer),
-                                    new Glider.OnLoadListener() {
-                                @Override
-                                public void onLoadFailed(ImageView imageView) {
-
-                                }
-
-                                @Override
-                                public boolean onSetResource(Bitmap resource, ImageView imageView) {
-                                    imageView.setTransitionName(flyer);
-                                    mFlyerLoaded = true;
-                                    return false;
-                                }
-                            });
-
-                // Schedule (e.i from start date to end date)
-                SpannableStringBuilder hourly = new SpannableStringBuilder();
-                DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-                DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-                try {
-                    Date startDate = selected.parse(getArguments().getString(ARG_KEY_DATE_START));
-                    hourly.append(getContext().getString(R.string.from, dateFormat.format(startDate)));
-                    hourly.append(' ');
-                    hourly.append(timeFormat.format(startDate));
-
-                } catch (ParseException e) {
-                    Logs.add(Logs.Type.E, "Wrong start date & time format: " +
-                            getArguments().getString(ARG_KEY_DATE_START));
-                    hourly.append(getContext().getString(R.string.from, getArguments().getString(ARG_KEY_DATE_START)));
-                }
-                hourly.append(' ');
-                hourly.setSpan(new StyleSpan(Typeface.BOLD), 0, getResources().getInteger(R.integer.from_pos), 0);
-                int endPos = hourly.length();
-                try {
-                    Date endDate = selected.parse(getArguments().getString(ARG_KEY_DATE_END));
-                    hourly.append(getContext().getString(R.string.to, dateFormat.format(endDate)));
-                    hourly.append(' ');
-                    hourly.append(timeFormat.format(endDate));
-
-                } catch (ParseException e) {
-                    Logs.add(Logs.Type.E, "Wrong end date & time format: " +
-                            getArguments().getString(ARG_KEY_DATE_END));
-                    hourly.append(getContext().getString(R.string.to, getArguments().getString(ARG_KEY_DATE_END)));
-                }
-                hourly.setSpan(new StyleSpan(Typeface.BOLD), endPos, endPos +
-                        getResources().getInteger(R.integer.to_pos), 0);
-                ((TextView) rootView.findViewById(R.id.text_hourly)).setText(hourly, TextView.BufferType.SPANNABLE);
-
-                // Set info: Title, location, members count & remark
-                ((TextView) rootView.findViewById(R.id.text_title)).setText(getArguments().getString(ARG_KEY_TITLE));
-                ((TextView) rootView.findViewById(R.id.text_location)).setText(getArguments().getString(ARG_KEY_LOCATION));
-                ((TextView) rootView.findViewById(R.id.text_info)).setText(getArguments().getString(ARG_KEY_REMARK));
-                ((TextView) rootView.findViewById(R.id.text_members))
-                        .setText(String.valueOf(getArguments().getInt(ARG_KEY_MEMBERS)));
-
-                ////// Events
-                rootView.findViewById(R.id.image_flyer).setOnClickListener(this);
-                rootView.findViewById(R.id.image_display).setOnClickListener(this);
-            }
             rootView.setTag(getArguments().getInt(ARG_KEY_POSITION)); // Add tag to be able to find it
             return rootView;
         }
@@ -233,32 +262,9 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         @Override
         public Fragment getItem(int position) {
             Logs.add(Logs.Type.V, "section: " + position);
-            Bundle data = new Bundle();
 
-            data.putInt(EventFragment.ARG_KEY_POSITION, position);
-            if (mEventLag == position) {
-                // "no event" page found
-                data.putInt(EventFragment.ARG_KEY_EVENT_ID, Constants.NO_DATA);
-                data.putString(EventFragment.ARG_KEY_DATE_START, mEventDate);
-
-            } else {
-                // Position cursor offset to event position (according date selection)
-                if ((mEventLag != Constants.NO_DATA) && (mEventLag < position))
-                    --position; // -1 to skip "no event" page
-                mCursor.move(position);
-
-                data.putInt(EventFragment.ARG_KEY_EVENT_ID, mCursor.getInt(COLUMN_INDEX_ID));
-                data.putString(EventFragment.ARG_KEY_FLYER, mCursor.getString(COLUMN_INDEX_FLYER));
-                data.putString(EventFragment.ARG_KEY_TITLE, mCursor.getString(COLUMN_INDEX_NOM));
-                data.putString(EventFragment.ARG_KEY_DATE_START, mCursor.getString(COLUMN_INDEX_DATE));
-                data.putString(EventFragment.ARG_KEY_DATE_END, mCursor.getString(COLUMN_INDEX_DATE_END));
-                data.putString(EventFragment.ARG_KEY_LOCATION, mCursor.getString(COLUMN_INDEX_LIEU));
-                data.putInt(EventFragment.ARG_KEY_MEMBERS, mCursor.getInt(COLUMN_INDEX_PRESENT_MEMBERS));
-                data.putString(EventFragment.ARG_KEY_REMARK, mCursor.getString(COLUMN_INDEX_REMARK));
-                mCursor.moveToFirst();
-            }
             EventFragment event = new EventFragment();
-            event.setArguments(data);
+            event.setArguments(getEventData(position));
             return event;
         }
 
@@ -272,6 +278,36 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             return POSITION_NONE;
             // NB: Needed to refresh all page at data change notification (e.g Internet connection)
         }
+    }
+
+    //////
+    private Bundle getEventData(int position) { // Return event info data
+        Logs.add(Logs.Type.V, "position: " + position);
+        Bundle data = new Bundle();
+
+        data.putInt(EventFragment.ARG_KEY_POSITION, position);
+        if (mEventLag == position) {
+            // "no event" page found
+            data.putInt(EventFragment.ARG_KEY_EVENT_ID, Constants.NO_DATA);
+            data.putString(EventFragment.ARG_KEY_DATE_START, mEventDate);
+
+        } else {
+            // Position cursor offset to event position (according date selection)
+            if ((mEventLag != Constants.NO_DATA) && (mEventLag < position))
+                --position; // -1 to skip "no event" page
+            mCursor.move(position);
+
+            data.putInt(EventFragment.ARG_KEY_EVENT_ID, mCursor.getInt(COLUMN_INDEX_ID));
+            data.putString(EventFragment.ARG_KEY_FLYER, mCursor.getString(COLUMN_INDEX_FLYER));
+            data.putString(EventFragment.ARG_KEY_TITLE, mCursor.getString(COLUMN_INDEX_NOM));
+            data.putString(EventFragment.ARG_KEY_DATE_START, mCursor.getString(COLUMN_INDEX_DATE));
+            data.putString(EventFragment.ARG_KEY_DATE_END, mCursor.getString(COLUMN_INDEX_DATE_END));
+            data.putString(EventFragment.ARG_KEY_LOCATION, mCursor.getString(COLUMN_INDEX_LIEU));
+            data.putInt(EventFragment.ARG_KEY_MEMBERS, mCursor.getInt(COLUMN_INDEX_PRESENT_MEMBERS));
+            data.putString(EventFragment.ARG_KEY_REMARK, mCursor.getString(COLUMN_INDEX_REMARK));
+            mCursor.moveToFirst();
+        }
+        return data;
     }
 
     ////// OnConnectivityListener //////////////////////////////////////////////////////////////////
@@ -370,25 +406,11 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         //Logs.add(Logs.Type.V, "nextSelection: " + nextSelection);
 
         if ((mCursor != null) && (mRefreshItem == nextSelection)) {
-            mRefreshItem = Constants.NO_DATA;
+            mRefreshItem = Constants.NO_DATA; // Stop refreshing pages
 
-            Logs.add(Logs.Type.E, "Refresh event page: " + nextSelection);
+            Logs.add(Logs.Type.I, "Refresh event page: " + nextSelection);
             ViewGroup page = (ViewGroup) mEventsPager.findViewWithTag(nextSelection);
-
-
-
-
-
-
-            //((TextView) page.findViewById(R.id.text_info)).setText("Ola");
-
-
-
-
-
-
-
-
+            EventFragment.createView(getContext(), getResources(), page, getEventData(nextSelection));
             return true;
         }
         return false;
