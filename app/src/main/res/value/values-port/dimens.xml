@@ -2,4 +2,7 @@
 
     <dimen name="fragment_horizontal_margin">12dp</dimen>
 
+    <!-- Events -->
+    <dimen name="event_no_padding">12dp</dimen>
+
 </resources>

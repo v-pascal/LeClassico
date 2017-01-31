@@ -7,5 +7,6 @@
     <!-- Events -->
     <dimen name="calendar_text_size">19sp</dimen>
     <dimen name="calendar_day_size">15sp</dimen>
+    <dimen name="event_no_padding">28dp</dimen>
 
 </resources>

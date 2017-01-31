@@ -25,4 +25,8 @@
     <dimen name="pub_margin">8dp</dimen>
     <dimen name="pub_image_margin">2dp</dimen>
 
+    <!-- Events -->
+    <dimen name="event_info_height">24dp</dimen>
+    <dimen name="event_command_height">48dp</dimen>
+
 </resources>
