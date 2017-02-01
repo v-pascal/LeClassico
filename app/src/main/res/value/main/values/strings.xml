@@ -96,7 +96,6 @@
     <string name="no_next_event">No existing next event</string>
     <string name="event_label_info">Info:</string>
     <string name="event_label_location">Location:</string>
-    <string name="event_label_members">Member(s):</string>
 
     <!-- Members -->
     <string name="admin_privilege">Admin privilege</string>

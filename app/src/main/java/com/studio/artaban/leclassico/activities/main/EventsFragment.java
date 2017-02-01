@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by pascal on 05/09/16.
@@ -50,13 +51,16 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         EventCalendar.OnSelectListener, ViewPager.OnPageChangeListener, View.OnClickListener,
         Internet.OnConnectivityListener {
 
+    private static final String DATA_KEY_REFRESH_TAGS = "refreshTags";
+    // Data keys
+
     private EventCalendar mCalendar; // Event calendar view
     private ViewPager mEventsPager; // Events list view
 
     //////
     public static class EventFragment extends Fragment implements View.OnClickListener { ///////////
 
-        public static final String ARG_KEY_POSITION = "position";
+        public static final String ARG_KEY_PAGE_TAG = "pageTag";
         public static final String ARG_KEY_EVENT_ID = "eventID";
         public static final String ARG_KEY_FLYER = "flyer";
         public static final String ARG_KEY_TITLE = "title";
@@ -79,6 +83,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             if (data.getInt(ARG_KEY_EVENT_ID) == Constants.NO_DATA) { // No event on selected date
 
                 rootView.findViewById(R.id.layout_data).setVisibility(View.GONE);
+                rootView.findViewById(R.id.text_title).setVisibility(View.GONE);
                 rootView.findViewById(R.id.layout_flyer).setBackground(null);
 
                 // Display "no event" image (as flyer)
@@ -109,6 +114,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
             } else {
                 rootView.findViewById(R.id.layout_data).setVisibility(View.VISIBLE);
+                rootView.findViewById(R.id.text_title).setVisibility(View.VISIBLE);
                 rootView.findViewById(R.id.text_no_event).setVisibility(View.GONE);
                 rootView.findViewById(R.id.layout_flyer)
                         .setBackground(resources.getDrawable(R.color.light_gray));
@@ -207,7 +213,10 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
 
 
+
+
                     //getArguments().getInt(ARG_KEY_EVENT_ID)
+
 
 
 
@@ -232,7 +241,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             rootView.findViewById(R.id.image_flyer).setOnClickListener(this);
             rootView.findViewById(R.id.image_display).setOnClickListener(this);
 
-            rootView.setTag(getArguments().getInt(ARG_KEY_POSITION)); // Add tag to be able to find it
+            rootView.setTag(getArguments().getInt(ARG_KEY_PAGE_TAG)); // Add tag to be able to find it
             return rootView;
         }
     }
@@ -283,16 +292,16 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     //////
     private Bundle getEventData(int position) { // Return event info data
         Logs.add(Logs.Type.V, "position: " + position);
-        Bundle data = new Bundle();
 
-        data.putInt(EventFragment.ARG_KEY_POSITION, position);
-        if (mEventLag == position) {
-            // "no event" page found
+        Bundle data = new Bundle();
+        data.putInt(EventFragment.ARG_KEY_PAGE_TAG, mCurTag + 1);
+        mCurTags.put(position, ++mCurTag);
+
+        if (mEventLag == position) { // "no event" page found
             data.putInt(EventFragment.ARG_KEY_EVENT_ID, Constants.NO_DATA);
             data.putString(EventFragment.ARG_KEY_DATE_START, mEventDate);
 
-        } else {
-            // Position cursor offset to event position (according date selection)
+        } else { // Position cursor offset to event position (according date selection)
             if ((mEventLag != Constants.NO_DATA) && (mEventLag < position))
                 --position; // -1 to skip "no event" page
             mCursor.move(position);
@@ -373,9 +382,11 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     public void onPageSelected(int position) {
         //Logs.add(Logs.Type.V, "position: " + position);
 
-        mCurrentItem = position;
-        if ((!refreshEventPage(position + 1)) && (position > 0))
+        // Refresh previous & next page (if any & needed)
+        refreshEventPage(position + 1);
+        if (position > 0)
             refreshEventPage(position - 1);
+        // NB: Fix wrong page state content (see declaration)
     }
 
     @Override
@@ -396,24 +407,25 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
     //
     private int mDraggingItem; // Item index when user starts changing event by dragging pager view
-    private int mCurrentItem; // Current event index selected
 
-    private int mRefreshItem = Constants.NO_DATA; // Event page index to refresh
-    // NB: Member needed to fix issue that store fragment state of the last selected page
-    //     with oldest content (need to refresh page below)
+    private int mCurTag = 0; // Unique page tag ID
+    private final HashMap<Integer, Integer> mCurTags = new HashMap<>(); // Position with tag ID map
+    private HashMap<Integer, Integer> mRefreshTags = new HashMap<>(); // Same above (to refresh pages)
+    // NB: Members above are needed to fix issue that store fragment state of the last selected page
+    //     with older state content (need to refresh pages below). This occurs when user drags main
+    //     fragments after having change date selection using calendar view
 
-    private boolean refreshEventPage(int nextSelection) { // Refresh next page B4 selection (see above)
-        //Logs.add(Logs.Type.V, "nextSelection: " + nextSelection);
+    private void refreshEventPage(int page) { // Refresh page B4 selection (see comments above)
+        //Logs.add(Logs.Type.V, "page: " + page);
 
-        if ((mCursor != null) && (mRefreshItem == nextSelection)) {
-            mRefreshItem = Constants.NO_DATA; // Stop refreshing pages
+        if ((mCursor != null) && (mRefreshTags.containsKey(page))) {
+            int tag = mRefreshTags.remove(page);
 
-            Logs.add(Logs.Type.I, "Refresh event page: " + nextSelection);
-            ViewGroup page = (ViewGroup) mEventsPager.findViewWithTag(nextSelection);
-            EventFragment.createView(getContext(), getResources(), page, getEventData(nextSelection));
-            return true;
+            Logs.add(Logs.Type.I, "Refresh event page: " + tag);
+            ViewGroup pageView = (ViewGroup) mEventsPager.findViewWithTag(tag);
+            if (pageView != null)
+                EventFragment.createView(getContext(), getResources(), pageView, getEventData(page));
         }
-        return false;
     }
 
     private void selectCalendarDate() { // Select date period into calendar (according selected event)
@@ -586,6 +598,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
         mEventsLoader = new QueryLoader(context, this);
         mAdapter = new EventPagerAdapter(getChildFragmentManager());
+        mRefreshTags = new HashMap<>();
         Internet.addConnectivityListener(this);
     }
 
@@ -597,8 +610,13 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         View rootView = inflater.inflate(R.layout.fragment_events, container, false);
         rootView.setTag(Constants.MAIN_SECTION_EVENTS);
 
+        // Restore data
+        if (savedInstanceState != null)
+            mRefreshTags = (HashMap) savedInstanceState.getSerializable(DATA_KEY_REFRESH_TAGS);
+
         mEventDate = null;
         mCursor = null;
+        mCurTags.clear();
         mCalendar = (EventCalendar) rootView.findViewById(R.id.event_calendar);
         mCalendar.setOnSelectListener(this);
         mEventsPager = (ViewPager) rootView.findViewById(R.id.pager_events);
@@ -632,11 +650,29 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putSerializable(DATA_KEY_REFRESH_TAGS, mCurTags);
+
+        Logs.add(Logs.Type.V, "outState: " + outState);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         Logs.add(Logs.Type.V, null);
 
-        mRefreshItem = mCurrentItem;
-        // NB: See assigned member declaration comments
+        // Store page tags to be able to be refreshed
+        mRefreshTags.clear();
+        mRefreshTags.putAll(mCurTags);
+        // NB: Needed here if user drags main pages (producing this fragment destruction)
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Logs.add(Logs.Type.V, null);
+        Internet.removeConnectivityListener(this);
     }
 }

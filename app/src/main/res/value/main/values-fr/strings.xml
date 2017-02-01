@@ -92,7 +92,6 @@
     <string name="no_next_event">Aucun évènement suivant</string>
     <string name="event_label_info">Info:</string>
     <string name="event_label_location">Lieu:</string>
-    <string name="event_label_members">Membre(s):</string>
 
     <!-- Members -->
     <string name="admin_privilege">Privilèges administrateur</string>
