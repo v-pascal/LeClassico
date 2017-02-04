@@ -32,10 +32,11 @@ import java.util.Map;
 public class Database extends SQLiteOpenHelper {
 
     private static final String NAME = Constants.APP_NAME + ".db"; // Database name
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
     // Database versions:
     // #1: Following application version 1.0
     // #2: Following application version 1.1
+    // #3: Following application version 1.3
 
     public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss.000"; // SQLite date & time format
 
