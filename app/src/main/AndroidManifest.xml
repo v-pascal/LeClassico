@@ -106,6 +106,10 @@
                     android:pathPattern="/User/.*/Profile"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.event.EventsActivity"
+            android:label="@string/title_activity_event"
+            android:theme="@style/EventAppTheme"/>
 
         <!-- Content providers -->
         <provider

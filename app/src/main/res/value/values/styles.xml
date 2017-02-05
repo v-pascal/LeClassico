@@ -36,6 +36,13 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDarkMailbox</item>
         <item name="colorAccent">@color/colorAccentMailbox</item>
     </style>
+    <style name="EventAppTheme" parent="ProfileAppTheme">
+        <item name="android:windowActivityTransitions">true</item>
+
+        <!-- Default activity transitions -->
+        <item name="android:windowEnterTransition">@android:transition/fade</item>
+        <item name="android:windowExitTransition">@android:transition/fade</item>
+    </style>
 
     <!-- Custom themes -->
     <style name="TransparentAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
