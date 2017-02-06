@@ -107,7 +107,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.event.EventsActivity"
+            android:name=".activities.event.EventDisplayActivity"
             android:label="@string/title_activity_event"
             android:theme="@style/EventAppTheme"/>
 

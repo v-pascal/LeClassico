@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.album.FullPhotoActivity;
-import com.studio.artaban.leclassico.activities.event.EventsActivity;
+import com.studio.artaban.leclassico.activities.event.EventDisplayActivity;
 import com.studio.artaban.leclassico.components.EventCalendar;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
@@ -213,8 +213,8 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                     Logs.add(Logs.Type.I, "Display event");
 
                     ////// Start event activity (display)
-                    Intent eventDisplay = new Intent(getContext(), EventsActivity.class);
-                    eventDisplay.putExtra(EventsActivity.EXTRA_DATA_ID, getArguments().getInt(ARG_KEY_EVENT_ID));
+                    Intent eventDisplay = new Intent(getContext(), EventDisplayActivity.class);
+                    eventDisplay.putExtra(EventDisplayActivity.EXTRA_DATA_ID, getArguments().getInt(ARG_KEY_EVENT_ID));
                     Login.copyExtraData(getActivity().getIntent(), eventDisplay);
                     startActivity(eventDisplay);
                     break;

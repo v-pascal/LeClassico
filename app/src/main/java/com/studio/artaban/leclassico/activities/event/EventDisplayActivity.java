@@ -2,6 +2,8 @@ package com.studio.artaban.leclassico.activities.event;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.studio.artaban.leclassico.R;
@@ -11,10 +13,9 @@ import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
  * Created by pascal on 05/02/17.
- * Event activity:
- * _ Display event info
+ * Event display activity
  */
-public class EventsActivity extends LoggedActivity {
+public class EventDisplayActivity extends LoggedActivity {
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
@@ -46,22 +47,23 @@ public class EventsActivity extends LoggedActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
-        setContentView(R.layout.activity_event);
+        setContentView(R.layout.activity_event_display);
 
-        // Set toolbar
-
-
-
-
+        // Set toolbar & default title
+        Toolbar toolbar =   (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
-
-
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setTitle(getString(R.string.title_activity_event));
 
         // Get event ID
         mId = getIntent().getIntExtra(EXTRA_DATA_ID, Constants.NO_DATA);
         Logs.add(Logs.Type.I, "Event #" + mId);
+
+
+
+
 
 
 
