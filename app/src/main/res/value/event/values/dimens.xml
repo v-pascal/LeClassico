@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Event -->
+
+    <dimen name="expanded_margin_start">36dp</dimen>
+    <dimen name="expanded_margin_end">64dp</dimen>
+
+</resources>

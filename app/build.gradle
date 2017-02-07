@@ -42,6 +42,7 @@ android {
                      'src/main/res/value/settings',
                      'src/main/res/value/album',
                      'src/main/res/value/publication',
+                     'src/main/res/value/event',
                      'src/main/res/layouts',
                      'src/main/res/drawables',
                      'src/main/res/value',

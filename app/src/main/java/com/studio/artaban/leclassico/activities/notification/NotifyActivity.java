@@ -470,7 +470,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             return;
 
         if (id == Queries.NOTIFICATIONS_MAIN_LIST) {
-            mNotifyCursor = cursor;
+            mCursor = cursor;
             refresh(); // Display notifications
         }
     }
@@ -478,12 +478,11 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     @Override
     public void onLoaderReset() {
         Logs.add(Logs.Type.V, null);
-        mNotifyCursor = null;
+        mCursor = null;
     }
 
     //////
     private final QueryLoader mListLoader = new QueryLoader(this, this); // User notification list query loader
-    private Cursor mNotifyCursor; // Notifications cursor
     private String mNotifyLast; // Last notification date received (newest date)
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
@@ -549,25 +548,25 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
     private void refresh() { // Display/Refresh notification list
         Logs.add(Logs.Type.V, null);
-        mNotifyCursor.moveToFirst();
+        mCursor.moveToFirst();
 
         // Get new notification (first unread notifications) + last notification date received
         int newNotify = 0;
         boolean unreadNotify = true;
         do {
-            if ((unreadNotify) && (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD))
+            if ((unreadNotify) && (mCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD))
                 ++newNotify; // new notification found (unread)
             else
                 unreadNotify = false;
 
-        } while (mNotifyCursor.moveToNext());
-        mNotifyCursor.moveToFirst();
+        } while (mCursor.moveToNext());
+        mCursor.moveToFirst();
 
         setNewNotifyInfo(newNotify); // Update new notification(s) info
 
         // Update current display data
-        String lastNotify = mNotifyCursor.getString(COLUMN_INDEX_DATE);
-        short count = (short) mNotifyCursor.getCount();
+        String lastNotify = mCursor.getString(COLUMN_INDEX_DATE);
+        short count = (short) mCursor.getCount();
         if ((mQueryCount != Constants.NO_DATA) && (mNotifyLast.compareTo(lastNotify) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
@@ -578,14 +577,14 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         int limit = mQueryLimit;
         unreadNotify = false;
         do {
-            mQueryDate = mNotifyCursor.getString(COLUMN_INDEX_DATE); // Get last item date displayed
-            if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
+            mQueryDate = mCursor.getString(COLUMN_INDEX_DATE); // Get last item date displayed
+            if (mCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD)
                 unreadNotify = true;
             if (--limit == 0)
                 break; // Only visible item are concerned
 
-        } while (mNotifyCursor.moveToNext());
-        mNotifyCursor.moveToFirst();
+        } while (mCursor.moveToNext());
+        mCursor.moveToFirst();
 
         //////
         if (mNotifyAdapter.isInitialized()) { // Check if not the initial query
@@ -593,7 +592,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
 
             ////// Update notification list
             RecyclerAdapter.SwapResult swapResult =
-                    mNotifyAdapter.getDataSource().swap(mNotifyAdapter, mNotifyCursor, mQueryLimit, null,
+                    mNotifyAdapter.getDataSource().swap(mNotifyAdapter, mCursor, mQueryLimit, null,
                             new RecyclerAdapter.DataView.OnNotifyChangeListener() {
                         @Override
                         public void onRemoved(ArrayList<ArrayList<Object>> newData, int start, int count) {
@@ -645,16 +644,16 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             Logs.add(Logs.Type.I, "Initial query");
 
             ////// Fill notification list
-            mNotifyAdapter.getDataSource().fill(mNotifyCursor, mQueryLimit, null);
+            mNotifyAdapter.getDataSource().fill(mCursor, mQueryLimit, null);
             mNotifyList.scrollToPosition(0);
 
             do { // Display floating action button according unread notification displayed
-                if (mNotifyCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
+                if (mCursor.getInt(COLUMN_INDEX_LU_FLAG) == Constants.DATA_UNREAD) {
                     displayFab();
                     break;
                 }
 
-            } while (mNotifyCursor.moveToNext());
+            } while (mCursor.moveToNext());
         }
     }
 

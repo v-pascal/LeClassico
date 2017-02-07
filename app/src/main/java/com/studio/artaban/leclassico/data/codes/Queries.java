@@ -95,6 +95,38 @@ public class Queries {
                         " GROUP BY " + fields +
                         " ORDER BY " + EvenementsTable.COLUMN_DATE + " ASC", null);
             }
+            case Uris.ID_EVENTS_DISPLAY: { // EVENTS_DISPLAY
+
+                Logs.add(Logs.Type.I, "Event query");
+                long eventId = Long.valueOf(Uri.decode(uri.getPathSegments().get(1)));
+
+                return db.rawQuery("SELECT " +
+                        EvenementsTable.TABLE_NAME + IDataTable.DataField.COLUMN_ID + ',' +
+                        EvenementsTable.COLUMN_EVENT_ID + ',' +
+                        EvenementsTable.COLUMN_PSEUDO + ',' +
+                        EvenementsTable.COLUMN_NOM + ',' +
+                        EvenementsTable.COLUMN_DATE + ',' +
+                        EvenementsTable.COLUMN_DATE_END + ',' +
+                        EvenementsTable.COLUMN_LIEU + ',' +
+                        EvenementsTable.COLUMN_FLYER + ',' +
+                        EvenementsTable.COLUMN_REMARK + ',' +
+                        PresentsTable.COLUMN_PSEUDO + ',' +
+                        CamaradesTable.COLUMN_SEXE + ',' +
+                        CamaradesTable.COLUMN_PROFILE + ',' +
+                        CamaradesTable.COLUMN_PHONE + ',' +
+                        CamaradesTable.COLUMN_EMAIL + ',' +
+                        CamaradesTable.COLUMN_VILLE + ',' +
+                        CamaradesTable.COLUMN_NOM + ',' +
+                        CamaradesTable.COLUMN_ADRESSE + ',' +
+                        CamaradesTable.COLUMN_ADMIN +
+                        " FROM " + EvenementsTable.TABLE_NAME +
+                        " LEFT JOIN " + PresentsTable.TABLE_NAME + " ON " +
+                        PresentsTable.COLUMN_EVENT_ID + '=' + EvenementsTable.COLUMN_EVENT_ID +
+                        " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
+                        CamaradesTable.COLUMN_PSEUDO + '=' + PresentsTable.COLUMN_PSEUDO +
+                        " WHERE " + EvenementsTable.TABLE_NAME + '.' +
+                        IDataTable.DataField.COLUMN_ID + '=' + String.valueOf(eventId), null);
+            }
             case Uris.ID_RAW_QUERY:
             default: { // Raw query (for multiple table selection)
                 return db.rawQuery(selection, selectionArgs);
@@ -117,6 +149,9 @@ public class Queries {
     ////// Notifications
     public static final int NOTIFICATIONS_NEW_INFO = Tables.ID_MAX + 7;
     public static final int NOTIFICATIONS_MAIN_LIST = Tables.ID_MAX + 8;
+
+    ////// Events
+    public static final int EVENTS_DISPLAY = Tables.ID_MAX + 9;
 
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////

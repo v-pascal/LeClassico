@@ -36,6 +36,7 @@ public abstract class LoggedActivity extends AppCompatActivity implements QueryL
     // Extra data keys
 
     protected int mId; // ID (pseudo, publication, etc)
+    protected Cursor mCursor; // Data cursor
 
     protected static Uri mNotifyURI; // User notifications URI
     // NB: Not private coz used in 'NotifyActivity' +
