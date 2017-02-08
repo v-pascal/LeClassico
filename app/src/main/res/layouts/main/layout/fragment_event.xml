@@ -87,16 +87,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/event_info_height"/>
             <TextView
-                android:id="@+id/text_location_label"
-                android:text="@string/event_label_location"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
-                android:textSize="@dimen/event_text_size"
-                android:gravity="center_vertical"
-                android:layout_marginEnd="@dimen/event_info_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/event_info_height"/>
-            <TextView
                 android:id="@+id/text_location"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/event_text_size"
@@ -146,26 +136,13 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/event_info_height"/>
         <TextView
-            android:id="@+id/text_info_label"
-            android:text="@string/event_label_info"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:textSize="@dimen/event_text_size"
-            android:gravity="center_vertical"
-            android:layout_toEndOf="@id/image_info"
-            android:layout_below="@id/layout_info"
-            android:layout_marginTop="@dimen/event_info_margin"
-            android:layout_marginEnd="@dimen/event_info_margin"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/event_info_height"/>
-        <TextView
             android:id="@+id/text_info"
             android:textColor="@android:color/black"
             android:textSize="@dimen/event_text_size"
             android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center_vertical"
-            android:layout_toEndOf="@id/text_info_label"
+            android:layout_toEndOf="@id/image_info"
             android:layout_below="@id/layout_info"
             android:layout_marginTop="@dimen/event_info_margin"
             android:layout_marginEnd="@dimen/event_remark_margin"

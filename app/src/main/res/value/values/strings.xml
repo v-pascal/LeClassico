@@ -11,8 +11,13 @@
     <string name="today">Today</string>
     <string name="display">Display</string>
     <string name="by">BY</string>
+    <string name="none">None</string>
 
-    <string name="status">Status:</string>
+    <!-- Labels -->
+    <string name="label_status">Status:</string>
+    <string name="label_info">Info:</string>
+    <string name="label_location">Location:</string>
+    <string name="label_author">Author:</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">Le Classico</string>

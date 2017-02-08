@@ -20,8 +20,8 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginStart="@dimen/expanded_margin_start"
-            app:expandedTitleMarginEnd="@dimen/expanded_margin_end"
+            app:expandedTitleMarginStart="@dimen/event_margin_start"
+            app:expandedTitleMarginEnd="@dimen/event_margin_end"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
                 <!-- Flyer -->
@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/content_event_display" /><!-- Info -->
+        <include layout="@layout/content_event_display"/><!-- Info -->
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton
@@ -61,7 +61,8 @@
         android:onClick="onEntry"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_gravity="end|top"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginTop="@dimen/event_fab_margin_top"
+        android:layout_marginEnd="@dimen/fab_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

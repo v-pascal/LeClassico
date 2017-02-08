@@ -80,7 +80,6 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             flyer.setTag(R.id.tag_flyer, data.getString(ARG_KEY_FLYER));
             flyer.setTag(R.id.tag_title, data.getString(ARG_KEY_TITLE));
 
-            DateFormat selected = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
             if (data.getInt(ARG_KEY_EVENT_ID) == Constants.NO_DATA) { // No event on selected date
 
                 rootView.findViewById(R.id.layout_data).setVisibility(View.GONE);
@@ -97,6 +96,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                 // Display selected date with "no event" message
                 StringBuilder info = new StringBuilder();
                 DateFormat display = android.text.format.DateFormat.getLongDateFormat(context);
+                DateFormat selected = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
                 try {
                     Date selectedDate = selected.parse(data.getString(ARG_KEY_DATE_START));
                     info.append(display.format(selectedDate));
@@ -144,34 +144,9 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                                     });
 
                 // Schedule (e.i from start date to end date)
-                SpannableStringBuilder hourly = new SpannableStringBuilder();
-                DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-                DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-                try {
-                    Date startDate = selected.parse(data.getString(ARG_KEY_DATE_START));
-                    hourly.append(context.getString(R.string.from, dateFormat.format(startDate)));
-                    hourly.append(' ');
-                    hourly.append(timeFormat.format(startDate));
-
-                } catch (ParseException e) {
-                    Logs.add(Logs.Type.E, "Wrong start date & time format: " + data.getString(ARG_KEY_DATE_START));
-                    hourly.append(context.getString(R.string.from, data.getString(ARG_KEY_DATE_START)));
-                }
-                hourly.append(' ');
-                hourly.setSpan(new StyleSpan(Typeface.BOLD), 0, resources.getInteger(R.integer.from_pos), 0);
-                int endPos = hourly.length();
-                try {
-                    Date endDate = selected.parse(data.getString(ARG_KEY_DATE_END));
-                    hourly.append(context.getString(R.string.to, dateFormat.format(endDate)));
-                    hourly.append(' ');
-                    hourly.append(timeFormat.format(endDate));
-
-                } catch (ParseException e) {
-                    Logs.add(Logs.Type.E, "Wrong end date & time format: " + data.getString(ARG_KEY_DATE_END));
-                    hourly.append(context.getString(R.string.to, data.getString(ARG_KEY_DATE_END)));
-                }
-                hourly.setSpan(new StyleSpan(Typeface.BOLD), endPos, endPos + resources.getInteger(R.integer.to_pos), 0);
-                ((TextView) rootView.findViewById(R.id.text_hourly)).setText(hourly, TextView.BufferType.SPANNABLE);
+                ((TextView) rootView.findViewById(R.id.text_hourly))
+                        .setText(EventDisplayActivity.getHourly(context, data.getString(ARG_KEY_DATE_START),
+                                data.getString(ARG_KEY_DATE_END)), TextView.BufferType.SPANNABLE);
 
                 // Set info: Title, location, members count & remark
                 ((TextView) rootView.findViewById(R.id.text_title)).setText(data.getString(ARG_KEY_TITLE));

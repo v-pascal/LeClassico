@@ -118,7 +118,6 @@ public class Uris {
     public static final short ID_MAIN_SHORTCUT_MEMBER = 8; // User/#/Shortcut/Camarades
     public static final short ID_MAIN_BEST_PHOTOS = 9;     // BestPhotos
     public static final short ID_MAIN_EVENTS = 10;         // Events
-    public static final short ID_EVENTS_DISPLAY = 11;      // Events/#
 
     ////// URI Matcher /////////////////////////////////////////////////////////////////////////////
 
@@ -137,9 +136,5 @@ public class Uris {
                 PATH_EVENTS, ID_MAIN_EVENTS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // Events/*
                 PATH_EVENTS + DataProvider.FILTER_ROW, ID_MAIN_EVENTS);
-
-        ////// ID_EVENTS_DISPLAY
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // Events/#
-                PATH_EVENTS + DataProvider.SINGLE_ROW, ID_EVENTS_DISPLAY);
     }
 }

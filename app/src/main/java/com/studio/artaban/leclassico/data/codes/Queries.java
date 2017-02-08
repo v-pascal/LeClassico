@@ -13,6 +13,11 @@ import com.studio.artaban.leclassico.data.tables.EvenementsTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by pascal on 07/09/16.
  * Queries, IDs & limits (see QueryLoader class)
@@ -66,10 +71,53 @@ public class Queries {
             }
             case Uris.ID_MAIN_EVENTS: { // MAIN_EVENTS_LIST
 
-                Logs.add(Logs.Type.I, "Events list query");
+                Logs.add(Logs.Type.I, "Events query");
+                String presentsJoin = " LEFT JOIN " + PresentsTable.TABLE_NAME + " ON " +
+                        PresentsTable.COLUMN_EVENT_ID + '=' + EvenementsTable.COLUMN_EVENT_ID + " AND " +
+                        PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
+                        PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue());
 
-                // TODO: Get date filter criteria to return events that follow N month B4 and after it
+                String criteria = "";
+                if ((uri.getPathSegments().size() > 1) && (!uri.getPathSegments().get(1).isEmpty())) {
 
+                    String filter = Uri.decode(uri.getPathSegments().get(1));
+                    DateFormat format = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+                    try {
+                        Date unused = format.parse(filter);
+
+                        // TODO: Get date filter criteria to return events that follow N month B4 and after it
+                        //criteria = Date filter criteria
+
+                    } catch (ParseException e) {
+                        Logs.add(Logs.Type.I, "Single event query");
+
+                        return db.rawQuery("SELECT " +
+                                EvenementsTable.COLUMN_PSEUDO + ',' +
+                                EvenementsTable.COLUMN_NOM + ',' +
+                                EvenementsTable.COLUMN_DATE + ',' +
+                                EvenementsTable.COLUMN_DATE_END + ',' +
+                                EvenementsTable.COLUMN_LIEU + ',' +
+                                EvenementsTable.COLUMN_FLYER + ',' +
+                                EvenementsTable.COLUMN_REMARK + ',' +
+                                PresentsTable.COLUMN_PSEUDO + ',' +
+                                CamaradesTable.COLUMN_SEXE + ',' +
+                                CamaradesTable.COLUMN_PROFILE + ',' +
+                                CamaradesTable.COLUMN_PHONE + ',' +
+                                CamaradesTable.COLUMN_EMAIL + ',' +
+                                CamaradesTable.COLUMN_VILLE + ',' +
+                                CamaradesTable.COLUMN_NOM + ',' +
+                                CamaradesTable.COLUMN_ADRESSE + ',' +
+                                CamaradesTable.COLUMN_ADMIN +
+                                " FROM " + EvenementsTable.TABLE_NAME +
+                                presentsJoin +
+                                " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
+                                CamaradesTable.COLUMN_PSEUDO + '=' + PresentsTable.COLUMN_PSEUDO +
+                                " WHERE " + EvenementsTable.TABLE_NAME + '.' +
+                                IDataTable.DataField.COLUMN_ID + '=' + filter, null);
+                    }
+                }
                 String fields = EvenementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +
                         EvenementsTable.COLUMN_FLYER + ',' +
                         EvenementsTable.COLUMN_NOM + ',' +
@@ -81,51 +129,15 @@ public class Queries {
                 return db.rawQuery("SELECT " + fields + ',' +
                         "count(" + PresentsTable.COLUMN_EVENT_ID + ')' +
                         " FROM " + EvenementsTable.TABLE_NAME +
-                        " LEFT JOIN " + PresentsTable.TABLE_NAME + " ON " +
-                        PresentsTable.COLUMN_EVENT_ID + '=' + EvenementsTable.COLUMN_EVENT_ID + " AND " +
-                        PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
-                        PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
+                        presentsJoin +
                         " WHERE " +
                         EvenementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
                         EvenementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
+                        criteria +
                         " GROUP BY " + fields +
                         " ORDER BY " + EvenementsTable.COLUMN_DATE + " ASC", null);
-            }
-            case Uris.ID_EVENTS_DISPLAY: { // EVENTS_DISPLAY
-
-                Logs.add(Logs.Type.I, "Event query");
-                long eventId = Long.valueOf(Uri.decode(uri.getPathSegments().get(1)));
-
-                return db.rawQuery("SELECT " +
-                        EvenementsTable.TABLE_NAME + IDataTable.DataField.COLUMN_ID + ',' +
-                        EvenementsTable.COLUMN_EVENT_ID + ',' +
-                        EvenementsTable.COLUMN_PSEUDO + ',' +
-                        EvenementsTable.COLUMN_NOM + ',' +
-                        EvenementsTable.COLUMN_DATE + ',' +
-                        EvenementsTable.COLUMN_DATE_END + ',' +
-                        EvenementsTable.COLUMN_LIEU + ',' +
-                        EvenementsTable.COLUMN_FLYER + ',' +
-                        EvenementsTable.COLUMN_REMARK + ',' +
-                        PresentsTable.COLUMN_PSEUDO + ',' +
-                        CamaradesTable.COLUMN_SEXE + ',' +
-                        CamaradesTable.COLUMN_PROFILE + ',' +
-                        CamaradesTable.COLUMN_PHONE + ',' +
-                        CamaradesTable.COLUMN_EMAIL + ',' +
-                        CamaradesTable.COLUMN_VILLE + ',' +
-                        CamaradesTable.COLUMN_NOM + ',' +
-                        CamaradesTable.COLUMN_ADRESSE + ',' +
-                        CamaradesTable.COLUMN_ADMIN +
-                        " FROM " + EvenementsTable.TABLE_NAME +
-                        " LEFT JOIN " + PresentsTable.TABLE_NAME + " ON " +
-                        PresentsTable.COLUMN_EVENT_ID + '=' + EvenementsTable.COLUMN_EVENT_ID +
-                        " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
-                        CamaradesTable.COLUMN_PSEUDO + '=' + PresentsTable.COLUMN_PSEUDO +
-                        " WHERE " + EvenementsTable.TABLE_NAME + '.' +
-                        IDataTable.DataField.COLUMN_ID + '=' + String.valueOf(eventId), null);
             }
             case Uris.ID_RAW_QUERY:
             default: { // Raw query (for multiple table selection)

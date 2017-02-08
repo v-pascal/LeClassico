@@ -1,18 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!-- Schedule -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:background="@android:color/black"
+        android:paddingTop="@dimen/event_info_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/image_hourly"
+            android:src="@drawable/ic_access_time_white_24dp"
+            android:layout_marginStart="@dimen/event_info_margin"
+            android:layout_marginEnd="@dimen/event_info_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/event_info_height"/>
+        <TextView
+            android:id="@+id/text_hourly"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/event_text_size"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="@dimen/event_info_margin"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/event_info_height"/>
+        <View
+            android:layout_width="@dimen/event_fab_width"
+            android:layout_height="1dp"/><!-- End margin to keep FAB placement -->
+
+    </LinearLayout>
+
+    <!-- Location -->
+    <LinearLayout
+        android:id="@+id/layout_location"
+        android:orientation="horizontal"
+        android:background="@android:color/black"
+        android:paddingTop="@dimen/event_info_margin"
+        android:paddingBottom="@dimen/event_info_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:src="@drawable/ic_location_on_white_24dp"
+            android:layout_marginStart="@dimen/event_info_margin"
+            android:layout_marginEnd="@dimen/event_info_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/event_info_height"/>
+        <TextView
+            android:text="@string/label_location"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="@dimen/event_text_size"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="@dimen/event_info_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/event_info_height"/>
+        <TextView
+            android:id="@+id/text_location"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/event_text_size"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="@dimen/event_info_margin"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/event_info_height"/>
+        <View
+            android:layout_width="@dimen/event_fab_width"
+            android:layout_height="1dp"/><!-- End margin to keep FAB placement -->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_content"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:padding="@dimen/event_margin"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+            <!-- Author -->
+            <TextView
+                android:id="@+id/text_author_label"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/event_text_size"
+                android:text="@string/label_author"
+                android:textStyle="bold"
+                android:layout_marginEnd="@dimen/event_info_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/text_author"
+                android:textSize="@dimen/event_text_size"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_toEndOf="@id/text_author_label"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"/>
 
+            <!-- Info -->
+            <TextView
+                android:id="@+id/text_info_label"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/event_text_size"
+                android:text="@string/label_info"
+                android:textStyle="bold"
+                android:layout_below="@id/text_author_label"
+                android:layout_marginEnd="@dimen/event_info_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/text_info"
+                android:text="@string/none"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/event_text_size"
+                android:layout_below="@id/text_author_label"
+                android:layout_toEndOf="@id/text_info_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
+        </RelativeLayout>
 
+        <!-- Presents member list -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list_members"
+            android:background="@color/colorPrimarySetting"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
 
-    <TextView
-        android:text="Testage"
-        android:textAppearance="@android:style/TextAppearance.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-
-
-
-</RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

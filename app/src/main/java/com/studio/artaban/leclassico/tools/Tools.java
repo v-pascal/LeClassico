@@ -222,6 +222,17 @@ public final class Tools { /////////////////////////////////////////////////////
         int id = resources.getIdentifier("status_bar_height", "dimen", "android");
         return (id > 0)? resources.getDimensionPixelSize(id):DEFAULT_STATUSBAR_HEIGHT;
     }
+    private static final int DEFAULT_ACTIONBAR_HEIGHT = 50; // Default status bar height (in pixels)
+    public static int getActionBarHeight(Context context) {
+        Logs.add(Logs.Type.V, "context: " + context);
+
+        TypedValue value = new TypedValue();
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, value, true))
+            return value.complexToDimensionPixelSize(value.data, context.getResources().getDisplayMetrics());
+
+        Logs.add(Logs.Type.W, "Action bar size attribute not found");
+        return DEFAULT_ACTIONBAR_HEIGHT;
+    }
 
     //////
     public interface OnProcessListener {

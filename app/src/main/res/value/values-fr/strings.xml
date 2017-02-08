@@ -10,8 +10,13 @@
     <string name="today">Aujourd\'hui</string>
     <string name="display">Afficher</string>
     <string name="by">PAR</string>
+    <string name="none">Aucune</string>
 
-    <string name="status">Statut:</string>
+    <!-- Labels -->
+    <string name="label_status">Statut:</string>
+    <string name="label_info">Info:</string>
+    <string name="label_location">Lieu:</string>
+    <string name="label_author">Auteur:</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

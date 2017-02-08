@@ -8,4 +8,13 @@
     <dimen name="calendar_text_size">24sp</dimen>
     <dimen name="calendar_day_size">26sp</dimen>
 
+
+
+
+    <dimen name="event_toolbar_height">336dp</dimen>
+
+
+
+
+
 </resources>
