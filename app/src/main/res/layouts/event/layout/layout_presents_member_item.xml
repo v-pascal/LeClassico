@@ -54,4 +54,12 @@
         <tag android:id="@id/tag_pseudo_id"/>
     </LinearLayout>
 
+    <!-- Separator -->
+    <View
+        android:background="@android:color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/event_member_padding_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+
 </RelativeLayout>

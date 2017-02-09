@@ -38,6 +38,7 @@ import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -147,14 +148,10 @@ public class EventDisplayActivity extends LoggedActivity implements
                     mQueryLimit += Queries.PRESENTS_MORE_LIMIT;
                     mAdapter.setRequesting(RequestFlag.IN_PROGRESS);
 
-
-
-                    /*
                     Intent request = new Intent(DataService.REQUEST_OLD_DATA);
                     request.putExtra(DataRequest.EXTRA_DATA_DATE, mQueryDate);
-                    getActivity().sendBroadcast(DataService.getIntent(request,
-                            Tables.ID_COMMENTAIRES, mComUri));
-                            */
+                    EventDisplayActivity.this.sendBroadcast(DataService.getIntent(request,
+                            Tables.ID_PRESENTS, mEventUri));
                     break;
                 }
             }
@@ -311,6 +308,8 @@ public class EventDisplayActivity extends LoggedActivity implements
 
     private short mQueryCount = Constants.NO_DATA; // DB query result count
     private short mQueryLimit = Queries.PRESENTS_LIST_LIMIT; // DB query limit
+    private String mQueryDate; // More query date displayed (visible)
+    private String mPresentsLast; // Last present status date received (newest date)
 
     // Query column indexes
     private static final int COLUMN_INDEX_PSEUDO = 0;
@@ -323,15 +322,16 @@ public class EventDisplayActivity extends LoggedActivity implements
     private static final int COLUMN_INDEX_STATUS_DATE = 7;
     private static final int COLUMN_INDEX_SYNC = 8;
     private static final int COLUMN_INDEX_ENTRY_PSEUDO = 9;
-    private static final int COLUMN_INDEX_ENTRY_PSEUDO_ID = 10;
-    private static final int COLUMN_INDEX_ENTRY_SEX = 11;
-    private static final int COLUMN_INDEX_ENTRY_PROFILE = 12;
-    private static final int COLUMN_INDEX_ENTRY_PHONE = 13;
-    private static final int COLUMN_INDEX_ENTRY_EMAIL = 14;
-    private static final int COLUMN_INDEX_ENTRY_TOWN = 15;
-    private static final int COLUMN_INDEX_ENTRY_NAME = 16;
-    private static final int COLUMN_INDEX_ENTRY_ADDRESS = 17;
-    private static final int COLUMN_INDEX_ENTRY_ADMIN = 18;
+    private static final int COLUMN_INDEX_ENTRY_DATE = 10; // Presents status date (used to sort entries)
+    private static final int COLUMN_INDEX_ENTRY_PSEUDO_ID = 11;
+    private static final int COLUMN_INDEX_ENTRY_SEX = 12;
+    private static final int COLUMN_INDEX_ENTRY_PROFILE = 13;
+    private static final int COLUMN_INDEX_ENTRY_PHONE = 14;
+    private static final int COLUMN_INDEX_ENTRY_EMAIL = 15;
+    private static final int COLUMN_INDEX_ENTRY_TOWN = 16;
+    private static final int COLUMN_INDEX_ENTRY_NAME = 17;
+    private static final int COLUMN_INDEX_ENTRY_ADDRESS = 18;
+    private static final int COLUMN_INDEX_ENTRY_ADMIN = 19;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -372,35 +372,30 @@ public class EventDisplayActivity extends LoggedActivity implements
         Logs.add(Logs.Type.V, null);
         mCursor.moveToFirst();
 
-
-
-
-
-
-
-        /*
         // Update current display data
-        String lastPub = mComCursor.getString(COLUMN_INDEX_DATE);
-        short count = (short) mComCursor.getCount();
-        if ((mQueryCount != Constants.NO_DATA) && (mComLast.compareTo(lastPub) != 0))
-            mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
+        if ((mCursor.getCount() != 1) || (!mCursor.isNull(COLUMN_INDEX_ENTRY_PSEUDO))) {
+            if (mCursor.isNull(COLUMN_INDEX_ENTRY_PSEUDO))
+                mCursor.moveToNext();
 
-        mQueryCount = count;
-        mComLast = lastPub;
+            String lastMember = mCursor.getString(COLUMN_INDEX_ENTRY_DATE);
+            short count = (short) mCursor.getCount();
+            if ((mQueryCount > 0) && (mPresentsLast.compareTo(lastMember) < 0))
+                mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
-        // Get last visible publication date
-        int limit = mQueryLimit;
-        do {
-            mQueryDate = mComCursor.getString(COLUMN_INDEX_DATE);
-            if (--limit == 0)
-                break; // Only visible item are concerned
+            mQueryCount = count;
+            mPresentsLast = lastMember;
 
-        } while (mComCursor.moveToNext());
-        mComCursor.moveToFirst();
-        */
+            // Get last visible present member date (status date)
+            int limit = mQueryLimit;
+            do {
+                mQueryDate = mCursor.getString(COLUMN_INDEX_ENTRY_DATE);
+                if (--limit == 0)
+                    break; // Only visible item are concerned
 
-
-
+            } while (mCursor.moveToNext());
+            mCursor.moveToFirst();
+        }
+        //else // No member presents at event
 
         //////
         if (mAdapter.isInitialized()) { // Check if not the initial query
@@ -416,14 +411,6 @@ public class EventDisplayActivity extends LoggedActivity implements
             mAdapter.getDataSource().fill(mCursor, mQueryLimit, this);
             mPresentsList.scrollToPosition(0);
         }
-
-
-
-
-
-
-
-
     }
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////

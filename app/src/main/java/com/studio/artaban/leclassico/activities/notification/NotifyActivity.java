@@ -567,7 +567,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         // Update current display data
         String lastNotify = mCursor.getString(COLUMN_INDEX_DATE);
         short count = (short) mCursor.getCount();
-        if ((mQueryCount != Constants.NO_DATA) && (mNotifyLast.compareTo(lastNotify) != 0))
+        if ((mQueryCount > 0) && (mNotifyLast.compareTo(lastNotify) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
         mQueryCount = count;

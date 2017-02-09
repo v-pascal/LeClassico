@@ -521,7 +521,7 @@ public class PublicationsFragment extends MainFragment implements
         short count = (short) mPubCursor.getCount();
         boolean newEntries = false;
 
-        if ((mQueryCount != Constants.NO_DATA) && (mPubLast.compareTo(lastPub) != 0)) {
+        if ((mQueryCount > 0) && (mPubLast.compareTo(lastPub) != 0)) {
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
             // Update shortcut (apply animation)

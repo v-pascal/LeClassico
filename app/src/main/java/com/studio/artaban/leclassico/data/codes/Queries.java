@@ -111,6 +111,7 @@ public class Queries {
                                 CamaradesTable.COLUMN_NOM + ',' +
                                 CamaradesTable.COLUMN_ADRESSE + ',' +
                                 CamaradesTable.COLUMN_ADMIN;
+                        String sortField = " AS StatusDate,";
                         String from = " FROM " + EvenementsTable.TABLE_NAME;
                         String membersJoin = " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON ";
                         String where = " WHERE " + EvenementsTable.TABLE_NAME + '.' +
@@ -119,6 +120,7 @@ public class Queries {
                         return db.rawQuery("SELECT " +
                                 eventFields +
                                 PresentsTable.COLUMN_PSEUDO + ',' +
+                                PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + sortField +
                                 memberFields +
                                 from +
                                 " INNER " + presentsJoin +
@@ -127,12 +129,13 @@ public class Queries {
                                 where +
                                 " UNION SELECT " + // Union
                                 eventFields +
-                                "NULL," +
+                                "NULL,NULL" + sortField +
                                 memberFields +
                                 from +
                                 membersJoin +
                                 CamaradesTable.COLUMN_PSEUDO + '=' + EvenementsTable.COLUMN_PSEUDO +
-                                where, null);
+                                where +
+                                " ORDER BY StatusDate ASC", null);
                     }
                 }
                 String fields = EvenementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +

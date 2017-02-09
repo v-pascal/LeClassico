@@ -344,7 +344,7 @@ public class BestPhotoFragment extends Fragment implements
         if (count == 0)
             return; // Nothing to display (no comment for this best photo)
 
-        if ((mQueryCount != Constants.NO_DATA) && (mComLast.compareTo(lastPub) != 0))
+        if ((mQueryCount > 0) && (mComLast.compareTo(lastPub) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
         mQueryCount = count;
