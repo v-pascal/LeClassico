@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -256,6 +257,20 @@ public class EventDisplayActivity extends LoggedActivity implements
             if (!cursor.isNull(COLUMN_INDEX_REMARK))
                 ((TextView) findViewById(R.id.text_info)).setText(cursor.getString(COLUMN_INDEX_REMARK));
 
+            // Change FAB image according if connected user is marked as present...
+            if (!mAdapter.isInitialized()) { // ...only at initialization (one call only)
+                String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
+                do {
+                    if ((!cursor.isNull(COLUMN_INDEX_ENTRY_PSEUDO)) &&
+                            (cursor.getString(COLUMN_INDEX_ENTRY_PSEUDO).compareTo(pseudo) == 0)) { // Presents
+                        ((FloatingActionButton) findViewById(R.id.fab))
+                                .setImageDrawable(getDrawable(R.drawable.ic_person_remove_white_36dp));
+                        break;
+                    }
+
+                } while (cursor.moveToNext());
+                cursor.moveToFirst();
+            }
             // Set synchronization
             Tools.setSyncView(EventDisplayActivity.this, (TextView) findViewById(R.id.text_sync_date),
                     (ImageView) findViewById(R.id.image_sync), cursor.getString(COLUMN_INDEX_STATUS_DATE),

@@ -46,14 +46,14 @@ public class PresentsRequest extends DataRequest {
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
-        if (data != null) { ////// Old data requested
-            Logs.add(Logs.Type.I, "Old presents info requested");
+        if (data != null) { ////// More data requested
+            Logs.add(Logs.Type.I, "More present members info requested");
 
 
 
 
 
-            return Result.NO_MORE; // No more old entries
+            return Result.NO_MORE; // No more entries
         }
         ////// New or data updates requested
 
