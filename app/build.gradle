@@ -35,6 +35,7 @@ android {
                      'src/main/res/drawables/location',
                      'src/main/res/drawables/mailbox',
                      'src/main/res/drawables/publication',
+                     'src/main/res/drawables/event',
                      'src/main/res/value/introduction',
                      'src/main/res/value/main',
                      'src/main/res/value/notification',

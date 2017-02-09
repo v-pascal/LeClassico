@@ -2,8 +2,8 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/colorPublication"/>
     <corners
-        android:bottomRightRadius="@dimen/shortcut_data_radius"
-        android:bottomLeftRadius="@dimen/shortcut_data_radius"
-        android:topLeftRadius="@dimen/shortcut_data_radius"
-        android:topRightRadius="@dimen/shortcut_data_radius"/>
+        android:bottomRightRadius="@dimen/background_radius"
+        android:bottomLeftRadius="@dimen/background_radius"
+        android:topLeftRadius="@dimen/background_radius"
+        android:topRightRadius="@dimen/background_radius"/>
 </shape>

@@ -97,7 +97,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     public static final String REQUEST_LOGOUT = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REQUEST_LOGOUT";
     public static final String REQUEST_OLD_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
-            Constants.APP_URI + ".action.REQUEST_OLD_DATA";
+            Constants.APP_URI + ".action.REQUEST_OLD_DATA"; // Old/More request
     private static final String REGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REGISTER_NEW_DATA";
     private static final String UNREGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +

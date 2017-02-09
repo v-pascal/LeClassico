@@ -130,12 +130,31 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
+            <!-- Synchronization -->
+            <ImageView
+                android:id="@+id/image_sync"
+                android:scaleType="center"
+                android:layout_marginStart="@dimen/sync_text_margin"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_width="@dimen/sync_height"
+                android:layout_height="@dimen/sync_height"/>
+            <TextView
+                android:id="@+id/text_sync_date"
+                android:layout_alignParentBottom="true"
+                android:layout_toStartOf="@id/image_sync"
+                android:textSize="@dimen/sync_text_size"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/sync_height"/>
+
         </RelativeLayout>
 
         <!-- Presents member list -->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/list_members"
             android:background="@color/colorPrimarySetting"
+            android:paddingTop="@dimen/event_presents_padding"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"/>

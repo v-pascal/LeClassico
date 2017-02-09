@@ -72,7 +72,7 @@ public class Queries {
             case Uris.ID_MAIN_EVENTS: { // MAIN_EVENTS_LIST
 
                 Logs.add(Logs.Type.I, "Events query");
-                String presentsJoin = " LEFT JOIN " + PresentsTable.TABLE_NAME + " ON " +
+                String presentsJoin = "JOIN " + PresentsTable.TABLE_NAME + " ON " +
                         PresentsTable.COLUMN_EVENT_ID + '=' + EvenementsTable.COLUMN_EVENT_ID + " AND " +
                         PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
@@ -93,15 +93,16 @@ public class Queries {
                     } catch (ParseException e) {
                         Logs.add(Logs.Type.I, "Single event query");
 
-                        return db.rawQuery("SELECT " +
-                                EvenementsTable.COLUMN_PSEUDO + ',' +
+                        String eventFields = EvenementsTable.COLUMN_PSEUDO + ',' +
                                 EvenementsTable.COLUMN_NOM + ',' +
                                 EvenementsTable.COLUMN_DATE + ',' +
                                 EvenementsTable.COLUMN_DATE_END + ',' +
                                 EvenementsTable.COLUMN_LIEU + ',' +
                                 EvenementsTable.COLUMN_FLYER + ',' +
                                 EvenementsTable.COLUMN_REMARK + ',' +
-                                PresentsTable.COLUMN_PSEUDO + ',' +
+                                EvenementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ',' +
+                                EvenementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + ',';
+                        String memberFields = CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +
                                 CamaradesTable.COLUMN_SEXE + ',' +
                                 CamaradesTable.COLUMN_PROFILE + ',' +
                                 CamaradesTable.COLUMN_PHONE + ',' +
@@ -109,13 +110,29 @@ public class Queries {
                                 CamaradesTable.COLUMN_VILLE + ',' +
                                 CamaradesTable.COLUMN_NOM + ',' +
                                 CamaradesTable.COLUMN_ADRESSE + ',' +
-                                CamaradesTable.COLUMN_ADMIN +
-                                " FROM " + EvenementsTable.TABLE_NAME +
-                                presentsJoin +
-                                " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
+                                CamaradesTable.COLUMN_ADMIN;
+                        String from = " FROM " + EvenementsTable.TABLE_NAME;
+                        String membersJoin = " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON ";
+                        String where = " WHERE " + EvenementsTable.TABLE_NAME + '.' +
+                                IDataTable.DataField.COLUMN_ID + '=' + filter;
+
+                        return db.rawQuery("SELECT " +
+                                eventFields +
+                                PresentsTable.COLUMN_PSEUDO + ',' +
+                                memberFields +
+                                from +
+                                " INNER " + presentsJoin +
+                                membersJoin +
                                 CamaradesTable.COLUMN_PSEUDO + '=' + PresentsTable.COLUMN_PSEUDO +
-                                " WHERE " + EvenementsTable.TABLE_NAME + '.' +
-                                IDataTable.DataField.COLUMN_ID + '=' + filter, null);
+                                where +
+                                " UNION SELECT " + // Union
+                                eventFields +
+                                "NULL," +
+                                memberFields +
+                                from +
+                                membersJoin +
+                                CamaradesTable.COLUMN_PSEUDO + '=' + EvenementsTable.COLUMN_PSEUDO +
+                                where, null);
                     }
                 }
                 String fields = EvenementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +
@@ -129,7 +146,7 @@ public class Queries {
                 return db.rawQuery("SELECT " + fields + ',' +
                         "count(" + PresentsTable.COLUMN_EVENT_ID + ')' +
                         " FROM " + EvenementsTable.TABLE_NAME +
-                        presentsJoin +
+                        " LEFT " + presentsJoin +
                         " WHERE " +
                         EvenementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
                         DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
@@ -173,6 +190,7 @@ public class Queries {
     public static final short NOTIFICATIONS_LIST_LIMIT = 20;
     public static final short PUBLICATIONS_LIST_LIMIT = 5;
     public static final short COMMENTS_LIST_LIMIT = 4;
+    public static final short PRESENTS_LIST_LIMIT = 4;
 
 
     ////// Older ///////////////////////////////////////////////////////////////////////////////////
@@ -181,4 +199,5 @@ public class Queries {
     public static final short NOTIFICATIONS_OLD_LIMIT = 5;
     public static final short PUBLICATIONS_OLD_LIMIT = 3;
     public static final short COMMENTS_OLD_LIMIT = 4;
+    public static final short PRESENTS_MORE_LIMIT = 3;
 }

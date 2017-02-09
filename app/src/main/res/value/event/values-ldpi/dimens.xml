@@ -5,5 +5,7 @@
     <dimen name="event_margin_start">36dp</dimen>
     <dimen name="event_margin_end">64dp</dimen>
     <!-- Expanded title margins -->
+    <dimen name="event_member_padding_horizontal">32dp</dimen>
+    <dimen name="event_member_padding_vertical">12dp</dimen>
 
 </resources>
