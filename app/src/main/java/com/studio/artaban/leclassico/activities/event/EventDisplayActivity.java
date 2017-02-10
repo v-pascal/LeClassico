@@ -1,6 +1,8 @@
 package com.studio.artaban.leclassico.activities.event;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -33,6 +35,7 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.album.FullPhotoActivity;
 import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
+import com.studio.artaban.leclassico.animations.InOutScreen;
 import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
@@ -66,15 +69,81 @@ public class EventDisplayActivity extends LoggedActivity implements
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
-    public void onEntry(View sender) { // Click event to set user present flag
+    private static final int DURATION_FAB_ANIMATION = 250; // in ms
+    public void onEntry(View sender) { // Click event to update user present flag
         Logs.add(Logs.Type.V, "sender: " + sender);
 
+        // Update DB
+        final boolean present = mPresent;
+        Tools.startProcess(this, new Tools.OnProcessListener() {
+            @Override
+            public Bundle onBackgroundTask() {
+                Logs.add(Logs.Type.V, null);
+
+                ContentValues values = new ContentValues();
 
 
 
 
 
 
+
+                /*
+                values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
+                getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
+                        values, NotificationsTable.COLUMN_PSEUDO + "='" +
+                                getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
+                                "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
+                        null);
+                        */
+
+
+
+
+
+                return null;
+            }
+
+            @Override
+            public void onMainNextTask(Bundle backResult) {
+                Logs.add(Logs.Type.V, "backResult: " + backResult);
+                mPresent = !mPresent;
+
+                getContentResolver().notifyChange(ContentUris.withAppendedId(mEventUri, 0), null);
+                // NB: The 0 appended to URI above permits to avoid multiple 'onChange' method call
+            }
+        });
+
+        // Animate FAB
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setClickable(false);
+
+        InOutScreen.with(this)
+                .setLocation(InOutScreen.Location.RIGHT)
+                .setDuration(DURATION_FAB_ANIMATION)
+                .addListener(new InOutScreen.OnInOutListener() {
+
+                    @Override
+                    public void onAnimationEnd() {
+                        Logs.add(Logs.Type.V, null);
+                        fab.setImageDrawable(getDrawable((present) ?
+                                R.drawable.ic_person_add_white_36dp : R.drawable.ic_person_remove_white_36dp));
+
+                        InOutScreen.with(EventDisplayActivity.this)
+                                .setLocation(InOutScreen.Location.RIGHT)
+                                .setDuration(DURATION_FAB_ANIMATION)
+                                .addListener(new InOutScreen.OnInOutListener() {
+
+                                    @Override
+                                    public void onAnimationEnd() {
+                                        Logs.add(Logs.Type.V, null);
+                                        fab.setClickable(true);
+                                    }
+                                })
+                                .in(fab);
+                    }
+                })
+                .out(fab);
     }
 
     public static SpannableStringBuilder getHourly(Context context, String from, String to) {
@@ -262,14 +331,18 @@ public class EventDisplayActivity extends LoggedActivity implements
                 String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
                 do {
                     if ((!cursor.isNull(COLUMN_INDEX_ENTRY_PSEUDO)) &&
-                            (cursor.getString(COLUMN_INDEX_ENTRY_PSEUDO).compareTo(pseudo) == 0)) { // Presents
+                            (cursor.getString(COLUMN_INDEX_ENTRY_PSEUDO).compareTo(pseudo) == 0)) { // Present
                         ((FloatingActionButton) findViewById(R.id.fab))
                                 .setImageDrawable(getDrawable(R.drawable.ic_person_remove_white_36dp));
+                        mPresent = true;
                         break;
                     }
 
                 } while (cursor.moveToNext());
                 cursor.moveToFirst();
+
+                // Set FAB ready to work
+                findViewById(R.id.fab).setClickable(true);
             }
             // Set synchronization
             Tools.setSyncView(EventDisplayActivity.this, (TextView) findViewById(R.id.text_sync_date),
@@ -324,7 +397,9 @@ public class EventDisplayActivity extends LoggedActivity implements
     private short mQueryCount = Constants.NO_DATA; // DB query result count
     private short mQueryLimit = Queries.PRESENTS_LIST_LIMIT; // DB query limit
     private String mQueryDate; // More query date displayed (visible)
+
     private String mPresentsLast; // Last present status date received (newest date)
+    private boolean mPresent; // Event user present flag
 
     // Query column indexes
     private static final int COLUMN_INDEX_PSEUDO = 0;
