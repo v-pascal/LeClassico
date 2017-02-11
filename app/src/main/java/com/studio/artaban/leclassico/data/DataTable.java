@@ -12,6 +12,10 @@ import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by pascal on 24/08/16.
  * Abstract DB table class
@@ -45,6 +49,14 @@ public abstract class DataTable implements IDataTable {
         result.close();
 
         return id;
+    }
+    public static void addSyncFields(ContentValues values, byte sync) { // Add sync & status date fields
+        Logs.add(Logs.Type.V, "values: " + values);
+
+        Date now = new Date();
+        DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+        values.put(Constants.DATA_COLUMN_STATUS_DATE, dateFormat.format(now));
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, sync);
     }
 
     ////// Notifications

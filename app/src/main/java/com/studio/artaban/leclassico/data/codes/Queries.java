@@ -93,7 +93,8 @@ public class Queries {
                     } catch (ParseException e) {
                         Logs.add(Logs.Type.I, "Single event query");
 
-                        String eventFields = EvenementsTable.COLUMN_PSEUDO + ',' +
+                        String eventFields = EvenementsTable.COLUMN_EVENT_ID + ',' +
+                                EvenementsTable.COLUMN_PSEUDO + ',' +
                                 EvenementsTable.COLUMN_NOM + ',' +
                                 EvenementsTable.COLUMN_DATE + ',' +
                                 EvenementsTable.COLUMN_DATE_END + ',' +
@@ -111,7 +112,6 @@ public class Queries {
                                 CamaradesTable.COLUMN_NOM + ',' +
                                 CamaradesTable.COLUMN_ADRESSE + ',' +
                                 CamaradesTable.COLUMN_ADMIN;
-                        String sortField = " AS StatusDate,";
                         String from = " FROM " + EvenementsTable.TABLE_NAME;
                         String membersJoin = " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON ";
                         String where = " WHERE " + EvenementsTable.TABLE_NAME + '.' +
@@ -119,8 +119,8 @@ public class Queries {
 
                         return db.rawQuery("SELECT " +
                                 eventFields +
-                                PresentsTable.COLUMN_PSEUDO + ',' +
-                                PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + sortField +
+                                PresentsTable.COLUMN_PSEUDO + " AS Pseudo," +
+                                PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + " AS Date," +
                                 memberFields +
                                 from +
                                 " INNER " + presentsJoin +
@@ -129,13 +129,13 @@ public class Queries {
                                 where +
                                 " UNION SELECT " + // Union
                                 eventFields +
-                                "NULL,NULL" + sortField +
+                                "NULL AS Pseudo,NULL AS Date," +
                                 memberFields +
                                 from +
                                 membersJoin +
                                 CamaradesTable.COLUMN_PSEUDO + '=' + EvenementsTable.COLUMN_PSEUDO +
                                 where +
-                                " ORDER BY StatusDate ASC", null);
+                                " ORDER BY Date DESC,Pseudo ASC", null);
                     }
                 }
                 String fields = EvenementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +

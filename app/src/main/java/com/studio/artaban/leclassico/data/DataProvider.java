@@ -235,7 +235,7 @@ public class DataProvider extends ContentProvider {
         if (!selection.contains(Constants.DATA_DELETE_SELECTION)) {
 
             ContentValues values = new ContentValues();
-            values.put(Constants.DATA_COLUMN_SYNCHRONIZED, DataTable.Synchronized.TO_DELETE.getValue());
+            DataTable.addSyncFields(values, DataTable.Synchronized.TO_DELETE.getValue());
             result = mDB.getDB().update(table, values, selection, selectionArgs);
 
             getContext().getContentResolver().notifyChange(uri, null);

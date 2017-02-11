@@ -449,7 +449,7 @@ public class PublicationsFragment extends MainFragment implements
     private Cursor mPubCursor; // Publications cursor
     private String mPubLast; // Last publication date received (newest date)
 
-    private short mQueryCount = Constants.NO_DATA; // DB query result count
+    private short mQueryCount; // DB query result count
     private short mQueryLimit = Queries.PUBLICATIONS_LIST_LIMIT; // DB query limit
     private String mQueryDate; // Old query date displayed (visible)
 
@@ -521,7 +521,7 @@ public class PublicationsFragment extends MainFragment implements
         short count = (short) mPubCursor.getCount();
         boolean newEntries = false;
 
-        if ((mQueryCount > 0) && (mPubLast.compareTo(lastPub) != 0)) {
+        if ((mPubLast != null) && (mPubLast.compareTo(lastPub) != 0)) {
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
             // Update shortcut (apply animation)

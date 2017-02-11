@@ -72,6 +72,12 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             public Bundle onBackgroundTask() {
                 Logs.add(Logs.Type.V, null);
 
+
+
+
+
+
+
                 ContentValues values = new ContentValues();
                 values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
                 getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
@@ -79,6 +85,13 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                                 getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
                                 "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
                         null);
+
+
+
+
+
+
+
                 return null;
             }
 
@@ -90,6 +103,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                 ServiceNotify.update(NotifyActivity.this, 0);
                 getContentResolver().notifyChange(ContentUris.withAppendedId(mNotifyURI, 0), null);
                 // NB: The 0 appended to URI above permits to avoid multiple 'onChange' method call
+                //     that occurs when more than on notification is touched
             }
         });
     }
@@ -485,7 +499,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
     private final QueryLoader mListLoader = new QueryLoader(this, this); // User notification list query loader
     private String mNotifyLast; // Last notification date received (newest date)
 
-    private short mQueryCount = Constants.NO_DATA; // DB query result count
+    private short mQueryCount; // DB query result count
     private short mQueryLimit = Queries.NOTIFICATIONS_LIST_LIMIT; // DB query limit
     private String mQueryDate; // Old query date displayed (visible)
 
@@ -567,7 +581,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
         // Update current display data
         String lastNotify = mCursor.getString(COLUMN_INDEX_DATE);
         short count = (short) mCursor.getCount();
-        if ((mQueryCount > 0) && (mNotifyLast.compareTo(lastNotify) != 0))
+        if ((mNotifyLast != null) && (mNotifyLast.compareTo(lastNotify) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
         mQueryCount = count;

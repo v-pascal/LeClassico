@@ -47,7 +47,8 @@ public final class Constants {
 
     public static final String DATA_DELETE_SELECTION = '(' +
             DATA_COLUMN_SYNCHRONIZED + '=' + DataTable.Synchronized.TO_DELETE.getValue() + " OR " +
-            DATA_COLUMN_SYNCHRONIZED + '=' + (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue());
+            DATA_COLUMN_SYNCHRONIZED + '=' + (DataTable.Synchronized.TO_DELETE.getValue() |
+            DataTable.Synchronized.IN_PROGRESS.getValue()) + ')';
     // Selection criteria to delete records from DB definitively
 
     public static final int DATA_UNREAD = 0;

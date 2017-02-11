@@ -41,10 +41,13 @@ import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.helpers.Storage;
@@ -69,55 +72,72 @@ public class EventDisplayActivity extends LoggedActivity implements
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
+    private void updateUserPresence() { // Update DB user presence to the event
+        Logs.add(Logs.Type.V, null);
+
+        Uri uri = Uri.parse(DataProvider.CONTENT_URI + PresentsTable.TABLE_NAME);
+        String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
+        String where = PresentsTable.COLUMN_EVENT_ID + '=' + mEventId + " AND " +
+                PresentsTable.COLUMN_PSEUDO + "='" + pseudo + '\'';
+
+
+
+
+
+
+        // Check existing DB entry
+        byte sync = Constants.NO_DATA;
+        Cursor existingEntry = getContentResolver().query(uri,
+                new String[]{Constants.DATA_COLUMN_SYNCHRONIZED}, where, null, null);
+        if (existingEntry.moveToFirst())
+            sync = (byte) existingEntry.getInt(0);
+        existingEntry.close();
+
+        if (!mPresent) { ////// Mark user as present
+            ContentValues values = new ContentValues();
+            values.put(PresentsTable.COLUMN_EVENT_ID, mEventId);
+            values.put(PresentsTable.COLUMN_PSEUDO, pseudo);
+
+            if (sync == Constants.NO_DATA) { // Insert entry
+                DataTable.addSyncFields(values, DataTable.Synchronized.TO_INSERT.getValue());
+                getContentResolver().insert(uri, values);
+
+            } else // Update entry (previously marked as to delete)
+                getContentResolver().update(uri, values, where, null);
+
+        } else { ////// Mark user as not present
+
+            // Mark DB entry to delete
+            getContentResolver().delete(uri, where, null);
+
+            if (sync == DataTable.Synchronized.TO_INSERT.getValue()) // Delete BD entry
+                getContentResolver().delete(uri, where + " AND " + Constants.DATA_DELETE_SELECTION, null);
+        }
+
+
+
+
+
+
+
+
+
+
+        mPresent = !mPresent;
+
+        // Notify change on cursor URI
+        getContentResolver().notifyChange(ContentUris.withAppendedId(mEventUri, mId), null);
+    }
+
     private static final int DURATION_FAB_ANIMATION = 250; // in ms
     public void onEntry(View sender) { // Click event to update user present flag
         Logs.add(Logs.Type.V, "sender: " + sender);
 
-        // Update DB
-        final boolean present = mPresent;
-        Tools.startProcess(this, new Tools.OnProcessListener() {
-            @Override
-            public Bundle onBackgroundTask() {
-                Logs.add(Logs.Type.V, null);
-
-                ContentValues values = new ContentValues();
-
-
-
-
-
-
-
-                /*
-                values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
-                getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
-                        values, NotificationsTable.COLUMN_PSEUDO + "='" +
-                                getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
-                                "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
-                        null);
-                        */
-
-
-
-
-
-                return null;
-            }
-
-            @Override
-            public void onMainNextTask(Bundle backResult) {
-                Logs.add(Logs.Type.V, "backResult: " + backResult);
-                mPresent = !mPresent;
-
-                getContentResolver().notifyChange(ContentUris.withAppendedId(mEventUri, 0), null);
-                // NB: The 0 appended to URI above permits to avoid multiple 'onChange' method call
-            }
-        });
-
-        // Animate FAB
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final boolean present = mPresent;
         fab.setClickable(false);
 
+        // Animate FAB
         InOutScreen.with(this)
                 .setLocation(InOutScreen.Location.RIGHT)
                 .setDuration(DURATION_FAB_ANIMATION)
@@ -128,6 +148,9 @@ public class EventDisplayActivity extends LoggedActivity implements
                         Logs.add(Logs.Type.V, null);
                         fab.setImageDrawable(getDrawable((present) ?
                                 R.drawable.ic_person_add_white_36dp : R.drawable.ic_person_remove_white_36dp));
+
+                        // Update DB
+                        updateUserPresence();
 
                         InOutScreen.with(EventDisplayActivity.this)
                                 .setLocation(InOutScreen.Location.RIGHT)
@@ -308,6 +331,7 @@ public class EventDisplayActivity extends LoggedActivity implements
 
         if (id == Queries.EVENTS_DISPLAY) {
             mCursor = cursor;
+            mEventId = cursor.getInt(COLUMN_INDEX_EVENT_ID);
 
             // Set event info
             ((CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar))
@@ -393,8 +417,9 @@ public class EventDisplayActivity extends LoggedActivity implements
     //////
     private final QueryLoader mEventLoader = new QueryLoader(this, this); // Event query loader
     private Uri mEventUri; // Event query URI
+    private int mEventId; // Event ID (!= _id -> != mId)
 
-    private short mQueryCount = Constants.NO_DATA; // DB query result count
+    private short mQueryCount; // DB query result count
     private short mQueryLimit = Queries.PRESENTS_LIST_LIMIT; // DB query limit
     private String mQueryDate; // More query date displayed (visible)
 
@@ -402,26 +427,27 @@ public class EventDisplayActivity extends LoggedActivity implements
     private boolean mPresent; // Event user present flag
 
     // Query column indexes
-    private static final int COLUMN_INDEX_PSEUDO = 0;
-    private static final int COLUMN_INDEX_NOM = 1;
-    private static final int COLUMN_INDEX_DATE = 2;
-    private static final int COLUMN_INDEX_DATE_END = 3;
-    private static final int COLUMN_INDEX_LIEU = 4;
-    private static final int COLUMN_INDEX_FLYER = 5;
-    private static final int COLUMN_INDEX_REMARK = 6;
-    private static final int COLUMN_INDEX_STATUS_DATE = 7;
-    private static final int COLUMN_INDEX_SYNC = 8;
-    private static final int COLUMN_INDEX_ENTRY_PSEUDO = 9;
-    private static final int COLUMN_INDEX_ENTRY_DATE = 10; // Presents status date (used to sort entries)
-    private static final int COLUMN_INDEX_ENTRY_PSEUDO_ID = 11;
-    private static final int COLUMN_INDEX_ENTRY_SEX = 12;
-    private static final int COLUMN_INDEX_ENTRY_PROFILE = 13;
-    private static final int COLUMN_INDEX_ENTRY_PHONE = 14;
-    private static final int COLUMN_INDEX_ENTRY_EMAIL = 15;
-    private static final int COLUMN_INDEX_ENTRY_TOWN = 16;
-    private static final int COLUMN_INDEX_ENTRY_NAME = 17;
-    private static final int COLUMN_INDEX_ENTRY_ADDRESS = 18;
-    private static final int COLUMN_INDEX_ENTRY_ADMIN = 19;
+    private static final int COLUMN_INDEX_EVENT_ID = 0;
+    private static final int COLUMN_INDEX_PSEUDO = 1;
+    private static final int COLUMN_INDEX_NOM = 2;
+    private static final int COLUMN_INDEX_DATE = 3;
+    private static final int COLUMN_INDEX_DATE_END = 4;
+    private static final int COLUMN_INDEX_LIEU = 5;
+    private static final int COLUMN_INDEX_FLYER = 6;
+    private static final int COLUMN_INDEX_REMARK = 7;
+    private static final int COLUMN_INDEX_STATUS_DATE = 8;
+    private static final int COLUMN_INDEX_SYNC = 9;
+    private static final int COLUMN_INDEX_ENTRY_PSEUDO = 10;
+    private static final int COLUMN_INDEX_ENTRY_DATE = 11; // Presents status date (used to sort entries)
+    private static final int COLUMN_INDEX_ENTRY_PSEUDO_ID = 12;
+    private static final int COLUMN_INDEX_ENTRY_SEX = 13;
+    private static final int COLUMN_INDEX_ENTRY_PROFILE = 14;
+    private static final int COLUMN_INDEX_ENTRY_PHONE = 15;
+    private static final int COLUMN_INDEX_ENTRY_EMAIL = 16;
+    private static final int COLUMN_INDEX_ENTRY_TOWN = 17;
+    private static final int COLUMN_INDEX_ENTRY_NAME = 18;
+    private static final int COLUMN_INDEX_ENTRY_ADDRESS = 19;
+    private static final int COLUMN_INDEX_ENTRY_ADMIN = 20;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -464,29 +490,38 @@ public class EventDisplayActivity extends LoggedActivity implements
 
         // Update current display data
         if ((mCursor.getCount() != 1) || (!mCursor.isNull(COLUMN_INDEX_ENTRY_PSEUDO))) {
-            if (mCursor.isNull(COLUMN_INDEX_ENTRY_PSEUDO))
-                mCursor.moveToNext();
-
             String lastMember = mCursor.getString(COLUMN_INDEX_ENTRY_DATE);
+
             short count = (short) mCursor.getCount();
-            if ((mQueryCount > 0) && (mPresentsLast.compareTo(lastMember) < 0))
-                mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
+            mCursor.moveToLast(); // Using sort
+            if (mCursor.isNull(COLUMN_INDEX_ENTRY_PSEUDO))
+                --count; // Remove event info entry from member presence count
+            mCursor.moveToFirst();
+
+            if ((mPresentsLast != null) && (mPresentsLast.compareTo(lastMember) < 0))
+                mQueryLimit += count - mQueryCount; // New entries case
 
             mQueryCount = count;
             mPresentsLast = lastMember;
+            Logs.add(Logs.Type.I, "Count: " + count + " - Last: " + lastMember);
 
             // Get last visible present member date (status date)
             int limit = mQueryLimit;
             do {
+                if (mCursor.isNull(COLUMN_INDEX_ENTRY_PSEUDO))
+                    break; // No more member present in result
                 mQueryDate = mCursor.getString(COLUMN_INDEX_ENTRY_DATE);
                 if (--limit == 0)
                     break; // Only visible item are concerned
 
             } while (mCursor.moveToNext());
             mCursor.moveToFirst();
-        }
-        //else // No member presents at event
 
+        } else { // No member presents at event
+            mPresentsLast = null;
+            mQueryLimit = Queries.PRESENTS_LIST_LIMIT;
+            mQueryCount = 0;
+        }
         //////
         if (mAdapter.isInitialized()) { // Check if not the initial query
             Logs.add(Logs.Type.I, "Query update");

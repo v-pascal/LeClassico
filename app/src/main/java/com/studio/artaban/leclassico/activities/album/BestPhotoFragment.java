@@ -265,7 +265,7 @@ public class BestPhotoFragment extends Fragment implements
     private Cursor mComCursor; // Photo comments cursor
     private String mComLast; // Last photo comment date received (newest date)
 
-    private short mQueryCount = Constants.NO_DATA; // DB query result count
+    private short mQueryCount; // DB query result count
     private short mQueryLimit = Queries.COMMENTS_LIST_LIMIT; // DB query limit
     private String mQueryDate; // Old query date displayed (visible)
 
@@ -344,7 +344,7 @@ public class BestPhotoFragment extends Fragment implements
         if (count == 0)
             return; // Nothing to display (no comment for this best photo)
 
-        if ((mQueryCount > 0) && (mComLast.compareTo(lastPub) != 0))
+        if ((mComLast != null) && (mComLast.compareTo(lastPub) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
         mQueryCount = count;

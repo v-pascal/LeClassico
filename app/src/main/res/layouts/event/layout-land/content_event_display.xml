@@ -143,6 +143,7 @@
                 android:id="@+id/text_sync_date"
                 android:layout_alignParentBottom="true"
                 android:layout_toStartOf="@id/image_sync"
+                android:textColor="@android:color/black"
                 android:textSize="@dimen/sync_text_size"
                 android:gravity="center_vertical"
                 android:layout_width="wrap_content"
