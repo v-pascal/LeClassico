@@ -465,6 +465,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
             @Override
             public void onCancel(DialogInterface dialog) {
                 Logs.add(Logs.Type.V, "dialog: " + dialog);
+                mLogging = false;
 
                 getSupportFragmentManager().popBackStack();
                 getSupportFragmentManager().executePendingTransactions();
@@ -929,6 +930,7 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
             case android.R.id.home: {
 
                 if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
+                    mLogging = false;
 
                     // Cancel connection task
                     getSupportFragmentManager().popBackStack();
@@ -995,9 +997,10 @@ public class IntroActivity extends AppCompatActivity implements ConnectFragment.
     public void onBackPressed() {
 
         Logs.add(Logs.Type.V, null);
-        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null)
+        if (getSupportFragmentManager().findFragmentByTag(ConnectFragment.TAG) != null) {
+            mLogging = false;
             replaceButtonIcon(false);
-
+        }
         super.onBackPressed();
     }
 

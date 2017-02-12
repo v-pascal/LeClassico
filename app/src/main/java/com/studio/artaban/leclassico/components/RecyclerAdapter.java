@@ -263,7 +263,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                     else
                         break;
                 }
-                mData.remove(toDo.get(i));
+                mData.remove((int)toDo.get(i));
                 if (j != (i + 1)) { // Range
                     adapter.notifyItemRangeRemoved(toDo.get(i), toDo.get(j - 1) - toDo.get(i));
                     if (listener != null) // Check to notify item changed according items removed
