@@ -48,6 +48,7 @@ import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.helpers.Storage;
@@ -74,55 +75,42 @@ public class EventDisplayActivity extends LoggedActivity implements
 
     private void updateUserPresence() { // Update DB user presence to the event
         Logs.add(Logs.Type.V, null);
-
-        Uri uri = Uri.parse(DataProvider.CONTENT_URI + PresentsTable.TABLE_NAME);
         String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
         String where = PresentsTable.COLUMN_EVENT_ID + '=' + mEventId + " AND " +
                 PresentsTable.COLUMN_PSEUDO + "='" + pseudo + '\'';
 
+        Uri uri = Uri.parse(DataProvider.CONTENT_URI + PresentsTable.TABLE_NAME);
+        synchronized (Database.getTable(PresentsTable.TABLE_NAME)) {
 
+            // Check existing DB entry
+            byte sync = Constants.NO_DATA;
+            Cursor existingEntry = getContentResolver().query(uri,
+                    new String[]{Constants.DATA_COLUMN_SYNCHRONIZED}, where, null, null);
+            if (existingEntry.moveToFirst())
+                sync = (byte) existingEntry.getInt(0);
+            existingEntry.close();
 
+            if (!mPresent) { ////// Mark user as present
+                ContentValues values = new ContentValues();
+                values.put(PresentsTable.COLUMN_EVENT_ID, mEventId);
+                values.put(PresentsTable.COLUMN_PSEUDO, pseudo);
 
+                if (sync == Constants.NO_DATA) { // Insert entry
+                    DataTable.addSyncFields(values, DataTable.Synchronized.TO_INSERT.getValue());
+                    getContentResolver().insert(uri, values);
 
+                } else // Update entry (previously marked as to delete)
+                    getContentResolver().update(uri, values, where, null);
 
-        // Check existing DB entry
-        byte sync = Constants.NO_DATA;
-        Cursor existingEntry = getContentResolver().query(uri,
-                new String[]{Constants.DATA_COLUMN_SYNCHRONIZED}, where, null, null);
-        if (existingEntry.moveToFirst())
-            sync = (byte) existingEntry.getInt(0);
-        existingEntry.close();
+            } else { ////// Mark user as not present
 
-        if (!mPresent) { ////// Mark user as present
-            ContentValues values = new ContentValues();
-            values.put(PresentsTable.COLUMN_EVENT_ID, mEventId);
-            values.put(PresentsTable.COLUMN_PSEUDO, pseudo);
+                // Mark DB entry to delete
+                getContentResolver().delete(uri, where, null);
 
-            if (sync == Constants.NO_DATA) { // Insert entry
-                DataTable.addSyncFields(values, DataTable.Synchronized.TO_INSERT.getValue());
-                getContentResolver().insert(uri, values);
-
-            } else // Update entry (previously marked as to delete)
-                getContentResolver().update(uri, values, where, null);
-
-        } else { ////// Mark user as not present
-
-            // Mark DB entry to delete
-            getContentResolver().delete(uri, where, null);
-
-            if (sync == DataTable.Synchronized.TO_INSERT.getValue()) // Delete BD entry
-                getContentResolver().delete(uri, where + " AND " + Constants.DATA_DELETE_SELECTION, null);
+                if (sync == DataTable.Synchronized.TO_INSERT.getValue()) // Delete BD entry
+                    getContentResolver().delete(uri, where + " AND " + Constants.DATA_DELETE_SELECTION, null);
+            }
         }
-
-
-
-
-
-
-
-
-
-
         mPresent = !mPresent;
 
         // Notify change on cursor URI

@@ -386,50 +386,53 @@ public class ConnectFragment extends RevealFragment {
 
                     for (byte tableId = 1; tableId <= Tables.ID_LAST; ++tableId) {
                         if (isStopped()) return Boolean.FALSE;
-                        DataTable table = Database.getTable(Tables.getName(tableId));
                         publishProgress(tableId);
 
-                        // From remote to local DB
-                        syncData.putShort(DataTable.DATA_KEY_LIMIT, (short)0); // Default limit
-                        if (table.synchronize(resolver, WebServices.OPERATION_SELECT,
-                                syncData, null) == null) {
+                        synchronized (Database.getTable(Tables.getName(tableId))) {
+                            DataTable table = Database.getTable(Tables.getName(tableId));
 
-                            Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
-                            publishProgress(STEP_ERROR);
-                            return Boolean.FALSE;
-                        }
-                        syncData.remove(DataTable.DATA_KEY_LIMIT);
+                            // From remote to local DB
+                            syncData.putShort(DataTable.DATA_KEY_LIMIT, (short)0); // Default limit
+                            if (table.synchronize(resolver, WebServices.OPERATION_SELECT,
+                                    syncData, null) == null) {
 
-                        // From local to remote DB
-                        if (isStopped()) return Boolean.FALSE;
-                        ContentValues operationData = table.syncInserted(resolver, mPseudo);
-                        if ((operationData.size() > 0) &&
-                                (table.synchronize(resolver, WebServices.OPERATION_INSERT,
-                                        syncData, operationData) == null)) {
+                                Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error");
+                                publishProgress(STEP_ERROR);
+                                return Boolean.FALSE;
+                            }
+                            syncData.remove(DataTable.DATA_KEY_LIMIT);
 
-                            Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (inserted)");
-                            publishProgress(STEP_ERROR);
-                            return Boolean.FALSE;
-                        }
-                        if (isStopped()) return Boolean.FALSE;
-                        operationData = table.syncUpdated(resolver, mPseudo);
-                        if ((operationData.size() > 0) &&
-                                (table.synchronize(resolver, WebServices.OPERATION_UPDATE,
-                                        syncData, operationData) == null)) {
+                            // From local to remote DB
+                            if (isStopped()) return Boolean.FALSE;
+                            ContentValues operationData = table.syncInserted(resolver, mPseudo);
+                            if ((operationData.size() > 0) &&
+                                    (table.synchronize(resolver, WebServices.OPERATION_INSERT,
+                                            syncData, operationData) == null)) {
 
-                            Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (updated)");
-                            publishProgress(STEP_ERROR);
-                            return Boolean.FALSE;
-                        }
-                        if (isStopped()) return Boolean.FALSE;
-                        operationData = table.syncDeleted(resolver, mPseudo);
-                        if ((operationData.size() > 0) &&
-                                (table.synchronize(resolver, WebServices.OPERATION_DELETE,
-                                        syncData, operationData) == null)) {
+                                Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (inserted)");
+                                publishProgress(STEP_ERROR);
+                                return Boolean.FALSE;
+                            }
+                            if (isStopped()) return Boolean.FALSE;
+                            operationData = table.syncUpdated(resolver, mPseudo);
+                            if ((operationData.size() > 0) &&
+                                    (table.synchronize(resolver, WebServices.OPERATION_UPDATE,
+                                            syncData, operationData) == null)) {
 
-                            Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (deleted)");
-                            publishProgress(STEP_ERROR);
-                            return Boolean.FALSE;
+                                Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (updated)");
+                                publishProgress(STEP_ERROR);
+                                return Boolean.FALSE;
+                            }
+                            if (isStopped()) return Boolean.FALSE;
+                            operationData = table.syncDeleted(resolver, mPseudo);
+                            if ((operationData.size() > 0) &&
+                                    (table.synchronize(resolver, WebServices.OPERATION_DELETE,
+                                            syncData, operationData) == null)) {
+
+                                Logs.add(Logs.Type.E, "Synchronization #" + tableId + " error (deleted)");
+                                publishProgress(STEP_ERROR);
+                                return Boolean.FALSE;
+                            }
                         }
                     }
 

@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -46,7 +47,9 @@ public class MessagerieRequest extends DataRequest {
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
+        DataTable.SyncResult result;
         if (data != null) { ////// Old data requested
+
             Logs.add(Logs.Type.I, "Old mails requested");
 
 

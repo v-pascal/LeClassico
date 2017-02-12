@@ -54,15 +54,18 @@ public class ActualitesRequest extends DataRequest {
         syncData.putString(DataTable.DATA_KEY_TOKEN, dataLogin.token.get());
         syncData.putString(DataTable.DATA_KEY_PSEUDO, dataLogin.pseudo);
 
+        DataTable.SyncResult result;
         if (data != null) { ////// Old data requested
 
             Logs.add(Logs.Type.I, "Old publications requested");
             syncData.putShort(DataTable.DATA_KEY_LIMIT, Queries.PUBLICATIONS_OLD_LIMIT);
             syncData.putString(DataTable.DATA_KEY_DATE, data.getString(EXTRA_DATA_DATE));
 
-            DataTable.SyncResult result = Database.getTable(ActualitesTable.TABLE_NAME)
-                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT_OLD,
-                            syncData, null);
+            synchronized (Database.getTable(ActualitesTable.TABLE_NAME)) {
+                result = Database.getTable(ActualitesTable.TABLE_NAME)
+                        .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT_OLD,
+                                syncData, null);
+            }
             if (result == null) {
 
                 Logs.add(Logs.Type.E, "Failed to get old publications");
@@ -81,8 +84,10 @@ public class ActualitesRequest extends DataRequest {
         ////// New or data updates requested
 
         // Synchronization (from remote to local DB)
-        DataTable.SyncResult result = Database.getTable(ActualitesTable.TABLE_NAME)
-                .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT, syncData, null);
+        synchronized (Database.getTable(ActualitesTable.TABLE_NAME)) {
+            result = Database.getTable(ActualitesTable.TABLE_NAME)
+                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT, syncData, null);
+        }
         if (DataTable.SyncResult.hasChanged(result)) {
 
             Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");

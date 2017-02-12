@@ -189,61 +189,63 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
         mService.copyLoginData(dataLogin);
 
         synchronized (mRegister) {
-            DataTable table = Database.getTable(Tables.getName(mTableId));
+            synchronized (Database.getTable(Tables.getName(mTableId))) {
+                DataTable table = Database.getTable(Tables.getName(mTableId));
 
-            Bundle syncData = new Bundle();
-            syncData.putString(DataTable.DATA_KEY_TOKEN, dataLogin.token.get());
-            syncData.putString(DataTable.DATA_KEY_PSEUDO, dataLogin.pseudo);
+                Bundle syncData = new Bundle();
+                syncData.putString(DataTable.DATA_KEY_TOKEN, dataLogin.token.get());
+                syncData.putString(DataTable.DATA_KEY_PSEUDO, dataLogin.pseudo);
 
-            ////// Synchronize inserted rows
-            setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
-                    DataTable.Synchronized.TO_INSERT.getValue());
+                ////// Synchronize inserted rows
+                setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+                        DataTable.Synchronized.TO_INSERT.getValue());
 
-            ContentValues operationData =
-                    table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
-            if (operationData.size() > 0) {
-                Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_INSERT,
-                        syncData, operationData);
-                notifyChange(); // To update UI synchronization fields (no more in progress status)
+                ContentValues operationData =
+                        table.syncInserted(mService.getContentResolver(), dataLogin.pseudo);
+                if (operationData.size() > 0) {
+                    Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_INSERT,
+                            syncData, operationData);
+                    notifyChange(); // To update UI synchronization fields (no more in progress status)
 
-                if (result == null) {
-                    Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (inserted)");
-                    return;
+                    if (result == null) {
+                        Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (inserted)");
+                        return;
+                    }
                 }
-            }
 
-            ////// Synchronize updated rows
-            setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
-                    DataTable.Synchronized.TO_UPDATE.getValue());
+                ////// Synchronize updated rows
+                setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+                        DataTable.Synchronized.TO_UPDATE.getValue());
 
-            operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.pseudo);
-            if (operationData.size() > 0) {
-                Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_UPDATE,
-                        syncData, operationData);
-                notifyChange();
+                operationData = table.syncUpdated(mService.getContentResolver(), dataLogin.pseudo);
+                if (operationData.size() > 0) {
+                    Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_UPDATE,
+                            syncData, operationData);
+                    notifyChange();
 
-                if (result == null) {
-                    Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (updated)");
-                    return;
+                    if (result == null) {
+                        Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (updated)");
+                        return;
+                    }
                 }
-            }
 
-            ////// Synchronize deleted rows
-            setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
-                    DataTable.Synchronized.TO_DELETE.getValue());
+                ////// Synchronize deleted rows
+                setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
+                        DataTable.Synchronized.TO_DELETE.getValue());
 
-            operationData = table.syncDeleted(mService.getContentResolver(), dataLogin.pseudo);
-            if (operationData.size() > 0) {
-                Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_DELETE,
-                        syncData, operationData);
-                notifyChange();
+                operationData = table.syncDeleted(mService.getContentResolver(), dataLogin.pseudo);
+                if (operationData.size() > 0) {
+                    Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_DELETE,
+                            syncData, operationData);
+                    notifyChange();
 
-                if (result == null) {
-                    Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (deleted)");
-                    return;
+                    if (result == null) {
+                        Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (deleted)");
+                        return;
+                    }
                 }
+                mToSynchronize = false;
             }
-            mToSynchronize = false;
         }
     }
 }

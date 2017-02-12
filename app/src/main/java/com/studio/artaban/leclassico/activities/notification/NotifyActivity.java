@@ -32,6 +32,7 @@ import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.connection.ServiceNotify;
 import com.studio.artaban.leclassico.data.Constants;
@@ -71,27 +72,16 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             @Override
             public Bundle onBackgroundTask() {
                 Logs.add(Logs.Type.V, null);
+                synchronized (Database.getTable(NotificationsTable.TABLE_NAME)) {
+                    ContentValues values = new ContentValues();
 
-
-
-
-
-
-
-                ContentValues values = new ContentValues();
-                values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
-                getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
-                        values, NotificationsTable.COLUMN_PSEUDO + "='" +
-                                getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
-                                "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
-                        null);
-
-
-
-
-
-
-
+                    values.put(NotificationsTable.COLUMN_LU_FLAG, Constants.DATA_READ);
+                    getContentResolver().update(Uri.parse(DataProvider.CONTENT_URI + NotificationsTable.TABLE_NAME),
+                            values, NotificationsTable.COLUMN_PSEUDO + "='" +
+                                    getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
+                                    "' AND " + NotificationsTable.COLUMN_LU_FLAG + '=' + Constants.DATA_UNREAD,
+                            null);
+                }
                 return null;
             }
 
