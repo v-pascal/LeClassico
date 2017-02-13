@@ -1,9 +1,11 @@
 package com.studio.artaban.leclassico.activities.event;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -12,17 +14,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
 import android.text.util.Linkify;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,8 +72,16 @@ import java.util.regex.Pattern;
 public class EventDisplayActivity extends LoggedActivity implements
         RecyclerAdapter.DataView.OnCriteriaListener {
 
+    public static final String EXTRA_DATA_ORIENTATION = "orientation";
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
+    private void setResult() { // Add event ID to activity result
+        Logs.add(Logs.Type.V, null);
+
+        Intent data = new Intent();
+        data.putExtra(Requests.EVENT_DISPLAY_2_MAIN.DATA_KEY_ID, mId);
+        setResult(Requests.EVENT_DISPLAY_2_MAIN.RESULT_ID, data);
+    }
     private void updateUserPresence() { // Update DB user presence to the event
         Logs.add(Logs.Type.V, null);
         String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
@@ -116,10 +124,7 @@ public class EventDisplayActivity extends LoggedActivity implements
 
         // Notify change on cursor URI
         getContentResolver().notifyChange(ContentUris.withAppendedId(mEventUri, mId), null);
-
-        Intent data = new Intent();
-        data.putExtra(Requests.EVENT_DISPLAY_2_MAIN.DATA_KEY_ID, mId);
-        setResult(Requests.EVENT_DISPLAY_2_MAIN.RESULT_ID, data); // Needed to select event after DB update
+        setResult(); // Needed to select event after any DB update
     }
 
     private static final int DURATION_FAB_ANIMATION = 250; // in ms
@@ -160,44 +165,6 @@ public class EventDisplayActivity extends LoggedActivity implements
                     }
                 })
                 .out(fab);
-    }
-
-    public static SpannableStringBuilder getHourly(Context context, String from, String to) {
-    // Return formatted string with from & to date info (date & time)
-
-        //Logs.add(Logs.Type.V, "context: " + context + ";from: " + from + ";to: " + to);
-        SpannableStringBuilder hourly = new SpannableStringBuilder();
-        DateFormat selected = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
-
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-        try {
-            Date startDate = selected.parse(from);
-            hourly.append(context.getString(R.string.from, dateFormat.format(startDate)));
-            hourly.append(' ');
-            hourly.append(timeFormat.format(startDate));
-
-        } catch (ParseException e) {
-            Logs.add(Logs.Type.E, "Wrong start date & time format: " + from);
-            hourly.append(context.getString(R.string.from, from));
-        }
-        hourly.append(' ');
-        hourly.setSpan(new StyleSpan(Typeface.BOLD), 0,
-                context.getResources().getInteger(R.integer.from_pos), 0);
-        int endPos = hourly.length();
-        try {
-            Date endDate = selected.parse(to);
-            hourly.append(context.getString(R.string.to, dateFormat.format(endDate)));
-            hourly.append(' ');
-            hourly.append(timeFormat.format(endDate));
-
-        } catch (ParseException e) {
-            Logs.add(Logs.Type.E, "Wrong end date & time format: " + to);
-            hourly.append(context.getString(R.string.to, to));
-        }
-        hourly.setSpan(new StyleSpan(Typeface.BOLD), endPos,
-                endPos + context.getResources().getInteger(R.integer.to_pos), 0);
-        return hourly;
     }
 
     //////
@@ -323,11 +290,21 @@ public class EventDisplayActivity extends LoggedActivity implements
             return;
         if (!cursor.moveToFirst()) { // No more event to display (event removed)
 
+            new AlertDialog.Builder(this)
+                    .setIcon(getDrawable(R.drawable.warning_red))
+                    .setTitle(getString(R.string.warning))
+                    .setMessage(getString(R.string.event_removed))
+                    .setCancelable(true)
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            Logs.add(Logs.Type.V, "dialog: " + dialog);
 
-
-
-
-
+                            setResult(Activity.RESULT_CANCELED);
+                            finish(); // Stop activity
+                        }
+                    })
+                    .show();
 
             return; // Activity stopped
         }
@@ -348,11 +325,27 @@ public class EventDisplayActivity extends LoggedActivity implements
                     Logs.add(Logs.Type.E, "Failed to open flyer: " + cursor.getString(COLUMN_INDEX_FLYER));
             }
             ((TextView) findViewById(R.id.text_location)).setText(cursor.getString(COLUMN_INDEX_LIEU));
-            ((TextView) findViewById(R.id.text_hourly))
-                    .setText(getHourly(this, cursor.getString(COLUMN_INDEX_DATE), cursor.getString(COLUMN_INDEX_DATE_END)));
             if (!cursor.isNull(COLUMN_INDEX_REMARK))
                 ((TextView) findViewById(R.id.text_info)).setText(cursor.getString(COLUMN_INDEX_REMARK));
 
+            // Set start & end date
+            DateFormat schedule = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+            DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.FULL);
+            DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+            try {
+                Date fromDate = schedule.parse(cursor.getString(COLUMN_INDEX_DATE));
+                ((TextView) findViewById(R.id.text_from))
+                        .setText(dateFormat.format(fromDate) + ' ' + timeFormat.format(fromDate));
+
+                Date toDate = schedule.parse(cursor.getString(COLUMN_INDEX_DATE_END));
+                ((TextView) findViewById(R.id.text_to))
+                        .setText(dateFormat.format(toDate) + ' ' + timeFormat.format(toDate));
+
+            } catch (ParseException e) {
+                Logs.add(Logs.Type.E, "Wrong start or end date format");
+                ((TextView) findViewById(R.id.text_from)).setText(cursor.getString(COLUMN_INDEX_DATE));
+                ((TextView) findViewById(R.id.text_to)).setText(cursor.getString(COLUMN_INDEX_DATE_END));
+            }
             // Change FAB image according if connected user is marked as present...
             if (!mAdapter.isInitialized()) { // ...only at initialization (one call only)
                 String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
@@ -649,5 +642,9 @@ public class EventDisplayActivity extends LoggedActivity implements
 
         // Unregister old request receiver
         unregisterReceiver(mMoreReceiver);
+
+        if ((isFinishing()) && (getResources().getConfiguration().orientation !=
+                getIntent().getIntExtra(EXTRA_DATA_ORIENTATION, Constants.NO_DATA)))
+            setResult(); // Needed to select event after orientation change
     }
 }

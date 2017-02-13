@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +58,44 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
     private EventCalendar mCalendar; // Event calendar view
     private ViewPager mEventsPager; // Events list view
+
+    public static SpannableStringBuilder getHourly(Context context, String from, String to) {
+    // Return formatted string with from & to date info (date & time)
+
+        //Logs.add(Logs.Type.V, "context: " + context + ";from: " + from + ";to: " + to);
+        SpannableStringBuilder hourly = new SpannableStringBuilder();
+        DateFormat selected = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+        try {
+            Date startDate = selected.parse(from);
+            hourly.append(context.getString(R.string.from, dateFormat.format(startDate)));
+            hourly.append(' ');
+            hourly.append(timeFormat.format(startDate));
+
+        } catch (ParseException e) {
+            Logs.add(Logs.Type.E, "Wrong start date & time format: " + from);
+            hourly.append(context.getString(R.string.from, from));
+        }
+        hourly.append(' ');
+        hourly.setSpan(new StyleSpan(Typeface.BOLD), 0,
+                context.getResources().getInteger(R.integer.from_pos), 0);
+        int endPos = hourly.length();
+        try {
+            Date endDate = selected.parse(to);
+            hourly.append(context.getString(R.string.to, dateFormat.format(endDate)));
+            hourly.append(' ');
+            hourly.append(timeFormat.format(endDate));
+
+        } catch (ParseException e) {
+            Logs.add(Logs.Type.E, "Wrong end date & time format: " + to);
+            hourly.append(context.getString(R.string.to, to));
+        }
+        hourly.setSpan(new StyleSpan(Typeface.BOLD), endPos,
+                endPos + context.getResources().getInteger(R.integer.to_pos), 0);
+        return hourly;
+    }
 
     //////
     public static class EventFragment extends Fragment implements View.OnClickListener { ///////////
@@ -144,7 +184,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
                 // Schedule (e.i from start date to end date)
                 ((TextView) rootView.findViewById(R.id.text_hourly))
-                        .setText(EventDisplayActivity.getHourly(context, data.getString(ARG_KEY_DATE_START),
+                        .setText(getHourly(context, data.getString(ARG_KEY_DATE_START),
                                 data.getString(ARG_KEY_DATE_END)), TextView.BufferType.SPANNABLE);
 
                 // Set info: Title, location, members count & remark
@@ -188,8 +228,11 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
                     ////// Start event activity (display)
                     Intent eventDisplay = new Intent(getContext(), EventDisplayActivity.class);
-                    eventDisplay.putExtra(EventDisplayActivity.EXTRA_DATA_ID, getArguments().getInt(ARG_KEY_EVENT_ID));
                     Login.copyExtraData(getActivity().getIntent(), eventDisplay);
+                    eventDisplay.putExtra(EventDisplayActivity.EXTRA_DATA_ID, getArguments().getInt(ARG_KEY_EVENT_ID));
+                    eventDisplay.putExtra(EventDisplayActivity.EXTRA_DATA_ORIENTATION,
+                            getResources().getConfiguration().orientation);
+
                     getActivity().startActivityForResult(eventDisplay, Requests.EVENT_DISPLAY_2_MAIN.CODE);
                     break;
                 }

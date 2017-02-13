@@ -1,86 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:background="@android:color/black"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <!-- Schedule -->
-    <LinearLayout
-        android:orientation="horizontal"
-        android:background="@android:color/black"
-        android:paddingTop="@dimen/event_info_margin"
+    <ImageView
+        android:id="@+id/image_hourly"
+        android:src="@drawable/ic_access_time_white_24dp"
+        android:layout_marginTop="@dimen/event_info_margin"
+        android:layout_marginStart="@dimen/event_info_margin"
+        android:layout_marginEnd="@dimen/event_info_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/event_info_height"/>
+    <TextView
+        android:id="@+id/text_label_from"
+        android:text="@string/label_from"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="@dimen/event_text_size"
+        android:gravity="center_vertical"
+        android:layout_toEndOf="@id/image_hourly"
+        android:layout_marginTop="@dimen/event_info_margin"
+        android:layout_marginEnd="@dimen/event_info_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/event_info_height"/>
+    <TextView
+        android:id="@+id/text_from"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/event_text_size"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:layout_toEndOf="@id/text_label_from"
+        android:layout_marginTop="@dimen/event_info_margin"
+        android:layout_marginEnd="@dimen/event_fab_width"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/event_info_height"/>
 
-        <ImageView
-            android:id="@+id/image_hourly"
-            android:src="@drawable/ic_access_time_white_24dp"
-            android:layout_marginStart="@dimen/event_info_margin"
-            android:layout_marginEnd="@dimen/event_info_margin"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/event_info_height"/>
-        <TextView
-            android:id="@+id/text_hourly"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/event_text_size"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="@dimen/event_info_margin"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/event_info_height"/>
-        <View
-            android:layout_width="@dimen/event_fab_width"
-            android:layout_height="1dp"/><!-- End margin to keep FAB placement -->
-
-    </LinearLayout>
-
-    <!-- Location -->
-    <LinearLayout
-        android:id="@+id/layout_location"
-        android:orientation="horizontal"
-        android:background="@android:color/black"
-        android:paddingTop="@dimen/event_info_margin"
-        android:paddingBottom="@dimen/event_info_margin"
+    <TextView
+        android:id="@+id/text_label_to"
+        android:text="@string/label_to"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="@dimen/event_text_size"
+        android:gravity="center_vertical"
+        android:layout_toEndOf="@id/image_hourly"
+        android:layout_below="@id/image_hourly"
+        android:layout_marginTop="@dimen/event_info_margin"
+        android:layout_marginBottom="@dimen/event_info_margin"
+        android:layout_marginEnd="@dimen/event_info_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/event_info_height"/>
+    <TextView
+        android:id="@+id/text_to"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/event_text_size"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:layout_toEndOf="@id/text_label_to"
+        android:layout_below="@id/image_hourly"
+        android:layout_marginTop="@dimen/event_info_margin"
+        android:layout_marginBottom="@dimen/event_info_margin"
+        android:layout_marginEnd="@dimen/event_fab_width"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:src="@drawable/ic_location_on_white_24dp"
-            android:layout_marginStart="@dimen/event_info_margin"
-            android:layout_marginEnd="@dimen/event_info_margin"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/event_info_height"/>
-        <TextView
-            android:text="@string/label_location"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:textSize="@dimen/event_text_size"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="@dimen/event_info_margin"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/event_info_height"/>
-        <TextView
-            android:id="@+id/text_location"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/event_text_size"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="@dimen/event_info_margin"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/event_info_height"/>
-        <View
-            android:layout_width="@dimen/event_fab_width"
-            android:layout_height="1dp"/><!-- End margin to keep FAB placement -->
-
-    </LinearLayout>
+        android:layout_height="@dimen/event_info_height"/>
 
     <LinearLayout
         android:id="@+id/layout_content"
+        android:background="@color/egg_shell"
         android:orientation="horizontal"
+        android:layout_below="@id/text_label_to"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -109,6 +100,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
+            <!-- Location -->
+            <TextView
+                android:id="@+id/text_label_location"
+                android:text="@string/label_location"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/event_text_size"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:layout_below="@id/text_author_label"
+                android:layout_marginEnd="@dimen/event_info_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/text_location"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/event_text_size"
+                android:gravity="center_vertical"
+                android:layout_below="@id/text_author_label"
+                android:layout_toEndOf="@id/text_label_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
             <!-- Info -->
             <TextView
                 android:id="@+id/text_info_label"
@@ -116,7 +129,7 @@
                 android:textSize="@dimen/event_text_size"
                 android:text="@string/label_info"
                 android:textStyle="bold"
-                android:layout_below="@id/text_author_label"
+                android:layout_below="@id/text_label_location"
                 android:layout_marginEnd="@dimen/event_info_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -125,7 +138,7 @@
                 android:text="@string/none"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/event_text_size"
-                android:layout_below="@id/text_author_label"
+                android:layout_below="@id/text_label_location"
                 android:layout_toEndOf="@id/text_info_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -161,4 +174,4 @@
             android:layout_height="match_parent"/>
 
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

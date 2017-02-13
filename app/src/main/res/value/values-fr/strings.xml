@@ -17,6 +17,8 @@
     <string name="label_info">Info:</string>
     <string name="label_location">Lieu:</string>
     <string name="label_author">Auteur:</string>
+    <string name="label_from">Du:</string>
+    <string name="label_to">Au:</string>
 
     <!-- Titles -->
     <string name="title_activity_intro">Introduction</string>

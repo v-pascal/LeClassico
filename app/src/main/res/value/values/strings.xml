@@ -18,6 +18,8 @@
     <string name="label_info">Info:</string>
     <string name="label_location">Location:</string>
     <string name="label_author">Author:</string>
+    <string name="label_from">From:</string>
+    <string name="label_to">To:</string>
 
     <!-- Application -->
     <string name="app_name" translatable="false">Le Classico</string>

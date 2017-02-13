@@ -3,5 +3,6 @@
 
     <!-- Display -->
     <string name="mnu_display">Display flyer</string>
+    <string name="event_removed">This event has been removed!</string>
 
 </resources>
