@@ -44,6 +44,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -115,6 +116,10 @@ public class EventDisplayActivity extends LoggedActivity implements
 
         // Notify change on cursor URI
         getContentResolver().notifyChange(ContentUris.withAppendedId(mEventUri, mId), null);
+
+        Intent data = new Intent();
+        data.putExtra(Requests.EVENT_DISPLAY_2_MAIN.DATA_KEY_ID, mId);
+        setResult(Requests.EVENT_DISPLAY_2_MAIN.RESULT_ID, data); // Needed to select event after DB update
     }
 
     private static final int DURATION_FAB_ANIMATION = 250; // in ms
@@ -314,8 +319,18 @@ public class EventDisplayActivity extends LoggedActivity implements
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-        if ((!cursor.moveToFirst()) || (onNotifyLoadFinished(id, cursor)))
+        if (onNotifyLoadFinished(id, cursor))
             return;
+        if (!cursor.moveToFirst()) { // No more event to display (event removed)
+
+
+
+
+
+
+
+            return; // Activity stopped
+        }
 
         if (id == Queries.EVENTS_DISPLAY) {
             mCursor = cursor;

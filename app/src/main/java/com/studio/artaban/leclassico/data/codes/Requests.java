@@ -4,19 +4,20 @@ import android.app.Activity;
 
 /**
  * Created by pascal on 11/08/16.
- * Request codes
+ * Activities request & result codes
  */
 public final class Requests {
 
-    /*
-    private static final int REQUEST_NOTIFY_2_MAIN = 1; // Notification to main activity request
+    private static final int REQUEST_EVENT_DISPLAY_2_MAIN = 1; // Event display to main activity request
 
     //////
-    public static final class NOTIFY_2_MAIN {
-        public static final int CODE = REQUEST_NOTIFY_2_MAIN;
+    public static final class EVENT_DISPLAY_2_MAIN {
+        public static final int CODE = REQUEST_EVENT_DISPLAY_2_MAIN;
 
         // Results
-        public static final int RESULT_LOGOUT = Activity.RESULT_FIRST_USER;
+        public static final int RESULT_ID = Activity.RESULT_FIRST_USER;
+
+        // Data keys
+        public static final String DATA_KEY_ID = "id";
     };
-    */
 }

@@ -644,6 +644,14 @@ public class MainActivity extends LoggedActivity implements
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        for (Fragment fragment : getSupportFragmentManager().getFragments())
+            fragment.onActivityResult(requestCode, resultCode, data);
+            // NB: Needed for events fragment
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Logs.add(Logs.Type.V, "item: " + item);
 

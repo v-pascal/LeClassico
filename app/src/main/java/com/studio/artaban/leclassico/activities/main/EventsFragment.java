@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,7 +13,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +27,7 @@ import com.studio.artaban.leclassico.components.EventCalendar;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Internet;
@@ -191,7 +190,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                     Intent eventDisplay = new Intent(getContext(), EventDisplayActivity.class);
                     eventDisplay.putExtra(EventDisplayActivity.EXTRA_DATA_ID, getArguments().getInt(ARG_KEY_EVENT_ID));
                     Login.copyExtraData(getActivity().getIntent(), eventDisplay);
-                    startActivity(eventDisplay);
+                    getActivity().startActivityForResult(eventDisplay, Requests.EVENT_DISPLAY_2_MAIN.CODE);
                     break;
                 }
             }
@@ -222,22 +221,6 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             super(fm);
         }
 
-        private boolean isEventExists() { // Return if one event exists at selected date
-            //Logs.add(Logs.Type.V, null);
-            boolean found = false;
-            do {
-                if (mEventDate.substring(0, 10)
-                        .compareTo(mCursor.getString(COLUMN_INDEX_DATE).substring(0, 10)) == 0) {
-                    found = true;
-                    break;
-                }
-
-            } while (mCursor.moveToNext());
-            mCursor.moveToFirst();
-
-            return found;
-        }
-
         //////
         @Override
         public Fragment getItem(int position) {
@@ -250,7 +233,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
         @Override
         public int getCount() {
-            return (mCursor == null)? 0:mCursor.getCount() + ((!isEventExists())? 1:0);
+            return (mCursor == null)? 0:mCursor.getCount() + ((mEventLag != Constants.NO_DATA)? 1:0);
         }
 
         @Override
@@ -480,7 +463,7 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                     mEventLag = Constants.NO_DATA; // Event found (no events cursor lag)
                     endDate = cursor.getString(COLUMN_INDEX_DATE_END); // NB: Always != NULL
 
-                    // Set shortcuts info (bottom shortcut as well)
+                    // Set shortcuts info
                     if (mEventDate.compareTo(today) == 0) { // Set top shortcut info (today)
                         try {
                             updateShortcut(mListener.onGetShortcut(Constants.MAIN_SECTION_EVENTS, false));
@@ -501,8 +484,30 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             } while (cursor.moveToNext());
             cursor.moveToFirst();
 
+            // Select previous selected event if needed (and if exists)
+            String startDate = mEventDate;
+            if (mEventId != Constants.NO_DATA) {
+                int idPosition = 0;
+                do {
+                    if (cursor.getInt(COLUMN_INDEX_ID) == mEventId) {
+                        eventPosition = idPosition;
+                        startDate = cursor.getString(COLUMN_INDEX_DATE);
+                        endDate = cursor.getString(COLUMN_INDEX_DATE_END);
+
+                        // Set bottom shortcut info
+                        updateShortcut((ShortcutFragment) getChildFragmentManager()
+                                .findFragmentById(R.id.shortcut_events_bottom));
+                        break;
+                    }
+                    ++idPosition;
+
+                } while (cursor.moveToNext());
+                cursor.moveToFirst();
+
+                mEventId = Constants.NO_DATA;
+            }
             // Select date (calendar & shortcuts)
-            mCalendar.selectPeriod(mEventDate, endDate);
+            mCalendar.selectPeriod(startDate, endDate);
 
             if (endDate == null) { // Check set shortcuts info with "no event" (bottom shortcut as well)
                 if (mEventDate.compareTo(today) == 0) { // Set top shortcut info (today)
@@ -520,7 +525,11 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
                 resetShortcut();
             }
             mAdapter.notifyDataSetChanged();
+
             refreshEventPage(eventPosition); // Do it now (B4 selection)
+            refreshEventPage(eventPosition + 1);
+            if (eventPosition > 0)
+                refreshEventPage(eventPosition - 1);
             mEventsPager.setCurrentItem(eventPosition, false);
         }
     }
@@ -541,6 +550,8 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     private int mEventLag; // Index from which a cursor lag is needed when no selected date event is found
     // NB: Member above needed coz if no event is found at the selected date an event item with
     //     the "no event" info is added (adding an index lag between events list & events cursor)
+
+    private long mEventId = Constants.NO_DATA; // Selected event ID displayed
 
     // Query column indexes
     private static final int COLUMN_INDEX_ID = 0;
@@ -618,6 +629,15 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
             getChildFragmentManager().executePendingTransactions();
         }
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Logs.add(Logs.Type.V, "requestCode: " + requestCode + ";resultCode: " + resultCode + ";data: " + data);
+
+        if ((requestCode == Requests.EVENT_DISPLAY_2_MAIN.CODE) && (resultCode == Requests.EVENT_DISPLAY_2_MAIN.RESULT_ID))
+            mEventId = data.getIntExtra(Requests.EVENT_DISPLAY_2_MAIN.DATA_KEY_ID, Constants.NO_DATA);
     }
 
     @Override
