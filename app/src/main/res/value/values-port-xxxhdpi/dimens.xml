@@ -7,5 +7,8 @@
     <!-- Events -->
     <dimen name="calendar_text_size">16sp</dimen>
     <dimen name="calendar_day_size">13sp</dimen>
+    <dimen name="event_toolbar_height">246dp</dimen>
+    <dimen name="event_fab_margin_top">119dp</dimen>
+    <!-- event_info_height * 5 + sync_height + event_info_margin * 5 - fab size (56dp) / 2 -->
 
 </resources>

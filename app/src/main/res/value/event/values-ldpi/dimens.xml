@@ -7,5 +7,6 @@
     <!-- Expanded title margins -->
     <dimen name="event_member_padding_horizontal">32dp</dimen>
     <dimen name="event_member_padding_vertical">12dp</dimen>
+    <dimen name="event_border_width">16dp</dimen>
 
 </resources>

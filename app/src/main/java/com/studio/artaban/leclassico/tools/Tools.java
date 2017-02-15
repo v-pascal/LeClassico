@@ -233,6 +233,15 @@ public final class Tools { /////////////////////////////////////////////////////
         Logs.add(Logs.Type.W, "Action bar size attribute not found");
         return DEFAULT_ACTIONBAR_HEIGHT;
     }
+    public static int getNavigationBarHeight(Resources resources) {
+        Logs.add(Logs.Type.V, "resources: " + resources);
+        int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
+        if (id == 0)
+            return Constants.NO_DATA; // No navigation bar
+
+        id = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        return (id == 0)? 0:resources.getDimensionPixelSize(id);
+    }
 
     //////
     public interface OnProcessListener {

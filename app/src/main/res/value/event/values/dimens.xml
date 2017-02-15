@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Event -->
 
-    <dimen name="event_fab_width">72dp</dimen><!-- fab size (56dp) + fab_margin -->
+    <dimen name="event_fab_width">88dp</dimen><!-- fab size (56dp) + fab_margin * 2 -->
+    <dimen name="event_presents_padding">28dp</dimen><!-- fab size (56dp) / 2 -->
 
 </resources>

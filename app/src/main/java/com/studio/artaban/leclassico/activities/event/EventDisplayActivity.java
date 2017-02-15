@@ -27,8 +27,10 @@ import android.text.util.Linkify;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
@@ -308,7 +310,6 @@ public class EventDisplayActivity extends LoggedActivity implements
 
             return; // Activity stopped
         }
-
         if (id == Queries.EVENTS_DISPLAY) {
             mCursor = cursor;
             mEventId = cursor.getInt(COLUMN_INDEX_EVENT_ID);
@@ -576,16 +577,25 @@ public class EventDisplayActivity extends LoggedActivity implements
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mPresentsList.getLayoutParams();
             params.height = screenSize.y - Tools.getStatusBarHeight(getResources()) - Tools.getActionBarHeight(this) -
                     (getResources().getDimensionPixelSize(R.dimen.event_info_height) << 1) -
-                    (getResources().getDimensionPixelSize(R.dimen.event_info_margin) * 3);
+                    (getResources().getDimensionPixelSize(R.dimen.event_info_margin) << 1);
             mPresentsList.setLayoutParams(params);
 
         } else {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mPresentsList.getLayoutParams();
+            params.height = screenSize.y - Tools.getStatusBarHeight(getResources()) - Tools.getActionBarHeight(this) -
+                    (getResources().getDimensionPixelSize(R.dimen.event_info_height) * 5) -
+                    getResources().getDimensionPixelSize(R.dimen.sync_height) -
+                    (getResources().getDimensionPixelSize(R.dimen.event_info_margin) * 5);
 
-
-
-
-
+            int navigationY = Tools.getNavigationBarHeight(getResources());
+            if (navigationY > 0) {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                params.height += navigationY;
+            }
+            mPresentsList.setLayoutParams(params);
         }
+        mPresentsList.setHasFixedSize(true);
+        mPresentsList.setNestedScrollingEnabled(false);
     }
 
     @Override

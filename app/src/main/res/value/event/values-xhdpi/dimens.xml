@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Event -->
+
+    <!-- Display -->
+    <dimen name="event_margin_start">27dp</dimen>
+    <dimen name="event_margin_end">43dp</dimen>
+    <!-- Expanded title margins -->
+    <dimen name="event_member_padding_horizontal">27dp</dimen>
+    <dimen name="event_member_padding_vertical">9dp</dimen>
+    <dimen name="event_border_width">13dp</dimen>
+
+</resources>

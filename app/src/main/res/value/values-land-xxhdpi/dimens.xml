@@ -8,5 +8,7 @@
     <dimen name="calendar_text_size">18sp</dimen>
     <dimen name="calendar_day_size">14sp</dimen>
     <dimen name="event_no_padding">22dp</dimen>
+    <dimen name="event_toolbar_height">152dp</dimen>
+    <dimen name="event_fab_margin_top">24dp</dimen><!-- event_info_height * 2 + event_info_margin * 2 - fab size (56dp) / 2 -->
 
 </resources>
