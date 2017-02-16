@@ -74,16 +74,8 @@ import java.util.regex.Pattern;
 public class EventDisplayActivity extends LoggedActivity implements
         RecyclerAdapter.DataView.OnCriteriaListener {
 
-    public static final String EXTRA_DATA_ORIENTATION = "orientation";
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
-    private void setResult() { // Add event ID to activity result
-        Logs.add(Logs.Type.V, null);
-
-        Intent data = new Intent();
-        data.putExtra(Requests.EVENT_DISPLAY_2_MAIN.DATA_KEY_ID, mId);
-        setResult(Requests.EVENT_DISPLAY_2_MAIN.RESULT_ID, data);
-    }
     private void updateUserPresence() { // Update DB user presence to the event
         Logs.add(Logs.Type.V, null);
         String pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
@@ -126,7 +118,6 @@ public class EventDisplayActivity extends LoggedActivity implements
 
         // Notify change on cursor URI
         getContentResolver().notifyChange(ContentUris.withAppendedId(mEventUri, mId), null);
-        setResult(); // Needed to select event after any DB update
     }
 
     private static final int DURATION_FAB_ANIMATION = 250; // in ms
@@ -552,6 +543,10 @@ public class EventDisplayActivity extends LoggedActivity implements
         mId = getIntent().getIntExtra(EXTRA_DATA_ID, Constants.NO_DATA);
         Logs.add(Logs.Type.I, "Event #" + mId);
 
+        Intent data = new Intent();
+        data.putExtra(Requests.EVENT_DISPLAY_2_MAIN.DATA_KEY_ID, mId);
+        setResult(Requests.EVENT_DISPLAY_2_MAIN.RESULT_ID, data);
+
         // Set URI to observe DB changes
         mEventUri = Uris.getUri(Uris.ID_MAIN_EVENTS);
 
@@ -653,8 +648,7 @@ public class EventDisplayActivity extends LoggedActivity implements
         // Unregister old request receiver
         unregisterReceiver(mMoreReceiver);
 
-        if ((isFinishing()) && (getResources().getConfiguration().orientation !=
-                getIntent().getIntExtra(EXTRA_DATA_ORIENTATION, Constants.NO_DATA)))
-            setResult(); // Needed to select event after orientation change
+        if (isFinishing()) // Notify DB update in order to select event when back to main activity
+            getContentResolver().notifyChange(ContentUris.withAppendedId(mEventUri, mId), null);
     }
 }

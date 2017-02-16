@@ -647,8 +647,9 @@ public class MainActivity extends LoggedActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         for (Fragment fragment : getSupportFragmentManager().getFragments())
-            fragment.onActivityResult(requestCode, resultCode, data);
-            // NB: Needed for events fragment
+            if (fragment != null)
+                fragment.onActivityResult(requestCode, resultCode, data);
+                // NB: Needed for events fragment
     }
 
     @Override

@@ -228,10 +228,8 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
 
                     ////// Start event activity (display)
                     Intent eventDisplay = new Intent(getContext(), EventDisplayActivity.class);
-                    Login.copyExtraData(getActivity().getIntent(), eventDisplay);
                     eventDisplay.putExtra(EventDisplayActivity.EXTRA_DATA_ID, getArguments().getInt(ARG_KEY_EVENT_ID));
-                    eventDisplay.putExtra(EventDisplayActivity.EXTRA_DATA_ORIENTATION,
-                            getResources().getConfiguration().orientation);
+                    Login.copyExtraData(getActivity().getIntent(), eventDisplay);
 
                     getActivity().startActivityForResult(eventDisplay, Requests.EVENT_DISPLAY_2_MAIN.CODE);
                     break;
