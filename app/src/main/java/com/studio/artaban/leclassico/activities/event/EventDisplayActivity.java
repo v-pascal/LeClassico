@@ -649,6 +649,6 @@ public class EventDisplayActivity extends LoggedActivity implements
         unregisterReceiver(mMoreReceiver);
 
         if (isFinishing()) // Notify DB update in order to select event when back to main activity
-            getContentResolver().notifyChange(ContentUris.withAppendedId(mEventUri, mId), null);
+            getContentResolver().notifyChange(mEventUri, null);
     }
 }

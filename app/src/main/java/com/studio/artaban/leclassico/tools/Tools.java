@@ -183,9 +183,7 @@ public final class Tools { /////////////////////////////////////////////////////
             DateFormat timeFormat = new SimpleDateFormat(context.getString((calendarParam.get(Calendar.YEAR) !=
                     calendarNow.get(Calendar.YEAR))? R.string.format_year:R.string.format_time));
 
-            String dateText = dateFormat.format(paramDate);
-            date.setText((dateText.compareTo(dateFormat.format(new Date())) != 0)?
-                    dateText : context.getString(R.string.today));
+            date.setText(dateFormat.format(paramDate));
             time.setText(timeFormat.format(paramDate));
 
         } catch (ParseException e) {
