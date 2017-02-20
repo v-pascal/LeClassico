@@ -29,7 +29,6 @@ import com.studio.artaban.leclassico.components.EventCalendar;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
-import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Internet;

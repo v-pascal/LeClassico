@@ -31,6 +31,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
@@ -46,7 +47,6 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
-import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -259,6 +259,7 @@ public class EventDisplayActivity extends LoggedActivity implements
         }
     }
     private RecyclerView mPresentsList; // Recycler view containing present members list
+    private ScrollView mLayoutList; // Members list parent scroll view
 
     ////// OnCriteriaListener //////////////////////////////////////////////////////////////////////
     @Override
@@ -522,8 +523,11 @@ public class EventDisplayActivity extends LoggedActivity implements
 
             ////// Fill presents list
             mAdapter.getDataSource().fill(mCursor, mQueryLimit, this);
-            mPresentsList.scrollToPosition(0);
         }
+        mLayoutList.scrollTo(0, 0);
+        mPresentsList.scrollToPosition(0);
+        // NB: Always called even when updating coz needed to fix bug that occurs where only one
+        //     entry is available but not appear
     }
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
@@ -560,19 +564,24 @@ public class EventDisplayActivity extends LoggedActivity implements
         mPresentsList.setLayoutManager(linearManager);
         mPresentsList.setItemAnimator(new DefaultItemAnimator());
         mPresentsList.setAdapter(mAdapter);
+        mPresentsList.setHasFixedSize(true);
+        mPresentsList.setNestedScrollingEnabled(false);
+
+        mLayoutList = (ScrollView) findViewById(R.id.layout_members);
 
         Point screenSize = new Point();
         getWindowManager().getDefaultDisplay().getSize(screenSize);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mPresentsList.getLayoutParams();
-            params.height = screenSize.y - Tools.getStatusBarHeight(getResources()) - Tools.getActionBarHeight(this) -
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mLayoutList.getLayoutParams();
+            params.height = screenSize.y - Tools.getStatusBarHeight(getResources()) -
+                    Tools.getActionBarHeight(this) -
                     (getResources().getDimensionPixelSize(R.dimen.event_info_height) << 1) -
                     (getResources().getDimensionPixelSize(R.dimen.event_info_margin) << 1);
-            mPresentsList.setLayoutParams(params);
+            mLayoutList.setLayoutParams(params);
 
         } else {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mPresentsList.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mLayoutList.getLayoutParams();
             params.height = screenSize.y - Tools.getStatusBarHeight(getResources()) - Tools.getActionBarHeight(this) -
                     (getResources().getDimensionPixelSize(R.dimen.event_info_height) * 5) -
                     getResources().getDimensionPixelSize(R.dimen.sync_height) -
@@ -582,11 +591,13 @@ public class EventDisplayActivity extends LoggedActivity implements
             if (navigationY > 0) {
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
                 params.height += navigationY;
+
+                ScrollView.LayoutParams paramsList = (ScrollView.LayoutParams) mPresentsList.getLayoutParams();
+                paramsList.setMargins(0, 0, 0, navigationY);
+                mPresentsList.setLayoutParams(paramsList);
             }
-            mPresentsList.setLayoutParams(params);
+            mLayoutList.setLayoutParams(params);
         }
-        mPresentsList.setHasFixedSize(true);
-        mPresentsList.setNestedScrollingEnabled(false);
     }
 
     @Override
@@ -600,7 +611,7 @@ public class EventDisplayActivity extends LoggedActivity implements
     public boolean onPrepareOptionsMenu(Menu menu) {
         Logs.add(Logs.Type.V, "menu: " + menu);
         if ((mCursor != null) && (mCursor.isNull(COLUMN_INDEX_FLYER)))
-            menu.findItem(R.id.mnu_notification).setVisible(false);
+            menu.findItem(R.id.mnu_full_screen).setVisible(false);
             // NB: No flyer to display in full screen mode
 
         return super.onPrepareOptionsMenu(menu);

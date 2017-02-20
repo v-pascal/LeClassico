@@ -202,12 +202,18 @@
     </RelativeLayout>
 
     <!-- Presents member list -->
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list_members"
+    <ScrollView
+        android:id="@+id/layout_members"
         android:background="@color/colorPrimarySetting"
-        android:paddingTop="@dimen/event_presents_padding"
+        android:nestedScrollingEnabled="true"
         android:layout_below="@id/layout_data"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list_members"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"/>
+    </ScrollView>
 
 </RelativeLayout>

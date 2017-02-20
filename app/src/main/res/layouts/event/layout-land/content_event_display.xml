@@ -73,103 +73,117 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:padding="@dimen/event_margin"
+        <ScrollView
+            android:nestedScrollingEnabled="true"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent">
 
-            <!-- Author -->
-            <TextView
-                android:id="@+id/text_author_label"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/event_text_size"
-                android:text="@string/label_author"
-                android:textStyle="bold"
-                android:layout_marginEnd="@dimen/event_info_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/text_author"
-                android:textSize="@dimen/event_text_size"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:layout_toEndOf="@id/text_author_label"
+            <RelativeLayout
+                android:padding="@dimen/event_margin"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content">
 
-            <!-- Location -->
-            <TextView
-                android:id="@+id/text_label_location"
-                android:text="@string/label_location"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/event_text_size"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:layout_below="@id/text_author_label"
-                android:layout_marginEnd="@dimen/event_info_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/text_location"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/event_text_size"
-                android:gravity="center_vertical"
-                android:layout_below="@id/text_author_label"
-                android:layout_toEndOf="@id/text_label_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                <!-- Author -->
+                <TextView
+                    android:id="@+id/text_author_label"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/event_text_size"
+                    android:text="@string/label_author"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="@dimen/event_info_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/text_author"
+                    android:textSize="@dimen/event_text_size"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:layout_toEndOf="@id/text_author_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
-            <!-- Info -->
-            <TextView
-                android:id="@+id/text_info_label"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/event_text_size"
-                android:text="@string/label_info"
-                android:textStyle="bold"
-                android:layout_below="@id/text_label_location"
-                android:layout_marginEnd="@dimen/event_info_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/text_info"
-                android:text="@string/none"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/event_text_size"
-                android:layout_below="@id/text_label_location"
-                android:layout_toEndOf="@id/text_info_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                <!-- Location -->
+                <TextView
+                    android:id="@+id/text_label_location"
+                    android:text="@string/label_location"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/event_text_size"
+                    android:textStyle="bold"
+                    android:gravity="center_vertical"
+                    android:layout_below="@id/text_author_label"
+                    android:layout_marginEnd="@dimen/event_info_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/text_location"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/event_text_size"
+                    android:gravity="center_vertical"
+                    android:layout_below="@id/text_author_label"
+                    android:layout_toEndOf="@id/text_label_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
-            <!-- Synchronization -->
-            <ImageView
-                android:id="@+id/image_sync"
-                android:scaleType="center"
-                android:layout_marginStart="@dimen/sync_text_margin"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:layout_width="@dimen/sync_height"
-                android:layout_height="@dimen/sync_height"/>
-            <TextView
-                android:id="@+id/text_sync_date"
-                android:layout_alignParentBottom="true"
-                android:layout_toStartOf="@id/image_sync"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/sync_text_size"
-                android:gravity="center_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/sync_height"/>
+                <!-- Info -->
+                <TextView
+                    android:id="@+id/text_info_label"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/event_text_size"
+                    android:text="@string/label_info"
+                    android:textStyle="bold"
+                    android:layout_below="@id/text_label_location"
+                    android:layout_marginEnd="@dimen/event_info_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/text_info"
+                    android:text="@string/none"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/event_text_size"
+                    android:layout_marginBottom="@dimen/sync_height"
+                    android:layout_below="@id/text_label_location"
+                    android:layout_toEndOf="@id/text_info_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
-        </RelativeLayout>
+                <!-- Synchronization -->
+                <ImageView
+                    android:id="@+id/image_sync"
+                    android:scaleType="center"
+                    android:layout_marginStart="@dimen/sync_text_margin"
+                    android:layout_below="@id/text_info"
+                    android:layout_alignParentEnd="true"
+                    android:layout_width="@dimen/sync_height"
+                    android:layout_height="@dimen/sync_height"/>
+                <TextView
+                    android:id="@+id/text_sync_date"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toStartOf="@id/image_sync"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/sync_text_size"
+                    android:gravity="center_vertical"
+                    android:layout_below="@id/text_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/sync_height"/>
+
+            </RelativeLayout>
+        </ScrollView>
 
         <!-- Presents member list -->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/list_members"
+        <ScrollView
+            android:id="@+id/layout_members"
+            android:nestedScrollingEnabled="true"
             android:background="@color/colorPrimarySetting"
-            android:paddingTop="@dimen/event_presents_padding"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </ScrollView>
 
     </LinearLayout>
 </RelativeLayout>
