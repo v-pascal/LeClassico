@@ -543,10 +543,6 @@ public class EventDisplayActivity extends LoggedActivity implements
         mId = getIntent().getIntExtra(EXTRA_DATA_ID, Constants.NO_DATA);
         Logs.add(Logs.Type.I, "Event #" + mId);
 
-        Intent data = new Intent();
-        data.putExtra(Requests.EVENT_DISPLAY_2_MAIN.DATA_KEY_ID, mId);
-        setResult(Requests.EVENT_DISPLAY_2_MAIN.RESULT_ID, data);
-
         // Set URI to observe DB changes
         mEventUri = Uris.getUri(Uris.ID_MAIN_EVENTS);
 
@@ -647,8 +643,5 @@ public class EventDisplayActivity extends LoggedActivity implements
 
         // Unregister old request receiver
         unregisterReceiver(mMoreReceiver);
-
-        if (isFinishing()) // Notify DB update in order to select event when back to main activity
-            getContentResolver().notifyChange(mEventUri, null);
     }
 }

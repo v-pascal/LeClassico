@@ -118,7 +118,7 @@ public final class Tools { /////////////////////////////////////////////////////
                 RoundedBitmapDrawableFactory.create(activity.getResources(),
                         resource);
 
-        radiusBmp.setCornerRadius(activity.getResources().getDimension(R.dimen.profile_border_radius));
+        radiusBmp.setCornerRadius(activity.getResources().getDimension(R.dimen.profile_header_radius));
         return radiusBmp;
     }
     public static void setHeaderProfile(final Activity activity, ImageView view,
@@ -130,8 +130,7 @@ public final class Tools { /////////////////////////////////////////////////////
                 ";profile: " + profile);
         if (profile != null)
             Glider.with(activity)
-                    .load(Storage.FOLDER_PROFILES +
-                                    File.separator + profile,
+                    .load(Storage.FOLDER_PROFILES + File.separator + profile,
                             Constants.APP_URL_PROFILES + '/' + profile)
                     .into(view, new Glider.OnLoadListener() {
 

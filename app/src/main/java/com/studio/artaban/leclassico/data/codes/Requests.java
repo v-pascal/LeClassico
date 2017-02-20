@@ -8,9 +8,10 @@ import android.app.Activity;
  */
 public final class Requests {
 
-    private static final int REQUEST_EVENT_DISPLAY_2_MAIN = 1; // Event display to main activity request
+    //private static final int REQUEST_EVENT_DISPLAY_2_MAIN = 1; // Event display to main activity request
 
     //////
+    /*
     public static final class EVENT_DISPLAY_2_MAIN {
         public static final int CODE = REQUEST_EVENT_DISPLAY_2_MAIN;
 
@@ -20,4 +21,5 @@ public final class Requests {
         // Data keys
         public static final String DATA_KEY_ID = "id";
     };
+    */
 }
