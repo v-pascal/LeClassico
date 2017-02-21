@@ -43,22 +43,20 @@ public class PresentsRequest extends DataRequest {
         if (!Internet.isConnected())
             return Result.NOT_FOUND; // Nothing to do (without connection)
 
+        if (data != null) { ////// More data requested
+
+            Logs.add(Logs.Type.I, "More present members info requested");
+            return Result.NOT_FOUND; // No more entries (always synchronized)
+        }
+        ////// New or deleted data requested
+
         // Get login info
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
         DataTable.SyncResult result;
-        if (data != null) { ////// More data requested
-
-            Logs.add(Logs.Type.I, "More present members info requested");
 
 
-
-
-
-            return Result.NO_MORE; // No more entries
-        }
-        ////// New or data updates requested
 
 
 

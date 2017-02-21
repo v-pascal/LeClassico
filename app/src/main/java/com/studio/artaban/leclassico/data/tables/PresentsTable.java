@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.tables;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -78,7 +79,8 @@ public class PresentsTable extends DataTable {
     // Columns index
     private static final short COLUMN_INDEX_EVENT_ID = 1; // DataField.COLUMN_INDEX_ID + 1
     private static final short COLUMN_INDEX_PSEUDO = 2;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 3;
+    private static final short COLUMN_INDEX_STATUS_DATE = 3;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 4;
 
     //
     private PresentsTable() { }
@@ -118,30 +120,91 @@ public class PresentsTable extends DataTable {
     public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
-
-
-
         ContentValues inserted = new ContentValues();
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME), null,
+                COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) + " AND (" +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_INSERT.getValue() + " OR " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_INSERT.getValue() |
+                        Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
+        if (cursor.moveToFirst()) {
+            try {
+
+                JSONArray keysArray = new JSONArray();
+                do {
+
+                    // Keys
+                    JSONObject key = new JSONObject();
+                    key.put(JSON_KEY_EVENT_ID, cursor.getInt(COLUMN_INDEX_EVENT_ID));
+                    key.put(JSON_KEY_PSEUDO, cursor.getString(COLUMN_INDEX_PSEUDO));
+
+                    //////
+                    keysArray.put(key);
+
+                } while (cursor.moveToNext());
+
+                //////
+                //Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+
+                inserted.put(WebServices.DATA_KEYS, keysArray.toString());
+
+            } catch (JSONException e) {
+                Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
+            }
+        }
+        cursor.close();
         return inserted;
     }
     @Override
     public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
-
-
-
-
-        ContentValues updated = new ContentValues();
+        ContentValues updated = new ContentValues(); // Not needed for presents table
         return updated;
     }
     @Override
     public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
-
-
-
         ContentValues deleted = new ContentValues();
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME), null,
+                COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) + " AND (" +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_DELETE.getValue() + " OR " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_DELETE.getValue() |
+                        Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
+        if (cursor.moveToFirst()) {
+            try {
+
+                JSONArray keysArray = new JSONArray();
+                JSONArray statusArray = new JSONArray();
+                do {
+
+                    // Keys
+                    JSONObject key = new JSONObject();
+                    key.put(JSON_KEY_EVENT_ID, cursor.getInt(COLUMN_INDEX_EVENT_ID));
+                    key.put(JSON_KEY_PSEUDO, cursor.getString(COLUMN_INDEX_PSEUDO));
+
+                    // Status
+                    JSONObject state = new JSONObject();
+                    state.put(JSON_KEY_STATUS_DATE, cursor.getString(COLUMN_INDEX_STATUS_DATE));
+                    // TODO: Implement local and remote time lag here ?!?!
+
+                    //////
+                    keysArray.put(key);
+                    statusArray.put(state);
+
+                } while (cursor.moveToNext());
+
+                //////
+                //Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                //Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
+
+                deleted.put(WebServices.DATA_KEYS, keysArray.toString());
+                deleted.put(WebServices.DATA_STATUS, statusArray.toString());
+
+            } catch (JSONException e) {
+                Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
+            }
+        }
+        cursor.close();
         return deleted;
     }
 
@@ -217,8 +280,11 @@ public class PresentsTable extends DataTable {
 
                                             ++syncResult.deleted;
 
+                                        } else { ////// Update status fields (for new entry)
+
+                                            resolver.update(tableUri, values, selection, null);
+                                            //++syncResult.updated; // Update not available for this table
                                         }
-                                        //else // No update available for this table
 
                                     } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
