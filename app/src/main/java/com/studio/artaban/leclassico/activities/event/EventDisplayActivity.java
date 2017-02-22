@@ -272,7 +272,8 @@ public class EventDisplayActivity extends LoggedActivity implements
     protected void onLoggedResume() {
         Logs.add(Logs.Type.V, null);
 
-        // Register more request receiver
+        // Register data service & more request receiver
+        sendBroadcast(DataService.getIntent(true, Tables.ID_PRESENTS, mEventUri));
         registerReceiver(mMoreReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
     }
 
@@ -652,7 +653,8 @@ public class EventDisplayActivity extends LoggedActivity implements
         super.onPause();
         Logs.add(Logs.Type.V, null);
 
-        // Unregister old request receiver
+        // Unregister data service & more request receiver
+        sendBroadcast(DataService.getIntent(false, Tables.ID_PRESENTS, mEventUri));
         unregisterReceiver(mMoreReceiver);
     }
 }
