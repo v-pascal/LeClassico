@@ -179,7 +179,7 @@ public class CommentairesTable extends DataTable {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";type: " + type + ";ids: " + ids);
         Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME),
                 new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ')' },
-                Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue() + " AND " +
+                Constants.DATA_COLUMN_SYNCHRONIZED + "<=" + Synchronized.DONE.getValue() + " AND " +
                         COLUMN_OBJ_TYPE + "='" + type + "' AND " +
                         COLUMN_OBJ_ID + " IN (" + ids.replace(WebServices.LIST_SEPARATOR, ',') + ')',
                 null, null);
@@ -261,12 +261,10 @@ public class CommentairesTable extends DataTable {
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
                                     // NB: Web site deletion priority (no status date comparison)
 
-                                    ////// Delete entry (definitively)
+                                    ////// Delete entry (not definitively to keep last status date)
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                            Synchronized.TO_DELETE.getValue());
+                                            Synchronized.DELETED.getValue());
                                     resolver.update(tableUri, values, selection, null);
-                                    resolver.delete(tableUri,
-                                            selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
 
                                     ++syncResult.deleted;
 

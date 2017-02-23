@@ -111,10 +111,7 @@ public class ActualitesTable extends DataTable {
                 "SELECT " + COLUMN_ACTU_ID + " FROM " + TABLE_NAME +
                 " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
                 AbonnementsTable.COLUMN_CAMARADE + '=' + COLUMN_PSEUDO + " AND " +
-                AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
-                AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) + " AND " +
+                getNotDeletedCriteria(AbonnementsTable.TABLE_NAME) + " AND " +
                 AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'' +
                 " ORDER BY " + COLUMN_DATE + " DESC", null, null);
 
@@ -287,12 +284,10 @@ public class ActualitesTable extends DataTable {
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
                                     // NB: Web site deletion priority (no status date comparison)
 
-                                    ////// Delete entry (definitively)
+                                    ////// Delete entry (not definitively to keep last status date)
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                            Synchronized.TO_DELETE.getValue());
+                                            Synchronized.DELETED.getValue());
                                     resolver.update(tableUri, values, selection, null);
-                                    resolver.delete(tableUri,
-                                            selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
 
                                     ++syncResult.deleted;
 

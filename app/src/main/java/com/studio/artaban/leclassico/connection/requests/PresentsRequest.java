@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -54,15 +56,20 @@ public class PresentsRequest extends DataRequest {
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
+        Bundle syncData = new Bundle();
+        syncData.putString(DataTable.DATA_KEY_TOKEN, dataLogin.token.get());
+        syncData.putString(DataTable.DATA_KEY_PSEUDO, dataLogin.pseudo);
+
+        // Synchronization (from remote to local DB)
         DataTable.SyncResult result;
-
-
-
-
-
-
-
-
+        synchronized (Database.getTable(PresentsTable.TABLE_NAME)) {
+            result = Database.getTable(PresentsTable.TABLE_NAME)
+                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT, syncData, null);
+        }
+        if (DataTable.SyncResult.hasChanged(result)) {
+            Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+            notifyChange(); // Notify DB change to observer URI
+        }
         return Result.NOT_FOUND; // Unused
     }
 }

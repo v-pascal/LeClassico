@@ -130,6 +130,7 @@ public class PresentsTable extends DataTable {
             try {
 
                 JSONArray keysArray = new JSONArray();
+                JSONArray statusArray = new JSONArray();
                 do {
 
                     // Keys
@@ -137,15 +138,23 @@ public class PresentsTable extends DataTable {
                     key.put(JSON_KEY_EVENT_ID, cursor.getInt(COLUMN_INDEX_EVENT_ID));
                     key.put(JSON_KEY_PSEUDO, cursor.getString(COLUMN_INDEX_PSEUDO));
 
+                    // Status
+                    JSONObject state = new JSONObject();
+                    state.put(JSON_KEY_STATUS_DATE, cursor.getString(COLUMN_INDEX_STATUS_DATE));
+                    // TODO: Implement local and remote time lag here ?!?!
+
                     //////
                     keysArray.put(key);
+                    statusArray.put(state);
 
                 } while (cursor.moveToNext());
 
                 //////
                 //Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                //Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
 
                 inserted.put(WebServices.DATA_KEYS, keysArray.toString());
+                inserted.put(WebServices.DATA_STATUS, statusArray.toString());
 
             } catch (JSONException e) {
                 Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
@@ -228,7 +237,6 @@ public class PresentsTable extends DataTable {
         syncData.putByte(DATA_KEY_OPERATION, operation);
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
 
-        syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         syncData.remove(DATA_KEY_FIELD_DATE); // No date field criteria for this table
         String url = getSyncUrlRequest(resolver, syncData);
 
@@ -271,19 +279,17 @@ public class PresentsTable extends DataTable {
                                         if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
                                             // NB: Web site deletion priority (no status date comparison)
 
-                                            ////// Delete entry (definitively)
+                                            ////// Delete entry (not definitively to keep last status date)
                                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                                    Synchronized.TO_DELETE.getValue());
+                                                    Synchronized.DELETED.getValue());
                                             resolver.update(tableUri, values, selection, null);
-                                            resolver.delete(tableUri,
-                                                    selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
 
                                             ++syncResult.deleted;
 
                                         } else { ////// Update status fields (for new entry)
 
                                             resolver.update(tableUri, values, selection, null);
-                                            //++syncResult.updated; // Update not available for this table
+                                            ++syncResult.updated; // Same as inserted (re-inserted)
                                         }
 
                                     } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {

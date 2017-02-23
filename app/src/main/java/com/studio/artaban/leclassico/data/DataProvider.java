@@ -279,7 +279,6 @@ public class DataProvider extends ContentProvider {
             DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
             values.put(Constants.DATA_COLUMN_STATUS_DATE, dateFormat.format(now));
         }
-
         int result = mDB.getDB().update(table, values, selection, selectionArgs);
         if (result > 0)
             getContext().getContentResolver().notifyChange(uri, null);

@@ -213,12 +213,10 @@ public class AbonnementsTable extends DataTable {
                                 if (entry.getInt(WebServices.JSON_KEY_STATUS) == STATUS_FIELD_DELETED) {
                                     // NB: Web site deletion priority (no status date comparison)
 
-                                    ////// Delete entry (definitively)
+                                    ////// Delete entry (not definitively to keep last status date)
                                     values.put(Constants.DATA_COLUMN_SYNCHRONIZED,
-                                            Synchronized.TO_DELETE.getValue());
+                                            Synchronized.DELETED.getValue());
                                     resolver.update(tableUri, values, selection, null);
-                                    resolver.delete(tableUri,
-                                            selection + " AND " + Constants.DATA_DELETE_SELECTION, null);
 
                                     ++syncResult.deleted;
 

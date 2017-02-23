@@ -665,16 +665,10 @@ public class PublicationsFragment extends MainFragment implements
                         LinksTable.COLUMN_URL + '=' + ActualitesTable.COLUMN_LINK +
                         " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
                         AbonnementsTable.COLUMN_CAMARADE + '=' + ActualitesTable.COLUMN_PSEUDO + " AND " +
-                        AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
-                        AbonnementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) + " AND " +
+                        DataTable.getNotDeletedCriteria(AbonnementsTable.TABLE_NAME) + " AND " +
                         AbonnementsTable.COLUMN_PSEUDO + "='" + getActivity().getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) + '\'' +
                         " WHERE " +
-                        ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
-                        ActualitesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
+                        DataTable.getNotDeletedCriteria(ActualitesTable.TABLE_NAME) +
                         " ORDER BY " + ActualitesTable.COLUMN_DATE + " DESC");
 
         // TODO: Same as explained in the 'ActualitesTable.getIds' method (about the query above)

@@ -380,6 +380,8 @@ public final class Tools { /////////////////////////////////////////////////////
             icon.setImageDrawable(context.getDrawable(R.drawable.ic_check_white_18dp));
 
         } else { // To synchronize
+            if (status == DataTable.Synchronized.DELETED.getValue())
+                throw new IllegalArgumentException("No synchronization display for deleted entry");
 
             text.setText(context.getString(R.string.to_synchronize));
             icon.setImageDrawable(context.getDrawable(R.drawable.ic_sync_white_18dp));

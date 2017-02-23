@@ -438,7 +438,8 @@ public class ConnectFragment extends RevealFragment {
 
                     // Get pseudo Id (from local DB)
                     mPseudoId = DataTable.getEntryId(resolver, CamaradesTable.TABLE_NAME,
-                            CamaradesTable.COLUMN_PSEUDO + "='" + mPseudo + '\'');
+                            CamaradesTable.COLUMN_PSEUDO + "='" + mPseudo + "' AND " +
+                                    DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME));
                 }
 
                 ////// Wait activity resumed (needed to avoid to start main activity when paused)

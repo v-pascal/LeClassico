@@ -74,10 +74,7 @@ public class Queries {
                 Logs.add(Logs.Type.I, "Events query");
                 String presentsJoin = "JOIN " + PresentsTable.TABLE_NAME + " ON " +
                         PresentsTable.COLUMN_EVENT_ID + '=' + EvenementsTable.COLUMN_EVENT_ID + " AND " +
-                        PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
-                        PresentsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue());
+                        DataTable.getNotDeletedCriteria(PresentsTable.TABLE_NAME);
 
                 String criteria = "";
                 if ((uri.getPathSegments().size() > 1) && (!uri.getPathSegments().get(1).isEmpty())) {
@@ -88,7 +85,7 @@ public class Queries {
                         Date unused = format.parse(filter);
 
                         // TODO: Get date filter criteria to return events that follow N month B4 and after it
-                        //criteria = Date filter criteria
+                        //criteria = " AND " + Date filter criteria
 
                     } catch (ParseException e) {
                         Logs.add(Logs.Type.I, "Single event query");
@@ -151,10 +148,7 @@ public class Queries {
                         " FROM " + EvenementsTable.TABLE_NAME +
                         " LEFT " + presentsJoin +
                         " WHERE " +
-                        EvenementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
-                        EvenementsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
+                        DataTable.getNotDeletedCriteria(EvenementsTable.TABLE_NAME) +
                         criteria +
                         " GROUP BY " + fields +
                         " ORDER BY " + EvenementsTable.COLUMN_DATE + " ASC", null);

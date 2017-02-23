@@ -98,21 +98,16 @@ public class EventDisplayActivity extends LoggedActivity implements
                 values.put(PresentsTable.COLUMN_EVENT_ID, mEventId);
                 values.put(PresentsTable.COLUMN_PSEUDO, pseudo);
 
-                if (sync == Constants.NO_DATA) { // Insert entry
-                    DataTable.addSyncFields(values, DataTable.Synchronized.TO_INSERT.getValue());
-                    getContentResolver().insert(uri, values);
+                DataTable.addSyncFields(values, DataTable.Synchronized.TO_INSERT.getValue());
+                // NB: Always marked as "to insert" coz update not available for this table
 
-                } else // Update entry (previously marked as to delete)
+                if (sync == Constants.NO_DATA) // Insert entry
+                    getContentResolver().insert(uri, values);
+                else // Update entry (previously marked as to delete)
                     getContentResolver().update(uri, values, where, null);
 
-            } else { ////// Mark user as not present
-
-                // Mark DB entry to delete
-                getContentResolver().delete(uri, where, null);
-
-                if (sync == DataTable.Synchronized.TO_INSERT.getValue()) // Delete BD entry
-                    getContentResolver().delete(uri, where + " AND " + Constants.DATA_DELETE_SELECTION, null);
-            }
+            } else ////// Mark user as not present
+                getContentResolver().delete(uri, where, null); // Mark DB entry as "to delete"
         }
         mPresent = !mPresent;
 
@@ -488,7 +483,7 @@ public class EventDisplayActivity extends LoggedActivity implements
                 --count; // Remove event info entry from member presence count
             mCursor.moveToFirst();
 
-            if ((mPresentsLast != null) && (mPresentsLast.compareTo(lastMember) < 0))
+            if ((mPresentsLast != null) && (mPresentsLast.compareTo(lastMember) < 0) && (count > mQueryCount))
                 mQueryLimit += count - mQueryCount; // New entries case
 
             mQueryCount = count;

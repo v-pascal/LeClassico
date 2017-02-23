@@ -28,7 +28,8 @@ public abstract class DataTable implements IDataTable {
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";table: " + table + ";selection: " + selection);
         Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + table),
-                new String[]{"count(*)"}, selection, null, null);
+                new String[]{"count(*)"}, (selection != null)? selection + " AND " +
+                        getNotDeletedCriteria(table):getNotDeletedCriteria(table), null, null);
         result.moveToFirst();
         int count = result.getInt(0);
         result.close();
@@ -50,13 +51,13 @@ public abstract class DataTable implements IDataTable {
 
         return id;
     }
-    public static void addSyncFields(ContentValues values, byte sync) { // Add sync & status date fields
-        Logs.add(Logs.Type.V, "values: " + values);
-
-        Date now = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
-        values.put(Constants.DATA_COLUMN_STATUS_DATE, dateFormat.format(now));
-        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, sync);
+    public static String getNotDeletedCriteria(String table) { // Return not delete records criteria
+        return table + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                DataTable.Synchronized.DELETED.getValue() + " AND " +
+                table + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
+                table + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
+                (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue());
     }
 
     ////// Notifications
@@ -91,14 +92,22 @@ public abstract class DataTable implements IDataTable {
 
     public enum Synchronized { // Synchronized field values (local DB)
 
-        DONE((byte)0x00), // Synchronized
-        TO_INSERT((byte)0x01), TO_UPDATE((byte)0x02), TO_DELETE((byte)0x03), // Operations
+        DELETED((byte)0x00), DONE((byte)0x01), // Status
+        TO_INSERT((byte)0x02), TO_UPDATE((byte)0x03), TO_DELETE((byte)0x04), // Operations
         IN_PROGRESS((byte)0x10); // In progress status mask (only combined with an operation)
 
         //
         private final byte id;
         Synchronized(byte id) { this.id = id; }
         public byte getValue() { return this.id; }
+    }
+    public static void addSyncFields(ContentValues values, byte sync) { // Add sync & status date fields
+        Logs.add(Logs.Type.V, "values: " + values);
+
+        Date now = new Date();
+        DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+        values.put(Constants.DATA_COLUMN_STATUS_DATE, dateFormat.format(now));
+        values.put(Constants.DATA_COLUMN_SYNCHRONIZED, sync);
     }
 
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
@@ -124,10 +133,10 @@ public abstract class DataTable implements IDataTable {
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
         Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
-                new String[]{ "max(" + Constants.DATA_COLUMN_STATUS_DATE + ')' },
-                ((data.containsKey(DATA_KEY_FIELD_PSEUDO))? // Check pseudo criteria need
-                        data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND ":"") +
-                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue(), // Unchanged
+                new String[]{"max(" + Constants.DATA_COLUMN_STATUS_DATE + ')'},
+                ((data.containsKey(DATA_KEY_FIELD_PSEUDO)) ? // Check pseudo criteria need
+                        data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " : "") +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + "<=" + Synchronized.DONE.getValue(), // Unchanged
                 null, null);
 
         String maxDate = null;
@@ -142,9 +151,9 @@ public abstract class DataTable implements IDataTable {
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";data: " + data);
         Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + data.getString(DATA_KEY_TABLE_NAME)),
-                new String[]{ "min(" + data.getString(DATA_KEY_FIELD_DATE) + ')' },
-                ((data.containsKey(DATA_KEY_FIELD_PSEUDO))? // Check pseudo criteria need
-                        data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND ":"") +
+                new String[]{"min(" + data.getString(DATA_KEY_FIELD_DATE) + ')'},
+                ((data.containsKey(DATA_KEY_FIELD_PSEUDO)) ? // Check pseudo criteria need
+                        data.getString(DATA_KEY_FIELD_PSEUDO) + "='" + data.getString(DATA_KEY_PSEUDO) + "' AND " : "") +
                         Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue(), // Unchanged
                 null, null);
 

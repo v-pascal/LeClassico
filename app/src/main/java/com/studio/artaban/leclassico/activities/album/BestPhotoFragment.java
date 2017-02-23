@@ -456,10 +456,7 @@ public class BestPhotoFragment extends Fragment implements
                         " LEFT JOIN " + CommentairesTable.TABLE_NAME + " ON " +
                         CommentairesTable.COLUMN_OBJ_TYPE + "='" + CommentairesTable.TYPE_PHOTO + "' AND " +
                         CommentairesTable.COLUMN_OBJ_ID + '=' + PhotosTable.COLUMN_FICHIER_ID + " AND " +
-                        CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        DataTable.Synchronized.TO_DELETE.getValue() + " AND " +
-                        CommentairesTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_SYNCHRONIZED + "<>" +
-                        (DataTable.Synchronized.TO_DELETE.getValue() | DataTable.Synchronized.IN_PROGRESS.getValue()) +
+                        DataTable.getNotDeletedCriteria(CommentairesTable.TABLE_NAME) +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
                         CamaradesTable.COLUMN_PSEUDO + '=' + CommentairesTable.COLUMN_PSEUDO +
                         " WHERE " +
