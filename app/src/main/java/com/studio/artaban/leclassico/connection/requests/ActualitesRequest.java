@@ -81,7 +81,7 @@ public class ActualitesRequest extends DataRequest {
             }
             return Result.NO_MORE; // No more old entries
         }
-        ////// New or data updates requested
+        ////// Data updates requested (inserted, deleted or updated)
 
         // Synchronization (from remote to local DB)
         synchronized (Database.getTable(ActualitesTable.TABLE_NAME)) {

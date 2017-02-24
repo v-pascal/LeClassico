@@ -112,7 +112,8 @@ public class Queries {
                         String from = " FROM " + EvenementsTable.TABLE_NAME;
                         String membersJoin = " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON ";
                         String where = " WHERE " + EvenementsTable.TABLE_NAME + '.' +
-                                IDataTable.DataField.COLUMN_ID + '=' + filter;
+                                IDataTable.DataField.COLUMN_ID + '=' + filter + " AND " +
+                                DataTable.getNotDeletedCriteria(EvenementsTable.TABLE_NAME);
 
                         return db.rawQuery("SELECT " +
                                 eventFields +

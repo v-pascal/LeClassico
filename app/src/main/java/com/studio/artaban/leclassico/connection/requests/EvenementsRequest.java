@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.WebServices;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -43,28 +45,33 @@ public class EvenementsRequest extends DataRequest {
         if (!Internet.isConnected())
             return Result.NOT_FOUND; // Nothing to do (without connection)
 
+        if (data != null) { ////// More data requested
+
+            Logs.add(Logs.Type.I, "More events requested");
+            // TODO: Implement next or previous date events request
+
+            return Result.NOT_FOUND; // No more entries (always synchronized)
+        }
+        ////// Data updates requested (inserted, deleted or updated)
+
         // Get login info
         Login.Reply dataLogin = new Login.Reply();
         mService.copyLoginData(dataLogin);
 
+        Bundle syncData = new Bundle();
+        syncData.putString(DataTable.DATA_KEY_TOKEN, dataLogin.token.get());
+        syncData.putString(DataTable.DATA_KEY_PSEUDO, dataLogin.pseudo);
+
+        // Synchronization (from remote to local DB)
         DataTable.SyncResult result;
-        if (data != null) { ////// Old data requested
-
-            Logs.add(Logs.Type.I, "Old events requested");
-
-
-
-
-
-            return Result.NO_MORE; // No more old entries
+        synchronized (Database.getTable(EvenementsTable.TABLE_NAME)) {
+            result = Database.getTable(EvenementsTable.TABLE_NAME)
+                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT, syncData, null);
         }
-        ////// New or data updates requested
-
-
-
-
-
-
+        if (DataTable.SyncResult.hasChanged(result)) {
+            Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+            notifyChange(); // Notify DB change to observer URI
+        }
         return Result.NOT_FOUND; // Unused
     }
 }

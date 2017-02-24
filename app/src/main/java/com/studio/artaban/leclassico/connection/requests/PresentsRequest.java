@@ -50,7 +50,7 @@ public class PresentsRequest extends DataRequest {
             Logs.add(Logs.Type.I, "More present members info requested");
             return Result.NOT_FOUND; // No more entries (always synchronized)
         }
-        ////// New or deleted data requested
+        ////// Data updates requested (inserted, deleted or updated)
 
         // Get login info
         Login.Reply dataLogin = new Login.Reply();

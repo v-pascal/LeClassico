@@ -268,6 +268,7 @@ public class EventDisplayActivity extends LoggedActivity implements
         Logs.add(Logs.Type.V, null);
 
         // Register data service & more request receiver
+        sendBroadcast(DataService.getIntent(true, Tables.ID_EVENEMENTS, mEventUri));
         sendBroadcast(DataService.getIntent(true, Tables.ID_PRESENTS, mEventUri));
         registerReceiver(mMoreReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
     }
@@ -314,8 +315,8 @@ public class EventDisplayActivity extends LoggedActivity implements
                     Logs.add(Logs.Type.E, "Failed to open flyer: " + cursor.getString(COLUMN_INDEX_FLYER));
             }
             ((TextView) findViewById(R.id.text_location)).setText(cursor.getString(COLUMN_INDEX_LIEU));
-            if (!cursor.isNull(COLUMN_INDEX_REMARK))
-                ((TextView) findViewById(R.id.text_info)).setText(cursor.getString(COLUMN_INDEX_REMARK));
+            ((TextView) findViewById(R.id.text_info)).setText((!cursor.isNull(COLUMN_INDEX_REMARK))?
+                    cursor.getString(COLUMN_INDEX_REMARK):getString(R.string.none));
 
             // Set start & end date
             DateFormat schedule = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
@@ -649,6 +650,7 @@ public class EventDisplayActivity extends LoggedActivity implements
         Logs.add(Logs.Type.V, null);
 
         // Unregister data service & more request receiver
+        sendBroadcast(DataService.getIntent(false, Tables.ID_EVENEMENTS, mEventUri));
         sendBroadcast(DataService.getIntent(false, Tables.ID_PRESENTS, mEventUri));
         unregisterReceiver(mMoreReceiver);
     }
