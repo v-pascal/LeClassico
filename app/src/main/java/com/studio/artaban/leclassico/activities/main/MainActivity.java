@@ -342,6 +342,7 @@ public class MainActivity extends LoggedActivity implements
     private final ServiceBinder mDataService = new ServiceBinder(); // Data service accessor
 
     private Uri mShortcutUri; // Shortcut URI (new mail & notifications)
+    private Uri mEventsUri; // Events URI (inserted, updated or deleted events DB observer)
 
     public void onPublish(View sender) { // Floating action button click event
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -367,9 +368,10 @@ public class MainActivity extends LoggedActivity implements
 
         getContentResolver().notifyChange(mShortcutUri, null); // Refresh shortcut info
 
-        // Register shortcut data service
+        // Register shortcut & events data service
         sendBroadcast(DataService.getIntent(true, Tables.ID_NOTIFICATIONS, mShortcutUri));
         sendBroadcast(DataService.getIntent(true, Tables.ID_MESSAGERIE, mShortcutUri));
+        sendBroadcast(DataService.getIntent(true, Tables.ID_EVENEMENTS, mEventsUri));
     }
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
@@ -438,6 +440,7 @@ public class MainActivity extends LoggedActivity implements
         // Set URI to observe shortcut DB changes
         mShortcutUri = Uris.getUri(Uris.ID_MAIN_SHORTCUT_NOTIFY, String.valueOf(getIntent()
                 .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
+        mEventsUri = Uris.getUri(Uris.ID_MAIN_EVENTS);
 
         // Set content view pager
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -668,9 +671,10 @@ public class MainActivity extends LoggedActivity implements
         super.onPause();
         Logs.add(Logs.Type.V, null);
 
-        // Unregister shortcut data service
+        // Unregister shortcut & events data service
         sendBroadcast(DataService.getIntent(false, Tables.ID_NOTIFICATIONS, mShortcutUri));
         sendBroadcast(DataService.getIntent(false, Tables.ID_MESSAGERIE, mShortcutUri));
+        sendBroadcast(DataService.getIntent(false, Tables.ID_EVENEMENTS, mEventsUri));
 
         // Unbind data service
         mDataService.unbind(this);

@@ -29,12 +29,14 @@ import com.studio.artaban.leclassico.components.EventCalendar;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.helpers.Storage;
+import com.studio.artaban.leclassico.services.DataService;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -648,6 +650,18 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+
+        try { // Disable events synchronization request when displaying events list
+            getActivity().sendBroadcast(DataService.getIntent(false, Tables.ID_EVENEMENTS, mListUri));
+        } catch (NullPointerException e) {
+            Logs.add(Logs.Type.E, "Activity not attached");
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
 
         outState.putSerializable(DATA_KEY_REFRESH_TAGS, mCurTags);
@@ -661,6 +675,13 @@ public class EventsFragment extends MainFragment implements QueryLoader.OnResult
         super.onDestroyView();
         Logs.add(Logs.Type.V, null);
 
+        try { // Enable events synchronization request
+            if (!getActivity().isFinishing())
+                getActivity().sendBroadcast(DataService.getIntent(true, Tables.ID_EVENEMENTS, mListUri));
+
+        } catch (NullPointerException e) {
+            Logs.add(Logs.Type.E, "Activity not attached");
+        }
         // Store page tags to be able to be refreshed
         mRefreshTags.clear();
         mRefreshTags.putAll(mCurTags);
