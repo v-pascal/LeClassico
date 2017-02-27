@@ -57,7 +57,6 @@ public class PhotosRequest extends DataRequest {
 
 
             return Result.NO_MORE; // No more old entries
-
         }
         ////// Data updates requested (inserted, deleted or updated)
 

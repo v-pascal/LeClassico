@@ -484,7 +484,7 @@ public class EventDisplayActivity extends LoggedActivity implements
                 --count; // Remove event info entry from member presence count
             mCursor.moveToFirst();
 
-            if ((mPresentsLast != null) && (mPresentsLast.compareTo(lastMember) < 0) && (count > mQueryCount))
+            if ((mPresentsLast != null) && (mPresentsLast.compareTo(lastMember) < 0))
                 mQueryLimit += count - mQueryCount; // New entries case
 
             mQueryCount = count;

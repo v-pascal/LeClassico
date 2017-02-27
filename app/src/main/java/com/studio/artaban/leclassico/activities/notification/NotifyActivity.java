@@ -528,24 +528,22 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                     (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI)) // Notification URI
                             .compareTo(mNotifyURI) == 0)) {
 
-                switch ((DataRequest.Result)intent.getSerializableExtra(DataService.EXTRA_DATA_REQUEST_RESULT)) {
-                    case NOT_FOUND: { // Old entries not found
-                        if (mQueryCount > (mQueryLimit - Queries.NOTIFICATIONS_OLD_LIMIT))
-                            refresh(); // No more old remote DB notifications but existing in local DB
-                        else
-                            mQueryLimit -= Queries.NOTIFICATIONS_OLD_LIMIT;
-                        //break;
+                boolean localOld = false;
+                DataRequest.Result result =
+                        (DataRequest.Result) intent.getSerializableExtra(DataService.EXTRA_DATA_REQUEST_RESULT);
+                if (result != DataRequest.Result.FOUND) {
+                    if (mQueryCount > (mQueryLimit - Queries.NOTIFICATIONS_OLD_LIMIT)) {
+                        refresh(); // No more old remote DB notifications but existing in local DB
+                        localOld = true;
                     }
-                    case FOUND: { // Old entries found
-                        mNotifyAdapter.setRequesting(RecyclerAdapter.RequestFlag.DISPLAYED);
-                        // DB table update will notify cursor (no need to call refresh)
-                        break;
-                    }
-                    case NO_MORE: { // No more old entries into remote DB
-                        mNotifyAdapter.setRequesting(RecyclerAdapter.RequestFlag.HIDDEN);
-                        break;
-                    }
+                    else
+                        mQueryLimit -= Queries.NOTIFICATIONS_OLD_LIMIT;
                 }
+                //else // Not found or No more remote DB entries
+                // NB: When old entries are found DB update will notify cursor (no need to refresh)
+
+                mNotifyAdapter.setRequesting(((result == DataRequest.Result.NO_MORE) && (!localOld))?
+                        RecyclerAdapter.RequestFlag.HIDDEN : RecyclerAdapter.RequestFlag.DISPLAYED);
             }
         }
     }

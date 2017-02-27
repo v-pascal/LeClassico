@@ -30,6 +30,7 @@ import com.studio.artaban.leclassico.animations.RequestAnimation;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.connection.requests.CommentairesRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.IDataTable;
@@ -99,6 +100,8 @@ public class BestPhotoFragment extends Fragment implements
 
                     Intent request = new Intent(DataService.REQUEST_OLD_DATA);
                     request.putExtra(DataRequest.EXTRA_DATA_DATE, mQueryDate);
+                    request.putExtra(CommentairesRequest.EXTRA_DATA_OBJECT_IDS, String.valueOf(mBestId));
+                    request.putExtra(CommentairesRequest.EXTRA_DATA_OBJECT_TYPE, CommentairesTable.TYPE_PHOTO);
                     getActivity().sendBroadcast(DataService.getIntent(request,
                             Tables.ID_COMMENTAIRES, mComUri));
                     break;
@@ -294,24 +297,22 @@ public class BestPhotoFragment extends Fragment implements
                     (((Uri) intent.getParcelableExtra(DataRequest.EXTRA_DATA_URI))
                             .compareTo(mComUri) == 0)) { // Comment URI
 
-                switch ((DataRequest.Result)intent.getSerializableExtra(DataService.EXTRA_DATA_REQUEST_RESULT)) {
-                    case NOT_FOUND: { // Old entries not found
-                        if (mQueryCount > (mQueryLimit - Queries.COMMENTS_OLD_LIMIT))
-                            refresh(); // No more old remote DB photo comments but existing in local DB
-                        else
-                            mQueryLimit -= Queries.COMMENTS_OLD_LIMIT;
-                        //break;
+                boolean localOld = false;
+                DataRequest.Result result =
+                        (DataRequest.Result) intent.getSerializableExtra(DataService.EXTRA_DATA_REQUEST_RESULT);
+                if (result != DataRequest.Result.FOUND) {
+                    if (mQueryCount > (mQueryLimit - Queries.COMMENTS_OLD_LIMIT)) {
+                        refresh(); // No more old remote DB photo comments but existing in local DB
+                        localOld = true;
                     }
-                    case FOUND: { // Old entries found
-                        mComAdapter.setRequesting(RecyclerAdapter.RequestFlag.DISPLAYED);
-                        // DB table update will notify cursor (no need to call refresh)
-                        break;
-                    }
-                    case NO_MORE: { // No more old entries into remote DB
-                        mComAdapter.setRequesting(RecyclerAdapter.RequestFlag.HIDDEN);
-                        break;
-                    }
+                    else
+                        mQueryLimit -= Queries.COMMENTS_OLD_LIMIT;
                 }
+                //else // Not found or No more remote DB entries
+                // NB: When old entries are found DB update will notify cursor (no need to refresh)
+
+                mComAdapter.setRequesting(((result == DataRequest.Result.NO_MORE) && (!localOld))?
+                        RecyclerAdapter.RequestFlag.HIDDEN : RecyclerAdapter.RequestFlag.DISPLAYED);
             }
         }
     }

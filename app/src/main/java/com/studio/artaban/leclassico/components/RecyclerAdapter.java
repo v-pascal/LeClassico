@@ -117,11 +117,9 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         if (mRequestLayout == Constants.NO_DATA)
             throw new IllegalStateException(ERROR_NO_REQUEST_LAYOUT);
 
-        if (mRequesting == RequestFlag.HIDDEN)
-            return false; // Always false when hidden
-
-        if (((mDescending) && ((getItemCount() - 1) == position)) ||
-                ((!mDescending) && (position == 0))) {
+        if ((mRequesting != RequestFlag.HIDDEN) && // Always false when hidden
+                (((mDescending) && ((getItemCount() - 1) == position)) ||
+                        ((!mDescending) && (position == 0)))) {
 
             holder.rootView.setVisibility(View.GONE);
             holder.requestView.setVisibility(View.VISIBLE);

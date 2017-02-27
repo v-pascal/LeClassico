@@ -376,7 +376,7 @@ public class CommentairesTable extends DataTable {
         } else { ////// Specific comments
 
             if (postData == null)
-                throw new IllegalArgumentException("Missing IDs & Type info into data");
+                throw new IllegalArgumentException("Missing IDs & Type in post data");
 
             //////
             if (sendSyncRequest(getSyncUrlRequest(resolver, syncData), postData, resolver,
