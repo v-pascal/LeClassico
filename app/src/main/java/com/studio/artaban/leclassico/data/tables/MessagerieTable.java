@@ -204,7 +204,7 @@ public class MessagerieTable extends DataTable {
         String url = getSyncUrlRequest(resolver, syncData);
 
         // Send remote DB request
-        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
+        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData, null,
                 new Internet.OnRequestListener() {
 
                     @Override

@@ -193,7 +193,7 @@ public class PhotosTable extends DataTable {
                                                            final ContentResolver resolver, final byte operation,
                                                            final SyncResult syncResult) {
         // Send remote DB request
-        return Internet.downloadHttpRequest(url, postData, new Internet.OnRequestListener() {
+        return Internet.downloadHttpRequest(url, postData, null, new Internet.OnRequestListener() {
 
             @Override
             public boolean onReceiveReply(String response) {

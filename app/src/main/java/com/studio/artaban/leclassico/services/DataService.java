@@ -264,7 +264,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 ////// Update token
                 Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
                                 WebServices.URL_CONNECTION + '?' + WebServices.DATA_TOKEN + '=' + mDataLogin.token.get(),
-                        data, receiveListener);
+                        data, null, receiveListener);
                 switch (result) {
 
                     case WRONG_URL:
@@ -303,7 +303,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
 
             ////// Get new token
             Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
-                    WebServices.URL_CONNECTION, data, receiveListener);
+                    WebServices.URL_CONNECTION, data, null, receiveListener);
             switch (result) {
 
                 case WRONG_URL:

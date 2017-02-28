@@ -342,7 +342,7 @@ public class ConnectFragment extends RevealFragment {
 
                     final Login.Reply loginRes = new Login.Reply();
                     Internet.DownloadResult result = Internet.downloadHttpRequest(Constants.APP_WEBSERVICES +
-                            WebServices.URL_CONNECTION, data, new Internet.OnRequestListener() {
+                            WebServices.URL_CONNECTION, data, null, new Internet.OnRequestListener() {
 
                         @Override
                         public boolean onReceiveReply(String response) {

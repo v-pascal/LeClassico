@@ -67,7 +67,7 @@ public class LinkService extends IntentService {
         link.url = intent.getData().toString();
         link.status = LinksTable.STATUS_DONE;
 
-        Internet.DownloadResult result = Internet.downloadHttpRequest(link.url, null,
+        Internet.DownloadResult result = Internet.downloadHttpRequest(link.url, null, Internet.ENCODING_UTF_8,
                 new Internet.OnRequestListener() {
 
             @Override

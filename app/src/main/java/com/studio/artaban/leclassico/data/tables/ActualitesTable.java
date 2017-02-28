@@ -234,7 +234,7 @@ public class ActualitesTable extends DataTable {
         // NB: Do not use pseudo criteria to get max status date but add it to reset sync fields!
 
         // Send remote DB request
-        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData,
+        Internet.DownloadResult result = Internet.downloadHttpRequest(url, postData, null,
                 new Internet.OnRequestListener() {
 
             @Override

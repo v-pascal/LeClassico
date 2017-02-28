@@ -32,6 +32,10 @@ import java.util.Map;
  */
 public final class Internet {
 
+    public static final String ENCODING_UTF_8 = "UTF-8";
+    public static final String ENCODING_ISO_8859_1 = "ISO-8859-1";
+
+    //
     private static final int DEFAULT_ONLINE_TIMEOUT = 2000; // Default Internet connection check timeout (in millisecond)
     private static final String DEFAULT_ONLINE_URL = "http://www.google.com"; // Default Internet connection check URL
 
@@ -90,8 +94,8 @@ public final class Internet {
 
     //////
     private static final int BUFFER_SIZE = 4096;
-    private static final String POST_CONTENT_ENCODING = "UTF-8";
-    private static final String REPLY_ENCODER = "ISO-8859-1";
+    private static final String POST_CONTENT_ENCODING = ENCODING_UTF_8;
+    private static final String DEFAULT_REPLY_ENCODING = ENCODING_ISO_8859_1;
 
     public enum DownloadResult {
 
@@ -197,10 +201,11 @@ public final class Internet {
         }
         return postContent.toString();
     }
-    public static DownloadResult downloadHttpRequest(String url, ContentValues postData,
+    public static DownloadResult downloadHttpRequest(String url, ContentValues postData, String encoding,
                                                      OnRequestListener listener) {
 
-        Logs.add(Logs.Type.V, "url: " + url + ";postData: " + postData + ";listener: " + listener);
+        Logs.add(Logs.Type.V, "url: " + url + ";postData: " + postData + ";encoding: " + encoding +
+                ";listener: " + listener);
         //Logs.add(Logs.Type.I, "postData: " + postData);
 
         InputStream is = null;
@@ -231,7 +236,8 @@ public final class Internet {
             if (listener != null) {
 
                 is = httpConnection.getInputStream();
-                BufferedReader br = new BufferedReader(new InputStreamReader(is, REPLY_ENCODER));
+                BufferedReader br = new BufferedReader(new InputStreamReader(is,
+                        (encoding == null)? DEFAULT_REPLY_ENCODING:encoding));
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null)
