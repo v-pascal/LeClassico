@@ -32,7 +32,7 @@ public class NotificationsRequest extends DataRequest {
         return 60000; // 1 minute
     }
     @Override
-    public void register(Bundle data) {
+    public void register(Uri uri, Bundle data) {
 
     }
     @Override

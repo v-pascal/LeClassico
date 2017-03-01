@@ -31,7 +31,7 @@ public class ActualitesRequest extends DataRequest {
         return DEFAULT_DELAY;
     }
     @Override
-    public void register(Bundle data) {
+    public void register(Uri uri, Bundle data) {
 
     }
     @Override

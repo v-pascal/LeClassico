@@ -16,6 +16,8 @@ import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import java.util.HashMap;
+
 /**
  * Created by pascal on 20/10/16.
  * Commentaires table exchange request (web service consumption)
@@ -29,7 +31,8 @@ public class CommentairesRequest extends DataRequest {
     public CommentairesRequest(DataService service) {
         super(service, Tables.ID_COMMENTAIRES, CommentairesTable.COLUMN_PSEUDO);
     }
-    private Bundle mData; // Register data
+    private final HashMap<Uri, String> mIdsPub = new HashMap<>(); // Publication IDs for each registered URI
+    private final HashMap<Uri, String> mIdsPhoto = new HashMap<>(); // Photo IDs for each registered URI
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     @Override
@@ -37,14 +40,29 @@ public class CommentairesRequest extends DataRequest {
         return DEFAULT_DELAY;
     }
     @Override
-    public void register(Bundle data) {
-        Logs.add(Logs.Type.V, "data: " + data);
-        if (data != null)
-            mData = (Bundle) data.clone();
+    public void register(Uri uri, Bundle data) {
+        Logs.add(Logs.Type.V, "uri: " + uri + ";data: " + data);
+        if ((data == null) ||
+                (!data.containsKey(EXTRA_DATA_OBJECT_TYPE)) || (!data.containsKey(EXTRA_DATA_OBJECT_IDS)))
+            throw new IllegalArgumentException("Missing IDs & Type in register data");
+
+        switch (data.getChar(EXTRA_DATA_OBJECT_TYPE)) {
+            case CommentairesTable.TYPE_PUBLICATION: { // Publication comments
+                mIdsPub.put(uri, data.getString(EXTRA_DATA_OBJECT_IDS));
+                break;
+            }
+            case CommentairesTable.TYPE_PHOTO: { // Photo comments
+                mIdsPhoto.put(uri, data.getString(EXTRA_DATA_OBJECT_IDS));
+                break;
+            }
+        }
     }
     @Override
     public void unregister(Uri uri) {
+        Logs.add(Logs.Type.V, "uri: " + uri);
 
+        mIdsPub.remove(uri);
+        mIdsPhoto.remove(uri);
     }
 
     @Override
@@ -93,35 +111,62 @@ public class CommentairesRequest extends DataRequest {
             return Result.NO_MORE; // No more old entries
         }
         ////// Data updates requested (inserted, deleted or updated)
-        if ((mData == null) ||
-                (!mData.containsKey(EXTRA_DATA_OBJECT_IDS)) || (!mData.containsKey(EXTRA_DATA_OBJECT_TYPE)))
-            throw new IllegalStateException("Missing IDs & Type in register data");
-
-        ContentValues postData = new ContentValues();
-        postData.put(WebServices.COMMENTS_DATA_IDS, mData.getString(EXTRA_DATA_OBJECT_IDS));
-        postData.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(mData.getChar(EXTRA_DATA_OBJECT_TYPE)));
-
-
-
-        /*
-        if NEW
 
         StringBuilder ids = new StringBuilder();
-        for (Integer id : syncData.getIntegerArrayList(DATA_KEY_IDS))
-            ids.append((ids.length() == 0)? id.toString():WebServices.LIST_SEPARATOR + id.toString());
-        postData.put(WebServices.DATA_IDS, ids.toString()); // Add IDs to post data
-        postData.put(WebServices.DATA_TYPE, ?); // Add type to post data
-        ////// ALSO ADD CODE ABOVE TO OLD REQUEST
+        for (HashMap.Entry<Uri, String> uriIds : mIdsPub.entrySet()) {
+            if (ids.length() != 0)
+                ids.append(WebServices.LIST_SEPARATOR);
 
+            ids.append(uriIds.getValue());
+        }
+        ContentValues postData = new ContentValues();
+        postData.put(WebServices.COMMENTS_DATA_IDS, ids.toString());
+        postData.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(CommentairesTable.TYPE_PUBLICATION));
 
-        syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, ids));
-        syncData.putString(DATA_KEY_DATE, getMinDate(resolver, ids));
-        */
+        // Get max status date criteria (according selected IDs & publication type)
+        syncData.putString(DataTable.DATA_KEY_STATUS_DATE,
+                CommentairesTable.getMaxStatusDate(mService.getContentResolver(),
+                        CommentairesTable.TYPE_PUBLICATION, ids.toString()));
 
+        // Publication comments synchronization (from remote to local DB)
+        synchronized (Database.getTable(CommentairesTable.TABLE_NAME)) {
+            result = Database.getTable(CommentairesTable.TABLE_NAME)
+                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT,
+                            syncData, postData);
+        }
+        if (DataTable.SyncResult.hasChanged(result)) {
 
+            Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+            notifyChange(); // Notify DB change to observer URI
+        }
 
+        ids = new StringBuilder();
+        for (HashMap.Entry<Uri, String> uriIds : mIdsPhoto.entrySet()) {
+            if (ids.length() != 0)
+                ids.append(WebServices.LIST_SEPARATOR);
 
+            ids.append(uriIds.getValue());
+        }
+        postData = new ContentValues();
+        postData.put(WebServices.COMMENTS_DATA_IDS, ids.toString());
+        postData.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(CommentairesTable.TYPE_PHOTO));
 
+        // Get max status date criteria (according selected IDs & photo type)
+        syncData.putString(DataTable.DATA_KEY_STATUS_DATE,
+                CommentairesTable.getMaxStatusDate(mService.getContentResolver(),
+                        CommentairesTable.TYPE_PHOTO, ids.toString()));
+
+        // Photo comments synchronization (from remote to local DB)
+        synchronized (Database.getTable(CommentairesTable.TABLE_NAME)) {
+            result = Database.getTable(CommentairesTable.TABLE_NAME)
+                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT,
+                            syncData, postData);
+        }
+        if (DataTable.SyncResult.hasChanged(result)) {
+
+            Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+            notifyChange(); // Notify DB change to observer URI
+        }
         return Result.NOT_FOUND; // Unused
     }
 }

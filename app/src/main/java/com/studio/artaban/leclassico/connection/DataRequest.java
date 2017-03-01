@@ -94,7 +94,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                 boolean stopped = mRegister.isEmpty();
 
                 mRegister.add(uri);
-                register(intent.getExtras());
+                register(uri, intent.getExtras());
                 mSyncObserver.register(mService.getContentResolver(), uri);
 
                 return ((stopped) && (Internet.isConnected()));
@@ -177,7 +177,7 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     protected final ArrayList<Uri> mRegister = new ArrayList<>(); // Register URI list
 
     public abstract long getDelay();
-    public abstract void register(Bundle data);
+    public abstract void register(Uri uri, Bundle data);
     public abstract void unregister(Uri uri);
 
     public abstract Result request(Bundle data); // Update data from remote to local DB

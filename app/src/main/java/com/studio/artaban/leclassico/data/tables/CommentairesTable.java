@@ -30,8 +30,8 @@ import java.util.List;
  */
 public class CommentairesTable extends DataTable {
 
-    public static char TYPE_PUBLICATION = 'A';
-    public static char TYPE_PHOTO = 'P';
+    public static final char TYPE_PUBLICATION = 'A';
+    public static final char TYPE_PHOTO = 'P';
     // Types
 
     private static final short DEFAULT_LIMIT = 5; // Default remote DB query limit
@@ -173,7 +173,7 @@ public class CommentairesTable extends DataTable {
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
     //////
-    private static String getMaxStatusDate(ContentResolver resolver, char type, String ids) {
+    public static String getMaxStatusDate(ContentResolver resolver, char type, String ids) {
     // Return newest status date of entries specified by criteria (passed in parameters)
 
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";type: " + type + ";ids: " + ids);
@@ -189,27 +189,6 @@ public class CommentairesTable extends DataTable {
             statusDate = cursor.getString(0);
         cursor.close();
         return statusDate;
-    }
-    private static String getMinDate(ContentResolver resolver, char type, String ids) {
-    // Return oldest date of entries specified by criteria (passed in parameters)
-
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";type: " + type + ";ids: " + ids);
-        Cursor cursor = resolver.query(Uris.getUri(Uris.ID_RAW_QUERY), null,
-                "SELECT min(" + COLUMN_DATE + ")," + COLUMN_OBJ_ID + " FROM " + TABLE_NAME + " WHERE " +
-                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.DONE.getValue() + " AND " +
-                        COLUMN_OBJ_TYPE + "='" + type + "' AND " +
-                        COLUMN_OBJ_ID + " IN (" + ids.replace(WebServices.LIST_SEPARATOR, ',') + ')' +
-                        " GROUP BY " + COLUMN_OBJ_ID + " ORDER BY " + COLUMN_DATE + " DESC LIMIT 1",
-                null, null);
-
-        // NB: Do not get min date directly as done in the common function coz should return the newest
-        //     date of the last comments. This need is due to the limitation added to the comments
-        //     synchronization query (LIMIT statement).
-        String date = null;
-        if (cursor.moveToFirst())
-            date = cursor.getString(0); // The most recent of the oldest date (see comments above)
-        cursor.close();
-        return date;
     }
 
     private static Internet.DownloadResult sendSyncRequest(String url, @Nullable ContentValues postData,
@@ -322,58 +301,66 @@ public class CommentairesTable extends DataTable {
             syncData.putShort(DATA_KEY_LIMIT, DEFAULT_LIMIT);
 
         syncData.remove(DATA_KEY_FIELD_PSEUDO); // No pseudo field criteria for this table
-        syncData.putString(DATA_KEY_FIELD_DATE, COLUMN_DATE);
+        syncData.remove(DATA_KEY_FIELD_DATE); // No date field for this table
 
         SyncResult syncResult = new SyncResult();
-        if (operation == WebServices.OPERATION_SELECT) { ////// All comments
+        if (operation == WebServices.OPERATION_SELECT) {
+            if (postData == null) { ////// Select all comments
 
-            // Get publication IDs list
-            String ids = ActualitesTable.getIds(resolver, syncData.getString(DATA_KEY_PSEUDO));
-            //if (ids == null)
-            //  Cannot be NULL coz there is at least one publication: the Webmaster presentation!
+                // Get publication IDs list
+                String ids = ActualitesTable.getIds(resolver, syncData.getString(DATA_KEY_PSEUDO));
+                //if (ids == null)
+                //  Cannot be NULL coz there is at least one publication: the Webmaster presentation!
 
-            // Get request URL accordingly
-            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, TYPE_PUBLICATION, ids));
-            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, TYPE_PUBLICATION, ids));
-            String url = getSyncUrlRequest(resolver, syncData);
+                // Get request URL accordingly
+                syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, TYPE_PUBLICATION, ids));
+                String url = getSyncUrlRequest(resolver, syncData);
 
-            // Add IDs & type to post data
-            ContentValues data = new ContentValues();
-            data.put(WebServices.COMMENTS_DATA_IDS, ids);
-            data.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(TYPE_PUBLICATION));
+                // Add IDs & type to post data
+                ContentValues data = new ContentValues();
+                data.put(WebServices.COMMENTS_DATA_IDS, ids);
+                data.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(TYPE_PUBLICATION));
 
-            ////// Get publications comments
-            if (sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT,
-                    syncResult) != Internet.DownloadResult.SUCCEEDED) {
-                Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error (A)");
-                return null;
+                ////// Get publications comments
+                if (sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT,
+                        syncResult) != Internet.DownloadResult.SUCCEEDED) {
+                    Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error (A)");
+                    return null;
+                }
+
+                // Get photos IDs list (best only)
+                ids = PhotosTable.getBestIds(resolver);
+                if (ids == null)
+                    return syncResult; // No photo found
+
+                // Get request URL accordingly
+                syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, TYPE_PHOTO, ids));
+                url = getSyncUrlRequest(resolver, syncData);
+
+                syncData.remove(DATA_KEY_STATUS_DATE);
+
+                // Replace IDs & type from post data
+                data.put(WebServices.COMMENTS_DATA_IDS, ids);
+                data.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(TYPE_PHOTO));
+
+                ////// Get photos comments
+                if (sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT,
+                        syncResult) != Internet.DownloadResult.SUCCEEDED) {
+                    Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error (P)");
+                    return null;
+                }
+
+            } else { ////// Select specific comments
+
+                String url = getSyncUrlRequest(resolver, syncData);
+                if (sendSyncRequest(url, postData, resolver, WebServices.OPERATION_SELECT,
+                        syncResult) != Internet.DownloadResult.SUCCEEDED) {
+                    Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
+                    return null;
+                }
             }
 
-            // Get photos IDs list (best only)
-            ids = PhotosTable.getBestIds(resolver);
-            if (ids == null)
-                return syncResult; // No photo found
-
-            // Get request URL accordingly
-            syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, TYPE_PHOTO, ids));
-            syncData.putString(DATA_KEY_DATE, getMinDate(resolver, TYPE_PHOTO, ids));
-            url = getSyncUrlRequest(resolver, syncData);
-
-            syncData.remove(DATA_KEY_STATUS_DATE);
-            syncData.remove(DATA_KEY_DATE);
-
-            // Replace IDs & type from post data
-            data.put(WebServices.COMMENTS_DATA_IDS, ids);
-            data.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(TYPE_PHOTO));
-
-            ////// Get photos comments
-            if (sendSyncRequest(url, data, resolver, WebServices.OPERATION_SELECT,
-                    syncResult) != Internet.DownloadResult.SUCCEEDED) {
-                Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error (P)");
-                return null;
-            }
-
-        } else { ////// Specific comments
+        } else { ////// No selection operation (specific comments)
 
             if (postData == null)
                 throw new IllegalArgumentException("Missing IDs & Type in post data");
