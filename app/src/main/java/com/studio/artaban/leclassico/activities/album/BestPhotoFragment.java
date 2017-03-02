@@ -66,6 +66,15 @@ public class BestPhotoFragment extends Fragment implements
     private RecyclerView mComList; // Recycler view containing comments list
     private Uri mComUri; // Comments observer URI
 
+    private void registerDataService() { // Register best photo comments data service
+        Logs.add(Logs.Type.V, null);
+
+        Intent intentService = DataService.getIntent(true, Tables.ID_COMMENTAIRES, mComUri);
+        intentService.putExtra(CommentairesRequest.EXTRA_DATA_OBJECT_IDS, String.valueOf(mBestId));
+        intentService.putExtra(CommentairesRequest.EXTRA_DATA_OBJECT_TYPE, CommentairesTable.TYPE_PHOTO);
+        getContext().sendBroadcast(intentService);
+    }
+
     //////
     private final ComRecyclerViewAdapter mComAdapter = new ComRecyclerViewAdapter();
     private class ComRecyclerViewAdapter extends RecyclerAdapter {
@@ -253,6 +262,11 @@ public class BestPhotoFragment extends Fragment implements
             } while (cursor.moveToNext());
             cursor.moveToFirst();
 
+            // Register best photo comments data service
+            getContext().sendBroadcast(DataService.getIntent(false, Tables.ID_COMMENTAIRES, mComUri));
+            registerDataService();
+            // NB: Remove previous best photo comments registration B4 (if any)
+
             refresh(); // Display/Refresh photo comments
         }
     }
@@ -329,27 +343,23 @@ public class BestPhotoFragment extends Fragment implements
         mComCursor.moveToFirst();
 
         // Update current display data
-        String lastPub = null;
+        String lastCom = null;
         short count = 0;
         do {
             if (onCheckEntry(mComCursor)) {
-                if (lastPub == null)
-                    lastPub = mComCursor.getString(COLUMN_INDEX_COMMENT_DATE);
+                if (lastCom == null)
+                    lastCom = mComCursor.getString(COLUMN_INDEX_COMMENT_DATE);
                 ++count;
             }
 
         } while (mComCursor.moveToNext());
         mComCursor.moveToFirst();
 
-        //Logs.add(Logs.Type.I, "Comment count: " + count);
-        if (count == 0)
-            return; // Nothing to display (no comment for this best photo)
-
-        if ((mComLast != null) && (mComLast.compareTo(lastPub) != 0))
+        if ((mComLast != null) && (lastCom != null) && (mComLast.compareTo(lastCom) != 0))
             mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
 
         mQueryCount = count;
-        mComLast = lastPub;
+        mComLast = lastCom;
 
         // Get last visible photo comment date
         int limit = mQueryLimit;
@@ -462,7 +472,7 @@ public class BestPhotoFragment extends Fragment implements
                         CamaradesTable.COLUMN_PSEUDO + '=' + CommentairesTable.COLUMN_PSEUDO +
                         " WHERE " +
                         PhotosTable.COLUMN_BEST + "=1" +
-                        " ORDER BY " + CommentairesTable.COLUMN_DATE + " ASC");
+                        " ORDER BY " + CommentairesTable.COLUMN_DATE + " DESC");
         mListLoader.init(getActivity(), Queries.MAIN_BEST_PHOTOS, bestData);
 
         return mRootView;
@@ -473,8 +483,10 @@ public class BestPhotoFragment extends Fragment implements
         super.onResume();
         Logs.add(Logs.Type.V, null);
 
-        // Register old request receiver
+        // Register old request receiver & comments data service
         getContext().registerReceiver(mOldReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
+        if (mBestId != Constants.NO_DATA)
+            registerDataService();
     }
 
     @Override
@@ -482,7 +494,8 @@ public class BestPhotoFragment extends Fragment implements
         super.onPause();
         Logs.add(Logs.Type.V, null);
 
-        // Unregister old request receiver
+        // Unregister old request receiver & comments data service
         getContext().unregisterReceiver(mOldReceiver);
+        getContext().sendBroadcast(DataService.getIntent(false, Tables.ID_COMMENTAIRES, mComUri));
     }
 }

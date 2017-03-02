@@ -30,7 +30,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     protected final DataView mDataSource; // Data source
     private RecyclerView mRecyclerView; // Attached recycler view
 
-    private final boolean mDescending; // Descending list ordered flag (request item location)
+    private final boolean mDescending; // Descending order display flag (request item location)
     public int getAscPosition(int position) { // Return valid position index according order & request flags
         return ((!mDescending) && (mRequesting != RequestFlag.HIDDEN))? position - 1:position;
     }
@@ -69,7 +69,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         mItemLayout = itemLayout;
         mRequestLayout = requestLayout;
         mDescending = desc;
-        mDataSource = new DataView(key);
+        mDataSource = new DataView(key, desc);
     }
 
     //
@@ -141,14 +141,17 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
     ////// DataView ////////////////////////////////////////////////////////////////////////////////
     public static class DataView {
 
-        private ArrayList<ArrayList<Object>> mData = new ArrayList<>(); // Data source
-        private int mColumnKey; // Key column index (column index containing unique entries Id)
-        private boolean mInitialized; // Initialization flag (filled once at least)
+        private final int mColumnKey; // Key column index (column index containing unique entries Id)
+        private final boolean mDescending; // Descending order flag
 
-        public DataView(int columnKey) {
-            Logs.add(Logs.Type.V, "columnKey: " + columnKey);
+        public DataView(int columnKey, boolean desc) {
+            Logs.add(Logs.Type.V, "columnKey: " + columnKey + ";desc: " + desc);
+
             mColumnKey = columnKey;
+            mDescending = desc;
         }
+        private ArrayList<ArrayList<Object>> mData = new ArrayList<>(); // Data source
+        private boolean mInitialized; // Initialization flag (filled once at least)
 
         private void clear() { // Clear all data
             Logs.add(Logs.Type.V, null);
@@ -156,13 +159,13 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                 data.clear();
         }
         private static void fill(Cursor cursor, ArrayList<ArrayList<Object>> data,
-                                 int limit, OnCriteriaListener criteria) {
+                                 int limit, boolean desc, OnCriteriaListener criteria) {
 
             // Fill data array according DB cursor
-            Logs.add(Logs.Type.V, "cursor: " + cursor + ";data: " + data + ";limit: " + limit +
-                    ";criteria: " + criteria);
+            Logs.add(Logs.Type.V, "cursor: " + cursor + ";desc: " + desc + ";data: " + data +
+                    ";limit: " + limit + ";criteria: " + criteria);
 
-            if (cursor.moveToFirst()) {
+            if (((desc) && (cursor.moveToFirst())) || ((!desc) && (cursor.moveToLast()))) {
                 do {
                     if ((criteria != null) && (!criteria.onCheckEntry(cursor))) {
                         ++limit; // Do not apply limit change (not a valid entry)
@@ -181,7 +184,8 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                     }
                     data.add(record);
 
-                } while ((cursor.moveToNext()) && (--limit != 0));
+                } while ((((desc) && (cursor.moveToNext()))||((!desc) && (cursor.moveToPrevious()))) &&
+                        (--limit != 0));
             }
             cursor.moveToFirst();
         }
@@ -219,7 +223,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             Logs.add(Logs.Type.V, "cursor: " + cursor + ";limit: " + limit + ";criteria: " + criteria);
 
             clear();
-            fill(cursor, mData, limit, criteria);
+            fill(cursor, mData, limit, mDescending, criteria);
             mInitialized = true;
         }
 
@@ -236,7 +240,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             Logs.add(Logs.Type.V, "adapter: " + adapter + ";cursor: " + cursor + ";limit: " + limit +
                     ";criteria: " + criteria + ";listener: " + listener);
             ArrayList<ArrayList<Object>> newData = new ArrayList<>();
-            fill(cursor, newData, limit, criteria);
+            fill(cursor, newData, limit, mDescending, criteria);
 
             SwapResult swapResult = new SwapResult();
 

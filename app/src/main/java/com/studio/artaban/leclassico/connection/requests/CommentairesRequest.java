@@ -112,6 +112,7 @@ public class CommentairesRequest extends DataRequest {
         }
         ////// Data updates requested (inserted, deleted or updated)
 
+        // Publication comments
         StringBuilder ids = new StringBuilder();
         for (HashMap.Entry<Uri, String> uriIds : mIdsPub.entrySet()) {
             if (ids.length() != 0)
@@ -119,27 +120,30 @@ public class CommentairesRequest extends DataRequest {
 
             ids.append(uriIds.getValue());
         }
-        ContentValues postData = new ContentValues();
-        postData.put(WebServices.COMMENTS_DATA_IDS, ids.toString());
-        postData.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(CommentairesTable.TYPE_PUBLICATION));
+        if (ids.length() != 0) {
+            ContentValues postData = new ContentValues();
+            postData.put(WebServices.COMMENTS_DATA_IDS, ids.toString());
+            postData.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(CommentairesTable.TYPE_PUBLICATION));
 
-        // Get max status date criteria (according selected IDs & publication type)
-        syncData.putString(DataTable.DATA_KEY_STATUS_DATE,
-                CommentairesTable.getMaxStatusDate(mService.getContentResolver(),
-                        CommentairesTable.TYPE_PUBLICATION, ids.toString()));
+            // Get max status date criteria (according selected IDs & publication type)
+            syncData.putString(DataTable.DATA_KEY_STATUS_DATE,
+                    CommentairesTable.getMaxStatusDate(mService.getContentResolver(),
+                            CommentairesTable.TYPE_PUBLICATION, ids.toString()));
 
-        // Publication comments synchronization (from remote to local DB)
-        synchronized (Database.getTable(CommentairesTable.TABLE_NAME)) {
-            result = Database.getTable(CommentairesTable.TABLE_NAME)
-                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT,
-                            syncData, postData);
+            // Publication comments synchronization (from remote to local DB)
+            synchronized (Database.getTable(CommentairesTable.TABLE_NAME)) {
+                result = Database.getTable(CommentairesTable.TABLE_NAME)
+                        .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT,
+                                syncData, postData);
+            }
+            if (DataTable.SyncResult.hasChanged(result)) {
+
+                Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+                notifyChange(); // Notify DB change to observer URI
+            }
         }
-        if (DataTable.SyncResult.hasChanged(result)) {
 
-            Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
-            notifyChange(); // Notify DB change to observer URI
-        }
-
+        // Photo comments
         ids = new StringBuilder();
         for (HashMap.Entry<Uri, String> uriIds : mIdsPhoto.entrySet()) {
             if (ids.length() != 0)
@@ -147,25 +151,27 @@ public class CommentairesRequest extends DataRequest {
 
             ids.append(uriIds.getValue());
         }
-        postData = new ContentValues();
-        postData.put(WebServices.COMMENTS_DATA_IDS, ids.toString());
-        postData.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(CommentairesTable.TYPE_PHOTO));
+        if (ids.length() != 0) {
+            ContentValues postData = new ContentValues();
+            postData.put(WebServices.COMMENTS_DATA_IDS, ids.toString());
+            postData.put(WebServices.COMMENTS_DATA_TYPE, String.valueOf(CommentairesTable.TYPE_PHOTO));
 
-        // Get max status date criteria (according selected IDs & photo type)
-        syncData.putString(DataTable.DATA_KEY_STATUS_DATE,
-                CommentairesTable.getMaxStatusDate(mService.getContentResolver(),
-                        CommentairesTable.TYPE_PHOTO, ids.toString()));
+            // Get max status date criteria (according selected IDs & photo type)
+            syncData.putString(DataTable.DATA_KEY_STATUS_DATE,
+                    CommentairesTable.getMaxStatusDate(mService.getContentResolver(),
+                            CommentairesTable.TYPE_PHOTO, ids.toString()));
 
-        // Photo comments synchronization (from remote to local DB)
-        synchronized (Database.getTable(CommentairesTable.TABLE_NAME)) {
-            result = Database.getTable(CommentairesTable.TABLE_NAME)
-                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT,
-                            syncData, postData);
-        }
-        if (DataTable.SyncResult.hasChanged(result)) {
+            // Photo comments synchronization (from remote to local DB)
+            synchronized (Database.getTable(CommentairesTable.TABLE_NAME)) {
+                result = Database.getTable(CommentairesTable.TABLE_NAME)
+                        .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT,
+                                syncData, postData);
+            }
+            if (DataTable.SyncResult.hasChanged(result)) {
 
-            Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
-            notifyChange(); // Notify DB change to observer URI
+                Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+                notifyChange(); // Notify DB change to observer URI
+            }
         }
         return Result.NOT_FOUND; // Unused
     }
