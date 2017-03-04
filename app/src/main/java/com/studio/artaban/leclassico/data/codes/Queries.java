@@ -64,7 +64,8 @@ public class Queries {
                         " FROM " + CamaradesTable.TABLE_NAME +
                         " LEFT JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
                         AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO + " AND " +
-                        AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'' +
+                        AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        DataTable.getNotDeletedCriteria(AbonnementsTable.TABLE_NAME) +
                         " WHERE " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + "<>" + pseudoId +
                         filterSelection +
                         " ORDER BY " + CamaradesTable.COLUMN_PSEUDO + " ASC", null);

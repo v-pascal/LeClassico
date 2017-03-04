@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -22,11 +23,14 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.tools.Tools;
@@ -40,6 +44,56 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
     public void updateFilter(String filter) { // Update member filter (pseudo)
         Logs.add(Logs.Type.V, "filter: " + filter);
         refresh(filter);
+    }
+    private void updateUserFollowers(final String comrade) { // Update user follower list
+        Logs.add(Logs.Type.V, "comrade: " + comrade);
+
+        // Update DB (background process)
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Logs.add(Logs.Type.V, null);
+
+                Uri uri = Uri.parse(DataProvider.CONTENT_URI + AbonnementsTable.TABLE_NAME);
+                String pseudo = getActivity().getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
+                String selection = AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        AbonnementsTable.COLUMN_CAMARADE + "='" + comrade + '\'';
+                synchronized (Database.getTable(AbonnementsTable.TABLE_NAME)) {
+
+                    Cursor cursor = getActivity().getContentResolver().query(uri,
+                            new String[]{Constants.DATA_COLUMN_SYNCHRONIZED}, selection, null, null);
+                    byte sync = Constants.NO_DATA;
+                    if (cursor.moveToFirst())
+                        sync = (byte) cursor.getInt(0);
+                    cursor.close();
+
+                    if ((sync != Constants.NO_DATA) &&
+                            (sync != DataTable.Synchronized.DELETED.getValue()) &&
+                            (sync != DataTable.Synchronized.TO_DELETE.getValue())) // Currently following
+
+                        getActivity().getContentResolver().delete(uri, selection, null);
+                        // NB: Mark DB entry as "to delete"
+
+                    else { // Not following (currently)
+
+                        ContentValues values = new ContentValues();
+                        values.put(AbonnementsTable.COLUMN_PSEUDO, pseudo);
+                        values.put(AbonnementsTable.COLUMN_CAMARADE, comrade);
+
+                        DataTable.addSyncFields(values, DataTable.Synchronized.TO_INSERT.getValue());
+                        // NB: Always marked as "to insert" coz update not available for this table
+
+                        if (sync == Constants.NO_DATA) // Insert entry
+                            getActivity().getContentResolver().insert(uri, values);
+                        else // Update entry (previously marked as to delete)
+                            getActivity().getContentResolver().update(uri, values, selection, null);
+                    }
+                }
+                // Notify change on URI cursors
+                getActivity().getContentResolver().notifyChange(mLastUri, null);
+                getActivity().getContentResolver().notifyChange(mListUri, null);
+            }
+        }).start();
     }
 
     //////
@@ -68,11 +122,12 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
         @Override
         public void onClick(View sender) {
             Logs.add(Logs.Type.V, "sender: " + sender);
-            int pseudoId = (int) sender.getTag(R.id.tag_pseudo_id);
 
             switch (sender.getId()) {
                 case R.id.layout_pseudo:
                 case R.id.image_pseudo: { // Display profile
+
+                    int pseudoId = (int) sender.getTag(R.id.tag_pseudo_id);
                     Logs.add(Logs.Type.V, "Display profile #" + pseudoId);
 
                     ////// Start profile activity
@@ -82,12 +137,10 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                     break;
                 }
                 case R.id.image_followed: { // Change followed status
-                    Logs.add(Logs.Type.V, "Change followed status #" + pseudoId);
 
-
-
-
-
+                    String pseudo = (String) sender.getTag(R.id.tag_pseudo);
+                    Logs.add(Logs.Type.V, "Change followed status: " + pseudo);
+                    updateUserFollowers(pseudo);
                     break;
                 }
             }
@@ -179,7 +232,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
 
             holder.profile.setTag(R.id.tag_pseudo_id, pseudoId);
             holder.layout.setTag(R.id.tag_pseudo_id, pseudoId);
-            holder.followed.setTag(R.id.tag_pseudo_id, pseudoId);
+            holder.followed.setTag(R.id.tag_pseudo, pseudo);
         }
     }
 
@@ -339,8 +392,10 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                         " FROM " + AbonnementsTable.TABLE_NAME +
                         " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON " +
                         AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO + " AND " +
-                        AbonnementsTable.COLUMN_CAMARADE + "<>'" + pseudo + '\'' +
-                        " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
+                        AbonnementsTable.COLUMN_CAMARADE + "<>'" + pseudo + "' AND " +
+                        DataTable.getNotDeletedCriteria(AbonnementsTable.TABLE_NAME) +
+                        " WHERE " + AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        DataTable.getNotDeletedCriteria(AbonnementsTable.TABLE_NAME));
         mLastLoader.init(getActivity(), Queries.MAIN_SHORTCUT_LAST_FOLLOWED, shortcutData);
 
         Bundle membersData = new Bundle();

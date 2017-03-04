@@ -72,7 +72,7 @@
         android:layout_width="@dimen/user_item_height"
         android:layout_height="@dimen/user_item_height">
 
-        <tag android:id="@id/tag_pseudo_id"/>
+        <tag android:id="@+id/tag_pseudo"/>
     </ImageView>
 
 </LinearLayout>
