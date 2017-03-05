@@ -120,30 +120,100 @@ public class AbonnementsTable extends DataTable {
     public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
-
-
-
         ContentValues inserted = new ContentValues();
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME), null,
+                COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) + " AND (" +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_INSERT.getValue() + " OR " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_INSERT.getValue() |
+                        Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
+        if (cursor.moveToFirst()) {
+            try {
+
+                JSONArray keysArray = new JSONArray();
+                JSONArray statusArray = new JSONArray();
+                do {
+
+                    // Keys
+                    JSONObject key = new JSONObject();
+                    key.put(JSON_KEY_PSEUDO, cursor.getString(COLUMN_INDEX_PSEUDO));
+                    key.put(JSON_KEY_CAMARADE, cursor.getString(COLUMN_INDEX_CAMARADE));
+
+                    // Status
+                    JSONObject state = new JSONObject();
+                    state.put(JSON_KEY_STATUS_DATE, cursor.getString(COLUMN_INDEX_STATUS_DATE));
+                    // TODO: Implement local and remote time lag here ?!?!
+
+                    //////
+                    keysArray.put(key);
+                    statusArray.put(state);
+
+                } while (cursor.moveToNext());
+
+                //////
+                //Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                //Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
+
+                inserted.put(WebServices.DATA_KEYS, keysArray.toString());
+                inserted.put(WebServices.DATA_STATUS, statusArray.toString());
+
+            } catch (JSONException e) {
+                Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
+            }
+        }
+        cursor.close();
         return inserted;
     }
     @Override
     public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
-
-
-
-
-        ContentValues updated = new ContentValues();
+        ContentValues updated = new ContentValues(); // Not needed for this table
         return updated;
     }
     @Override
     public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
-
-
-
         ContentValues deleted = new ContentValues();
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME), null,
+                COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) + " AND (" +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_DELETE.getValue() + " OR " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_DELETE.getValue() |
+                        Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
+        if (cursor.moveToFirst()) {
+            try {
+
+                JSONArray keysArray = new JSONArray();
+                JSONArray statusArray = new JSONArray();
+                do {
+
+                    // Keys
+                    JSONObject key = new JSONObject();
+                    key.put(JSON_KEY_PSEUDO, cursor.getString(COLUMN_INDEX_PSEUDO));
+                    key.put(JSON_KEY_CAMARADE, cursor.getString(COLUMN_INDEX_CAMARADE));
+
+                    // Status
+                    JSONObject state = new JSONObject();
+                    state.put(JSON_KEY_STATUS_DATE, cursor.getString(COLUMN_INDEX_STATUS_DATE));
+                    // TODO: Implement local and remote time lag here ?!?!
+
+                    //////
+                    keysArray.put(key);
+                    statusArray.put(state);
+
+                } while (cursor.moveToNext());
+
+                //////
+                //Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                //Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
+
+                deleted.put(WebServices.DATA_KEYS, keysArray.toString());
+                deleted.put(WebServices.DATA_STATUS, statusArray.toString());
+
+            } catch (JSONException e) {
+                Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
+            }
+        }
+        cursor.close();
         return deleted;
     }
 
@@ -160,6 +230,8 @@ public class AbonnementsTable extends DataTable {
         // updated entry count & NO_DATA if error)
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";operation: " + operation +
                 ";syncData: " + syncData + ";postData: " + postData);
+        if (operation == WebServices.OPERATION_SELECT_OLD)
+            throw new IllegalArgumentException("Old selection operation not allowed for this table");
 
         final SyncResult syncResult = new SyncResult();
 
@@ -184,8 +256,7 @@ public class AbonnementsTable extends DataTable {
                     if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
                         if (reply.isNull(TABLE_NAME))
-                            return ((operation == WebServices.OPERATION_SELECT) ||
-                                    (operation == WebServices.OPERATION_SELECT_OLD));
+                            return (operation == WebServices.OPERATION_SELECT);
                             // Already synchronized for selection but error for any other operation
 
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
@@ -220,15 +291,11 @@ public class AbonnementsTable extends DataTable {
 
                                     ++syncResult.deleted;
 
-                                } else if (cursor.getString(0)
-                                            .compareTo(entry.getString(JSON_KEY_STATUS_DATE)) < 0) {
+                                } else { ////// Update status fields (for new entry)
 
-                                    ////// Update entry
                                     resolver.update(tableUri, values, selection, null);
-                                    ++syncResult.updated;
-
+                                    ++syncResult.updated; // Same as inserted (re-inserted)
                                 }
-                                //else // Nothing to do here (let's synchronize from local to remote DB)
 
                             } else if (entry.getInt(WebServices.JSON_KEY_STATUS) != STATUS_FIELD_DELETED) {
 
@@ -259,7 +326,7 @@ public class AbonnementsTable extends DataTable {
         if (result != Internet.DownloadResult.SUCCEEDED) {
 
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            if ((operation != WebServices.OPERATION_SELECT) && (operation != WebServices.OPERATION_SELECT_OLD))
+            if (operation != WebServices.OPERATION_SELECT)
                 resetSyncInProgress(resolver, syncData);
             return null;
         }

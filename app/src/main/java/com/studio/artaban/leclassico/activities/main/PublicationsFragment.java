@@ -520,7 +520,11 @@ public class PublicationsFragment extends MainFragment implements
         boolean newEntries = false;
 
         if ((mPubLast != null) && (mPubLast.compareTo(lastPub) != 0)) {
-            mQueryLimit += count - mQueryCount; // New entries case (from remote DB)
+            newEntries = count > mQueryCount;
+
+            mQueryLimit += count - mQueryCount; // New or removed entries case (from remote DB)
+            if (mQueryLimit <= 0)
+                mQueryLimit = count;
 
             // Update shortcut (apply animation)
             fillShortcut(shortcutData, true);
@@ -536,7 +540,6 @@ public class PublicationsFragment extends MainFragment implements
                     previous.setInfo(shortcutData.info);
                 }
             });
-            newEntries = true;
         }
         mQueryCount = count;
         mPubLast = lastPub;
@@ -681,6 +684,7 @@ public class PublicationsFragment extends MainFragment implements
 
         // Register data service & old request receiver
         getContext().sendBroadcast(DataService.getIntent(true, Tables.ID_ACTUALITES, mPubUri));
+        getContext().sendBroadcast(DataService.getIntent(true, Tables.ID_ABONNEMENTS, mPubUri));
         getContext().registerReceiver(mOldReceiver, new IntentFilter(DataService.REQUEST_OLD_DATA));
     }
 
@@ -700,6 +704,7 @@ public class PublicationsFragment extends MainFragment implements
 
         // Unregister data service & old request receiver
         getContext().sendBroadcast(DataService.getIntent(false, Tables.ID_ACTUALITES, mPubUri));
+        getContext().sendBroadcast(DataService.getIntent(false, Tables.ID_ABONNEMENTS, mPubUri));
         getContext().unregisterReceiver(mOldReceiver);
     }
 }

@@ -26,6 +26,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -33,6 +34,7 @@ import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
+import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.tools.Tools;
 
 /**
@@ -93,6 +95,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
                 getActivity().getContentResolver().notifyChange(mLastUri, null);
                 getActivity().getContentResolver().notifyChange(mListUri, null);
             }
+
         }).start();
     }
 
@@ -413,6 +416,20 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
 
         // Refresh query loader with existing filter (if any)
         refresh(mListener.onGetShortcut(Constants.MAIN_SECTION_MEMBERS, false).getFilter());
+
+        // Register data service
+        getActivity().sendBroadcast(DataService.getIntent(true, Tables.ID_ABONNEMENTS, mLastUri));
+        getActivity().sendBroadcast(DataService.getIntent(true, Tables.ID_ABONNEMENTS, mListUri));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+
+        // Unregister data service
+        getActivity().sendBroadcast(DataService.getIntent(false, Tables.ID_ABONNEMENTS, mLastUri));
+        getActivity().sendBroadcast(DataService.getIntent(false, Tables.ID_ABONNEMENTS, mListUri));
     }
 
     @Override

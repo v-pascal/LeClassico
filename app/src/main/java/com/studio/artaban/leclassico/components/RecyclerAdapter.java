@@ -255,21 +255,33 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
                     toDo.add(i);
                 }
             }
+            ArrayList<Integer> toRemove = null;
+            if (listener != null)
+                toRemove = (ArrayList<Integer>) toDo.clone();
+
             for (int i = 0; i < toDo.size(); ++i) {
                 int j = i + 1;
 
                 // Check to remove range
                 for (int k = 0; j < toDo.size(); ++j, ++k) {
-                    if (toDo.get(i + k) == (toDo.get(j) - 1))
-                        mData.remove((int)toDo.get(i));
-                    else
+                    if (toDo.get(i + k) == (toDo.get(j) - 1)) {
+
+                        mData.remove((int) toDo.get(i));
+                        for (int l = i + 1; l < toDo.size(); ++l)
+                            toDo.set(l, toDo.get(l) - 1);
+                        // NB: After having removed entry all following indexes are changed (less one)
+
+                    } else
                         break;
                 }
                 mData.remove((int)toDo.get(i));
+                for (int l = i + 1; l < toDo.size(); ++l)
+                    toDo.set(l, toDo.get(l) - 1); // NB: Same as above
+
                 if (j != (i + 1)) { // Range
                     adapter.notifyItemRangeRemoved(toDo.get(i), toDo.get(j - 1) - toDo.get(i));
                     if (listener != null) // Check to notify item changed according items removed
-                        listener.onRemoved(mData, toDo.get(i), toDo.get(j - 1) - toDo.get(i));
+                        listener.onRemoved(mData, toRemove.get(i), toRemove.get(j - 1) - toRemove.get(i));
 
                     i = j - 1;
 
@@ -277,7 +289,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
 
                     adapter.notifyItemRemoved(toDo.get(i));
                     if (listener != null) // Check to notify item changed according item removed
-                        listener.onRemoved(mData, toDo.get(i), 1);
+                        listener.onRemoved(mData, toRemove.get(i), 1);
                 }
             }
 

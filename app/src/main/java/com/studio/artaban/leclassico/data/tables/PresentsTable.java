@@ -166,7 +166,7 @@ public class PresentsTable extends DataTable {
     @Override
     public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
-        ContentValues updated = new ContentValues(); // Not needed for presents table
+        ContentValues updated = new ContentValues(); // Not needed for this table
         return updated;
     }
     @Override
