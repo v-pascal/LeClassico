@@ -506,6 +506,8 @@ public class PublicationsFragment extends MainFragment implements
             }
         }
     }
+    private boolean mVisible; // Fragment visibility flag (displayed)
+    private boolean mToRefresh; // Refresh list request flag (done when visible)
 
     private void refresh() { // Display/Refresh publication list
         Logs.add(Logs.Type.V, null);
@@ -517,10 +519,10 @@ public class PublicationsFragment extends MainFragment implements
         // Update current display data
         String lastPub = mPubCursor.getString(COLUMN_INDEX_DATE);
         short count = (short) mPubCursor.getCount();
-        boolean newEntries = false;
+        boolean fillShortcut = true;
 
         if ((mPubLast != null) && (mPubLast.compareTo(lastPub) != 0)) {
-            newEntries = count > mQueryCount;
+            fillShortcut = false;
 
             mQueryLimit += count - mQueryCount; // New or removed entries case (from remote DB)
             if (mQueryLimit <= 0)
@@ -575,10 +577,15 @@ public class PublicationsFragment extends MainFragment implements
             } while (mPubCursor.moveToNext());
             mPubCursor.moveToFirst();
         }
-        if (!newEntries) // Fill shortcut info (if not already done)
+        if (fillShortcut) // Fill shortcut info (if not already done)
             fillShortcut(shortcutData, false);
 
         //////
+        mToRefresh = !mVisible;
+        if ((mToRefresh) && (mPubAdapter.isInitialized()))
+            return; // Do not refresh/update list now (not visible yet)
+            // NB: Let's refresh when visible (see 'setMenuVisibility' method)
+
         if (mPubAdapter.isInitialized()) { // Check if not the initial query
             Logs.add(Logs.Type.I, "Query update");
 
@@ -695,6 +702,16 @@ public class PublicationsFragment extends MainFragment implements
 
         Logs.add(Logs.Type.V, "outState: " + outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        Logs.add(Logs.Type.V, "menuVisible: " + menuVisible);
+
+        mVisible = menuVisible;
+        if ((mVisible) && (mToRefresh))
+            refresh();
     }
 
     @Override
