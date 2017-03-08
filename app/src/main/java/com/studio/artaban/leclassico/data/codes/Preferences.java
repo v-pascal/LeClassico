@@ -31,6 +31,19 @@ public final class Preferences {
     public static final String SETTINGS_NOTIFY_VIBRATE = "pref_notify_vibrate";
     public static final String SETTINGS_NOTIFY_LIGHT = "pref_notify_light";
 
+    ////// Notifications (see '/xml/settings_fragment_user.xml')
+    public static final String SETTINGS_USER_PASSWORD = "pref_user_password";
+    public static final String SETTINGS_USER_NAME = "pref_user_name";
+    public static final String SETTINGS_USER_SURNAME = "pref_user_surname";
+    public static final String SETTINGS_USER_GENDER = "pref_user_gender";
+    public static final String SETTINGS_USER_BIRTHDAY = "pref_user_birthday";
+    public static final String SETTINGS_USER_ADDRESS = "pref_user_address";
+    public static final String SETTINGS_USER_TOWN = "pref_user_town";
+    public static final String SETTINGS_USER_POSTAL_CODE = "pref_user_postal_code";
+    public static final String SETTINGS_USER_EMAIL = "pref_user_email";
+    public static final String SETTINGS_USER_HOBBIES = "pref_user_hobbies";
+    public static final String SETTINGS_USER_ABOUT = "pref_user_about";
+
     //////
     public static boolean getBoolean(String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LeClassicoApp.getInstance());

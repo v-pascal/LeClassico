@@ -8,7 +8,7 @@
             android:summary="@string/pref_notify_way" />
 
     <!-- User information -->
-    <header android:fragment="com.studio.artaban.leclassico.activities.settings.SettingsActivity$PrefsUserFragment"
+    <header android:fragment="com.studio.artaban.leclassico.activities.settings.PrefsUserFragment"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/personal_info"
             android:summary="@string/pref_personal_info" />
