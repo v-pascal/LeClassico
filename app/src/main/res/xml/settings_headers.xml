@@ -6,4 +6,10 @@
             android:icon="@drawable/ic_notifications_black_24dp"
             android:title="@string/title_activity_notify"
             android:summary="@string/pref_notify_way" />
+
+    <!-- User information -->
+    <header android:fragment="com.studio.artaban.leclassico.activities.settings.SettingsActivity$PrefsUserFragment"
+            android:icon="@drawable/ic_info_black_24dp"
+            android:title="@string/personal_info"
+            android:summary="@string/pref_personal_info" />
 </preference-headers>

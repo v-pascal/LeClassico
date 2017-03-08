@@ -528,20 +528,22 @@ public class PublicationsFragment extends MainFragment implements
             if (mQueryLimit <= 0)
                 mQueryLimit = count;
 
-            // Update shortcut (apply animation)
-            fillShortcut(shortcutData, true);
-            mListener.onAnimateShortcut(Constants.MAIN_SECTION_PUBLICATIONS,
-                    new OnFragmentListener.OnAnimationListener() {
+            if (mVisible) { // Update shortcut...
+                fillShortcut(shortcutData, true); // ...with animation
+                mListener.onAnimateShortcut(Constants.MAIN_SECTION_PUBLICATIONS,
+                        new OnFragmentListener.OnAnimationListener() {
 
-                @Override
-                public void onCopyNewToPrevious(ShortcutFragment previous) {
-                    Logs.add(Logs.Type.V, "previous: " + previous);
+                            @Override
+                            public void onCopyNewToPrevious(ShortcutFragment previous) {
+                                Logs.add(Logs.Type.V, "previous: " + previous);
 
-                    previous.setIcon(shortcutData.pseudoId, shortcutData.female, shortcutData.profile);
-                    previous.setMessage(shortcutData.message);
-                    previous.setInfo(shortcutData.info);
-                }
-            });
+                                previous.setIcon(shortcutData.pseudoId, shortcutData.female, shortcutData.profile);
+                                previous.setMessage(shortcutData.message);
+                                previous.setInfo(shortcutData.info);
+                            }
+                        });
+            } else // ...without animation
+                fillShortcut(shortcutData, false);
         }
         mQueryCount = count;
         mPubLast = lastPub;

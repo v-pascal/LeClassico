@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_personal_info" android:layout="@layout/settings_category">
+
+        <EditTextPreference
+            android:key="pref_user_password"
+            android:inputType="textPassword"
+            android:title="@string/pref_user_password"
+            android:summary="@string/pref_user_password_info" />
+        <EditTextPreference
+            android:key="pref_user_name"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:title="@string/pref_user_name"
+            android:summary="@string/pref_user_name_info" />
+        <EditTextPreference
+            android:key="pref_user_surname"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:title="@string/pref_user_surname"
+            android:summary="@string/pref_user_surname_info" />
+        <ListPreference
+            android:key="pref_user_gender"
+            android:defaultValue="1"
+            android:entries="@array/pref_gender"
+            android:entryValues="@array/pref_gender_values"
+            android:title="@string/pref_user_gender"
+            android:summary="@string/pref_user_gender_info" />
+        <EditTextPreference
+            android:key="pref_user_birthday"
+            android:inputType="date"
+            android:title="@string/pref_user_birthday"
+            android:summary="@string/pref_user_birthday_info" />
+        <EditTextPreference
+            android:key="pref_user_address"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:title="@string/pref_user_address"
+            android:summary="@string/pref_user_address_info" />
+        <EditTextPreference
+            android:key="pref_user_town"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:title="@string/pref_user_town"
+            android:summary="@string/pref_user_town_info" />
+        <EditTextPreference
+            android:key="pref_user_postal_code"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:title="@string/pref_user_postal_code"
+            android:summary="@string/pref_user_postal_code_info" />
+        <EditTextPreference
+            android:key="pref_user_email"
+            android:inputType="textEmailAddress"
+            android:ellipsize="end"
+            android:title="@string/pref_user_email"
+            android:summary="@string/pref_user_email_info" />
+        <EditTextPreference
+            android:key="pref_user_hobbies"
+            android:ellipsize="end"
+            android:title="@string/pref_user_hobbies"
+            android:summary="@string/pref_user_hobbies_info" />
+        <EditTextPreference
+            android:key="pref_user_about"
+            android:ellipsize="end"
+            android:title="@string/pref_user_about"
+            android:summary="@string/pref_user_about_info" />
+    </PreferenceCategory>
+</PreferenceScreen>
