@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.activities.settings.PrefsUserFragment;
 import com.studio.artaban.leclassico.components.RevealFragment;
 import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.data.Constants;
@@ -291,13 +292,14 @@ public class ConnectFragment extends RevealFragment {
                                         DatabaseUtils.sqlEscapeString(mPseudo.toUpperCase()) +
                                         " AND " + CamaradesTable.COLUMN_CODE_CONF;
                         Cursor result = resolver.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                                new String[]{CamaradesTable.COLUMN_PSEUDO, IDataTable.DataField.COLUMN_ID},
-                                selection + '=' + DatabaseUtils.sqlEscapeString(password),
+                                null, selection + '=' + DatabaseUtils.sqlEscapeString(password) + " AND " +
+                                        DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME),
                                 null, null);
-                        if (result.getCount() > 0) {
-                            result.moveToFirst();
-                            pseudo = result.getString(0);
-                            mPseudoId = result.getInt(1);
+                        if (result.moveToFirst()) {
+                            pseudo = result.getString(CamaradesTable.COLUMN_INDEX_PSEUDO);
+                            mPseudoId = result.getInt(DataTable.DataField.COLUMN_INDEX_ID);
+
+                            PrefsUserFragment.getData(result); // Get user data settings
                         }
                         result.close();
 
@@ -436,10 +438,15 @@ public class ConnectFragment extends RevealFragment {
                         }
                     }
 
-                    // Get pseudo Id (from local DB)
-                    mPseudoId = DataTable.getEntryId(resolver, CamaradesTable.TABLE_NAME,
-                            CamaradesTable.COLUMN_PSEUDO + "='" + mPseudo + "' AND " +
-                                    DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME));
+                    // Get user data settings & pseudo Id (Id from local DB)
+                    Cursor user = resolver.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                            null, CamaradesTable.COLUMN_PSEUDO + "='" + mPseudo + "' AND " +
+                                    DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME),
+                            null, null);
+                    user.moveToFirst(); // Always existing entry (here)
+                    mPseudoId = user.getInt(DataTable.DataField.COLUMN_INDEX_ID);
+                    PrefsUserFragment.getData(user);
+                    user.close();
                 }
 
                 ////// Wait activity resumed (needed to avoid to start main activity when paused)

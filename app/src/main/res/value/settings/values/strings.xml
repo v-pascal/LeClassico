@@ -16,11 +16,8 @@
     <string name="pref_user_password">Password</string>
     <string name="pref_user_password_info">Connection password</string>
     <string name="pref_user_name">Name</string>
-    <string name="pref_user_name_info">Your name</string>
     <string name="pref_user_surname">Surname</string>
-    <string name="pref_user_surname_info">Your surname</string>
-    <string name="pref_user_gender">Gender</string>
-    <string name="pref_user_gender_info">Sex</string>
+    <string name="pref_user_gender">Sex</string>
     <string-array name="pref_gender">
         <item>Female</item>
         <item>Male</item>
@@ -30,18 +27,12 @@
         <item>2</item>
     </string-array>
     <string name="pref_user_birthday">Birthday</string>
-    <string name="pref_user_birthday_info">Born date</string>
     <string name="pref_user_address">Address</string>
-    <string name="pref_user_address_info">Number &amp; street name</string>
     <string name="pref_user_town">Town</string>
-    <string name="pref_user_town_info">City name</string>
     <string name="pref_user_postal_code">ZIP</string>
-    <string name="pref_user_postal_code_info">Postal code</string>
+    <string name="pref_user_phone">Phone</string>
     <string name="pref_user_email">Email</string>
-    <string name="pref_user_email_info">Email address</string>
     <string name="pref_user_hobbies">Hobbies</string>
-    <string name="pref_user_hobbies_info">Pastime</string>
     <string name="pref_user_about">About</string>
-    <string name="pref_user_about_info">Your description</string>
 
 </resources>

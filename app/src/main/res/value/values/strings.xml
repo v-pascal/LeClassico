@@ -12,6 +12,7 @@
     <string name="display">Display</string>
     <string name="by">BY</string>
     <string name="none">None</string>
+    <string name="undefined">Undefined</string>
 
     <!-- Labels -->
     <string name="label_status">Status:</string>

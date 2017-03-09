@@ -2,6 +2,7 @@ package com.studio.artaban.leclassico.data.codes;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 
 import com.studio.artaban.leclassico.LeClassicoApp;
 import com.studio.artaban.leclassico.data.Constants;
@@ -40,17 +41,30 @@ public final class Preferences {
     public static final String SETTINGS_USER_ADDRESS = "pref_user_address";
     public static final String SETTINGS_USER_TOWN = "pref_user_town";
     public static final String SETTINGS_USER_POSTAL_CODE = "pref_user_postal_code";
+    public static final String SETTINGS_USER_PHONE = "pref_user_phone";
     public static final String SETTINGS_USER_EMAIL = "pref_user_email";
     public static final String SETTINGS_USER_HOBBIES = "pref_user_hobbies";
     public static final String SETTINGS_USER_ABOUT = "pref_user_about";
 
     //////
+    private static final SharedPreferences AppPrefs =
+            PreferenceManager.getDefaultSharedPreferences(LeClassicoApp.getInstance());
+
     public static boolean getBoolean(String key) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LeClassicoApp.getInstance());
-        return prefs.getBoolean(key, false);
+        return AppPrefs.getBoolean(key, false);
     }
     public static int getInt(String key) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LeClassicoApp.getInstance());
-        return prefs.getInt(key, Constants.NO_DATA);
+        return AppPrefs.getInt(key, Constants.NO_DATA);
+    }
+    public static String getString(String key) {
+        return AppPrefs.getString(key, null);
+    }
+
+    //
+    public static void setString(String key, @Nullable String value) {
+        if (value == null)
+            AppPrefs.edit().remove(key).apply();
+        else
+            AppPrefs.edit().putString(key, value).apply();
     }
 }

@@ -11,6 +11,7 @@
     <string name="display">Afficher</string>
     <string name="by">PAR</string>
     <string name="none">Aucune</string>
+    <string name="undefined">Non défini</string>
 
     <!-- Labels -->
     <string name="label_status">Statut:</string>

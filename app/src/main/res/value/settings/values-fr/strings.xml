@@ -16,28 +16,19 @@
     <string name="pref_user_password">Mot de passe</string>
     <string name="pref_user_password_info">Code confidentiel</string>
     <string name="pref_user_name">Nom</string>
-    <string name="pref_user_name_info">Votre nom</string>
     <string name="pref_user_surname">Prénom</string>
-    <string name="pref_user_surname_info">Votre prénom</string>
-    <string name="pref_user_gender">Genre</string>
-    <string name="pref_user_gender_info">Sexe</string>
+    <string name="pref_user_gender">Sexe</string>
     <string-array name="pref_gender">
         <item>Féminin</item>
         <item>Masculin</item>
     </string-array>
     <string name="pref_user_birthday">Anniversaire</string>
-    <string name="pref_user_birthday_info">Date d\'anniversaire</string>
     <string name="pref_user_address">Adresse</string>
-    <string name="pref_user_address_info">Numéro &amp; nom de rue</string>
     <string name="pref_user_town">Ville</string>
-    <string name="pref_user_town_info">Ville &amp; Arrondissement</string>
     <string name="pref_user_postal_code">Code postal</string>
-    <string name="pref_user_postal_code_info">Code postal</string>
+    <string name="pref_user_phone">Téléphone</string>
     <string name="pref_user_email">Courriel</string>
-    <string name="pref_user_email_info">Adresse email</string>
     <string name="pref_user_hobbies">Passe-temps</string>
-    <string name="pref_user_hobbies_info">Hobbies</string>
     <string name="pref_user_about">A propos</string>
-    <string name="pref_user_about_info">Votre description</string>
 
 </resources>
