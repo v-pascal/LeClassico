@@ -75,7 +75,6 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
 
 
 
-
             } else {
                 preference.getEditor().remove(preference.getKey()).apply();
                 preference.setSummary(getString(R.string.undefined));
@@ -85,7 +84,7 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
 
             }
         }
-        return false;
+        return true;
     }
 
     ////// PreferenceFragment //////////////////////////////////////////////////////////////////////
