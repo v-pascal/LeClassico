@@ -1,13 +1,20 @@
 package com.studio.artaban.leclassico.activities.settings;
 
+import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 /**
@@ -27,7 +34,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class PrefsUserFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
 
-    public static void getData(Cursor user) { // Fill connected user info in preferences data
+    public static void getData(Cursor user) { // Store connected user info into preferences (from DB)
         Logs.add(Logs.Type.V, "user: " + user);
 
         Preferences.setString(Preferences.SETTINGS_USER_PASSWORD, user.getString(CamaradesTable.COLUMN_INDEX_CODE_CONF));
@@ -55,35 +62,82 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
                 user.getString(CamaradesTable.COLUMN_INDEX_A_PROPOS):null);
     }
 
+    //////
+    private void updateUserInfo(final String key, final String value) { // Update DB user info
+        Logs.add(Logs.Type.V, "key: " + key + ";value: " + value);
+
+        new Thread(new Runnable() { // Background process
+            @Override
+            public void run() {
+                Logs.add(Logs.Type.V, null);
+
+                String field = (key.equals(Preferences.SETTINGS_USER_PASSWORD))? CamaradesTable.COLUMN_CODE_CONF:
+                        ((key.equals(Preferences.SETTINGS_USER_NAME))? CamaradesTable.COLUMN_NOM:
+                        ((key.equals(Preferences.SETTINGS_USER_SURNAME))? CamaradesTable.COLUMN_PRENOM:
+                        ((key.equals(Preferences.SETTINGS_USER_GENDER))? CamaradesTable.COLUMN_SEXE:
+                        ((key.equals(Preferences.SETTINGS_USER_BIRTHDAY))? CamaradesTable.COLUMN_BORN_DATE:
+                        ((key.equals(Preferences.SETTINGS_USER_ADDRESS))? CamaradesTable.COLUMN_ADRESSE:
+                        ((key.equals(Preferences.SETTINGS_USER_TOWN))? CamaradesTable.COLUMN_VILLE:
+                        ((key.equals(Preferences.SETTINGS_USER_POSTAL_CODE))? CamaradesTable.COLUMN_POSTAL:
+                        ((key.equals(Preferences.SETTINGS_USER_PHONE))? CamaradesTable.COLUMN_PHONE:
+                        ((key.equals(Preferences.SETTINGS_USER_EMAIL))? CamaradesTable.COLUMN_EMAIL:
+                        ((key.equals(Preferences.SETTINGS_USER_HOBBIES))? CamaradesTable.COLUMN_HOBBIES:
+                        CamaradesTable.COLUMN_A_PROPOS))))))))));
+                String updateField = (key.equals(Preferences.SETTINGS_USER_PASSWORD))? CamaradesTable.COLUMN_CODE_CONF_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_NAME))? CamaradesTable.COLUMN_NOM_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_SURNAME))? CamaradesTable.COLUMN_PRENOM_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_GENDER))? CamaradesTable.COLUMN_SEXE_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_BIRTHDAY))? CamaradesTable.COLUMN_BORN_DATE_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_ADDRESS))? CamaradesTable.COLUMN_ADRESSE_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_TOWN))? CamaradesTable.COLUMN_VILLE_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_POSTAL_CODE))? CamaradesTable.COLUMN_POSTAL_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_PHONE))? CamaradesTable.COLUMN_PHONE_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_EMAIL))? CamaradesTable.COLUMN_EMAIL_UPD:
+                        ((key.equals(Preferences.SETTINGS_USER_HOBBIES))? CamaradesTable.COLUMN_HOBBIES_UPD:
+                        CamaradesTable.COLUMN_A_PROPOS_UPD))))))))));
+
+                Uri uri = Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME);
+                String where = DataTable.DataField.COLUMN_ID + '=' + getActivity().getIntent()
+                        .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA);
+                synchronized (Database.getTable(CamaradesTable.TABLE_NAME)) {
+
+                    ContentValues values = new ContentValues();
+                    if (field.equals(CamaradesTable.COLUMN_SEXE))
+                        values.put(field, Integer.valueOf(value));
+                    else
+                        values.put(field, value);
+
+
+
+
+
+
+
+
+                    getActivity().getContentResolver().update(uri, values, where, null);
+                }
+            }
+        }).start();
+    }
+
     ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         Logs.add(Logs.Type.V, "preference: " + preference + ";newValue: " + newValue);
 
         String value = ((String)newValue).trim();
-        if (preference.getKey().equals(Preferences.SETTINGS_USER_GENDER)) {
+        if (preference.getKey().equals(Preferences.SETTINGS_USER_GENDER))
             preference.setSummary(getResources()
                     .getStringArray(R.array.pref_gender)[Integer.valueOf(value) - 1]);
-
-
-
-
-
-        } else {
-            if (!value.isEmpty()) {
+        else {
+            if (!value.isEmpty())
                 preference.setSummary(value);
-
-
-
-            } else {
+            else {
                 preference.getEditor().remove(preference.getKey()).apply();
                 preference.setSummary(getString(R.string.undefined));
-
-
-
-
             }
         }
+        updateUserInfo(preference.getKey(), value);
         return true;
     }
 

@@ -254,12 +254,8 @@ public class CamaradesTable extends DataTable {
     @Override
     public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
-
-
-
-
         ContentValues deleted = new ContentValues();
-        return deleted;
+        return deleted; // Not defined for this table
     }
 
     // JSON keys

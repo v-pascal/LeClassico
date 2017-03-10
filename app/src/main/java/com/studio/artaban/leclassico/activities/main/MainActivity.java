@@ -248,6 +248,7 @@ public class MainActivity extends LoggedActivity implements
 
                 ////// Start profile activity
                 Intent profile = new Intent(this, ProfileActivity.class);
+                Login.copyExtraData(getIntent(), profile);
                 profile.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
                 startActivity(profile);
                 break;
@@ -257,6 +258,7 @@ public class MainActivity extends LoggedActivity implements
 
                 ////// Start location activity
                 Intent location = new Intent(this, LocationActivity.class);
+                Login.copyExtraData(getIntent(), location);
                 location.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
                 startActivity(location);
                 break;
@@ -266,6 +268,7 @@ public class MainActivity extends LoggedActivity implements
 
                 ////// Start mailbox activity
                 Intent mailBox = new Intent(this, MailboxActivity.class);
+                Login.copyExtraData(getIntent(), mailBox);
                 mailBox.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
                 startActivity(mailBox);
                 break;
@@ -280,7 +283,9 @@ public class MainActivity extends LoggedActivity implements
                 Logs.add(Logs.Type.I, "Display settings");
 
                 ////// Start settings activity
-                startActivity(new Intent(this, SettingsActivity.class));
+                Intent settings = new Intent(this, SettingsActivity.class);
+                Login.copyExtraData(getIntent(), settings);
+                startActivity(settings);
                 break;
             }
             case R.id.navig_logout: { // Logout
