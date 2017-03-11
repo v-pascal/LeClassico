@@ -322,8 +322,11 @@ public class PresentsTable extends DataTable {
         if (result != Internet.DownloadResult.SUCCEEDED) {
 
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            if (operation != WebServices.OPERATION_SELECT)
+            if (operation != WebServices.OPERATION_SELECT) {
+
+                syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
                 resetSyncInProgress(resolver, syncData);
+            }
             return null;
         }
         return syncResult;

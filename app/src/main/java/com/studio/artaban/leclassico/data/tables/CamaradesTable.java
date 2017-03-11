@@ -245,10 +245,144 @@ public class CamaradesTable extends DataTable {
     public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
-
-
-
         ContentValues updated = new ContentValues();
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME), null, '(' +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_CODE_CONF_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_NOM_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_PRENOM_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_SEXE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_BORN_DATE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_ADRESSE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_VILLE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_POSTAL_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_PHONE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_EMAIL_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_HOBBIES_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_A_PROPOS_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LOG_DATE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_ADMIN_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_PROFILE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_BANNER_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LOCATED_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LATITUDE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LONGITUDE_UPD + ") AND (" +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_UPDATE.getValue() + " OR " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_UPDATE.getValue() |
+                        Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
+        if (cursor.moveToFirst()) {
+            try {
+
+                JSONArray keysArray = new JSONArray();
+                JSONArray updatesArray = new JSONArray();
+                JSONArray statusArray = new JSONArray();
+                do {
+
+                    // Keys
+                    JSONObject key = new JSONObject();
+                    key.put(JSON_KEY_PSEUDO, cursor.getString(COLUMN_INDEX_PSEUDO));
+
+                    // Updates & Status
+                    JSONObject update = new JSONObject();
+                    JSONObject status = new JSONObject();
+
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_CODE_CONF_UPD)) < 0) {
+                        update.put(JSON_KEY_CODE_CONF, cursor.getString(COLUMN_INDEX_CODE_CONF));
+                        status.put(JSON_KEY_CODE_CONF_UPD, cursor.getString(COLUMN_INDEX_CODE_CONF_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_NOM_UPD)) < 0) {
+                        update.put(JSON_KEY_NOM, cursor.getString(COLUMN_INDEX_NOM));
+                        status.put(JSON_KEY_NOM_UPD, cursor.getString(COLUMN_INDEX_NOM_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PRENOM_UPD)) < 0) {
+                        update.put(JSON_KEY_PRENOM, cursor.getString(COLUMN_INDEX_PRENOM));
+                        status.put(JSON_KEY_PRENOM_UPD, cursor.getString(COLUMN_INDEX_PRENOM_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_SEXE_UPD)) < 0) {
+                        update.put(JSON_KEY_SEXE, cursor.getInt(COLUMN_INDEX_SEXE));
+                        status.put(JSON_KEY_SEXE_UPD, cursor.getString(COLUMN_INDEX_SEXE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_BORN_DATE_UPD)) < 0) {
+                        update.put(JSON_KEY_BORN_DATE, cursor.getString(COLUMN_INDEX_BORN_DATE));
+                        status.put(JSON_KEY_BORN_DATE_UPD, cursor.getString(COLUMN_INDEX_BORN_DATE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_ADRESSE_UPD)) < 0) {
+                        update.put(JSON_KEY_ADRESSE, cursor.getString(COLUMN_INDEX_ADRESSE));
+                        status.put(JSON_KEY_ADRESSE_UPD, cursor.getString(COLUMN_INDEX_ADRESSE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_VILLE_UPD)) < 0) {
+                        update.put(JSON_KEY_VILLE, cursor.getString(COLUMN_INDEX_VILLE));
+                        status.put(JSON_KEY_VILLE_UPD, cursor.getString(COLUMN_INDEX_VILLE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_POSTAL_UPD)) < 0) {
+                        update.put(JSON_KEY_POSTAL, cursor.getString(COLUMN_INDEX_POSTAL));
+                        status.put(JSON_KEY_POSTAL_UPD, cursor.getString(COLUMN_INDEX_POSTAL_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PHONE_UPD)) < 0) {
+                        update.put(JSON_KEY_PHONE, cursor.getString(COLUMN_INDEX_PHONE));
+                        status.put(JSON_KEY_PHONE_UPD, cursor.getString(COLUMN_INDEX_PHONE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_EMAIL_UPD)) < 0) {
+                        update.put(JSON_KEY_EMAIL, cursor.getString(COLUMN_INDEX_EMAIL));
+                        status.put(JSON_KEY_EMAIL_UPD, cursor.getString(COLUMN_INDEX_EMAIL_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_HOBBIES_UPD)) < 0) {
+                        update.put(JSON_KEY_HOBBIES, cursor.getString(COLUMN_INDEX_HOBBIES));
+                        status.put(JSON_KEY_HOBBIES_UPD, cursor.getString(COLUMN_INDEX_HOBBIES_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_A_PROPOS_UPD)) < 0) {
+                        update.put(JSON_KEY_A_PROPOS, cursor.getString(COLUMN_INDEX_A_PROPOS));
+                        status.put(JSON_KEY_A_PROPOS_UPD, cursor.getString(COLUMN_INDEX_A_PROPOS_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LOG_DATE_UPD)) < 0) {
+                        update.put(JSON_KEY_LOG_DATE, cursor.getString(COLUMN_INDEX_LOG_DATE));
+                        status.put(JSON_KEY_LOG_DATE_UPD, cursor.getString(COLUMN_INDEX_LOG_DATE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_ADMIN_UPD)) < 0) {
+                        update.put(JSON_KEY_ADMIN, cursor.getInt(COLUMN_INDEX_ADMIN));
+                        status.put(JSON_KEY_ADMIN_UPD, cursor.getString(COLUMN_INDEX_ADMIN_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PROFILE_UPD)) < 0) {
+                        update.put(JSON_KEY_PROFILE, cursor.getString(COLUMN_INDEX_PROFILE));
+                        status.put(JSON_KEY_PROFILE_UPD, cursor.getString(COLUMN_INDEX_PROFILE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_BANNER_UPD)) < 0) {
+                        update.put(JSON_KEY_BANNER, cursor.getString(COLUMN_INDEX_BANNER));
+                        status.put(JSON_KEY_BANNER_UPD, cursor.getString(COLUMN_INDEX_BANNER_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LOCATED_UPD)) < 0) {
+                        update.put(JSON_KEY_LOCATED, cursor.getInt(COLUMN_INDEX_LOCATED));
+                        status.put(JSON_KEY_LOCATED_UPD, cursor.getString(COLUMN_INDEX_LOCATED_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LATITUDE_UPD)) < 0) {
+                        update.put(JSON_KEY_LATITUDE, cursor.getDouble(COLUMN_INDEX_LATITUDE));
+                        status.put(JSON_KEY_LATITUDE_UPD, cursor.getString(COLUMN_INDEX_LATITUDE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) < 0) {
+                        update.put(JSON_KEY_LONGITUDE, cursor.getDouble(COLUMN_INDEX_LONGITUDE));
+                        status.put(JSON_KEY_LONGITUDE_UPD, cursor.getString(COLUMN_INDEX_LONGITUDE_UPD));
+                    }
+
+                    //////
+                    keysArray.put(key);
+                    updatesArray.put(update);
+                    statusArray.put(status);
+
+                } while (cursor.moveToNext());
+
+                //////
+                Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                Logs.add(Logs.Type.I, "Updates: " + updatesArray.toString());
+                Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
+
+                updated.put(WebServices.DATA_KEYS, keysArray.toString());
+                updated.put(WebServices.DATA_UPDATES, updatesArray.toString());
+                updated.put(WebServices.DATA_STATUS, statusArray.toString());
+
+            } catch (JSONException e) {
+                Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
+            }
+        }
+        cursor.close();
         return updated;
     }
     @Override
@@ -316,7 +450,7 @@ public class CamaradesTable extends DataTable {
         syncData.putByte(DATA_KEY_OPERATION, operation);
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
 
-        syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+        syncData.remove(DATA_KEY_FIELD_PSEUDO); // No pseudo field criteria for this table
         syncData.remove(DATA_KEY_FIELD_DATE); // No date field criteria for this table
         String url = getSyncUrlRequest(resolver, syncData);
 
@@ -326,15 +460,14 @@ public class CamaradesTable extends DataTable {
 
             @Override
             public boolean onReceiveReply(String response) {
-                //Logs.add(Logs.Type.V, "response: " + response);
+                Logs.add(Logs.Type.V, "response: " + response);
                 try {
 
                     JSONObject reply = new JSONObject(response);
                     if (!reply.has(WebServices.JSON_KEY_ERROR)) { // Check no web service error
 
                         if (reply.isNull(TABLE_NAME))
-                            return ((operation == WebServices.OPERATION_SELECT) ||
-                                    (operation == WebServices.OPERATION_SELECT_OLD));
+                            return (operation == WebServices.OPERATION_SELECT);
                             // Already synchronized for selection but error for any other operation
 
                         Uri tableUri = Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME);
@@ -357,55 +490,85 @@ public class CamaradesTable extends DataTable {
                             }
                             if (!entry.isNull(JSON_KEY_NOM))
                                 values.put(COLUMN_NOM, entry.getString(JSON_KEY_NOM));
+                            else
+                                values.putNull(COLUMN_NOM);
                             values.put(COLUMN_NOM_UPD, entry.getString(JSON_KEY_NOM_UPD));
                             if (!entry.isNull(JSON_KEY_PRENOM))
                                 values.put(COLUMN_PRENOM, entry.getString(JSON_KEY_PRENOM));
+                            else
+                                values.putNull(COLUMN_PRENOM);
                             values.put(COLUMN_PRENOM_UPD, entry.getString(JSON_KEY_PRENOM_UPD));
                             if (!entry.isNull(JSON_KEY_SEXE))
                                 values.put(COLUMN_SEXE, entry.getInt(JSON_KEY_SEXE));
+                            //else // Cannot be set to null
                             values.put(COLUMN_SEXE_UPD, entry.getString(JSON_KEY_SEXE_UPD));
                             if (!entry.isNull(JSON_KEY_BORN_DATE))
                                 values.put(COLUMN_BORN_DATE, entry.getString(JSON_KEY_BORN_DATE));
+                            else
+                                values.putNull(COLUMN_BORN_DATE);
                             values.put(COLUMN_BORN_DATE_UPD, entry.getString(JSON_KEY_BORN_DATE_UPD));
                             if (!entry.isNull(JSON_KEY_ADRESSE))
                                 values.put(COLUMN_ADRESSE, entry.getString(JSON_KEY_ADRESSE));
+                            else
+                                values.putNull(COLUMN_ADRESSE);
                             values.put(COLUMN_ADRESSE_UPD, entry.getString(JSON_KEY_ADRESSE_UPD));
                             if (!entry.isNull(JSON_KEY_VILLE))
                                 values.put(COLUMN_VILLE, entry.getString(JSON_KEY_VILLE));
+                            else
+                                values.putNull(COLUMN_VILLE);
                             values.put(COLUMN_VILLE_UPD, entry.getString(JSON_KEY_VILLE_UPD));
                             if (!entry.isNull(JSON_KEY_POSTAL))
                                 values.put(COLUMN_POSTAL, entry.getString(JSON_KEY_POSTAL));
+                            else
+                                values.putNull(COLUMN_POSTAL);
                             values.put(COLUMN_POSTAL_UPD, entry.getString(JSON_KEY_POSTAL_UPD));
                             if (!entry.isNull(JSON_KEY_PHONE))
                                 values.put(COLUMN_PHONE, entry.getString(JSON_KEY_PHONE));
+                            else
+                                values.putNull(COLUMN_PHONE);
                             values.put(COLUMN_PHONE_UPD, entry.getString(JSON_KEY_PHONE_UPD));
                             if (!entry.isNull(JSON_KEY_EMAIL))
                                 values.put(COLUMN_EMAIL, entry.getString(JSON_KEY_EMAIL));
+                            else
+                                values.putNull(COLUMN_EMAIL);
                             values.put(COLUMN_EMAIL_UPD, entry.getString(JSON_KEY_EMAIL_UPD));
                             if (!entry.isNull(JSON_KEY_HOBBIES))
                                 values.put(COLUMN_HOBBIES, entry.getString(JSON_KEY_HOBBIES));
+                            else
+                                values.putNull(COLUMN_HOBBIES);
                             values.put(COLUMN_HOBBIES_UPD, entry.getString(JSON_KEY_HOBBIES_UPD));
                             if (!entry.isNull(JSON_KEY_A_PROPOS))
                                 values.put(COLUMN_A_PROPOS, entry.getString(JSON_KEY_A_PROPOS));
+                            else
+                                values.putNull(COLUMN_A_PROPOS);
                             values.put(COLUMN_A_PROPOS_UPD, entry.getString(JSON_KEY_A_PROPOS_UPD));
                             if (!entry.isNull(JSON_KEY_LOG_DATE))
                                 values.put(COLUMN_LOG_DATE, entry.getString(JSON_KEY_LOG_DATE));
+                            //else // Cannot be set to null
                             values.put(COLUMN_LOG_DATE_UPD, entry.getString(JSON_KEY_LOG_DATE_UPD));
                             values.put(COLUMN_ADMIN, entry.getInt(JSON_KEY_ADMIN));
                             values.put(COLUMN_ADMIN_UPD, entry.getString(JSON_KEY_ADMIN_UPD));
                             if (!entry.isNull(JSON_KEY_PROFILE))
                                 values.put(COLUMN_PROFILE, entry.getString(JSON_KEY_PROFILE));
+                            else
+                                values.putNull(COLUMN_PROFILE);
                             values.put(COLUMN_PROFILE_UPD, entry.getString(JSON_KEY_PROFILE_UPD));
                             if (!entry.isNull(JSON_KEY_BANNER))
                                 values.put(COLUMN_BANNER, entry.getString(JSON_KEY_BANNER));
+                            else
+                                values.putNull(COLUMN_BANNER);
                             values.put(COLUMN_BANNER_UPD, entry.getString(JSON_KEY_BANNER_UPD));
                             values.put(COLUMN_LOCATED, entry.getInt(JSON_KEY_LOCATED));
                             values.put(COLUMN_LOCATED_UPD, entry.getString(JSON_KEY_LOCATED_UPD));
                             if (!entry.isNull(JSON_KEY_LATITUDE))
                                 values.put(COLUMN_LATITUDE, entry.getDouble(JSON_KEY_LATITUDE));
+                            else
+                                values.putNull(COLUMN_LATITUDE);
                             values.put(COLUMN_LATITUDE_UPD, entry.getString(JSON_KEY_LATITUDE_UPD));
                             if (!entry.isNull(JSON_KEY_LONGITUDE))
                                 values.put(COLUMN_LONGITUDE, entry.getDouble(JSON_KEY_LONGITUDE));
+                            else
+                                values.putNull(COLUMN_LONGITUDE);
                             values.put(COLUMN_LONGITUDE_UPD, entry.getString(JSON_KEY_LONGITUDE_UPD));
 
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
@@ -589,8 +752,11 @@ public class CamaradesTable extends DataTable {
         if (result != Internet.DownloadResult.SUCCEEDED) {
 
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            if ((operation != WebServices.OPERATION_SELECT) && (operation != WebServices.OPERATION_SELECT_OLD))
+            if (operation != WebServices.OPERATION_SELECT) {
+
+                syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
                 resetSyncInProgress(resolver, syncData);
+            }
             return null;
         }
         return syncResult;

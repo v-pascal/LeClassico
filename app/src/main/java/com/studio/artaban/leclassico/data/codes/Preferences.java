@@ -32,7 +32,7 @@ public final class Preferences {
     public static final String SETTINGS_NOTIFY_VIBRATE = "pref_notify_vibrate";
     public static final String SETTINGS_NOTIFY_LIGHT = "pref_notify_light";
 
-    ////// Notifications (see '/xml/settings_fragment_user.xml')
+    ////// User info (see '/xml/settings_fragment_user.xml')
     public static final String SETTINGS_USER_PASSWORD = "pref_user_password";
     public static final String SETTINGS_USER_NAME = "pref_user_name";
     public static final String SETTINGS_USER_SURNAME = "pref_user_surname";

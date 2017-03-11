@@ -60,6 +60,9 @@ public final class WebServices {
     public static final String PHOTOS_DATA_BEST = "Best";
     public static final String PHOTOS_DATA_IDS = "Ids";
 
+    // Members
+    public static final String MEMBERS_DATA_PSEUDO = "Pseudos";
+
 
     ////// JSON ////////////////////////////////////////////////////////////////////////////////////
 

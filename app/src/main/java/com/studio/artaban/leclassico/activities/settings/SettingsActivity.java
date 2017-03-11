@@ -5,6 +5,8 @@ import android.preference.PreferenceFragment;
 import android.view.MenuItem;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.List;
@@ -24,12 +26,28 @@ public class SettingsActivity extends BasePreferenceActivity {
             addPreferencesFromResource(R.xml.settings_fragment_notify);
         }
     }
+    private static String pseudo;
+    private static int pseudoId;
+    // Login info (see NB below)
+
+    public String getPseudo() {
+        return pseudo;
+    }
+    public int getPseudoId() {
+        return pseudoId;
+    }
 
     ////// PreferenceActivity //////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
+
+        if (getIntent().hasExtra(Login.EXTRA_DATA_PSEUDO))
+            pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
+        if (getIntent().hasExtra(Login.EXTRA_DATA_PSEUDO_ID))
+            pseudoId = getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA);
+        // NB: Needed coz intent is replaced by new one at preference header selection
 
         // Enable to display back arrow (toolbar)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

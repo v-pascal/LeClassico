@@ -17,6 +17,10 @@ import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by pascal on 08/03/17.
  * User preferences:
@@ -54,12 +58,12 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
                 user.getString(CamaradesTable.COLUMN_INDEX_POSTAL):null);
         Preferences.setString(Preferences.SETTINGS_USER_PHONE, (!user.isNull(CamaradesTable.COLUMN_INDEX_PHONE))?
                 user.getString(CamaradesTable.COLUMN_INDEX_PHONE):null);
-        Preferences.setString(Preferences.SETTINGS_USER_EMAIL, (!user.isNull(CamaradesTable.COLUMN_INDEX_EMAIL))?
-                user.getString(CamaradesTable.COLUMN_INDEX_EMAIL):null);
+        Preferences.setString(Preferences.SETTINGS_USER_EMAIL, (!user.isNull(CamaradesTable.COLUMN_INDEX_EMAIL)) ?
+                user.getString(CamaradesTable.COLUMN_INDEX_EMAIL) : null);
         Preferences.setString(Preferences.SETTINGS_USER_HOBBIES, (!user.isNull(CamaradesTable.COLUMN_INDEX_HOBBIES))?
                 user.getString(CamaradesTable.COLUMN_INDEX_HOBBIES):null);
-        Preferences.setString(Preferences.SETTINGS_USER_ABOUT, (!user.isNull(CamaradesTable.COLUMN_INDEX_A_PROPOS))?
-                user.getString(CamaradesTable.COLUMN_INDEX_A_PROPOS):null);
+        Preferences.setString(Preferences.SETTINGS_USER_ABOUT, (!user.isNull(CamaradesTable.COLUMN_INDEX_A_PROPOS)) ?
+                user.getString(CamaradesTable.COLUMN_INDEX_A_PROPOS) : null);
     }
 
     //////
@@ -97,24 +101,34 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
                         CamaradesTable.COLUMN_A_PROPOS_UPD))))))))));
 
                 Uri uri = Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME);
-                String where = DataTable.DataField.COLUMN_ID + '=' + getActivity().getIntent()
-                        .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA);
-                synchronized (Database.getTable(CamaradesTable.TABLE_NAME)) {
+                String where = DataTable.DataField.COLUMN_ID + '=' + ((SettingsActivity)getActivity()).getPseudoId();
 
+                synchronized (Database.getTable(CamaradesTable.TABLE_NAME)) {
                     ContentValues values = new ContentValues();
+
                     if (field.equals(CamaradesTable.COLUMN_SEXE))
                         values.put(field, Integer.valueOf(value));
                     else
                         values.put(field, value);
+                    Date now = new Date();
+                    DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+                    values.put(updateField, dateFormat.format(now));
 
-
-
-
-
-
-
+                    Cursor status = getActivity().getContentResolver().query(uri,
+                            new String[]{Constants.DATA_COLUMN_STATUS_DATE}, where, null, null);
+                    status.moveToFirst();
+                    values.put(Constants.DATA_COLUMN_STATUS_DATE, status.getString(0));
+                    // NB: Needed to keep current status date entry (allow to find fields to update)
 
                     getActivity().getContentResolver().update(uri, values, where, null);
+
+
+
+
+
+
+
+
                 }
             }
         }).start();

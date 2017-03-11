@@ -26,7 +26,7 @@ public class CommentairesRequest extends DataRequest {
 
     public static final String EXTRA_DATA_OBJECT_IDS = "objectIDs";
     public static final String EXTRA_DATA_OBJECT_TYPE = "objectType";
-    // Extra data keys
+    // Extra data keys (see 'DataRequest' extra data keys)
 
     public CommentairesRequest(DataService service) {
         super(service, Tables.ID_COMMENTAIRES, CommentairesTable.COLUMN_PSEUDO);

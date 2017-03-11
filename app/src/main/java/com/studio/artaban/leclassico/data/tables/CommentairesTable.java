@@ -371,9 +371,8 @@ public class CommentairesTable extends DataTable {
 
                 Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
                 if (operation != WebServices.OPERATION_SELECT_OLD) {
-                    syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
-                    // NB: Needed to reset sync fields!
 
+                    syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
                     resetSyncInProgress(resolver, syncData);
                 }
                 return null;
