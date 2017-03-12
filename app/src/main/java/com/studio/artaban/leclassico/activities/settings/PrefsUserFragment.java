@@ -8,14 +8,17 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.studio.artaban.leclassico.R;
-import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
+import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.services.DataService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -36,7 +39,8 @@ import java.util.Date;
  * _ Hobbies
  * _ About
  */
-public class PrefsUserFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
+public class PrefsUserFragment extends PreferenceFragment implements
+        Preference.OnPreferenceChangeListener, DataObserver.OnContentListener {
 
     public static void getData(Cursor user) { // Store connected user info into preferences (from DB)
         Logs.add(Logs.Type.V, "user: " + user);
@@ -67,6 +71,9 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
     }
 
     //////
+    private Uri mUserUri; // User member URI to observe DB
+    private DataObserver mUserObserver; // User data update observer
+
     private void updateUserInfo(final String key, final String value) { // Update DB user info
         Logs.add(Logs.Type.V, "key: " + key + ";value: " + value);
 
@@ -99,9 +106,9 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
                         ((key.equals(Preferences.SETTINGS_USER_EMAIL))? CamaradesTable.COLUMN_EMAIL_UPD:
                         ((key.equals(Preferences.SETTINGS_USER_HOBBIES))? CamaradesTable.COLUMN_HOBBIES_UPD:
                         CamaradesTable.COLUMN_A_PROPOS_UPD))))))))));
-
                 Uri uri = Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME);
-                String where = DataTable.DataField.COLUMN_ID + '=' + ((SettingsActivity)getActivity()).getPseudoId();
+                String where = DataTable.DataField.COLUMN_ID + '=' +
+                        Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID);
 
                 synchronized (Database.getTable(CamaradesTable.TABLE_NAME)) {
                     ContentValues values = new ContentValues();
@@ -121,17 +128,24 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
                     // NB: Needed to keep current status date entry (allow to find fields to update)
 
                     getActivity().getContentResolver().update(uri, values, where, null);
-
-
-
-
-
-
-
-
+                    getActivity().getContentResolver().notifyChange(mUserUri, null); // Notify changes
                 }
             }
         }).start();
+    }
+
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+
+
+
+
+
+
+
+
     }
 
     ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
@@ -162,6 +176,14 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         addPreferencesFromResource(R.xml.settings_fragment_user);
 
+        // Set URI & observer (to check DB changes)
+        mUserUri = Uris.getUri(Uris.ID_USER_MEMBERS,
+                String.valueOf(Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID)));
+
+        mUserObserver = new DataObserver("prefsUserDataObserverThread", this);
+        mUserObserver.register(getActivity().getContentResolver(), mUserUri);
+
+        // Initialize preferences
         Preference preference = findPreference(Preferences.SETTINGS_USER_NAME);
         String value = Preferences.getString(Preferences.SETTINGS_USER_NAME);
         if (value != null)
@@ -228,5 +250,23 @@ public class PrefsUserFragment extends PreferenceFragment implements Preference.
         if (value != null)
             preference.setSummary(value);
         preference.setOnPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+
+        // Register data service
+        getActivity().sendBroadcast(DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+
+        // Unregister data service
+        getActivity().sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUserUri));
     }
 }

@@ -27,6 +27,9 @@ public final class Preferences {
 
     ////// User settings ///////////////////////////////////////////////////////////////////////////
 
+    public static final String SETTINGS_LOGIN_PSEUDO = "loginPseudo";
+    public static final String SETTINGS_LOGIN_PSEUDO_ID = "loginPseudoID";
+
     ////// Notifications (see '/xml/settings_fragment_notify.xml')
     public static final String SETTINGS_NOTIFY_SOUND = "pref_notify_sound";
     public static final String SETTINGS_NOTIFY_VIBRATE = "pref_notify_vibrate";
@@ -66,5 +69,11 @@ public final class Preferences {
             AppPrefs.edit().remove(key).apply();
         else
             AppPrefs.edit().putString(key, value).apply();
+    }
+    public static void setInt(String key, @Nullable Integer value) {
+        if (value == null)
+            AppPrefs.edit().remove(key).apply();
+        else
+            AppPrefs.edit().putInt(key, value).apply();
     }
 }
