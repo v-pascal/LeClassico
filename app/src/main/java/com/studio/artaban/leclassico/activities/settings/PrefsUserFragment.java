@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.activities.settings;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -258,7 +260,10 @@ public class PrefsUserFragment extends PreferenceFragment implements
         Logs.add(Logs.Type.V, null);
 
         // Register data service
-        getActivity().sendBroadcast(DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri));
+        Intent intent = DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri);
+        intent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO,
+                Preferences.getString(Preferences.SETTINGS_LOGIN_PSEUDO));
+        getActivity().sendBroadcast(intent);
     }
 
     @Override

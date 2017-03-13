@@ -370,9 +370,9 @@ public class CamaradesTable extends DataTable {
                 } while (cursor.moveToNext());
 
                 //////
-                Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
-                Logs.add(Logs.Type.I, "Updates: " + updatesArray.toString());
-                Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
+                //Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                //Logs.add(Logs.Type.I, "Updates: " + updatesArray.toString());
+                //Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
 
                 updated.put(WebServices.DATA_KEYS, keysArray.toString());
                 updated.put(WebServices.DATA_UPDATES, updatesArray.toString());
@@ -460,7 +460,7 @@ public class CamaradesTable extends DataTable {
 
             @Override
             public boolean onReceiveReply(String response) {
-                Logs.add(Logs.Type.V, "response: " + response);
+                //Logs.add(Logs.Type.V, "response: " + response);
                 try {
 
                     JSONObject reply = new JSONObject(response);
