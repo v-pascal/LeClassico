@@ -130,7 +130,7 @@ public class PrefsUserFragment extends PreferenceFragment implements
                     // NB: Needed to keep current status date entry (allow to find fields to update)
 
                     getActivity().getContentResolver().update(uri, values, where, null);
-                    getActivity().getContentResolver().notifyChange(mUserUri, null); // Notify changes
+                    getActivity().getContentResolver().notifyChange(mUserUri, mUserObserver); // Notify changes
                 }
             }
         }).start();
@@ -143,6 +143,10 @@ public class PrefsUserFragment extends PreferenceFragment implements
 
 
 
+
+        //Logs.add(Logs.Type.E, "test");
+        // TODO: Allow to lock 'notifyChange' in 'synchronize' of 'DataRequest' that update sync field
+        // TODO: Check remote DB update observer
 
 
 
