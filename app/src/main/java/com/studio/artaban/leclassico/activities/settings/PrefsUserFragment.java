@@ -135,61 +135,9 @@ public class PrefsUserFragment extends PreferenceFragment implements
             }
         }).start();
     }
+    private void displayData() { // Display preferences data into summaries
+        Logs.add(Logs.Type.V, null);
 
-    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
-    @Override
-    public void onChange(boolean selfChange, Uri uri) {
-        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
-
-
-
-
-        //Logs.add(Logs.Type.E, "test");
-        // TODO: Allow to lock 'notifyChange' in 'synchronize' of 'DataRequest' that update sync field
-        // TODO: Check remote DB update observer
-
-
-
-
-
-    }
-
-    ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Logs.add(Logs.Type.V, "preference: " + preference + ";newValue: " + newValue);
-
-        String value = ((String)newValue).trim();
-        if (preference.getKey().equals(Preferences.SETTINGS_USER_GENDER))
-            preference.setSummary(getResources()
-                    .getStringArray(R.array.pref_gender)[Integer.valueOf(value) - 1]);
-        else {
-            if (!value.isEmpty())
-                preference.setSummary(value);
-            else {
-                preference.getEditor().remove(preference.getKey()).apply();
-                preference.setSummary(getString(R.string.undefined));
-            }
-        }
-        updateUserInfo(preference.getKey(), value);
-        return true;
-    }
-
-    ////// PreferenceFragment //////////////////////////////////////////////////////////////////////
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
-        addPreferencesFromResource(R.xml.settings_fragment_user);
-
-        // Set URI & observer (to check DB changes)
-        mUserUri = Uris.getUri(Uris.ID_USER_MEMBERS,
-                String.valueOf(Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID)));
-
-        mUserObserver = new DataObserver("prefsUserDataObserverThread", this);
-        mUserObserver.register(getActivity().getContentResolver(), mUserUri);
-
-        // Initialize preferences
         Preference preference = findPreference(Preferences.SETTINGS_USER_NAME);
         String value = Preferences.getString(Preferences.SETTINGS_USER_NAME);
         if (value != null)
@@ -256,6 +204,57 @@ public class PrefsUserFragment extends PreferenceFragment implements
         if (value != null)
             preference.setSummary(value);
         preference.setOnPreferenceChangeListener(this);
+    }
+
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+
+        Cursor cursor = getActivity().getContentResolver().query(Uri.parse(DataProvider.CONTENT_URI +
+                CamaradesTable.TABLE_NAME), null, DataTable.DataField.COLUMN_ID + '=' +
+                Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID), null, null);
+        getData(cursor);
+        displayData();
+    }
+
+    ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        Logs.add(Logs.Type.V, "preference: " + preference + ";newValue: " + newValue);
+
+        String value = ((String)newValue).trim();
+        if (preference.getKey().equals(Preferences.SETTINGS_USER_GENDER))
+            preference.setSummary(getResources()
+                    .getStringArray(R.array.pref_gender)[Integer.valueOf(value) - 1]);
+        else {
+            if (!value.isEmpty())
+                preference.setSummary(value);
+            else {
+                preference.getEditor().remove(preference.getKey()).apply();
+                preference.setSummary(getString(R.string.undefined));
+            }
+        }
+        updateUserInfo(preference.getKey(), value);
+        return true;
+    }
+
+    ////// PreferenceFragment //////////////////////////////////////////////////////////////////////
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
+        addPreferencesFromResource(R.xml.settings_fragment_user);
+
+        // Set URI & observer (to check DB changes)
+        mUserUri = Uris.getUri(Uris.ID_USER_MEMBERS,
+                String.valueOf(Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID)));
+
+        mUserObserver = new DataObserver("prefsUserDataObserverThread", this);
+        mUserObserver.register(getActivity().getContentResolver(), mUserUri);
+
+        // Initialize preferences
+        displayData();
     }
 
     @Override
