@@ -23,7 +23,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class NotificationsRequest extends DataRequest {
 
     public NotificationsRequest(DataService service) {
-        super(service, Tables.ID_NOTIFICATIONS, NotificationsTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_NOTIFICATIONS, NotificationsTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

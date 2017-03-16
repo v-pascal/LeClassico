@@ -29,7 +29,7 @@ public class CommentairesRequest extends DataRequest {
     // Extra data keys (see 'DataRequest' extra data keys)
 
     public CommentairesRequest(DataService service) {
-        super(service, Tables.ID_COMMENTAIRES, CommentairesTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_COMMENTAIRES, CommentairesTable.COLUMN_PSEUDO, true);
     }
     private final HashMap<Uri, String> mIdsPub = new HashMap<>(); // Publication IDs for each registered URI
     private final HashMap<Uri, String> mIdsPhoto = new HashMap<>(); // Photo IDs for each registered URI

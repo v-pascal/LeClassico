@@ -19,7 +19,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class VotesRequest extends DataRequest {
 
     public VotesRequest(DataService service) {
-        super(service, Tables.ID_VOTES, VotesTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_VOTES, VotesTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

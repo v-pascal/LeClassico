@@ -19,7 +19,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class AlbumsRequest extends DataRequest {
 
     public AlbumsRequest(DataService service) {
-        super(service, Tables.ID_ALBUMS, AlbumsTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_ALBUMS, AlbumsTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

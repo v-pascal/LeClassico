@@ -22,7 +22,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class ActualitesRequest extends DataRequest {
 
     public ActualitesRequest(DataService service) {
-        super(service, Tables.ID_ACTUALITES, ActualitesTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_ACTUALITES, ActualitesTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

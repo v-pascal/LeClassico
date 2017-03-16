@@ -21,7 +21,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class AbonnementsRequest extends DataRequest {
 
     public AbonnementsRequest(DataService service) {
-        super(service, Tables.ID_ABONNEMENTS, AbonnementsTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_ABONNEMENTS, AbonnementsTable.COLUMN_PSEUDO, false);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

@@ -44,14 +44,17 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
     protected final DataService mService; // Data service
     protected final byte mTableId; // DB table ID
     private final String mFieldPseudo; // DB pseudo column name
+    private final boolean mNotifySync; // Notify synchronization field change flag
 
-    public DataRequest(DataService service, byte tableId, String pseudoField) {
-        Logs.add(Logs.Type.V, "service: " + service + ";tableId: " + tableId + ";pseudoField: " + pseudoField);
+    public DataRequest(DataService service, byte tableId, String pseudoField, boolean syncNotify) {
+        Logs.add(Logs.Type.V, "service: " + service + ";tableId: " + tableId +
+                ";pseudoField: " + pseudoField + ";syncNotify: " + syncNotify);
 
         mSyncObserver = new DataObserver("requestDataObserverThread", this);
         mFieldPseudo = pseudoField;
         mService = service;
         mTableId = tableId;
+        mNotifySync = syncNotify;
     }
 
     //
@@ -205,14 +208,14 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                 if (operationData.size() > 0) {
                     Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_INSERT,
                             syncData, operationData);
-                    notifyChange(); // To update UI synchronization fields (no more in progress status)
+                    if (mNotifySync)
+                        notifyChange(); // To update UI synchronization fields (no more in progress status)
 
                     if (result == null) {
                         Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (inserted)");
                         return;
                     }
                 }
-
                 ////// Synchronize updated rows
                 setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                         DataTable.Synchronized.TO_UPDATE.getValue());
@@ -221,14 +224,14 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                 if (operationData.size() > 0) {
                     Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_UPDATE,
                             syncData, operationData);
-                    notifyChange();
+                    if (mNotifySync)
+                        notifyChange();
 
                     if (result == null) {
                         Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (updated)");
                         return;
                     }
                 }
-
                 ////// Synchronize deleted rows
                 setSyncInProgress(mFieldPseudo + "='" + dataLogin.pseudo + '\'',
                         DataTable.Synchronized.TO_DELETE.getValue());
@@ -237,7 +240,8 @@ public abstract class DataRequest implements DataObserver.OnContentListener {
                 if (operationData.size() > 0) {
                     Object result = table.synchronize(mService.getContentResolver(), WebServices.OPERATION_DELETE,
                             syncData, operationData);
-                    notifyChange();
+                    if (mNotifySync)
+                        notifyChange();
 
                     if (result == null) {
                         Logs.add(Logs.Type.E, "Synchronization #" + mTableId + " error (deleted)");

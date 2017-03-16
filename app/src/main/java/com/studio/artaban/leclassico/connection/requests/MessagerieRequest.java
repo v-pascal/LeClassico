@@ -19,7 +19,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class MessagerieRequest extends DataRequest {
 
     public MessagerieRequest(DataService service) {
-        super(service, Tables.ID_MESSAGERIE, MessagerieTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_MESSAGERIE, MessagerieTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

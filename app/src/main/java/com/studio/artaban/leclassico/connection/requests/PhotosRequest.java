@@ -19,7 +19,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class PhotosRequest extends DataRequest {
 
     public PhotosRequest(DataService service) {
-        super(service, Tables.ID_PHOTOS, PhotosTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_PHOTOS, PhotosTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

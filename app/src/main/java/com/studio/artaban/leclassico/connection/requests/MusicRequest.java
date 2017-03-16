@@ -19,7 +19,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class MusicRequest extends DataRequest {
 
     public MusicRequest(DataService service) {
-        super(service, Tables.ID_MUSIC, MusicTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_MUSIC, MusicTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

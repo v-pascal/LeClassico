@@ -21,7 +21,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class EvenementsRequest extends DataRequest {
 
     public EvenementsRequest(DataService service) {
-        super(service, Tables.ID_EVENEMENTS, EvenementsTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_EVENEMENTS, EvenementsTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

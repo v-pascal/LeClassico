@@ -21,7 +21,7 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class PresentsRequest extends DataRequest {
 
     public PresentsRequest(DataService service) {
-        super(service, Tables.ID_PRESENTS, PresentsTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_PRESENTS, PresentsTable.COLUMN_PSEUDO, true);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////

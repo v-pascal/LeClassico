@@ -33,7 +33,7 @@ public class CamaradesRequest extends DataRequest {
     // NB: The '&' is not available in the member pseudo definition
 
     public CamaradesRequest(DataService service) {
-        super(service, Tables.ID_CAMARADES, CamaradesTable.COLUMN_PSEUDO);
+        super(service, Tables.ID_CAMARADES, CamaradesTable.COLUMN_PSEUDO, false);
     }
     private final HashMap<Uri, String> mIdsPseudo = new HashMap<>(); // Member IDs for each registered URI
 
