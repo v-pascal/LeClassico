@@ -46,6 +46,7 @@ public class PrefsUserFragment extends PreferenceFragment implements
 
     public static void getData(Cursor user) { // Store connected user info into preferences (from DB)
         Logs.add(Logs.Type.V, "user: " + user);
+        user.moveToFirst();
 
         Preferences.setString(Preferences.SETTINGS_USER_PASSWORD, user.getString(CamaradesTable.COLUMN_INDEX_CODE_CONF));
         Preferences.setString(Preferences.SETTINGS_USER_NAME, (!user.isNull(CamaradesTable.COLUMN_INDEX_NOM)) ?
@@ -210,12 +211,22 @@ public class PrefsUserFragment extends PreferenceFragment implements
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+        try {
+            Cursor cursor = getActivity().getContentResolver().query(Uri.parse(DataProvider.CONTENT_URI +
+                    CamaradesTable.TABLE_NAME), null, DataTable.DataField.COLUMN_ID + '=' +
+                    Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID), null, null);
+            getData(cursor);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Logs.add(Logs.Type.V, null);
+                    displayData();
+                }
+            });
 
-        Cursor cursor = getActivity().getContentResolver().query(Uri.parse(DataProvider.CONTENT_URI +
-                CamaradesTable.TABLE_NAME), null, DataTable.DataField.COLUMN_ID + '=' +
-                Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID), null, null);
-        getData(cursor);
-        displayData();
+        } catch (NullPointerException e) {
+            Logs.add(Logs.Type.E, "No activity attached");
+        }
     }
 
     ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
