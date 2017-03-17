@@ -268,7 +268,7 @@ public class EventCalendar extends FrameLayout implements View.OnClickListener, 
             }
             if ((startPeriod) || (inPeriod)) {
                 if (marked) // Today
-                    text.setTextColor((startPeriod)? Color.RED:getResources().getColor(R.color.colorAccentProfile));
+                    text.setTextColor((startPeriod)? Color.RED:getResources().getColor(R.color.colorAccentLocation));
                 else {
                     text.setTextColor((startPeriod)? Color.WHITE:Color.BLACK);
                     text.setBackground(getResources().getDrawable((startPeriod) ?

@@ -8,8 +8,8 @@ import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-
 import com.google.android.gms.maps.SupportMapFragment;
+
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.data.Constants;

@@ -74,7 +74,7 @@ public final class ServiceNotify {
         // Set title info (connected user)
         SpannableStringBuilder textBuilder = new SpannableStringBuilder(title);
         textBuilder.setSpan(new ForegroundColorSpan(Color.BLACK), pseudo.length(), textBuilder.length(), 0);
-        textBuilder.setSpan(new ForegroundColorSpan(service.getResources().getColor(R.color.colorAccentProfile)),
+        textBuilder.setSpan(new ForegroundColorSpan(service.getResources().getColor(R.color.colorAccentLocation)),
                 0, pseudo.length(), 0);
         notifyViews.setTextViewText(R.id.notify_title, textBuilder.subSequence(0, textBuilder.length()));
 

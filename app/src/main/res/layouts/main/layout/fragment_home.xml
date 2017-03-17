@@ -133,7 +133,7 @@
             <!-- Events -->
             <ImageView
                 android:src="@drawable/ic_event_white_24dp"
-                android:tint="@color/colorPrimaryDarkProfile"
+                android:tint="@color/colorPrimaryProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <TextView

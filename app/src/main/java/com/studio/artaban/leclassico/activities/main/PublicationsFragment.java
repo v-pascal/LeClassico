@@ -245,7 +245,7 @@ public class PublicationsFragment extends MainFragment implements
             // Set publication header (info, date & type icon)
             short type = Tools.getPubType(mDataSource, position, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER);
             SpannableStringBuilder info = getInfo(mDataSource.getString(position, COLUMN_INDEX_PSEUDO),
-                    type, R.color.colorPrimaryProfile);
+                    type, R.color.colorPrimaryLocation);
 
             ((TextView)holder.rootView.findViewById(R.id.text_info)).setText(info, TextView.BufferType.SPANNABLE);
             ((ImageView)holder.rootView.findViewById(R.id.image_type))

@@ -266,7 +266,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
             ((TextView) root.findViewById(R.id.text_message)).setTypeface(Typeface.DEFAULT);
             time.setTypeface(Typeface.DEFAULT);
             time.setTextColor(getResources().getColor(R.color.orange));
-            return R.color.colorPrimaryProfile;
+            return R.color.colorPrimaryLocation;
         }
 
         ////// View.OnClickListener ////////////////////////////////////////////////////////////////

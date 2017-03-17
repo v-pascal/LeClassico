@@ -6,17 +6,17 @@
     <color name="colorPrimaryDarkMain">#7b1fa2</color>
     <color name="colorAccentMain">#03a9f4</color>
 
-    <color name="colorPrimaryProfile">#4caf50</color>
-    <color name="colorPrimaryDarkProfile">#388e3c</color>
-    <color name="colorAccentProfile">#ffc107</color>
+    <color name="colorPrimaryProfile">#03a9f4</color>
+    <color name="colorPrimaryDarkProfile">#0288d1</color>
+    <color name="colorAccentProfile">#e040fb</color>
 
     <color name="colorPrimarySetting">#ff5722</color>
     <color name="colorPrimaryDarkSetting">#e64a19</color>
     <color name="colorAccentSetting">#c3d136</color>
 
-    <color name="colorPrimaryLocation">#03a9f4</color>
-    <color name="colorPrimaryDarkLocation">#0288d1</color>
-    <color name="colorAccentLocation">#e040fb</color>
+    <color name="colorPrimaryLocation">#4caf50</color>
+    <color name="colorPrimaryDarkLocation">#388e3c</color>
+    <color name="colorAccentLocation">#ffc107</color>
 
     <color name="colorPrimaryMailbox">#795548</color>
     <color name="colorPrimaryDarkMailbox">#5d4037</color>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/colorPrimaryProfile"/>
+    <solid android:color="@color/colorPrimaryLocation"/>
     <corners
         android:bottomRightRadius="@dimen/background_radius"
         android:bottomLeftRadius="@dimen/background_radius"
