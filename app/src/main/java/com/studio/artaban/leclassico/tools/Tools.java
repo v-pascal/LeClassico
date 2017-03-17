@@ -249,7 +249,7 @@ public final class Tools { /////////////////////////////////////////////////////
     public static void startProcess(final Activity activity, final OnProcessListener listener) {
     // Do a background process B4 executing a followed task on main thread (with background result)
 
-        Logs.add(Logs.Type.V, "listener: " + listener);
+        Logs.add(Logs.Type.V, "activity: " + activity + ";listener: " + listener);
         new Thread(new Runnable() {
             @Override
             public void run() {

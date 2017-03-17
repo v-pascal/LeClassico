@@ -30,6 +30,9 @@
         <item name="colorPrimary">@color/colorPrimaryLocation</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkLocation</item>
         <item name="colorAccent">@color/colorAccentLocation</item>
+
+        <!-- Translucent navigation bar -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
     <style name="MailboxAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimaryMailbox</item>
@@ -53,13 +56,8 @@
     <style name="TransparentAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowActivityTransitions">true</item>
 
-        <!-- Transparent action bar properties -->
-        <item name="android:windowTranslucentStatus">false</item>
+        <!-- Translucent navigation & status bar -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:actionBarSize">96dp</item><!-- fitsSystemWindows property not working in
-        this case coz will overlap photo -->
-
-        <item name="windowActionBarOverlay">true</item>
-        <item name="android:windowActionBarOverlay">true</item>
     </style>
 </resources>

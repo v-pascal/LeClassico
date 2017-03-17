@@ -1,10 +1,13 @@
 package com.studio.artaban.leclassico.activities.settings;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
@@ -21,6 +24,7 @@ import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.services.DataService;
+import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -75,7 +79,7 @@ public class PrefsUserFragment extends PreferenceFragment implements
 
     //////
     private Uri mUserUri; // User member URI to observe DB
-    private DataObserver mUserObserver; // User data update observer
+    private DataObserver mUserObserver; // User data update observer (observe remote DB updates)
 
     private void updateUserInfo(final String key, final String value) { // Update DB user info
         Logs.add(Logs.Type.V, "key: " + key + ";value: " + value);
@@ -211,22 +215,27 @@ public class PrefsUserFragment extends PreferenceFragment implements
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
-        try {
-            Cursor cursor = getActivity().getContentResolver().query(Uri.parse(DataProvider.CONTENT_URI +
-                    CamaradesTable.TABLE_NAME), null, DataTable.DataField.COLUMN_ID + '=' +
-                    Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID), null, null);
-            getData(cursor);
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Logs.add(Logs.Type.V, null);
-                    displayData();
-                }
-            });
 
-        } catch (NullPointerException e) {
-            Logs.add(Logs.Type.E, "No activity attached");
-        }
+        final ContentResolver resolver = getActivity().getContentResolver();
+        Tools.startProcess(getActivity(), new Tools.OnProcessListener() {
+            @Override
+            public Bundle onBackgroundTask() {
+                Logs.add(Logs.Type.V, null);
+
+                Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI +
+                        CamaradesTable.TABLE_NAME), null, DataTable.DataField.COLUMN_ID + '=' +
+                        Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID), null, null);
+                getData(cursor);
+                cursor.close();
+                return null;
+            }
+
+            @Override
+            public void onMainNextTask(Bundle backResult) {
+                Logs.add(Logs.Type.V, "backResult: " + backResult);
+                displayData();
+            }
+        });
     }
 
     ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
@@ -257,12 +266,10 @@ public class PrefsUserFragment extends PreferenceFragment implements
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
         addPreferencesFromResource(R.xml.settings_fragment_user);
 
-        // Set URI & observer (to check DB changes)
+        // Set observer & URI (to check DB changes)
+        mUserObserver = new DataObserver(new Handler(Looper.getMainLooper()), this);
         mUserUri = Uris.getUri(Uris.ID_USER_MEMBERS,
                 String.valueOf(Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID)));
-
-        mUserObserver = new DataObserver("prefsUserDataObserverThread", this);
-        mUserObserver.register(getActivity().getContentResolver(), mUserUri);
 
         // Initialize preferences
         displayData();
@@ -272,6 +279,8 @@ public class PrefsUserFragment extends PreferenceFragment implements
     public void onResume() {
         super.onResume();
         Logs.add(Logs.Type.V, null);
+
+        mUserObserver.register(getActivity().getContentResolver(), mUserUri);
 
         // Register data service
         Intent intent = DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri);
@@ -284,6 +293,8 @@ public class PrefsUserFragment extends PreferenceFragment implements
     public void onPause() {
         super.onPause();
         Logs.add(Logs.Type.V, null);
+
+        mUserObserver.unregister(getActivity().getContentResolver());
 
         // Unregister data service
         getActivity().sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUserUri));
