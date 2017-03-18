@@ -17,9 +17,11 @@ import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.notification.NotifyActivity;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.services.DataService;
@@ -112,20 +114,24 @@ public abstract class LoggedActivity extends AppCompatActivity implements QueryL
         Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
 
         // Set URI to observe notification DB changes (if not already done)
+        int pseudoId = getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA);
         if (mNotifyURI == null)
-            mNotifyURI = Uris.getUri(Uris.ID_USER_NOTIFICATIONS,
-                    String.valueOf(getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA)));
+            mNotifyURI = Uris.getUri(Uris.ID_USER_NOTIFICATIONS, String.valueOf(pseudoId));
                     // NB: The first logged activity started is the 'MainActivity' which always
                     //     contains extras login data
 
         // Load notification info (using query loader)
+        if (pseudoId == Constants.NO_DATA)
+            pseudoId = Integer.valueOf(mNotifyURI.getPathSegments().get(1));
+
         Bundle notifyData = new Bundle();
         notifyData.putParcelable(QueryLoader.DATA_KEY_URI, mNotifyURI);
         notifyData.putString(QueryLoader.DATA_KEY_SELECTION,
                 "SELECT " + NotificationsTable.COLUMN_LU_FLAG + " FROM " + NotificationsTable.TABLE_NAME +
-                        " WHERE " + NotificationsTable.COLUMN_PSEUDO + "='" +
-                        getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
-                        "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
+                        " INNER JOIN " + CamaradesTable.TABLE_NAME + " ON " + CamaradesTable.TABLE_NAME + '.' +
+                        IDataTable.DataField.COLUMN_ID + '=' + pseudoId + " AND " +
+                        CamaradesTable.COLUMN_PSEUDO + '=' + NotificationsTable.COLUMN_PSEUDO +
+                        " ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
         mNewNotifyLoader.init(this, Queries.NOTIFICATIONS_NEW_INFO, notifyData);
 
         // Register new user notifications service
