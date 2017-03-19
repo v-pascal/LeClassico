@@ -6,10 +6,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.data.Constants;
@@ -31,7 +33,10 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     ////// OnMapReadyCallback //////////////////////////////////////////////////////////////////////
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Logs.add(Logs.Type.V, "googleMap: " + googleMap);
 
+        // Position camera above France
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(46, 2.2), 5));
     }
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////

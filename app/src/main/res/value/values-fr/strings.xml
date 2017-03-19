@@ -12,6 +12,7 @@
     <string name="by">PAR</string>
     <string name="none">Aucune</string>
     <string name="undefined">Non défini</string>
+    <string name="disabled">Désactivé</string>
 
     <!-- Labels -->
     <string name="label_status">Statut:</string>

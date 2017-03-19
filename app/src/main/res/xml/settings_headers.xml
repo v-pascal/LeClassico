@@ -12,4 +12,10 @@
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/personal_info"
             android:summary="@string/pref_personal_info" />
+
+    <!-- Location -->
+    <header android:fragment="com.studio.artaban.leclassico.activities.settings.SettingsActivity$PrefsLocationFragment"
+            android:icon="@drawable/ic_location_off_black_24dp"
+            android:title="@string/title_activity_location"
+            android:summary="@string/disabled" />
 </preference-headers>

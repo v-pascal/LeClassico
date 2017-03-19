@@ -13,6 +13,7 @@
     <string name="by">BY</string>
     <string name="none">None</string>
     <string name="undefined">Undefined</string>
+    <string name="disabled">Disabled</string>
 
     <!-- Labels -->
     <string name="label_status">Status:</string>

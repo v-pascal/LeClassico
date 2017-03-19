@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_location_way" android:layout="@layout/settings_category">
+
+        <SwitchPreference
+            android:key="pref_location"
+            android:defaultValue="false"
+            android:title="@string/title_activity_location"
+            android:summary="@string/disabled" />
+    </PreferenceCategory>
+</PreferenceScreen>
