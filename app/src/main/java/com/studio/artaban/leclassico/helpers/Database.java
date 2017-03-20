@@ -40,6 +40,8 @@ public class Database extends SQLiteOpenHelper {
     // #4: Following application version 1.4
     // #5: Following application version 1.5
     //     * Synchronization field values changed
+    // #6: Following application version 1.6
+    //     * Members table fields 'CAM_Located' & 'CAM_LocatedUPD' replaced by fields 'CAM_Device', 'CAM_DeviceUPD', 'CAM_DevId' & 'CAM_DevIdUPD'
 
     public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss.000"; // SQLite date & time format
 

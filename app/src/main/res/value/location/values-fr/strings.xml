@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Location -->
+
+    <!-- Settings -->
+    <string name="pref_location_way">Partage de la géolocalisation</string>
+    <string name="current_device">Périphérique actuel (%1$s)</string>
+    <string name="other_device">Autre périphérique (%1$s)</string>
+
+</resources>

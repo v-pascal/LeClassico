@@ -13,6 +13,7 @@
     <string name="none">Aucune</string>
     <string name="undefined">Non défini</string>
     <string name="disabled">Désactivé</string>
+    <string name="enabled">Activé</string>
 
     <!-- Labels -->
     <string name="label_status">Statut:</string>

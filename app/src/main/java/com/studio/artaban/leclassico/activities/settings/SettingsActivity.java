@@ -27,15 +27,6 @@ public class SettingsActivity extends BasePreferenceActivity {
             addPreferencesFromResource(R.xml.settings_fragment_notify);
         }
     }
-    public static class PrefsLocationFragment extends PreferenceFragment {
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
-            addPreferencesFromResource(R.xml.settings_fragment_location);
-        }
-    }
 
     ////// PreferenceActivity //////////////////////////////////////////////////////////////////////
     @Override

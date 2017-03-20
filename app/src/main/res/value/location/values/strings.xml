@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Location -->
+
+    <!-- Settings -->
+    <string name="pref_location_way">Location share</string>
+    <string name="current_device">Current device (%1$s)</string>
+    <string name="other_device">Other device (%1$s)</string>
+
+</resources>

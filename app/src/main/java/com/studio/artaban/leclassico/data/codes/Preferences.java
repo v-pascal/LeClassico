@@ -49,6 +49,12 @@ public final class Preferences {
     public static final String SETTINGS_USER_HOBBIES = "pref_user_hobbies";
     public static final String SETTINGS_USER_ABOUT = "pref_user_about";
 
+    ////// Location (see '/xml/settings_fragment_location.xml')
+    public static final String SETTINGS_LOCATION = "pref_location";
+    public static final String SETTINGS_LOCATION_DEVICE = "pref_location_device";
+    public static final String SETTINGS_LOCATION_DEVICE_ID = "pref_location_device_id";
+
+
     //////
     private static final SharedPreferences AppPrefs =
             PreferenceManager.getDefaultSharedPreferences(LeClassicoApp.getInstance());

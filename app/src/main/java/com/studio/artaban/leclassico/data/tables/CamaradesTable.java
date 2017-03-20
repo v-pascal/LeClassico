@@ -109,8 +109,10 @@ public class CamaradesTable extends DataTable {
     public static final String COLUMN_PROFILE_UPD = "CAM_ProfileUPD";
     public static final String COLUMN_BANNER = "CAM_Banner";
     public static final String COLUMN_BANNER_UPD = "CAM_BannerUPD";
-    public static final String COLUMN_LOCATED = "CAM_Located";
-    public static final String COLUMN_LOCATED_UPD = "CAM_LocatedUPD";
+    public static final String COLUMN_DEVICE = "CAM_Device";
+    public static final String COLUMN_DEVICE_UPD = "CAM_DeviceUPD";
+    public static final String COLUMN_DEVICE_ID = "CAM_DevId";
+    public static final String COLUMN_DEVICE_ID_UPD = "CAM_DevIdUPD";
     public static final String COLUMN_LATITUDE = "CAM_Latitude";
     public static final String COLUMN_LATITUDE_UPD = "CAM_LatitudeUPD";
     public static final String COLUMN_LONGITUDE = "CAM_Longitude";
@@ -151,14 +153,16 @@ public class CamaradesTable extends DataTable {
     private static final short COLUMN_INDEX_PROFILE_UPD = 31;
     private static final short COLUMN_INDEX_BANNER = 32;
     private static final short COLUMN_INDEX_BANNER_UPD = 33;
-    private static final short COLUMN_INDEX_LOCATED = 34;
-    private static final short COLUMN_INDEX_LOCATED_UPD = 35;
-    private static final short COLUMN_INDEX_LATITUDE = 36;
-    private static final short COLUMN_INDEX_LATITUDE_UPD = 37;
-    private static final short COLUMN_INDEX_LONGITUDE = 38;
-    private static final short COLUMN_INDEX_LONGITUDE_UPD = 39;
-    private static final short COLUMN_INDEX_STATUS_DATE = 40;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 41;
+    public static final short COLUMN_INDEX_DEVICE = 34;
+    private static final short COLUMN_INDEX_DEVICE_UPD = 35;
+    public static final short COLUMN_INDEX_DEVICE_ID = 36;
+    private static final short COLUMN_INDEX_DEVICE_ID_UPD = 37;
+    private static final short COLUMN_INDEX_LATITUDE = 38;
+    private static final short COLUMN_INDEX_LATITUDE_UPD = 39;
+    private static final short COLUMN_INDEX_LONGITUDE = 40;
+    private static final short COLUMN_INDEX_LONGITUDE_UPD = 41;
+    private static final short COLUMN_INDEX_STATUS_DATE = 42;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 43;
 
     //
     private CamaradesTable() { }
@@ -204,8 +208,10 @@ public class CamaradesTable extends DataTable {
                 COLUMN_PROFILE_UPD + " TEXT NOT NULL," +
                 COLUMN_BANNER + " TEXT," +
                 COLUMN_BANNER_UPD + " TEXT NOT NULL," +
-                COLUMN_LOCATED + " INTEGER NOT NULL," +
-                COLUMN_LOCATED_UPD + " TEXT NOT NULL," +
+                COLUMN_DEVICE + " TEXT," +
+                COLUMN_DEVICE_UPD + " TEXT NOT NULL," +
+                COLUMN_DEVICE_ID + " TEXT," +
+                COLUMN_DEVICE_ID_UPD + " TEXT NOT NULL," +
                 COLUMN_LATITUDE + " REAL," +
                 COLUMN_LATITUDE_UPD + " TEXT NOT NULL," +
                 COLUMN_LONGITUDE + " REAL," +
@@ -263,7 +269,8 @@ public class CamaradesTable extends DataTable {
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_ADMIN_UPD + " OR " +
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_PROFILE_UPD + " OR " +
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_BANNER_UPD + " OR " +
-                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LOCATED_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_DEVICE_UPD + " OR " +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_DEVICE_ID_UPD + " OR " +
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LATITUDE_UPD + " OR " +
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LONGITUDE_UPD + ") AND (" +
                         Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_UPDATE.getValue() + " OR " +
@@ -290,11 +297,11 @@ public class CamaradesTable extends DataTable {
                         status.put(JSON_KEY_CODE_CONF_UPD, cursor.getString(COLUMN_INDEX_CODE_CONF_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_NOM_UPD)) < 0) {
-                        update.put(JSON_KEY_NOM, cursor.getString(COLUMN_INDEX_NOM));
+                        update.put(JSON_KEY_NOM, (!cursor.isNull(COLUMN_INDEX_NOM))? cursor.getString(COLUMN_INDEX_NOM):null);
                         status.put(JSON_KEY_NOM_UPD, cursor.getString(COLUMN_INDEX_NOM_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PRENOM_UPD)) < 0) {
-                        update.put(JSON_KEY_PRENOM, cursor.getString(COLUMN_INDEX_PRENOM));
+                        update.put(JSON_KEY_PRENOM, (!cursor.isNull(COLUMN_INDEX_PRENOM))? cursor.getString(COLUMN_INDEX_PRENOM):null);
                         status.put(JSON_KEY_PRENOM_UPD, cursor.getString(COLUMN_INDEX_PRENOM_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_SEXE_UPD)) < 0) {
@@ -302,35 +309,35 @@ public class CamaradesTable extends DataTable {
                         status.put(JSON_KEY_SEXE_UPD, cursor.getString(COLUMN_INDEX_SEXE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_BORN_DATE_UPD)) < 0) {
-                        update.put(JSON_KEY_BORN_DATE, cursor.getString(COLUMN_INDEX_BORN_DATE));
+                        update.put(JSON_KEY_BORN_DATE, (!cursor.isNull(COLUMN_INDEX_BORN_DATE))? cursor.getString(COLUMN_INDEX_BORN_DATE):null);
                         status.put(JSON_KEY_BORN_DATE_UPD, cursor.getString(COLUMN_INDEX_BORN_DATE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_ADRESSE_UPD)) < 0) {
-                        update.put(JSON_KEY_ADRESSE, cursor.getString(COLUMN_INDEX_ADRESSE));
+                        update.put(JSON_KEY_ADRESSE, (!cursor.isNull(COLUMN_INDEX_ADRESSE))? cursor.getString(COLUMN_INDEX_ADRESSE):null);
                         status.put(JSON_KEY_ADRESSE_UPD, cursor.getString(COLUMN_INDEX_ADRESSE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_VILLE_UPD)) < 0) {
-                        update.put(JSON_KEY_VILLE, cursor.getString(COLUMN_INDEX_VILLE));
+                        update.put(JSON_KEY_VILLE, (!cursor.isNull(COLUMN_INDEX_VILLE))? cursor.getString(COLUMN_INDEX_VILLE):null);
                         status.put(JSON_KEY_VILLE_UPD, cursor.getString(COLUMN_INDEX_VILLE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_POSTAL_UPD)) < 0) {
-                        update.put(JSON_KEY_POSTAL, cursor.getString(COLUMN_INDEX_POSTAL));
+                        update.put(JSON_KEY_POSTAL, (!cursor.isNull(COLUMN_INDEX_POSTAL))? cursor.getString(COLUMN_INDEX_POSTAL):null);
                         status.put(JSON_KEY_POSTAL_UPD, cursor.getString(COLUMN_INDEX_POSTAL_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PHONE_UPD)) < 0) {
-                        update.put(JSON_KEY_PHONE, cursor.getString(COLUMN_INDEX_PHONE));
+                        update.put(JSON_KEY_PHONE, (!cursor.isNull(COLUMN_INDEX_PHONE))? cursor.getString(COLUMN_INDEX_PHONE):null);
                         status.put(JSON_KEY_PHONE_UPD, cursor.getString(COLUMN_INDEX_PHONE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_EMAIL_UPD)) < 0) {
-                        update.put(JSON_KEY_EMAIL, cursor.getString(COLUMN_INDEX_EMAIL));
+                        update.put(JSON_KEY_EMAIL, (!cursor.isNull(COLUMN_INDEX_EMAIL))? cursor.getString(COLUMN_INDEX_EMAIL):null);
                         status.put(JSON_KEY_EMAIL_UPD, cursor.getString(COLUMN_INDEX_EMAIL_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_HOBBIES_UPD)) < 0) {
-                        update.put(JSON_KEY_HOBBIES, cursor.getString(COLUMN_INDEX_HOBBIES));
+                        update.put(JSON_KEY_HOBBIES, (!cursor.isNull(COLUMN_INDEX_HOBBIES))? cursor.getString(COLUMN_INDEX_HOBBIES):null);
                         status.put(JSON_KEY_HOBBIES_UPD, cursor.getString(COLUMN_INDEX_HOBBIES_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_A_PROPOS_UPD)) < 0) {
-                        update.put(JSON_KEY_A_PROPOS, cursor.getString(COLUMN_INDEX_A_PROPOS));
+                        update.put(JSON_KEY_A_PROPOS, (!cursor.isNull(COLUMN_INDEX_A_PROPOS))? cursor.getString(COLUMN_INDEX_A_PROPOS):null);
                         status.put(JSON_KEY_A_PROPOS_UPD, cursor.getString(COLUMN_INDEX_A_PROPOS_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LOG_DATE_UPD)) < 0) {
@@ -342,16 +349,20 @@ public class CamaradesTable extends DataTable {
                         status.put(JSON_KEY_ADMIN_UPD, cursor.getString(COLUMN_INDEX_ADMIN_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PROFILE_UPD)) < 0) {
-                        update.put(JSON_KEY_PROFILE, cursor.getString(COLUMN_INDEX_PROFILE));
+                        update.put(JSON_KEY_PROFILE, (!cursor.isNull(COLUMN_INDEX_PROFILE))? cursor.getString(COLUMN_INDEX_PROFILE):null);
                         status.put(JSON_KEY_PROFILE_UPD, cursor.getString(COLUMN_INDEX_PROFILE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_BANNER_UPD)) < 0) {
-                        update.put(JSON_KEY_BANNER, cursor.getString(COLUMN_INDEX_BANNER));
+                        update.put(JSON_KEY_BANNER, (!cursor.isNull(COLUMN_INDEX_BANNER))? cursor.getString(COLUMN_INDEX_BANNER):null);
                         status.put(JSON_KEY_BANNER_UPD, cursor.getString(COLUMN_INDEX_BANNER_UPD));
                     }
-                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LOCATED_UPD)) < 0) {
-                        update.put(JSON_KEY_LOCATED, cursor.getInt(COLUMN_INDEX_LOCATED));
-                        status.put(JSON_KEY_LOCATED_UPD, cursor.getString(COLUMN_INDEX_LOCATED_UPD));
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_DEVICE_UPD)) < 0) {
+                        update.put(JSON_KEY_DEVICE, (!cursor.isNull(COLUMN_INDEX_DEVICE))? cursor.getString(COLUMN_INDEX_DEVICE):null);
+                        status.put(JSON_KEY_DEVICE_UPD, cursor.getString(COLUMN_INDEX_DEVICE_UPD));
+                    }
+                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_DEVICE_ID_UPD)) < 0) {
+                        update.put(JSON_KEY_DEVICE_ID, (!cursor.isNull(COLUMN_INDEX_DEVICE_ID))? cursor.getString(COLUMN_INDEX_DEVICE_ID):null);
+                        status.put(JSON_KEY_DEVICE_ID_UPD, cursor.getString(COLUMN_INDEX_DEVICE_ID_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LATITUDE_UPD)) < 0) {
                         update.put(JSON_KEY_LATITUDE, cursor.getDouble(COLUMN_INDEX_LATITUDE));
@@ -426,8 +437,10 @@ public class CamaradesTable extends DataTable {
     private static final String JSON_KEY_PROFILE_UPD = COLUMN_PROFILE_UPD.substring(4);
     private static final String JSON_KEY_BANNER = COLUMN_BANNER.substring(4);
     private static final String JSON_KEY_BANNER_UPD = COLUMN_BANNER_UPD.substring(4);
-    private static final String JSON_KEY_LOCATED = COLUMN_LOCATED.substring(4);
-    private static final String JSON_KEY_LOCATED_UPD = COLUMN_LOCATED_UPD.substring(4);
+    private static final String JSON_KEY_DEVICE = COLUMN_DEVICE.substring(4);
+    private static final String JSON_KEY_DEVICE_UPD = COLUMN_DEVICE_UPD.substring(4);
+    private static final String JSON_KEY_DEVICE_ID = COLUMN_DEVICE_ID.substring(4);
+    private static final String JSON_KEY_DEVICE_ID_UPD = COLUMN_DEVICE_ID_UPD.substring(4);
     private static final String JSON_KEY_LATITUDE = COLUMN_LATITUDE.substring(4);
     private static final String JSON_KEY_LATITUDE_UPD = COLUMN_LATITUDE_UPD.substring(4);
     private static final String JSON_KEY_LONGITUDE = COLUMN_LONGITUDE.substring(4);
@@ -558,8 +571,16 @@ public class CamaradesTable extends DataTable {
                             else
                                 values.putNull(COLUMN_BANNER);
                             values.put(COLUMN_BANNER_UPD, entry.getString(JSON_KEY_BANNER_UPD));
-                            values.put(COLUMN_LOCATED, entry.getInt(JSON_KEY_LOCATED));
-                            values.put(COLUMN_LOCATED_UPD, entry.getString(JSON_KEY_LOCATED_UPD));
+                            if (!entry.isNull(JSON_KEY_DEVICE))
+                                values.put(COLUMN_DEVICE, entry.getString(JSON_KEY_DEVICE));
+                            else
+                                values.putNull(COLUMN_DEVICE);
+                            values.put(COLUMN_DEVICE_UPD, entry.getString(JSON_KEY_DEVICE_UPD));
+                            if (!entry.isNull(JSON_KEY_DEVICE_ID))
+                                values.put(COLUMN_DEVICE_ID, entry.getString(JSON_KEY_DEVICE_ID));
+                            else
+                                values.putNull(COLUMN_DEVICE_ID);
+                            values.put(COLUMN_DEVICE_ID_UPD, entry.getString(JSON_KEY_DEVICE_ID_UPD));
                             if (!entry.isNull(JSON_KEY_LATITUDE))
                                 values.put(COLUMN_LATITUDE, entry.getDouble(JSON_KEY_LATITUDE));
                             else
@@ -694,10 +715,16 @@ public class CamaradesTable extends DataTable {
                                         values.remove(COLUMN_BANNER_UPD);
                                         removed = true;
                                     }
-                                    if (cursor.getString(COLUMN_INDEX_LOCATED_UPD)
-                                            .compareTo(entry.getString(JSON_KEY_LOCATED_UPD)) > 0) {
-                                        values.remove(COLUMN_LOCATED);
-                                        values.remove(COLUMN_LOCATED_UPD);
+                                    if (cursor.getString(COLUMN_INDEX_DEVICE_UPD)
+                                            .compareTo(entry.getString(JSON_KEY_DEVICE_UPD)) > 0) {
+                                        values.remove(COLUMN_DEVICE);
+                                        values.remove(COLUMN_DEVICE_UPD);
+                                        removed = true;
+                                    }
+                                    if (cursor.getString(COLUMN_INDEX_DEVICE_ID_UPD)
+                                            .compareTo(entry.getString(JSON_KEY_DEVICE_ID_UPD)) > 0) {
+                                        values.remove(COLUMN_DEVICE_ID);
+                                        values.remove(COLUMN_DEVICE_ID_UPD);
                                         removed = true;
                                     }
                                     if (cursor.getString(COLUMN_INDEX_LATITUDE_UPD)

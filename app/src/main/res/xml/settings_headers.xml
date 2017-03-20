@@ -14,7 +14,7 @@
             android:summary="@string/pref_personal_info" />
 
     <!-- Location -->
-    <header android:fragment="com.studio.artaban.leclassico.activities.settings.SettingsActivity$PrefsLocationFragment"
+    <header android:fragment="com.studio.artaban.leclassico.activities.settings.PrefsLocationFragment"
             android:icon="@drawable/ic_location_off_black_24dp"
             android:title="@string/title_activity_location"
             android:summary="@string/disabled" />
