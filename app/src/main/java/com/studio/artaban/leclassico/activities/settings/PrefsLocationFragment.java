@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.SwitchPreference;
+import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
 import com.studio.artaban.leclassico.R;
@@ -16,7 +17,6 @@ import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
-import com.studio.artaban.leclassico.tools.Tools;
 
 /**
  * Created by pascal on 20/03/17.
@@ -25,8 +25,42 @@ import com.studio.artaban.leclassico.tools.Tools;
  */
 public class PrefsLocationFragment extends BasePreferenceFragment {
 
-    private void displayData() { // Display location preference
-        Logs.add(Logs.Type.V, null);
+    ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        Logs.add(Logs.Type.V, "preference: " + preference + ";newValue: " + newValue);
+        String deviceId = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
+        String currentId = ((TelephonyManager)getActivity()
+                .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+
+        Boolean locate = (Boolean)newValue;
+        if (!locate) {
+            if ((deviceId == null) || (currentId == null) || (deviceId.equals(currentId))) {
+                preference.setSummary(getString(R.string.disabled));
+                updateData(preference.getKey(), newValue);
+                return true;
+            }
+            // Confirm disabling location share defined on another device
+
+
+
+
+
+
+        } else {
+
+
+
+
+
+        }
+        return false;
+    }
+
+    ////// BasePreferenceFragment //////////////////////////////////////////////////////////////////
+    @Override
+    protected void displayData(@Nullable Bundle result) {
+        Logs.add(Logs.Type.V, "result: " + result);
 
         SwitchPreference preference = (SwitchPreference)findPreference(Preferences.SETTINGS_LOCATION);
         String value = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
@@ -50,71 +84,37 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
         preference.setOnPreferenceChangeListener(this);
     }
 
-    ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
     @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Logs.add(Logs.Type.V, "preference: " + preference + ";newValue: " + newValue);
-        String deviceId = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
-        String currentId = ((TelephonyManager)getActivity()
-                .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+    protected Bundle onDataChanged(ContentResolver resolver) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver);
 
-        Boolean locate = (Boolean)newValue;
-        if (!locate) {
-            if ((deviceId == null) || (currentId == null) || (deviceId.equals(currentId))) {
-                preference.setSummary(getString(R.string.disabled));
-                //updateData(preference.getKey(), newValue);
-                return true;
-            }
-            // Confirm disabling location share of another device
-
-
-
-
-
-
-        } else {
-
-
-
-
-
-        }
-        return false;
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI +
+                CamaradesTable.TABLE_NAME), new String[]{
+                    CamaradesTable.COLUMN_DEVICE_ID,
+                    CamaradesTable.COLUMN_DEVICE
+                },
+                DataTable.DataField.COLUMN_ID + '=' + Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID),
+                null, null);
+        cursor.moveToFirst();
+        Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID,
+                (!cursor.isNull(0)) ? cursor.getString(0) : null);
+        Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE,
+                (!cursor.isNull(1)) ? cursor.getString(1) : null);
+        cursor.close();
+        return null;
     }
-
-    ////// BasePreferenceFragment ///////////////////////////////////////////////////////////////////////
     @Override
-    public void onChange(boolean selfChange, Uri uri) {
-        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+    protected void onUpdateData(String key, Object newValue) {
+        Logs.add(Logs.Type.V, "key: " + key + ";newValue: " + newValue);
 
-        final ContentResolver resolver = getActivity().getContentResolver();
-        Tools.startProcess(getActivity(), new Tools.OnProcessListener() {
-            @Override
-            public Bundle onBackgroundTask() {
-                Logs.add(Logs.Type.V, null);
 
-                Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI +
-                        CamaradesTable.TABLE_NAME), new String[]{
-                                CamaradesTable.COLUMN_DEVICE_ID,
-                                CamaradesTable.COLUMN_DEVICE
-                        },
-                        DataTable.DataField.COLUMN_ID + '=' + Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID),
-                        null, null);
-                cursor.moveToFirst();
-                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID,
-                        (!cursor.isNull(0)) ? cursor.getString(0) : null);
-                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE,
-                        (!cursor.isNull(1)) ? cursor.getString(1) : null);
-                cursor.close();
-                return null;
-            }
 
-            @Override
-            public void onMainNextTask(Bundle backResult) {
-                Logs.add(Logs.Type.V, "backResult: " + backResult);
-                displayData();
-            }
-        });
+
+
+
+
+
+
     }
 
     ////// PreferenceFragment //////////////////////////////////////////////////////////////////////
@@ -129,6 +129,6 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
                 String.valueOf(Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID)));
 
         // Initialize location preference
-        displayData();
+        displayData(null);
     }
 }
