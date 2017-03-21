@@ -14,6 +14,8 @@
     <string name="undefined">Non défini</string>
     <string name="disabled">Désactivé</string>
     <string name="enabled">Activé</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
 
     <!-- Labels -->
     <string name="label_status">Statut:</string>

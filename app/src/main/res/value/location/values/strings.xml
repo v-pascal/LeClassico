@@ -5,5 +5,6 @@
     <string name="pref_location_way">Location share</string>
     <string name="current_device">Current device (%1$s)</string>
     <string name="other_device">Other device (%1$s)</string>
+    <string name="confirm_disable_location">The location\'s share is defined on another device with the \"%1$s\" model. Do you really want to disable it?</string>
 
 </resources>

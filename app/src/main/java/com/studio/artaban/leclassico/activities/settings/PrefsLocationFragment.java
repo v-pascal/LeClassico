@@ -1,22 +1,30 @@
 package com.studio.artaban.leclassico.activities.settings;
 
 import android.content.ContentResolver;
-import android.content.Context;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
-import android.telephony.TelephonyManager;
+import android.support.v7.app.AlertDialog;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.tools.Tools;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by pascal on 20/03/17.
@@ -25,34 +33,55 @@ import com.studio.artaban.leclassico.helpers.Logs;
  */
 public class PrefsLocationFragment extends BasePreferenceFragment {
 
+    private void updateData(String deviceId, String device) {
+        Logs.add(Logs.Type.V, "deviceId: " + deviceId + ";device: " + device);
+
+        Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID, deviceId);
+        Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE, device);
+        updateData(null, (deviceId == null)? Boolean.FALSE : Boolean.TRUE);
+    }
+
     ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
     @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
+    public boolean onPreferenceChange(final Preference preference, Object newValue) {
         Logs.add(Logs.Type.V, "preference: " + preference + ";newValue: " + newValue);
-        String deviceId = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
-        String currentId = ((TelephonyManager)getActivity()
-                .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
 
+        String deviceId = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
+        String currentId = Tools.getDeviceId(getActivity());
         Boolean locate = (Boolean)newValue;
         if (!locate) {
             if ((deviceId == null) || (currentId == null) || (deviceId.equals(currentId))) {
                 preference.setSummary(getString(R.string.disabled));
-                updateData(preference.getKey(), newValue);
+                updateData(null, null);
                 return true;
             }
             // Confirm disabling location share defined on another device
+            new AlertDialog.Builder(getActivity())
+                    .setIcon(R.drawable.question_red)
+                    .setTitle(R.string.confirm)
+                    .setMessage(getString(R.string.confirm_disable_location,
+                            Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE)))
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
 
-
-
-
+                            preference.setSummary(getString(R.string.disabled));
+                            ((SwitchPreference)preference).setChecked(false);
+                            preference.getEditor().apply();
+                            updateData(null, null);
+                        }
+                    })
+                    .setNegativeButton(R.string.no, null)
+                    .create()
+                    .show();
 
         } else {
-
-
-
-
-
+            String device = Tools.getDeviceName();
+            preference.setSummary(getString(R.string.current_device, device));
+            updateData(currentId, device);
+            return true;
         }
         return false;
     }
@@ -69,17 +98,18 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
             preference.setSummary(getString(R.string.disabled));
 
         } else {
-            String device, deviceId = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
-            String currentId = ((TelephonyManager)getActivity()
-                    .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+            String summary, deviceId = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
+            String currentId = Tools.getDeviceId(getActivity());
 
             if ((currentId == null) || (deviceId == null))
-                device = getString(R.string.enabled);
+                summary = getString(R.string.enabled);
             else
-                device = getString((currentId.equals(deviceId))?
-                        R.string.current_device : R.string.other_device, currentId);
+                summary = getString((currentId.equals(deviceId))?
+                        R.string.current_device : R.string.other_device,
+                        Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE));
+
             preference.setChecked(true);
-            preference.setSummary(device);
+            preference.setSummary(summary);
         }
         preference.setOnPreferenceChangeListener(this);
     }
@@ -107,14 +137,36 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
     protected void onUpdateData(String key, Object newValue) {
         Logs.add(Logs.Type.V, "key: " + key + ";newValue: " + newValue);
 
+        Uri uri = Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME);
+        String where = DataTable.DataField.COLUMN_ID + '=' +
+                Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID);
 
+        synchronized (Database.getTable(CamaradesTable.TABLE_NAME)) {
+            ContentValues values = new ContentValues();
 
+            Date now = new Date();
+            DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+            String currentDate = dateFormat.format(now);
+            values.put(CamaradesTable.COLUMN_DEVICE_UPD, currentDate);
+            values.put(CamaradesTable.COLUMN_DEVICE_ID_UPD, currentDate);
 
+            if ((Boolean)newValue) {
+                try {
+                    values.put(CamaradesTable.COLUMN_DEVICE, Tools.getDeviceName());
+                    values.put(CamaradesTable.COLUMN_DEVICE_ID, Tools.getDeviceId(getActivity()));
 
+                } finally {
+                    values.put(CamaradesTable.COLUMN_DEVICE, "UNKNOWN");
+                    values.put(CamaradesTable.COLUMN_DEVICE_ID, "NO-DEVICE-ID");
+                }
 
-
-
-
+            } else {
+                values.putNull(CamaradesTable.COLUMN_DEVICE);
+                values.putNull(CamaradesTable.COLUMN_DEVICE_ID);
+            }
+            getActivity().getContentResolver().update(uri, values, where, null);
+            getActivity().getContentResolver().notifyChange(mUri, mObserver); // Notify changes
+        }
     }
 
     ////// PreferenceFragment //////////////////////////////////////////////////////////////////////

@@ -5,5 +5,6 @@
     <string name="pref_location_way">Partage de la géolocalisation</string>
     <string name="current_device">Périphérique actuel (%1$s)</string>
     <string name="other_device">Autre périphérique (%1$s)</string>
+    <string name="confirm_disable_location">La géolocalisation est défini sur autre périphérique de modèle \"%1$s\". Etes-vous sûr de vouloir le désactivé?</string>
 
 </resources>

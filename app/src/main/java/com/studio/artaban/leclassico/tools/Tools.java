@@ -10,13 +10,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.RippleDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
+import android.telephony.TelephonyManager;
 import android.util.TypedValue;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -24,6 +27,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.studio.artaban.leclassico.LeClassicoApp;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
@@ -200,9 +204,9 @@ public final class Tools { /////////////////////////////////////////////////////
                 .setTitle(R.string.error)
                 .setMessage(error)
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
+
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-
                         Logs.add(Logs.Type.V, "dialog: " + dialog);
                         activity.finishAffinity();
                     }
@@ -281,6 +285,23 @@ public final class Tools { /////////////////////////////////////////////////////
         anim.setRepeatCount(Animation.INFINITE);
         anim.setDuration(700);
         return anim;
+    }
+
+    //////
+    public static String getDeviceId(Activity activity) {
+        Logs.add(Logs.Type.V, "activity: " + activity);
+        if (activity == null)
+            return null;
+
+        String id = ((TelephonyManager)activity.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+        if (id == null)
+            id = Settings.Secure.getString(LeClassicoApp.getInstance().getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+        return id;
+    }
+    public static String getDeviceName() {
+        Logs.add(Logs.Type.V, null);
+        return Build.MANUFACTURER + " " + Build.MODEL;
     }
 
     ////////////////////////////////////////////////////////////////////////////////// Notifications
