@@ -231,6 +231,7 @@ public class PrefsUserFragment extends BasePreferenceFragment {
                     new String[]{Constants.DATA_COLUMN_STATUS_DATE}, where, null, null);
             status.moveToFirst();
             values.put(Constants.DATA_COLUMN_STATUS_DATE, status.getString(0));
+            status.close();
             // NB: Needed to keep current status date entry (allow to find fields to update)
 
             getActivity().getContentResolver().update(uri, values, where, null);

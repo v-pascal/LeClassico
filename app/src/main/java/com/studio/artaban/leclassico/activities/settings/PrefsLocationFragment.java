@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.activities.settings;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,14 +13,17 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 
 import com.studio.artaban.leclassico.R;
+import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
@@ -118,10 +122,10 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
     protected Bundle onDataChanged(ContentResolver resolver) {
         Logs.add(Logs.Type.V, "resolver: " + resolver);
 
-        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI +
-                CamaradesTable.TABLE_NAME), new String[]{
-                    CamaradesTable.COLUMN_DEVICE_ID,
-                    CamaradesTable.COLUMN_DEVICE
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                new String[]{
+                        CamaradesTable.COLUMN_DEVICE_ID,
+                        CamaradesTable.COLUMN_DEVICE
                 },
                 DataTable.DataField.COLUMN_ID + '=' + Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID),
                 null, null);
@@ -150,12 +154,19 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
             values.put(CamaradesTable.COLUMN_DEVICE_UPD, currentDate);
             values.put(CamaradesTable.COLUMN_DEVICE_ID_UPD, currentDate);
 
+            Cursor status = getActivity().getContentResolver().query(uri,
+                    new String[]{Constants.DATA_COLUMN_STATUS_DATE}, where, null, null);
+            status.moveToFirst();
+            values.put(Constants.DATA_COLUMN_STATUS_DATE, status.getString(0));
+            status.close();
+            // NB: Needed to keep current status date entry (allow to find fields to update)
+
             if ((Boolean)newValue) {
                 try {
                     values.put(CamaradesTable.COLUMN_DEVICE, Tools.getDeviceName());
                     values.put(CamaradesTable.COLUMN_DEVICE_ID, Tools.getDeviceId(getActivity()));
 
-                } finally {
+                } catch (Exception e) {
                     values.put(CamaradesTable.COLUMN_DEVICE, "UNKNOWN");
                     values.put(CamaradesTable.COLUMN_DEVICE_ID, "NO-DEVICE-ID");
                 }
@@ -182,5 +193,26 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
 
         // Initialize location preference
         displayData(null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+
+        // Register data service
+        Intent intent = DataService.getIntent(true, Tables.ID_CAMARADES, mUri);
+        intent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO,
+                Preferences.getString(Preferences.SETTINGS_LOGIN_PSEUDO));
+        getActivity().sendBroadcast(intent);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+
+        // Unregister data service
+        getActivity().sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUri));
     }
 }

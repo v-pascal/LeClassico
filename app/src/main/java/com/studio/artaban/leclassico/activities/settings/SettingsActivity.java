@@ -1,14 +1,29 @@
 package com.studio.artaban.leclassico.activities.settings;
 
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceFragment;
 import android.view.MenuItem;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataObserver;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
+import com.studio.artaban.leclassico.data.codes.Tables;
+import com.studio.artaban.leclassico.data.codes.Uris;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.services.DataService;
+import com.studio.artaban.leclassico.tools.Tools;
 
 import java.util.List;
 
@@ -16,7 +31,7 @@ import java.util.List;
  * Created by pascal on 16/11/16.
  * User settings activity
  */
-public class SettingsActivity extends BasePreferenceActivity {
+public class SettingsActivity extends BasePreferenceActivity implements DataObserver.OnContentListener {
 
     public static class PrefsNotifyFragment extends PreferenceFragment { ///////////////////////////
 
@@ -26,6 +41,43 @@ public class SettingsActivity extends BasePreferenceActivity {
             Logs.add(Logs.Type.V, "savedInstanceState: " + savedInstanceState);
             addPreferencesFromResource(R.xml.settings_fragment_notify);
         }
+    }
+    protected Uri mUserUri; // URI to observe user DB info (e.i location share flag)
+    protected DataObserver mObserver; // DB update observer (observe remote DB updates)
+
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+
+        final ContentResolver resolver = getContentResolver();
+        Tools.startProcess(this, new Tools.OnProcessListener() {
+            @Override
+            public Bundle onBackgroundTask() {
+                Logs.add(Logs.Type.V, null);
+
+                Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
+                        new String[]{
+                                CamaradesTable.COLUMN_DEVICE_ID,
+                                CamaradesTable.COLUMN_DEVICE
+                        },
+                        DataTable.DataField.COLUMN_ID + '=' + Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID),
+                        null, null);
+                cursor.moveToFirst();
+                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID,
+                        (!cursor.isNull(0)) ? cursor.getString(0) : null);
+                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE,
+                        (!cursor.isNull(1)) ? cursor.getString(1) : null);
+                cursor.close();
+                return null;
+            }
+
+            @Override
+            public void onMainNextTask(Bundle backResult) {
+                Logs.add(Logs.Type.V, "backResult: " + backResult);
+                invalidateHeaders(); // Refresh headers
+            }
+        });
     }
 
     ////// PreferenceActivity //////////////////////////////////////////////////////////////////////
@@ -44,6 +96,11 @@ public class SettingsActivity extends BasePreferenceActivity {
 
         // Enable to display back arrow (toolbar)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Set observer & URI to check DB changes (location share flag)
+        mObserver = new DataObserver(new Handler(Looper.getMainLooper()), this);
+        mUserUri = Uris.getUri(Uris.ID_USER_MEMBERS,
+                String.valueOf(Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID)));
     }
 
     @Override
@@ -51,6 +108,12 @@ public class SettingsActivity extends BasePreferenceActivity {
         super.onBuildHeaders(target);
         Logs.add(Logs.Type.V, "target: " + target);
         loadHeadersFromResource(R.xml.settings_headers, target);
+
+        // Set location flag (summary & icon)
+        if (Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID) != null) {
+            target.get(2).summaryRes = R.string.enabled;
+            target.get(2).iconRes = R.drawable.ic_location_on_black_24dp;
+        }
     }
 
     @Override
@@ -67,5 +130,35 @@ public class SettingsActivity extends BasePreferenceActivity {
             return true;
         }
         return super.onMenuItemSelected(featureId, item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Logs.add(Logs.Type.V, null);
+
+        invalidateHeaders(); // Refresh headers
+        // NB: Needed when back from location screen with changes
+
+        // Register data service
+        Intent intent = DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri);
+        intent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO,
+                Preferences.getString(Preferences.SETTINGS_LOGIN_PSEUDO));
+        sendBroadcast(intent);
+
+        // Register DB observer
+        mObserver.register(getContentResolver(), mUserUri);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+
+        // Unregister DB observer
+        mObserver.unregister(getContentResolver());
+
+        // Unregister data service
+        sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUserUri));
     }
 }
