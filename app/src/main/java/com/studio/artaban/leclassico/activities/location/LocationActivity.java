@@ -1,9 +1,11 @@
 package com.studio.artaban.leclassico.activities.location;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,7 +17,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Uris;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.tools.Tools;
 
 /**
@@ -27,8 +35,25 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
 
+    //////
+    public void onSearch(View sender) {
+        Logs.add(Logs.Type.V, "sender: " + sender);
 
 
+
+    }
+    public void onShare(View sender) {
+        Logs.add(Logs.Type.V, "sender: " + sender);
+
+
+
+    }
+    public void onLocate(View sender) {
+        Logs.add(Logs.Type.V, "sender: " + sender);
+
+
+
+    }
 
     ////// OnMapReadyCallback //////////////////////////////////////////////////////////////////////
     @Override
@@ -49,13 +74,51 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-        onNotifyLoadFinished(id, cursor); // Refresh notification info
+        if (onNotifyLoadFinished(id, cursor)) // Refresh notification info
+            return;
+
+        switch (id) {
+            case Queries.LOCATION_USER_INFO: { // Location share info
+                ((ImageView)findViewById(R.id.image_share))
+                        .setImageDrawable(getDrawable((cursor.isNull(0)) ?
+                                R.drawable.ic_location_off_white_36dp : R.drawable.ic_location_on_white_36dp));
+                break;
+            }
+            case Queries.LOCATION_FOLLOWERS: {
+
+
+
+
+
+                Logs.add(Logs.Type.I, "Count: " + cursor.getCount());
+
+
+
+
+
+
+
+                break;
+            }
+        }
     }
 
     @Override
     public void onLoaderReset() {
 
     }
+
+    //////
+    private final QueryLoader mFollowers = new QueryLoader(this, this); // Followers list query loader
+    private final QueryLoader mUser = new QueryLoader(this, this); // User location share info query loader
+
+    // Followers query column indexes
+    private static final int COLUMN_INDEX_FOLLOWER_ID = 0;
+
+
+
+
+
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
@@ -87,6 +150,19 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         // Position map & control panel
         ((RelativeLayout.LayoutParams) findViewById(R.id.layout_panel).getLayoutParams())
                 .setMargins(0, Tools.getStatusBarHeight(getResources()) + Tools.getActionBarHeight(this), 0, 0);
+
+        // Initialize loaders
+        Bundle userData = new Bundle();
+        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{CamaradesTable.COLUMN_DEVICE_ID});
+        userData.putString(QueryLoader.DATA_KEY_SELECTION, DataTable.DataField.COLUMN_ID + '=' + mId);
+        userData.putParcelable(QueryLoader.DATA_KEY_URI,
+                Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME));
+        mUser.init(this, Queries.LOCATION_USER_INFO, userData);
+
+        Bundle followData = new Bundle();
+        followData.putParcelable(QueryLoader.DATA_KEY_URI,
+                Uris.getUri(Uris.ID_USER_LOCATION, String.valueOf(mId)));
+        mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
     }
 
     @Override

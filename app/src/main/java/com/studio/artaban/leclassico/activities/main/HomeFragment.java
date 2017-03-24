@@ -197,7 +197,7 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                     public String transformUrl(Matcher match, String url) {
 
                         // content://com.studio.artaban.provider.leclassico/User/#/Location
-                        return Uris.getUri(Uris.ID_USER_LOCATIONS, String.valueOf(getActivity().getIntent()
+                        return Uris.getUri(Uris.ID_USER_LOCATION, String.valueOf(getActivity().getIntent()
                                 .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA))).toString();
                     }
                 });

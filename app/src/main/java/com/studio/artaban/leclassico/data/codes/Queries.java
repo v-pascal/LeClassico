@@ -155,6 +155,48 @@ public class Queries {
                         " GROUP BY " + fields +
                         " ORDER BY " + EvenementsTable.COLUMN_DATE + " ASC", null);
             }
+            case Uris.ID_USER_LOCATION: { // LOCATION_FOLLOWERS
+
+                Logs.add(Logs.Type.I, "locations query");
+                int userId = Integer.valueOf(uri.getPathSegments().get(1)); // User/#/Location
+                int followId = Constants.NO_DATA;
+
+                if ((uri.getPathSegments().size() > 3) && (!uri.getPathSegments().get(3).isEmpty()))
+                    followId = Integer.valueOf(uri.getPathSegments().get(3)); // User/#/Location/#
+
+                return db.rawQuery("SELECT " +
+                        CamaradesTable.TABLE_NAME + '.' + DataTable.DataField.COLUMN_ID + ',' +
+                        CamaradesTable.COLUMN_PSEUDO + ',' +
+                        CamaradesTable.COLUMN_SEXE + ',' +
+                        CamaradesTable.COLUMN_PROFILE + ',' +
+                        CamaradesTable.COLUMN_PHONE + ',' +
+                        CamaradesTable.COLUMN_EMAIL + ',' +
+                        CamaradesTable.COLUMN_VILLE + ',' +
+                        CamaradesTable.COLUMN_NOM + ',' +
+                        CamaradesTable.COLUMN_ADRESSE + ',' +
+                        CamaradesTable.COLUMN_ADMIN + ',' +
+                        CamaradesTable.COLUMN_LATITUDE + ',' +
+                        CamaradesTable.COLUMN_LATITUDE_UPD + ',' +
+                        CamaradesTable.COLUMN_LONGITUDE + ',' +
+                        CamaradesTable.COLUMN_LONGITUDE_UPD +
+                        " FROM " + CamaradesTable.TABLE_NAME +
+                        " LEFT JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
+                        AbonnementsTable.COLUMN_PSEUDO + '=' + CamaradesTable.COLUMN_PSEUDO +
+
+
+
+
+
+
+
+
+
+
+                        " WHERE " +
+                        DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) +
+                        ((followId != Constants.NO_DATA)?
+                                " AND " + DataTable.DataField.COLUMN_ID + '=' + followId:""), null);
+            }
             case Uris.ID_RAW_QUERY:
             default: { // Raw query (for multiple table selection)
                 return db.rawQuery(selection, selectionArgs);
@@ -180,6 +222,10 @@ public class Queries {
 
     ////// Events
     public static final int EVENTS_DISPLAY = Tables.ID_MAX + 9;
+
+    ////// Location
+    public static final int LOCATION_USER_INFO = Tables.ID_MAX + 10;
+    public static final int LOCATION_FOLLOWERS = Tables.ID_MAX + 11;
 
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////

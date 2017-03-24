@@ -847,7 +847,7 @@ public class NotifyActivity extends LoggedActivity implements QueryLoader.OnResu
                         NotificationsTable.COLUMN_PSEUDO + "='" + getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO) +
                         "' ORDER BY " + NotificationsTable.COLUMN_DATE + " DESC");
 
-        mListLoader.init(NotifyActivity.this, Queries.NOTIFICATIONS_MAIN_LIST, queryData);
+        mListLoader.init(this, Queries.NOTIFICATIONS_MAIN_LIST, queryData);
     }
 
     @Override

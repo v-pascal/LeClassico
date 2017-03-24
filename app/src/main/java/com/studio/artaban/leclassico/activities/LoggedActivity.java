@@ -85,7 +85,7 @@ public abstract class LoggedActivity extends AppCompatActivity implements QueryL
     }
     protected boolean onNotifyLoadFinished(int id, Cursor cursor) { // Notification info updated
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-        if (!cursor.moveToFirst())
+        if ((cursor == null) || (!cursor.moveToFirst()))
             return false;
 
         if (id == Queries.NOTIFICATIONS_NEW_INFO) {

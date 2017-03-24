@@ -64,9 +64,9 @@ public class Uris {
             case ID_USER_MAILBOX: // User/#/Messagerie
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + MessagerieTable.TABLE_NAME);
-            case ID_USER_LOCATIONS: // User/#/Locations
+            case ID_USER_LOCATION: // User/#/Location
                 return Uri.parse(DataProvider.CONTENT_URI +
-                        PATH_USER + arguments[0] + PATH_LOCATIONS);
+                        PATH_USER + arguments[0] + PATH_LOCATION);
             case ID_USER_PUBLICATIONS: // User/#/Actualites
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_USER + arguments[0] + '/' + ActualitesTable.TABLE_NAME);
@@ -102,7 +102,7 @@ public class Uris {
 
     private static final String PATH_USER = "User/"; // User URI path following with member ID
     private static final String PATH_SHORTCUT = "/Shortcut/"; // Shortcut URI path
-    private static final String PATH_LOCATIONS = "/Locations"; // Locations URI path
+    private static final String PATH_LOCATION = "/Location"; // Location URI path
     private static final String PATH_PROFILE = "/Profile"; // Profile URI path
 
     ////// URI /////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ public class Uris {
     public static final short ID_RAW_QUERY = 0;            // SQL
     public static final short ID_USER_NOTIFICATIONS = 1;   // User/#/Notifications
     public static final short ID_USER_MAILBOX = 2;         // User/#/Messagerie
-    public static final short ID_USER_LOCATIONS = 3;       // User/#/Locations
+    public static final short ID_USER_LOCATION = 3;        // User/#/Location
     public static final short ID_USER_PUBLICATIONS = 4;    // User/#/Actualites
     public static final short ID_USER_PROFILE = 5;         // User/#/Profile
     public static final short ID_USER_MEMBERS = 6;         // User/#/Camarades
@@ -136,5 +136,11 @@ public class Uris {
                 PATH_EVENTS, ID_MAIN_EVENTS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // Events/*
                 PATH_EVENTS + DataProvider.FILTER_ROW, ID_MAIN_EVENTS);
+
+        ////// ID_USER_LOCATION
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Location
+                PATH_USER + '#' + PATH_LOCATION, ID_USER_LOCATION);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Location/#
+                PATH_USER + '#' + PATH_LOCATION + DataProvider.SINGLE_ROW, ID_USER_LOCATION);
     }
 }
