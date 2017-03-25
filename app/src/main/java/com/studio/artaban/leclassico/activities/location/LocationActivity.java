@@ -16,9 +16,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
-import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -42,6 +41,12 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
 
     }
+    public void onToday(View sender) {
+        Logs.add(Logs.Type.V, "sender: " + sender);
+
+
+
+    }
     public void onShare(View sender) {
         Logs.add(Logs.Type.V, "sender: " + sender);
 
@@ -60,8 +65,10 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     public void onMapReady(GoogleMap googleMap) {
         Logs.add(Logs.Type.V, "googleMap: " + googleMap);
 
-        // Position camera above France
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(46, 2.2), 5));
+        // Initialize map (position, zoom, etc.)
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(46, 2.2), 5)); // Europe (France)
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+        googleMap.getUiSettings().setCompassEnabled(true);
     }
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
@@ -90,6 +97,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
 
 
+
                 Logs.add(Logs.Type.I, "Count: " + cursor.getCount());
 
 
@@ -113,12 +121,20 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     private final QueryLoader mUser = new QueryLoader(this, this); // User location share info query loader
 
     // Followers query column indexes
-    private static final int COLUMN_INDEX_FOLLOWER_ID = 0;
-
-
-
-
-
+    private static final int COLUMN_INDEX_ID = 0;
+    private static final int COLUMN_INDEX_PSEUDO = 1;
+    private static final int COLUMN_INDEX_SEXE = 2;
+    private static final int COLUMN_INDEX_PROFILE = 3;
+    private static final int COLUMN_INDEX_PHONE = 4;
+    private static final int COLUMN_INDEX_EMAIL = 5;
+    private static final int COLUMN_INDEX_VILLE = 6;
+    private static final int COLUMN_INDEX_NOM = 7;
+    private static final int COLUMN_INDEX_ADRESSE = 8;
+    private static final int COLUMN_INDEX_ADMIN = 9;
+    private static final int COLUMN_INDEX_LATITUDE = 10;
+    private static final int COLUMN_INDEX_LATITUDE_UPD = 11;
+    private static final int COLUMN_INDEX_LONGITUDE = 12;
+    private static final int COLUMN_INDEX_LONGITUDE_UPD = 13;
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
@@ -134,12 +150,13 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         // Set action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get pseudo ID
+        // Get pseudo
+        String pseudo;
         if (getIntent().getData() != null)
-            mId = Integer.valueOf(getIntent().getData().getPathSegments().get(1));
+            pseudo = Uri.decode(getIntent().getData().getPathSegments().get(1));
         else
-            mId = getIntent().getIntExtra(EXTRA_DATA_ID, Constants.NO_DATA);
-        Logs.add(Logs.Type.I, "Pseudo #" + mId);
+            pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
+        Logs.add(Logs.Type.I, "Pseudo: " + pseudo);
 
         // Initialize map
         if (getSupportFragmentManager().findFragmentById(R.id.map) == null) {
@@ -154,14 +171,13 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         // Initialize loaders
         Bundle userData = new Bundle();
         userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{CamaradesTable.COLUMN_DEVICE_ID});
-        userData.putString(QueryLoader.DATA_KEY_SELECTION, DataTable.DataField.COLUMN_ID + '=' + mId);
+        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
         userData.putParcelable(QueryLoader.DATA_KEY_URI,
                 Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME));
         mUser.init(this, Queries.LOCATION_USER_INFO, userData);
 
         Bundle followData = new Bundle();
-        followData.putParcelable(QueryLoader.DATA_KEY_URI,
-                Uris.getUri(Uris.ID_USER_LOCATION, String.valueOf(mId)));
+        followData.putParcelable(QueryLoader.DATA_KEY_URI, Uris.getUri(Uris.ID_USER_LOCATION, pseudo));
         mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
     }
 

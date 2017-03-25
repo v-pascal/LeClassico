@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.activities.main;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
@@ -196,9 +197,9 @@ public class HomeFragment extends MainFragment implements QueryLoader.OnResultLi
                     @Override
                     public String transformUrl(Matcher match, String url) {
 
-                        // content://com.studio.artaban.provider.leclassico/User/#/Location
-                        return Uris.getUri(Uris.ID_USER_LOCATION, String.valueOf(getActivity().getIntent()
-                                .getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA))).toString();
+                        // content://com.studio.artaban.provider.leclassico/User/*/Location
+                        return Uris.getUri(Uris.ID_USER_LOCATION, Uri.encode(getActivity().getIntent()
+                                .getStringExtra(Login.EXTRA_DATA_PSEUDO))).toString();
                     }
                 });
 

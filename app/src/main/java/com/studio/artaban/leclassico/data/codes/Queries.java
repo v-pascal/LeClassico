@@ -158,11 +158,11 @@ public class Queries {
             case Uris.ID_USER_LOCATION: { // LOCATION_FOLLOWERS
 
                 Logs.add(Logs.Type.I, "locations query");
-                int userId = Integer.valueOf(uri.getPathSegments().get(1)); // User/#/Location
-                int followId = Constants.NO_DATA;
+                String pseudo = Uri.decode(uri.getPathSegments().get(1)); // User/*/Location
+                int filter = Constants.NO_DATA; // User/*/Location/#
 
                 if ((uri.getPathSegments().size() > 3) && (!uri.getPathSegments().get(3).isEmpty()))
-                    followId = Integer.valueOf(uri.getPathSegments().get(3)); // User/#/Location/#
+                    filter = Integer.valueOf(uri.getPathSegments().get(3));
 
                 return db.rawQuery("SELECT " +
                         CamaradesTable.TABLE_NAME + '.' + DataTable.DataField.COLUMN_ID + ',' +
@@ -180,22 +180,16 @@ public class Queries {
                         CamaradesTable.COLUMN_LONGITUDE + ',' +
                         CamaradesTable.COLUMN_LONGITUDE_UPD +
                         " FROM " + CamaradesTable.TABLE_NAME +
-                        " LEFT JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
-                        AbonnementsTable.COLUMN_PSEUDO + '=' + CamaradesTable.COLUMN_PSEUDO +
-
-
-
-
-
-
-
-
-
-
+                        " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
+                        AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO +
                         " WHERE " +
-                        DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) +
-                        ((followId != Constants.NO_DATA)?
-                                " AND " + DataTable.DataField.COLUMN_ID + '=' + followId:""), null);
+                        DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) + " AND " +
+                        CamaradesTable.COLUMN_DEVICE_ID + " IS NOT NULL AND (" +
+                        CamaradesTable.COLUMN_LATITUDE + " IS NOT NULL OR " +
+                        CamaradesTable.COLUMN_LONGITUDE + " IS NOT NULL)" +
+                        ((filter != Constants.NO_DATA) ?
+                                " AND " + DataTable.DataField.COLUMN_ID + '=' + filter : ""), null);
             }
             case Uris.ID_RAW_QUERY:
             default: { // Raw query (for multiple table selection)

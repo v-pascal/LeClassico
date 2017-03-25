@@ -110,7 +110,7 @@ public class Uris {
     public static final short ID_RAW_QUERY = 0;            // SQL
     public static final short ID_USER_NOTIFICATIONS = 1;   // User/#/Notifications
     public static final short ID_USER_MAILBOX = 2;         // User/#/Messagerie
-    public static final short ID_USER_LOCATION = 3;        // User/#/Location
+    public static final short ID_USER_LOCATION = 3;        // User/*/Location
     public static final short ID_USER_PUBLICATIONS = 4;    // User/#/Actualites
     public static final short ID_USER_PROFILE = 5;         // User/#/Profile
     public static final short ID_USER_MEMBERS = 6;         // User/#/Camarades
@@ -138,9 +138,9 @@ public class Uris {
                 PATH_EVENTS + DataProvider.FILTER_ROW, ID_MAIN_EVENTS);
 
         ////// ID_USER_LOCATION
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Location
-                PATH_USER + '#' + PATH_LOCATION, ID_USER_LOCATION);
-        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/#/Location/#
-                PATH_USER + '#' + PATH_LOCATION + DataProvider.SINGLE_ROW, ID_USER_LOCATION);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/*/Location
+                PATH_USER + '*' + PATH_LOCATION, ID_USER_LOCATION);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/*/Location/#
+                PATH_USER + '*' + PATH_LOCATION + DataProvider.SINGLE_ROW, ID_USER_LOCATION);
     }
 }

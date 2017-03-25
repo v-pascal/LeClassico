@@ -33,6 +33,18 @@
             android:layout_height="wrap_content"/>
 
         <ImageView
+            android:id="@+id/image_today"
+            android:src="@drawable/ic_no_today_white_36dp"
+            android:background="@drawable/location_panel_ripple"
+            android:clickable="true"
+            android:onClick="onToday"
+            android:padding="@dimen/location_panel_padding"
+            android:layout_marginStart="@dimen/location_panel_padding"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
             android:id="@+id/image_share"
             android:src="@drawable/ic_location_off_white_36dp"
             android:background="@drawable/location_panel_ripple"

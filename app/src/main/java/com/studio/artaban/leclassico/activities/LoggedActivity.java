@@ -37,7 +37,7 @@ public abstract class LoggedActivity extends AppCompatActivity implements QueryL
     public static final String EXTRA_DATA_URI = "uri";
     // Extra data keys
 
-    protected int mId; // ID (pseudo, publication, etc)
+    protected int mId; // ID (event, publication, etc)
     protected Cursor mCursor; // Data cursor
 
     protected static Uri mNotifyURI; // User notifications URI
