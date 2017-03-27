@@ -174,6 +174,11 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
             } else {
                 values.putNull(CamaradesTable.COLUMN_DEVICE);
                 values.putNull(CamaradesTable.COLUMN_DEVICE_ID);
+
+                values.put(CamaradesTable.COLUMN_LATITUDE_UPD, currentDate);
+                values.put(CamaradesTable.COLUMN_LONGITUDE_UPD, currentDate);
+                values.putNull(CamaradesTable.COLUMN_LATITUDE);
+                values.putNull(CamaradesTable.COLUMN_LONGITUDE);
             }
             getActivity().getContentResolver().update(uri, values, where, null);
             getActivity().getContentResolver().notifyChange(mUri, mObserver); // Notify changes

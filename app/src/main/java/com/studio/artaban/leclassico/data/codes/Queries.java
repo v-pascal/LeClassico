@@ -185,9 +185,8 @@ public class Queries {
                         AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO +
                         " WHERE " +
                         DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) + " AND " +
-                        CamaradesTable.COLUMN_DEVICE_ID + " IS NOT NULL AND (" +
-                        CamaradesTable.COLUMN_LATITUDE + " IS NOT NULL OR " +
-                        CamaradesTable.COLUMN_LONGITUDE + " IS NOT NULL)" +
+                        CamaradesTable.COLUMN_LATITUDE + " IS NOT NULL AND " +
+                        CamaradesTable.COLUMN_LONGITUDE + " IS NOT NULL" +
                         ((filter != Constants.NO_DATA) ?
                                 " AND " + DataTable.DataField.COLUMN_ID + '=' + filter : ""), null);
             }

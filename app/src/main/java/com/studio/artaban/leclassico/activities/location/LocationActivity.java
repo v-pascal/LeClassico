@@ -7,16 +7,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.text.format.DateFormat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.studio.artaban.leclassico.LeClassicoApp;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Uris;
@@ -25,14 +31,36 @@ import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.tools.Tools;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by pascal on 22/11/16.
  * Location activity
  */
-public class LocationActivity extends LoggedActivity implements OnMapReadyCallback {
+public class LocationActivity extends LoggedActivity implements OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener {
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
+    private static final String DATA_KEY_TODAY_FLAG = "todayFlag";
+    // Data keys
+
+    private static final float[] MARKER_COLORS = new float[]{ // Marker colors array
+        BitmapDescriptorFactory.HUE_RED,
+        BitmapDescriptorFactory.HUE_ORANGE,
+        BitmapDescriptorFactory.HUE_YELLOW,
+        BitmapDescriptorFactory.HUE_GREEN,
+        BitmapDescriptorFactory.HUE_CYAN,
+        BitmapDescriptorFactory.HUE_AZURE,
+        BitmapDescriptorFactory.HUE_BLUE,
+        BitmapDescriptorFactory.HUE_VIOLET,
+        BitmapDescriptorFactory.HUE_MAGENTA,
+        BitmapDescriptorFactory.HUE_ROSE
+    };
+    private GoogleMap mMap; // Google map
+    private boolean mToday; // Today filter flag
 
     //////
     public void onSearch(View sender) {
@@ -60,15 +88,29 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
     }
 
+    ////// OnMarkerClickListener ///////////////////////////////////////////////////////////////////
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Logs.add(Logs.Type.V, "marker: " + marker);
+
+
+
+
+
+        return false;
+    }
+
     ////// OnMapReadyCallback //////////////////////////////////////////////////////////////////////
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Logs.add(Logs.Type.V, "googleMap: " + googleMap);
+        mMap = googleMap;
 
         // Initialize map (position, zoom, etc.)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(46, 2.2), 5)); // Europe (France)
-        googleMap.getUiSettings().setZoomControlsEnabled(true);
-        googleMap.getUiSettings().setCompassEnabled(true);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(46, 2.2), 5)); // Europe (France)
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.setOnMarkerClickListener(this);
     }
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
@@ -81,7 +123,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     @Override
     public void onLoadFinished(int id, Cursor cursor) {
         Logs.add(Logs.Type.V, "id: " + id + ";cursor: " + cursor);
-        if (onNotifyLoadFinished(id, cursor)) // Refresh notification info
+        if ((!cursor.moveToFirst()) || (onNotifyLoadFinished(id, cursor)))
             return;
 
         switch (id) {
@@ -92,20 +134,35 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                 break;
             }
             case Queries.LOCATION_FOLLOWERS: {
+                do {
+                    int colorIdx = LeClassicoApp.getRandom().nextInt(MARKER_COLORS.length);
 
+                    StringBuilder title = new StringBuilder();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+                    String date = (cursor.getString(COLUMN_INDEX_LATITUDE_UPD)
+                            .compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) > 0)?
+                            cursor.getString(COLUMN_INDEX_LATITUDE_UPD) :
+                            cursor.getString(COLUMN_INDEX_LONGITUDE_UPD);
+                    try {
+                        Date locationDate = dateFormat.parse(date);
+                        if (!mToday) {
+                            title.append(DateFormat.getDateFormat(this).format(locationDate));
+                            title.append(' ');
+                        }
+                        title.append(DateFormat.getTimeFormat(this).format(locationDate));
 
+                    } catch (ParseException e) {
+                        Logs.add(Logs.Type.E, "Wrong location date format: " + date);
+                        title.append(date);
+                    }
+                    mMap.addMarker(new MarkerOptions()
+                            .icon(BitmapDescriptorFactory.defaultMarker(MARKER_COLORS[colorIdx]))
+                            .title(title.toString())
+                            .position(new LatLng(cursor.getDouble(COLUMN_INDEX_LATITUDE),
+                                    cursor.getDouble(COLUMN_INDEX_LONGITUDE))));
 
-
-
-
-                Logs.add(Logs.Type.I, "Count: " + cursor.getCount());
-
-
-
-
-
-
-
+                } while (cursor.moveToNext());
+                cursor.moveToFirst();
                 break;
             }
         }
@@ -150,6 +207,13 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         // Set action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Restore data
+        if (savedInstanceState != null)
+            mToday = savedInstanceState.getBoolean(DATA_KEY_TODAY_FLAG);
+        if (mToday)
+            ((ImageView)findViewById(R.id.image_today))
+                    .setImageDrawable(getDrawable(R.drawable.ic_today_white_36dp));
+
         // Get pseudo
         String pseudo;
         if (getIntent().getData() != null)
@@ -158,12 +222,16 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
             pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
         Logs.add(Logs.Type.I, "Pseudo: " + pseudo);
 
-        // Initialize map
-        if (getSupportFragmentManager().findFragmentById(R.id.map) == null) {
-            SupportMapFragment map = new SupportMapFragment();
+        // Set map
+        SupportMapFragment map = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
+        if (map == null) {
+            map = new SupportMapFragment();
             map.getMapAsync(this);
             getSupportFragmentManager().beginTransaction().add(R.id.map, map).commit();
-        }
+
+        } else
+            map.getMapAsync(this);
+
         // Position map & control panel
         ((RelativeLayout.LayoutParams) findViewById(R.id.layout_panel).getLayoutParams())
                 .setMargins(0, Tools.getStatusBarHeight(getResources()) + Tools.getActionBarHeight(this), 0, 0);
@@ -179,6 +247,15 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         Bundle followData = new Bundle();
         followData.putParcelable(QueryLoader.DATA_KEY_URI, Uris.getUri(Uris.ID_USER_LOCATION, pseudo));
         mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        outState.putBoolean(DATA_KEY_TODAY_FLAG, mToday);
+
+        Logs.add(Logs.Type.V, "outState: " + outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override

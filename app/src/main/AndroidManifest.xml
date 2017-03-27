@@ -88,7 +88,7 @@
                 <data
                     android:scheme="content"
                     android:host="com.studio.artaban.provider.leclassico"
-                    android:pathPattern="/User/.*/Locations"/>
+                    android:pathPattern="/User/.*/Location"/>
             </intent-filter>
         </activity>
         <activity
