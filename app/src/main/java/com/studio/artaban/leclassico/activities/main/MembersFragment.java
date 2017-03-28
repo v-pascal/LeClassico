@@ -204,19 +204,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
             }
             // Set pseudo & info
             holder.pseudo.setText(pseudo);
-            if (!cursor.isNull(COLUMN_INDEX_PHONE))
-                holder.info.setText(cursor.getString(COLUMN_INDEX_PHONE));
-            else if (!cursor.isNull(COLUMN_INDEX_EMAIL))
-                holder.info.setText(cursor.getString(COLUMN_INDEX_EMAIL));
-            else if (!cursor.isNull(COLUMN_INDEX_NAME))
-                holder.info.setText(cursor.getString(COLUMN_INDEX_NAME));
-            else if (!cursor.isNull(COLUMN_INDEX_TOWN))
-                holder.info.setText(cursor.getString(COLUMN_INDEX_TOWN));
-            else if (!cursor.isNull(COLUMN_INDEX_ADDRESS))
-                holder.info.setText(cursor.getString(COLUMN_INDEX_ADDRESS));
-            else
-                holder.info.setText(getString((cursor.getInt(COLUMN_INDEX_ADMIN) == 1)?
-                        R.string.admin_privilege:R.string.no_admin_privilege));
+            holder.info.setText(Tools.getUserInfo(getResources(), cursor, COLUMN_INDEX_PHONE));
 
             // Set followed info
             int colorId = (cursor.isNull(COLUMN_INDEX_FOLLOWED))?
@@ -334,11 +322,11 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
     private static final int COLUMN_INDEX_SEX = 2;
     private static final int COLUMN_INDEX_PROFILE = 3;
     private static final int COLUMN_INDEX_PHONE = 4;
-    private static final int COLUMN_INDEX_EMAIL = 5;
-    private static final int COLUMN_INDEX_TOWN = 6;
-    private static final int COLUMN_INDEX_NAME = 7;
-    private static final int COLUMN_INDEX_ADDRESS = 8;
-    private static final int COLUMN_INDEX_ADMIN = 9;
+    //private static final int COLUMN_INDEX_EMAIL = 5;
+    //private static final int COLUMN_INDEX_TOWN = 6;
+    //private static final int COLUMN_INDEX_NAME = 7;
+    //private static final int COLUMN_INDEX_ADDRESS = 8;
+    //private static final int COLUMN_INDEX_ADMIN = 9;
     private static final int COLUMN_INDEX_FOLLOWED = 10;
 
     private void refresh(String filter) { // Refresh query loader

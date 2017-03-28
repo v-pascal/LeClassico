@@ -12,6 +12,7 @@ import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.EvenementsTable;
 import com.studio.artaban.leclassico.data.tables.PresentsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
+import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -54,12 +55,7 @@ public class Queries {
                         CamaradesTable.COLUMN_PSEUDO + ',' +
                         CamaradesTable.COLUMN_SEXE + ',' +
                         CamaradesTable.COLUMN_PROFILE + ',' +
-                        CamaradesTable.COLUMN_PHONE + ',' +
-                        CamaradesTable.COLUMN_EMAIL + ',' +
-                        CamaradesTable.COLUMN_VILLE + ',' +
-                        CamaradesTable.COLUMN_NOM + ',' +
-                        CamaradesTable.COLUMN_ADRESSE + ',' +
-                        CamaradesTable.COLUMN_ADMIN + ',' +
+                        Tools.getUserInfoFields() + ',' +
                         AbonnementsTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID +
                         " FROM " + CamaradesTable.TABLE_NAME +
                         " LEFT JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
@@ -104,12 +100,8 @@ public class Queries {
                         String memberFields = CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +
                                 CamaradesTable.COLUMN_SEXE + ',' +
                                 CamaradesTable.COLUMN_PROFILE + ',' +
-                                CamaradesTable.COLUMN_PHONE + ',' +
-                                CamaradesTable.COLUMN_EMAIL + ',' +
-                                CamaradesTable.COLUMN_VILLE + ',' +
-                                CamaradesTable.COLUMN_NOM + ',' +
-                                CamaradesTable.COLUMN_ADRESSE + ',' +
-                                CamaradesTable.COLUMN_ADMIN;
+                                Tools.getUserInfoFields();
+
                         String from = " FROM " + EvenementsTable.TABLE_NAME;
                         String membersJoin = " LEFT JOIN " + CamaradesTable.TABLE_NAME + " ON ";
                         String where = " WHERE " + EvenementsTable.TABLE_NAME + '.' +
@@ -169,12 +161,7 @@ public class Queries {
                         CamaradesTable.COLUMN_PSEUDO + ',' +
                         CamaradesTable.COLUMN_SEXE + ',' +
                         CamaradesTable.COLUMN_PROFILE + ',' +
-                        CamaradesTable.COLUMN_PHONE + ',' +
-                        CamaradesTable.COLUMN_EMAIL + ',' +
-                        CamaradesTable.COLUMN_VILLE + ',' +
-                        CamaradesTable.COLUMN_NOM + ',' +
-                        CamaradesTable.COLUMN_ADRESSE + ',' +
-                        CamaradesTable.COLUMN_ADMIN + ',' +
+                        Tools.getUserInfoFields() + ',' +
                         CamaradesTable.COLUMN_LATITUDE + ',' +
                         CamaradesTable.COLUMN_LATITUDE_UPD + ',' +
                         CamaradesTable.COLUMN_LONGITUDE + ',' +

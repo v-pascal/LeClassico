@@ -40,7 +40,7 @@ import java.util.Date;
  * Location activity
  */
 public class LocationActivity extends LoggedActivity implements OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener {
+        GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
@@ -96,8 +96,35 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
 
 
-
         return false;
+    }
+
+    //////
+    private static class MarkerInfo {
+        public MarkerInfo(long id, String profile, boolean female, String pseudo, String info) {
+            Logs.add(Logs.Type.V, "id: " + id + ";profile: " + profile + ";female: " + female +
+                    ";pseudo: " + pseudo + ";info: " + info);
+
+            this.id = id;
+            this.profile = profile;
+            this.female = female;
+            this.pseudo = pseudo;
+            this.info = info;
+        }
+        public final long id;
+        public final String profile;
+        public final boolean female;
+        public final String pseudo;
+        public final String info;
+    }
+
+    ////// OnMapClickListener //////////////////////////////////////////////////////////////////////
+    @Override
+    public void onMapClick(LatLng latLng) {
+        Logs.add(Logs.Type.V, "latLng: " + latLng);
+
+
+
     }
 
     ////// OnMapReadyCallback //////////////////////////////////////////////////////////////////////
@@ -111,6 +138,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.setOnMarkerClickListener(this);
+        mMap.setOnMapClickListener(this);
     }
 
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
@@ -155,11 +183,21 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                         Logs.add(Logs.Type.E, "Wrong location date format: " + date);
                         title.append(date);
                     }
-                    mMap.addMarker(new MarkerOptions()
+                    Marker marker = mMap.addMarker(new MarkerOptions()
                             .icon(BitmapDescriptorFactory.defaultMarker(MARKER_COLORS[colorIdx]))
                             .title(title.toString())
                             .position(new LatLng(cursor.getDouble(COLUMN_INDEX_LATITUDE),
                                     cursor.getDouble(COLUMN_INDEX_LONGITUDE))));
+
+                    // Add marker info
+                    boolean female = (!cursor.isNull(COLUMN_INDEX_SEXE)) &&
+                            (cursor.getInt(COLUMN_INDEX_SEXE) == CamaradesTable.GENDER_FEMALE);
+                    String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
+                            cursor.getString(COLUMN_INDEX_PROFILE) : null;
+
+                    marker.setTag(new MarkerInfo(cursor.getInt(COLUMN_INDEX_ID), profile, female,
+                            cursor.getString(COLUMN_INDEX_PSEUDO),
+                            Tools.getUserInfo(getResources(), cursor, COLUMN_INDEX_PHONE)));
 
                 } while (cursor.moveToNext());
                 cursor.moveToFirst();
@@ -183,11 +221,11 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     private static final int COLUMN_INDEX_SEXE = 2;
     private static final int COLUMN_INDEX_PROFILE = 3;
     private static final int COLUMN_INDEX_PHONE = 4;
-    private static final int COLUMN_INDEX_EMAIL = 5;
-    private static final int COLUMN_INDEX_VILLE = 6;
-    private static final int COLUMN_INDEX_NOM = 7;
-    private static final int COLUMN_INDEX_ADRESSE = 8;
-    private static final int COLUMN_INDEX_ADMIN = 9;
+    //private static final int COLUMN_INDEX_EMAIL = 5;
+    //private static final int COLUMN_INDEX_VILLE = 6;
+    //private static final int COLUMN_INDEX_NOM = 7;
+    //private static final int COLUMN_INDEX_ADRESSE = 8;
+    //private static final int COLUMN_INDEX_ADMIN = 9;
     private static final int COLUMN_INDEX_LATITUDE = 10;
     private static final int COLUMN_INDEX_LATITUDE_UPD = 11;
     private static final int COLUMN_INDEX_LONGITUDE = 12;

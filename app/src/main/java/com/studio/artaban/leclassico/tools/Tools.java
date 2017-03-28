@@ -33,6 +33,7 @@ import com.studio.artaban.leclassico.components.RecyclerAdapter;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.tables.ActualitesTable;
+import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
 import com.studio.artaban.leclassico.helpers.Glider;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -51,117 +52,6 @@ import java.util.Date;
  */
 public final class Tools { /////////////////////////////////////////////////////////////////////////
 
-    private static float PROFILE_SIZE_RADIUS_FACTOR = 80f;
-    public static void setProfile(final Activity activity, ImageView view, final boolean female,
-                                  String profile, @DimenRes final int size, final boolean clickable) {
-    // Display profile image using 'Glider' class (expected user profile & gender)
-
-        //Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
-        //        ";profile: " + profile + ";clickable: " + clickable);
-        if (profile != null)
-            Glider.with(activity)
-                    .load(Storage.FOLDER_PROFILES +
-                                    File.separator + profile,
-                            Constants.APP_URL_PROFILES + '/' + profile)
-                    .placeholder((female) ? R.drawable.woman : R.drawable.man)
-                    .into(view, new Glider.OnLoadListener() {
-
-                                @Override
-                                public void onLoadFailed(ImageView imageView) {
-
-                                    //Logs.add(Logs.Type.V, "imageView: " + imageView);
-                                    if (clickable) {
-                                        imageView.setImageDrawable(null); // Remove placeholder
-                                        imageView.setBackground(
-                                                new RippleDrawable(ColorStateList.valueOf(activity
-                                                        .getResources().getColor(R.color.black_transparent)),
-                                                        activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
-                                                        activity.getDrawable(R.drawable.man)));
-                                    }
-                                }
-
-                                @Override
-                                public boolean onSetResource(Bitmap resource, ImageView imageView) {
-                                    //Logs.add(Logs.Type.V, "resource: " + resource +
-                                    //        ";imageView: " + imageView);
-                                    RoundedBitmapDrawable radiusBmp =
-                                            RoundedBitmapDrawableFactory.create(activity.getResources(),
-                                                    resource);
-
-                                    TypedValue radius = new TypedValue();
-                                    activity.getResources().getValue(R.dimen.profile_radius, radius, true);
-                                    float factor = activity.getResources().getDimension(size) /
-                                            activity.getResources().getDisplayMetrics().density;
-                                    radiusBmp.setCornerRadius(radius.getFloat() * (factor /
-                                            PROFILE_SIZE_RADIUS_FACTOR));
-
-                                    if (clickable) { // Check to display a ripple effect
-                                        imageView.setImageDrawable(null); // Remove placeholder
-                                        imageView.setBackground(
-                                                new RippleDrawable(ColorStateList.valueOf(activity
-                                                        .getResources().getColor(R.color.black_transparent)),
-                                                        radiusBmp, radiusBmp));
-                                    } else
-                                        imageView.setImageDrawable(radiusBmp);
-                                    return true;
-                                }
-                            });
-        else if (!clickable)
-            view.setImageDrawable(activity.getDrawable((female) ? R.drawable.woman : R.drawable.man));
-        else {
-            view.setImageDrawable(null); // Remove previous drawable (if any)
-            view.setBackground(new RippleDrawable(ColorStateList.valueOf(activity.getResources()
-                    .getColor(R.color.black_transparent)),
-                    activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
-                    activity.getDrawable(R.drawable.man)));
-        }
-    }
-    private static RoundedBitmapDrawable getHeaderBmp(Activity activity, Bitmap resource) {
-        Logs.add(Logs.Type.V, "activity: " + activity + ";resource: " + resource);
-        RoundedBitmapDrawable radiusBmp =
-                RoundedBitmapDrawableFactory.create(activity.getResources(),
-                        resource);
-
-        radiusBmp.setCornerRadius(activity.getResources().getDimension(R.dimen.profile_header_radius));
-        return radiusBmp;
-    }
-    public static void setHeaderProfile(final Activity activity, ImageView view,
-                                        final boolean female, String profile) {
-    // Display header profile image using 'Glider' class (expected user profile & gender)
-    // NB: Needed coz default profile image radius does not match with header profile radius
-
-        Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
-                ";profile: " + profile);
-        if (profile != null)
-            Glider.with(activity)
-                    .load(Storage.FOLDER_PROFILES + File.separator + profile,
-                            Constants.APP_URL_PROFILES + '/' + profile)
-                    .into(view, new Glider.OnLoadListener() {
-
-                        @Override
-                        public void onLoadFailed(ImageView imageView) {
-                            Logs.add(Logs.Type.V, "imageView: " + imageView);
-                            Bitmap defaultImage = BitmapFactory.decodeResource(activity.getResources(),
-                                    (female) ? R.drawable.woman : R.drawable.man);
-                            imageView.setImageDrawable(getHeaderBmp(activity, defaultImage));
-                        }
-
-                        @Override
-                        public boolean onSetResource(Bitmap resource, ImageView imageView) {
-                            Logs.add(Logs.Type.V, "resource: " + resource + ";imageView: " + imageView);
-                            RoundedBitmapDrawable radiusBmp = getHeaderBmp(activity, resource);
-                            imageView.setImageDrawable(radiusBmp);
-                            return true;
-                        }
-                    });
-        else {
-            Bitmap defaultImage = BitmapFactory.decodeResource(activity.getResources(),
-                    (female) ? R.drawable.woman : R.drawable.man);
-            view.setImageDrawable(getHeaderBmp(activity, defaultImage));
-        }
-    }
-
-    //////
     public static void setDateTime(Context context, TextView date, TextView time, String dateTime) {
     // Fill date & time text views according a date & time parameter (in query date & time format)
     // i.e: --/-- for the date & --:-- for the time
@@ -302,6 +192,148 @@ public final class Tools { /////////////////////////////////////////////////////
     public static String getDeviceName() {
         Logs.add(Logs.Type.V, null);
         return Build.MANUFACTURER + " " + Build.MODEL;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////// Members
+
+    private static float PROFILE_SIZE_RADIUS_FACTOR = 80f;
+    public static void setProfile(final Activity activity, ImageView view, final boolean female,
+                                  String profile, @DimenRes final int size, final boolean clickable) {
+    // Display profile image using 'Glider' class (expected user profile & gender)
+
+        //Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
+        //        ";profile: " + profile + ";clickable: " + clickable);
+        if (profile != null)
+            Glider.with(activity)
+                    .load(Storage.FOLDER_PROFILES +
+                                    File.separator + profile,
+                            Constants.APP_URL_PROFILES + '/' + profile)
+                    .placeholder((female) ? R.drawable.woman : R.drawable.man)
+                    .into(view, new Glider.OnLoadListener() {
+
+                                @Override
+                                public void onLoadFailed(ImageView imageView) {
+
+                                    //Logs.add(Logs.Type.V, "imageView: " + imageView);
+                                    if (clickable) {
+                                        imageView.setImageDrawable(null); // Remove placeholder
+                                        imageView.setBackground(
+                                                new RippleDrawable(ColorStateList.valueOf(activity
+                                                        .getResources().getColor(R.color.black_transparent)),
+                                                        activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
+                                                        activity.getDrawable(R.drawable.man)));
+                                    }
+                                }
+
+                                @Override
+                                public boolean onSetResource(Bitmap resource, ImageView imageView) {
+                                    //Logs.add(Logs.Type.V, "resource: " + resource +
+                                    //        ";imageView: " + imageView);
+                                    RoundedBitmapDrawable radiusBmp =
+                                            RoundedBitmapDrawableFactory.create(activity.getResources(),
+                                                    resource);
+
+                                    TypedValue radius = new TypedValue();
+                                    activity.getResources().getValue(R.dimen.profile_radius, radius, true);
+                                    float factor = activity.getResources().getDimension(size) /
+                                            activity.getResources().getDisplayMetrics().density;
+                                    radiusBmp.setCornerRadius(radius.getFloat() * (factor /
+                                            PROFILE_SIZE_RADIUS_FACTOR));
+
+                                    if (clickable) { // Check to display a ripple effect
+                                        imageView.setImageDrawable(null); // Remove placeholder
+                                        imageView.setBackground(
+                                                new RippleDrawable(ColorStateList.valueOf(activity
+                                                        .getResources().getColor(R.color.black_transparent)),
+                                                        radiusBmp, radiusBmp));
+                                    } else
+                                        imageView.setImageDrawable(radiusBmp);
+                                    return true;
+                                }
+                            });
+        else if (!clickable)
+            view.setImageDrawable(activity.getDrawable((female) ? R.drawable.woman : R.drawable.man));
+        else {
+            view.setImageDrawable(null); // Remove previous drawable (if any)
+            view.setBackground(new RippleDrawable(ColorStateList.valueOf(activity.getResources()
+                    .getColor(R.color.black_transparent)),
+                    activity.getDrawable((female) ? R.drawable.woman : R.drawable.man),
+                    activity.getDrawable(R.drawable.man)));
+        }
+    }
+    private static RoundedBitmapDrawable getHeaderBmp(Activity activity, Bitmap resource) {
+        Logs.add(Logs.Type.V, "activity: " + activity + ";resource: " + resource);
+        RoundedBitmapDrawable radiusBmp =
+                RoundedBitmapDrawableFactory.create(activity.getResources(),
+                        resource);
+
+        radiusBmp.setCornerRadius(activity.getResources().getDimension(R.dimen.profile_header_radius));
+        return radiusBmp;
+    }
+    public static void setHeaderProfile(final Activity activity, ImageView view,
+                                        final boolean female, String profile) {
+    // Display header profile image using 'Glider' class (expected user profile & gender)
+    // NB: Needed coz default profile image radius does not match with header profile radius
+
+        Logs.add(Logs.Type.V, "activity: " + activity + ";view: " + view + ";female: " + female +
+                ";profile: " + profile);
+        if (profile != null)
+            Glider.with(activity)
+                    .load(Storage.FOLDER_PROFILES + File.separator + profile,
+                            Constants.APP_URL_PROFILES + '/' + profile)
+                    .into(view, new Glider.OnLoadListener() {
+
+                        @Override
+                        public void onLoadFailed(ImageView imageView) {
+                            Logs.add(Logs.Type.V, "imageView: " + imageView);
+                            Bitmap defaultImage = BitmapFactory.decodeResource(activity.getResources(),
+                                    (female) ? R.drawable.woman : R.drawable.man);
+                            imageView.setImageDrawable(getHeaderBmp(activity, defaultImage));
+                        }
+
+                        @Override
+                        public boolean onSetResource(Bitmap resource, ImageView imageView) {
+                            Logs.add(Logs.Type.V, "resource: " + resource + ";imageView: " + imageView);
+                            RoundedBitmapDrawable radiusBmp = getHeaderBmp(activity, resource);
+                            imageView.setImageDrawable(radiusBmp);
+                            return true;
+                        }
+                    });
+        else {
+            Bitmap defaultImage = BitmapFactory.decodeResource(activity.getResources(),
+                    (female) ? R.drawable.woman : R.drawable.man);
+            view.setImageDrawable(getHeaderBmp(activity, defaultImage));
+        }
+    }
+
+    //////
+    public static String getUserInfoFields() { // Return user info fields (see below)
+        Logs.add(Logs.Type.V, null);
+
+        return CamaradesTable.COLUMN_PHONE + ',' +
+                CamaradesTable.COLUMN_EMAIL + ',' +
+                CamaradesTable.COLUMN_VILLE + ',' +
+                CamaradesTable.COLUMN_NOM + ',' +
+                CamaradesTable.COLUMN_ADRESSE + ',' +
+                CamaradesTable.COLUMN_ADMIN;
+    }
+    public static String getUserInfo(Resources resource, Cursor cursor, int phoneColumn) {
+    // Return user info
+
+        Logs.add(Logs.Type.V, "cursor: " + cursor + ";phoneColumn: " + phoneColumn);
+        if (!cursor.isNull(phoneColumn))
+            return cursor.getString(phoneColumn);
+        else if (!cursor.isNull(phoneColumn + 1)) // Email
+            return cursor.getString(phoneColumn + 1);
+        else if (!cursor.isNull(phoneColumn + 2)) // Name
+            return cursor.getString(phoneColumn + 2);
+        else if (!cursor.isNull(phoneColumn + 3)) // Town
+            return cursor.getString(phoneColumn + 3);
+        else if (!cursor.isNull(phoneColumn + 4)) // Address
+            return cursor.getString(phoneColumn + 4);
+        else // Admin info
+            return resource.getString((cursor.getInt(phoneColumn + 5) == 1) ?
+                    R.string.admin_privilege : R.string.no_admin_privilege);
     }
 
     ////////////////////////////////////////////////////////////////////////////////// Notifications
