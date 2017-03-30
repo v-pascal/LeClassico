@@ -1,13 +1,17 @@
 package com.studio.artaban.leclassico.activities.location;
 
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.text.format.DateFormat;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,6 +25,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.studio.artaban.leclassico.LeClassicoApp;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
+import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
+import com.studio.artaban.leclassico.animations.InOutScreen;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -47,6 +53,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     private static final String DATA_KEY_TODAY_FLAG = "todayFlag";
     // Data keys
 
+    private static final int DELAY_DISPLAY_MEMBER = 300; // Delay of displaying or hiding member info
     private static final float[] MARKER_COLORS = new float[]{ // Marker colors array
         BitmapDescriptorFactory.HUE_RED,
         BitmapDescriptorFactory.HUE_ORANGE,
@@ -59,8 +66,21 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         BitmapDescriptorFactory.HUE_MAGENTA,
         BitmapDescriptorFactory.HUE_ROSE
     };
+    private static final @ColorRes int[] MEMBER_COLORS = new int[]{ // Member map color IDs
+        R.color.map_red,
+        R.color.map_orange,
+        R.color.map_yellow,
+        R.color.map_green,
+        R.color.map_cyan,
+        R.color.map_azure,
+        R.color.map_blue,
+        R.color.map_violet,
+        R.color.map_magenta,
+        R.color.map_rose
+    };
     private GoogleMap mMap; // Google map
     private boolean mToday; // Today filter flag
+    private boolean mSelected; // Member selection flag
 
     //////
     public void onSearch(View sender) {
@@ -85,7 +105,6 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         Logs.add(Logs.Type.V, "sender: " + sender);
 
 
-
     }
 
     ////// OnMarkerClickListener ///////////////////////////////////////////////////////////////////
@@ -93,38 +112,59 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     public boolean onMarkerClick(Marker marker) {
         Logs.add(Logs.Type.V, "marker: " + marker);
 
+        // Select member info
+        MarkerInfo data = (MarkerInfo) marker.getTag();
+        findViewById(R.id.layout_member).setBackgroundColor(getResources().getColor(data.color));
+        ((TextView) findViewById(R.id.text_pseudo)).setText(data.pseudo);
+        ((TextView) findViewById(R.id.text_info)).setText(data.info);
 
+        ImageView image = (ImageView) findViewById(R.id.image_pseudo);
+        image.setTag(R.id.tag_pseudo_id, data.id);
+        Tools.setProfile(this, image, data.female, data.profile, R.dimen.user_item_height, true);
 
+        if (!mSelected) // Display selection with animation
+            InOutScreen.with(this)
+                    .setLocation(InOutScreen.Location.LEFT)
+                    .setDuration(DELAY_DISPLAY_MEMBER)
+                    .in(findViewById(R.id.layout_member));
 
+        mSelected = true;
         return false;
     }
 
     //////
     private static class MarkerInfo {
-        public MarkerInfo(long id, String profile, boolean female, String pseudo, String info) {
+        public MarkerInfo(int id, String profile, boolean female, String pseudo,
+                          String info, @ColorRes int color) {
+
             Logs.add(Logs.Type.V, "id: " + id + ";profile: " + profile + ";female: " + female +
                     ";pseudo: " + pseudo + ";info: " + info);
-
             this.id = id;
             this.profile = profile;
             this.female = female;
             this.pseudo = pseudo;
             this.info = info;
+            this.color = color;
         }
-        public final long id;
+        public final int id;
         public final String profile;
         public final boolean female;
         public final String pseudo;
         public final String info;
+        public final @ColorRes int color;
     }
 
     ////// OnMapClickListener //////////////////////////////////////////////////////////////////////
     @Override
     public void onMapClick(LatLng latLng) {
         Logs.add(Logs.Type.V, "latLng: " + latLng);
+        if (mSelected)
+            InOutScreen.with(this) // Hide selection
+                    .setLocation(InOutScreen.Location.LEFT)
+                    .setDuration(DELAY_DISPLAY_MEMBER)
+                    .out(findViewById(R.id.layout_member));
 
-
-
+        mSelected = false;
     }
 
     ////// OnMapReadyCallback //////////////////////////////////////////////////////////////////////
@@ -197,7 +237,8 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
                     marker.setTag(new MarkerInfo(cursor.getInt(COLUMN_INDEX_ID), profile, female,
                             cursor.getString(COLUMN_INDEX_PSEUDO),
-                            Tools.getUserInfo(getResources(), cursor, COLUMN_INDEX_PHONE)));
+                            Tools.getUserInfo(getResources(), cursor, COLUMN_INDEX_PHONE),
+                            MEMBER_COLORS[colorIdx]));
 
                 } while (cursor.moveToNext());
                 cursor.moveToFirst();
@@ -273,6 +314,29 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         // Position map & control panel
         ((RelativeLayout.LayoutParams) findViewById(R.id.layout_panel).getLayoutParams())
                 .setMargins(0, Tools.getStatusBarHeight(getResources()) + Tools.getActionBarHeight(this), 0, 0);
+
+        // Display member layout on half screen (horizontally)
+        Point screenSize = new Point();
+        getWindowManager().getDefaultDisplay().getSize(screenSize);
+        int padding = (int) getResources().getDimension(R.dimen.location_panel_padding);
+        ((RelativeLayout.LayoutParams) findViewById(R.id.layout_member).getLayoutParams())
+                .width =  (screenSize.x >> 1) - (padding + (padding >> 1));
+
+        findViewById(R.id.image_pseudo).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View sender) {
+                Logs.add(Logs.Type.V, "sender: " + sender);
+
+                int pseudoId = (int) sender.getTag(R.id.tag_pseudo_id);
+                Logs.add(Logs.Type.V, "Display profile #" + pseudoId);
+
+                ////// Start profile activity
+                Intent profile = new Intent(LocationActivity.this, ProfileActivity.class);
+                profile.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
+                startActivity(profile);
+            }
+        }); // To display member profile
 
         // Initialize loaders
         Bundle userData = new Bundle();

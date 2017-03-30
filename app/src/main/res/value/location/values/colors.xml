@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Location -->
+
+    <!-- Marker map colors -->
+    <color name="map_red">#d0f44646</color>
+    <color name="map_orange">#d0f49c44</color>
+    <color name="map_yellow">#d0f4f446</color>
+    <color name="map_green">#d046f446</color>
+    <color name="map_cyan">#d046f4f4</color>
+    <color name="map_azure">#d0469df4</color>
+    <color name="map_blue">#d04949f5</color>
+    <color name="map_violet">#d09d46f4</color>
+    <color name="map_magenta">#d0f446f4</color>
+    <color name="map_rose">#d0f5499f</color>
+
+</resources>

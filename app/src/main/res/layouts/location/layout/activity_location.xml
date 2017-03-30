@@ -72,7 +72,10 @@
 
     <!-- Member info -->
     <RelativeLayout
-        android:layout_alignParentBottom="true"
+        android:id="@+id/layout_member"
+        android:layout_below="@id/layout_panel"
+        android:layout_marginTop="@dimen/location_panel_padding"
+        android:layout_marginStart="@dimen/location_panel_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -80,6 +83,7 @@
         <ImageView
             android:id="@+id/image_pseudo"
             android:clickable="true"
+            android:layout_margin="@dimen/user_text_margin"
             android:layout_width="@dimen/user_item_height"
             android:layout_height="@dimen/user_item_height">
 
@@ -89,24 +93,25 @@
         <!-- Pseudo -->
         <TextView
             android:id="@+id/text_pseudo"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/user_info_text_size"
+            android:textStyle="bold"
             android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center_vertical"
-            android:layout_marginStart="@dimen/user_text_margin"
             android:layout_toEndOf="@id/image_pseudo"
+            android:layout_marginTop="@dimen/location_panel_padding"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/user_info_height"/>
 
         <!-- Info -->
         <TextView
             android:id="@+id/text_info"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/user_date_text_size"
             android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center_vertical"
-            android:layout_marginStart="@dimen/user_text_margin"
             android:layout_toEndOf="@id/image_pseudo"
             android:layout_below="@id/text_pseudo"
             android:layout_width="wrap_content"
