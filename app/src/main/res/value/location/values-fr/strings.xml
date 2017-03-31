@@ -7,4 +7,8 @@
     <string name="other_device">Autre périphérique (%1$s)</string>
     <string name="confirm_disable_location">La géolocalisation est défini sur autre périphérique de modèle \"%1$s\". Etes-vous sûr de vouloir le désactivé?</string>
 
+    <!-- Map -->
+    <string name="location_today_filter">Filtre localisation 24h activé</string>
+    <string name="location_no_filter">Filtre localisation 24h désactivé</string>
+
 </resources>

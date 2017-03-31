@@ -7,4 +7,8 @@
     <string name="other_device">Other device (%1$s)</string>
     <string name="confirm_disable_location">The location\'s share is defined on another device with the \"%1$s\" model. Do you really want to disable it?</string>
 
+    <!-- Map -->
+    <string name="location_today_filter">Today filter enabled</string>
+    <string name="location_no_filter">Today filter disabled</string>
+
 </resources>

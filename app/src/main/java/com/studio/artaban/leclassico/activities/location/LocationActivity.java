@@ -6,12 +6,14 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
+import android.support.annotation.Nullable;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.text.format.DateFormat;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -91,13 +93,18 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     }
     public void onToday(View sender) {
         Logs.add(Logs.Type.V, "sender: " + sender);
+        mToday = !mToday;
 
+        ((ImageView)findViewById(R.id.image_today)).setImageDrawable(getDrawable((mToday)?
+                R.drawable.ic_today_white_36dp : R.drawable.ic_no_today_white_36dp));
+        onMapClick(null);
 
-
+        refresh(null); // Refresh query
+        Toast.makeText(this, (mToday)? R.string.location_today_filter:R.string.location_no_filter,
+                Toast.LENGTH_SHORT).show(); // Display filter info
     }
     public void onShare(View sender) {
         Logs.add(Logs.Type.V, "sender: " + sender);
-
 
 
     }
@@ -202,15 +209,21 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                 break;
             }
             case Queries.LOCATION_FOLLOWERS: {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+                String today = dateFormat.format(new Date()).substring(0, 10);
+
+                mMap.clear(); // Remove all previous markers
                 do {
                     int colorIdx = LeClassicoApp.getRandom().nextInt(MARKER_COLORS.length);
 
                     StringBuilder title = new StringBuilder();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
                     String date = (cursor.getString(COLUMN_INDEX_LATITUDE_UPD)
                             .compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) > 0)?
                             cursor.getString(COLUMN_INDEX_LATITUDE_UPD) :
                             cursor.getString(COLUMN_INDEX_LONGITUDE_UPD);
+                    if ((mToday) && (!date.startsWith(today))) // Apply today filter
+                        continue;
+
                     try {
                         Date locationDate = dateFormat.parse(date);
                         if (!mToday) {
@@ -253,8 +266,18 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     }
 
     //////
+    private Uri mFollowersUri; // Followers location URI
     private final QueryLoader mFollowers = new QueryLoader(this, this); // Followers list query loader
     private final QueryLoader mUser = new QueryLoader(this, this); // User location share info query loader
+    private void refresh(@Nullable Long memberId) { // Refresh followers location query (markers)
+        Logs.add(Logs.Type.V, "memberId: " + memberId);
+
+        Bundle followData = new Bundle();
+        followData.putParcelable(QueryLoader.DATA_KEY_URI, mFollowersUri);
+        if (memberId != null)
+            followData.putLong(QueryLoader.DATA_KEY_URI_FILTER, memberId);
+        mFollowers.restart(this, Queries.LOCATION_FOLLOWERS, followData);
+    }
 
     // Followers query column indexes
     private static final int COLUMN_INDEX_ID = 0;
@@ -347,7 +370,8 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         mUser.init(this, Queries.LOCATION_USER_INFO, userData);
 
         Bundle followData = new Bundle();
-        followData.putParcelable(QueryLoader.DATA_KEY_URI, Uris.getUri(Uris.ID_USER_LOCATION, pseudo));
+        mFollowersUri = Uris.getUri(Uris.ID_USER_LOCATION, pseudo);
+        followData.putParcelable(QueryLoader.DATA_KEY_URI, mFollowersUri);
         mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
     }
 

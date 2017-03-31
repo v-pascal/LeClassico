@@ -167,6 +167,7 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
                     values.put(CamaradesTable.COLUMN_DEVICE_ID, Tools.getDeviceId(getActivity()));
 
                 } catch (Exception e) {
+                    Logs.add(Logs.Type.E, "Unable to get device Name & ID");
                     values.put(CamaradesTable.COLUMN_DEVICE, "UNKNOWN");
                     values.put(CamaradesTable.COLUMN_DEVICE_ID, "NO-DEVICE-ID");
                 }
