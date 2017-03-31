@@ -15,6 +15,9 @@ import android.text.format.DateFormat;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -48,7 +51,8 @@ import java.util.Date;
  * Location activity
  */
 public class LocationActivity extends LoggedActivity implements OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
+        GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener,  GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
@@ -81,12 +85,52 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         R.color.map_rose
     };
     private GoogleMap mMap; // Google map
+    private GoogleApiClient mClient; // Google API client
+
+    private LatLng mUserLocation; // User location coordinates
+    private Marker mUserMarker; // User location marker
+
+    private void locate() { // Locate connected user
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+        //if (mUserLocation == null)
+        //mUserLocation = null;
+
+
+
+
+
+
+    }
+    private void displayUserLocation() { // Display & move camera to user location marker
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+        //if (mUserMarker != null)
+        //    mUserMarker.remove();
+
+
+
+
+
+    }
+    private String mPseudo; // Connected user pseudo
     private boolean mToday; // Today filter flag
     private boolean mSelected; // Member selection flag
 
     //////
     public void onSearch(View sender) {
         Logs.add(Logs.Type.V, "sender: " + sender);
+
+
+
 
 
 
@@ -107,17 +151,43 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         Logs.add(Logs.Type.V, "sender: " + sender);
 
 
+
+
+
+
     }
     public void onLocate(View sender) {
         Logs.add(Logs.Type.V, "sender: " + sender);
+        if (!mClient.isConnected())
+            mClient.connect();
+        else
+            locate();
+    }
 
+    ////// ConnectionCallbacks /////////////////////////////////////////////////////////////////////
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Logs.add(Logs.Type.V, "bundle: " + bundle);
+        locate();
+    }
 
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    ////// OnConnectionFailedListener //////////////////////////////////////////////////////////////
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Logs.add(Logs.Type.E, "connectionResult: " + connectionResult);
     }
 
     ////// OnMarkerClickListener ///////////////////////////////////////////////////////////////////
     @Override
     public boolean onMarkerClick(Marker marker) {
         Logs.add(Logs.Type.V, "marker: " + marker);
+        if (marker.getTag() == null)
+            return false; // Connected user marker
 
         // Select member info
         MarkerInfo data = (MarkerInfo) marker.getTag();
@@ -214,9 +284,10 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
                 mMap.clear(); // Remove all previous markers
                 do {
-                    int colorIdx = LeClassicoApp.getRandom().nextInt(MARKER_COLORS.length);
+                    if (mPseudo.compareTo(cursor.getString(COLUMN_INDEX_PSEUDO)) == 0)
+                        continue; // Do not display user location (with common marker)
+                        // NB: Let user locate himself using the locate option
 
-                    StringBuilder title = new StringBuilder();
                     String date = (cursor.getString(COLUMN_INDEX_LATITUDE_UPD)
                             .compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) > 0)?
                             cursor.getString(COLUMN_INDEX_LATITUDE_UPD) :
@@ -224,6 +295,8 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                     if ((mToday) && (!date.startsWith(today))) // Apply today filter
                         continue;
 
+                    int colorIdx = LeClassicoApp.getRandom().nextInt(MARKER_COLORS.length);
+                    StringBuilder title = new StringBuilder();
                     try {
                         Date locationDate = dateFormat.parse(date);
                         if (!mToday) {
@@ -255,6 +328,11 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
                 } while (cursor.moveToNext());
                 cursor.moveToFirst();
+
+                // Add user location (if it was requested)
+                if (mUserLocation != null)
+                    displayUserLocation();
+                // NB: Needed coz the map clear causes to remove all marker even user location marker
                 break;
             }
         }
@@ -269,6 +347,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     private Uri mFollowersUri; // Followers location URI
     private final QueryLoader mFollowers = new QueryLoader(this, this); // Followers list query loader
     private final QueryLoader mUser = new QueryLoader(this, this); // User location share info query loader
+
     private void refresh(@Nullable Long memberId) { // Refresh followers location query (markers)
         Logs.add(Logs.Type.V, "memberId: " + memberId);
 
@@ -317,14 +396,13 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                     .setImageDrawable(getDrawable(R.drawable.ic_today_white_36dp));
 
         // Get pseudo
-        String pseudo;
         if (getIntent().getData() != null)
-            pseudo = Uri.decode(getIntent().getData().getPathSegments().get(1));
+            mPseudo = Uri.decode(getIntent().getData().getPathSegments().get(1));
         else
-            pseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
-        Logs.add(Logs.Type.I, "Pseudo: " + pseudo);
+            mPseudo = getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO);
+        Logs.add(Logs.Type.I, "Pseudo: " + mPseudo);
 
-        // Set map
+        // Set map & API client
         SupportMapFragment map = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         if (map == null) {
             map = new SupportMapFragment();
@@ -333,6 +411,12 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
         } else
             map.getMapAsync(this);
+
+        mClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
         // Position map & control panel
         ((RelativeLayout.LayoutParams) findViewById(R.id.layout_panel).getLayoutParams())
@@ -364,13 +448,13 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         // Initialize loaders
         Bundle userData = new Bundle();
         userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{CamaradesTable.COLUMN_DEVICE_ID});
-        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + pseudo + '\'');
+        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + mPseudo + '\'');
         userData.putParcelable(QueryLoader.DATA_KEY_URI,
                 Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME));
         mUser.init(this, Queries.LOCATION_USER_INFO, userData);
 
         Bundle followData = new Bundle();
-        mFollowersUri = Uris.getUri(Uris.ID_USER_LOCATION, pseudo);
+        mFollowersUri = Uris.getUri(Uris.ID_USER_LOCATION, mPseudo);
         followData.putParcelable(QueryLoader.DATA_KEY_URI, mFollowersUri);
         mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
     }
