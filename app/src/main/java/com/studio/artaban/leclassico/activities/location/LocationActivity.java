@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.activities.location;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Point;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
@@ -92,34 +93,27 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
     private void locate() { // Locate connected user
         Logs.add(Logs.Type.V, null);
+        try {
 
+            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mClient);
+            mUserLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+            displayUserLocation();
 
-
-
-
-        //if (mUserLocation == null)
-        //mUserLocation = null;
-
-
-
-
-
-
+        } catch (SecurityException e) {
+            Logs.add(Logs.Type.E, "Location failed: " + e.getMessage());
+            Toast.makeText(this, R.string.location_user_failed, Toast.LENGTH_LONG).show();
+            mUserLocation = null;
+        }
     }
     private void displayUserLocation() { // Display & move camera to user location marker
         Logs.add(Logs.Type.V, null);
+        if (mUserMarker != null)
+            mUserMarker.remove();
 
-
-
-
-
-        //if (mUserMarker != null)
-        //    mUserMarker.remove();
-
-
-
-
-
+        mUserMarker = mMap.addMarker(new MarkerOptions()
+                .position(mUserLocation)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location_black_24dp)));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mUserLocation, 18));
     }
     private String mPseudo; // Connected user pseudo
     private boolean mToday; // Today filter flag
@@ -187,7 +181,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     public boolean onMarkerClick(Marker marker) {
         Logs.add(Logs.Type.V, "marker: " + marker);
         if (marker.getTag() == null)
-            return false; // Connected user marker
+            return false; // User location marker
 
         // Select member info
         MarkerInfo data = (MarkerInfo) marker.getTag();

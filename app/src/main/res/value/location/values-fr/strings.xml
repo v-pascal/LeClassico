@@ -10,5 +10,6 @@
     <!-- Map -->
     <string name="location_today_filter">Filtre localisation 24h activé</string>
     <string name="location_no_filter">Filtre localisation 24h désactivé</string>
+    <string name="location_user_failed">Géolocalisation impossible! Vérifiez votre configuration ou réessayer ultérieurement.</string>
 
 </resources>
