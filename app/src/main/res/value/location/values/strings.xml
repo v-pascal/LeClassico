@@ -10,6 +10,6 @@
     <!-- Map -->
     <string name="location_today_filter">Today filter enabled</string>
     <string name="location_no_filter">Today filter disabled</string>
-    <string name="location_user_failed">Location failed! Check settings or try later.</string>
+    <string name="location_user_failed">Location failed! Make sure location is enabled on the device.</string>
 
 </resources>

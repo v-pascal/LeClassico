@@ -96,8 +96,12 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         try {
 
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mClient);
-            mUserLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            displayUserLocation();
+            if (lastLocation != null) {
+                mUserLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                displayUserLocation();
+
+            } else
+                Toast.makeText(this, R.string.location_user_failed, Toast.LENGTH_LONG).show();
 
         } catch (SecurityException e) {
             Logs.add(Logs.Type.E, "Location failed: " + e.getMessage());
@@ -152,22 +156,19 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     }
     public void onLocate(View sender) {
         Logs.add(Logs.Type.V, "sender: " + sender);
-        if (!mClient.isConnected())
-            mClient.connect();
-        else
-            locate();
+        locate();
     }
 
     ////// ConnectionCallbacks /////////////////////////////////////////////////////////////////////
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Logs.add(Logs.Type.V, "bundle: " + bundle);
-        locate();
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-
+    public void onConnectionSuspended(int cause) {
+        Logs.add(Logs.Type.V, "cause: " + cause);
+        mClient.connect();
     }
 
     ////// OnConnectionFailedListener //////////////////////////////////////////////////////////////
@@ -451,6 +452,20 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         mFollowersUri = Uris.getUri(Uris.ID_USER_LOCATION, mPseudo);
         followData.putParcelable(QueryLoader.DATA_KEY_URI, mFollowersUri);
         mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
+    }
+
+    @Override
+    protected void onStart() {
+        Logs.add(Logs.Type.V, null);
+        mClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        Logs.add(Logs.Type.V, null);
+        mClient.disconnect();
+        super.onStop();
     }
 
     @Override
