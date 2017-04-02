@@ -204,8 +204,7 @@ public class Queries {
     public static final int EVENTS_DISPLAY = Tables.ID_MAX + 9;
 
     ////// Location
-    public static final int LOCATION_USER_INFO = Tables.ID_MAX + 10;
-    public static final int LOCATION_FOLLOWERS = Tables.ID_MAX + 11;
+    public static final int LOCATION_FOLLOWERS = Tables.ID_MAX + 10;
 
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////

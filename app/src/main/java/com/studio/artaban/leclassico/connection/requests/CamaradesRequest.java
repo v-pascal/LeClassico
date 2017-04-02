@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.studio.artaban.leclassico.activities.settings.PrefsUserFragment;
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
@@ -29,7 +30,7 @@ public class CamaradesRequest extends DataRequest {
     public static final String EXTRA_DATA_PSEUDO = "pseudo";
     // Extra data keys (see 'DataRequest' extra data keys)
 
-    private static final char PSEUDO_SEPARATOR = '&'; // Pseudo separator in the post data request
+    public static final char PSEUDO_SEPARATOR = '&'; // Pseudo separator in the post data request
     // NB: The '&' is not available in the member pseudo definition
 
     public CamaradesRequest(DataService service) {
@@ -110,8 +111,16 @@ public class CamaradesRequest extends DataRequest {
                             syncData, postData);
         }
         if (DataTable.SyncResult.hasChanged(result)) {
-
             Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+
+            // Set user preferences info (in case of update)
+            if (result.updated > 0) {
+                Cursor cursor = mService.getContentResolver().query(Uri.parse(DataProvider.CONTENT_URI +
+                        CamaradesTable.TABLE_NAME), null, DataTable.DataField.COLUMN_ID + '=' +
+                        dataLogin.pseudoId, null, null);
+                PrefsUserFragment.getData(cursor);
+                cursor.close();
+            }
             notifyChange(); // Notify DB change to observer URI
         }
         return Result.NOT_FOUND; // Unused

@@ -175,13 +175,6 @@ public class PrefsUserFragment extends BasePreferenceFragment {
 
     @Override
     protected Bundle onDataChanged(ContentResolver resolver) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver);
-
-        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI +
-                CamaradesTable.TABLE_NAME), null, DataTable.DataField.COLUMN_ID + '=' +
-                Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID), null, null);
-        getData(cursor);
-        cursor.close();
         return null;
     }
     @Override

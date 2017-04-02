@@ -1,8 +1,6 @@
 package com.studio.artaban.leclassico.activities.settings;
 
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,15 +13,11 @@ import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
-import com.studio.artaban.leclassico.data.DataProvider;
-import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
-import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.services.DataService;
-import com.studio.artaban.leclassico.tools.Tools;
 
 import java.util.List;
 
@@ -49,35 +43,7 @@ public class SettingsActivity extends BasePreferenceActivity implements DataObse
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
-
-        final ContentResolver resolver = getContentResolver();
-        Tools.startProcess(this, new Tools.OnProcessListener() {
-            @Override
-            public Bundle onBackgroundTask() {
-                Logs.add(Logs.Type.V, null);
-
-                Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                        new String[]{
-                                CamaradesTable.COLUMN_DEVICE_ID,
-                                CamaradesTable.COLUMN_DEVICE
-                        },
-                        DataTable.DataField.COLUMN_ID + '=' + Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID),
-                        null, null);
-                cursor.moveToFirst();
-                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID,
-                        (!cursor.isNull(0)) ? cursor.getString(0) : null);
-                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE,
-                        (!cursor.isNull(1)) ? cursor.getString(1) : null);
-                cursor.close();
-                return null;
-            }
-
-            @Override
-            public void onMainNextTask(Bundle backResult) {
-                Logs.add(Logs.Type.V, "backResult: " + backResult);
-                invalidateHeaders(); // Refresh headers
-            }
-        });
+        invalidateHeaders(); // Refresh headers
     }
 
     ////// PreferenceActivity //////////////////////////////////////////////////////////////////////

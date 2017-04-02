@@ -35,7 +35,7 @@ import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.animations.InOutScreen;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.Constants;
-import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -256,6 +256,24 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
     protected void onLoggedResume() {
+        Logs.add(Logs.Type.V, null);
+
+
+
+
+
+        // Register data service
+        /*
+        Intent intent = DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri);
+        intent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO,
+                Preferences.getString(Preferences.SETTINGS_LOGIN_PSEUDO));
+        sendBroadcast(intent);
+        */
+
+
+
+
+
 
     }
 
@@ -266,71 +284,63 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         if ((!cursor.moveToFirst()) || (onNotifyLoadFinished(id, cursor)))
             return;
 
-        switch (id) {
-            case Queries.LOCATION_USER_INFO: { // Location share info
-                ((ImageView)findViewById(R.id.image_share))
-                        .setImageDrawable(getDrawable((cursor.isNull(0)) ?
-                                R.drawable.ic_location_off_white_36dp : R.drawable.ic_location_on_white_36dp));
-                break;
+        if (id != Queries.LOCATION_FOLLOWERS)
+            throw new IllegalArgumentException("Unexpected query ID");
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+        String today = dateFormat.format(new Date()).substring(0, 10);
+
+        mMap.clear(); // Remove all previous markers
+        do {
+            if (mPseudo.compareTo(cursor.getString(COLUMN_INDEX_PSEUDO)) == 0)
+                continue; // Do not display user location (with common marker)
+                // NB: Let user locate himself using the locate option
+
+            String date = (cursor.getString(COLUMN_INDEX_LATITUDE_UPD)
+                    .compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) > 0)?
+                    cursor.getString(COLUMN_INDEX_LATITUDE_UPD) :
+                    cursor.getString(COLUMN_INDEX_LONGITUDE_UPD);
+            if ((mToday) && (!date.startsWith(today))) // Apply today filter
+                continue;
+
+            int colorIdx = LeClassicoApp.getRandom().nextInt(MARKER_COLORS.length);
+            StringBuilder title = new StringBuilder();
+            try {
+                Date locationDate = dateFormat.parse(date);
+                if (!mToday) {
+                    title.append(DateFormat.getDateFormat(this).format(locationDate));
+                    title.append(' ');
+                }
+                title.append(DateFormat.getTimeFormat(this).format(locationDate));
+
+            } catch (ParseException e) {
+                Logs.add(Logs.Type.E, "Wrong location date format: " + date);
+                title.append(date);
             }
-            case Queries.LOCATION_FOLLOWERS: {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
-                String today = dateFormat.format(new Date()).substring(0, 10);
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.defaultMarker(MARKER_COLORS[colorIdx]))
+                    .title(title.toString())
+                    .position(new LatLng(cursor.getDouble(COLUMN_INDEX_LATITUDE),
+                            cursor.getDouble(COLUMN_INDEX_LONGITUDE))));
 
-                mMap.clear(); // Remove all previous markers
-                do {
-                    if (mPseudo.compareTo(cursor.getString(COLUMN_INDEX_PSEUDO)) == 0)
-                        continue; // Do not display user location (with common marker)
-                        // NB: Let user locate himself using the locate option
+            // Add marker info
+            boolean female = (!cursor.isNull(COLUMN_INDEX_SEXE)) &&
+                    (cursor.getInt(COLUMN_INDEX_SEXE) == CamaradesTable.GENDER_FEMALE);
+            String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
+                    cursor.getString(COLUMN_INDEX_PROFILE) : null;
 
-                    String date = (cursor.getString(COLUMN_INDEX_LATITUDE_UPD)
-                            .compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) > 0)?
-                            cursor.getString(COLUMN_INDEX_LATITUDE_UPD) :
-                            cursor.getString(COLUMN_INDEX_LONGITUDE_UPD);
-                    if ((mToday) && (!date.startsWith(today))) // Apply today filter
-                        continue;
+            marker.setTag(new MarkerInfo(cursor.getInt(COLUMN_INDEX_ID), profile, female,
+                    cursor.getString(COLUMN_INDEX_PSEUDO),
+                    Tools.getUserInfo(getResources(), cursor, COLUMN_INDEX_PHONE),
+                    MEMBER_COLORS[colorIdx]));
 
-                    int colorIdx = LeClassicoApp.getRandom().nextInt(MARKER_COLORS.length);
-                    StringBuilder title = new StringBuilder();
-                    try {
-                        Date locationDate = dateFormat.parse(date);
-                        if (!mToday) {
-                            title.append(DateFormat.getDateFormat(this).format(locationDate));
-                            title.append(' ');
-                        }
-                        title.append(DateFormat.getTimeFormat(this).format(locationDate));
+        } while (cursor.moveToNext());
+        cursor.moveToFirst();
 
-                    } catch (ParseException e) {
-                        Logs.add(Logs.Type.E, "Wrong location date format: " + date);
-                        title.append(date);
-                    }
-                    Marker marker = mMap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.defaultMarker(MARKER_COLORS[colorIdx]))
-                            .title(title.toString())
-                            .position(new LatLng(cursor.getDouble(COLUMN_INDEX_LATITUDE),
-                                    cursor.getDouble(COLUMN_INDEX_LONGITUDE))));
-
-                    // Add marker info
-                    boolean female = (!cursor.isNull(COLUMN_INDEX_SEXE)) &&
-                            (cursor.getInt(COLUMN_INDEX_SEXE) == CamaradesTable.GENDER_FEMALE);
-                    String profile = (!cursor.isNull(COLUMN_INDEX_PROFILE))?
-                            cursor.getString(COLUMN_INDEX_PROFILE) : null;
-
-                    marker.setTag(new MarkerInfo(cursor.getInt(COLUMN_INDEX_ID), profile, female,
-                            cursor.getString(COLUMN_INDEX_PSEUDO),
-                            Tools.getUserInfo(getResources(), cursor, COLUMN_INDEX_PHONE),
-                            MEMBER_COLORS[colorIdx]));
-
-                } while (cursor.moveToNext());
-                cursor.moveToFirst();
-
-                // Add user location (if it was requested)
-                if (mUserLocation != null)
-                    displayUserLocation();
-                // NB: Needed coz the map clear causes to remove all marker even user location marker
-                break;
-            }
-        }
+        // Add user location (if it was requested)
+        if (mUserLocation != null)
+            displayUserLocation();
+        // NB: Needed coz the map clear causes to remove all marker even user location marker
     }
 
     @Override
@@ -341,7 +351,6 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     //////
     private Uri mFollowersUri; // Followers location URI
     private final QueryLoader mFollowers = new QueryLoader(this, this); // Followers list query loader
-    private final QueryLoader mUser = new QueryLoader(this, this); // User location share info query loader
 
     private void refresh(@Nullable Long memberId) { // Refresh followers location query (markers)
         Logs.add(Logs.Type.V, "memberId: " + memberId);
@@ -413,9 +422,12 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        // Position map & control panel
+        // Position & set control panel
         ((RelativeLayout.LayoutParams) findViewById(R.id.layout_panel).getLayoutParams())
                 .setMargins(0, Tools.getStatusBarHeight(getResources()) + Tools.getActionBarHeight(this), 0, 0);
+        ((ImageView)findViewById(R.id.image_share))
+                .setImageDrawable(getDrawable((Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID) != null) ?
+                        R.drawable.ic_location_on_white_36dp : R.drawable.ic_location_off_white_36dp));
 
         // Display member layout on half screen (horizontally)
         Point screenSize = new Point();
@@ -440,14 +452,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
             }
         }); // To display member profile
 
-        // Initialize loaders
-        Bundle userData = new Bundle();
-        userData.putStringArray(QueryLoader.DATA_KEY_PROJECTION, new String[]{CamaradesTable.COLUMN_DEVICE_ID});
-        userData.putString(QueryLoader.DATA_KEY_SELECTION, CamaradesTable.COLUMN_PSEUDO + "='" + mPseudo + '\'');
-        userData.putParcelable(QueryLoader.DATA_KEY_URI,
-                Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME));
-        mUser.init(this, Queries.LOCATION_USER_INFO, userData);
-
+        // Initialize locations loader
         Bundle followData = new Bundle();
         mFollowersUri = Uris.getUri(Uris.ID_USER_LOCATION, mPseudo);
         followData.putParcelable(QueryLoader.DATA_KEY_URI, mFollowersUri);

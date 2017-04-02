@@ -120,21 +120,6 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
 
     @Override
     protected Bundle onDataChanged(ContentResolver resolver) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver);
-
-        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME),
-                new String[]{
-                        CamaradesTable.COLUMN_DEVICE_ID,
-                        CamaradesTable.COLUMN_DEVICE
-                },
-                DataTable.DataField.COLUMN_ID + '=' + Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID),
-                null, null);
-        cursor.moveToFirst();
-        Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID,
-                (!cursor.isNull(0)) ? cursor.getString(0) : null);
-        Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE,
-                (!cursor.isNull(1)) ? cursor.getString(1) : null);
-        cursor.close();
         return null;
     }
     @Override
