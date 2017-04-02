@@ -106,14 +106,14 @@ public class SettingsActivity extends BasePreferenceActivity implements DataObse
         invalidateHeaders(); // Refresh headers
         // NB: Needed when back from location screen with changes
 
+        // Register DB observer
+        mObserver.register(getContentResolver(), mUserUri);
+
         // Register data service
         Intent intent = DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri);
         intent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO,
                 Preferences.getString(Preferences.SETTINGS_LOGIN_PSEUDO));
         sendBroadcast(intent);
-
-        // Register DB observer
-        mObserver.register(getContentResolver(), mUserUri);
     }
 
     @Override
@@ -121,10 +121,10 @@ public class SettingsActivity extends BasePreferenceActivity implements DataObse
         super.onPause();
         Logs.add(Logs.Type.V, null);
 
-        // Unregister DB observer
-        mObserver.unregister(getContentResolver());
-
         // Unregister data service
         sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUserUri));
+
+        // Unregister DB observer
+        mObserver.unregister(getContentResolver());
     }
 }

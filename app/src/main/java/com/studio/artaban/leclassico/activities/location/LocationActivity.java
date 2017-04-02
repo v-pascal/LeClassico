@@ -6,6 +6,8 @@ import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
@@ -34,13 +36,17 @@ import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
 import com.studio.artaban.leclassico.animations.InOutScreen;
 import com.studio.artaban.leclassico.connection.Login;
+import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
+import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.tools.Tools;
 
 import java.text.ParseException;
@@ -53,7 +59,7 @@ import java.util.Date;
  */
 public class LocationActivity extends LoggedActivity implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener,  GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, DataObserver.OnContentListener {
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
 
@@ -253,28 +259,29 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         mMap.setOnMapClickListener(this);
     }
 
+    ////// OnContentListener ///////////////////////////////////////////////////////////////////////
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        Logs.add(Logs.Type.V, "selfChange: " + selfChange + ";uri: " + uri);
+
+        // Update location share option (in case of change)
+        ((ImageView)findViewById(R.id.image_share))
+                .setImageDrawable(getDrawable((Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID) != null) ?
+                        R.drawable.ic_location_on_white_36dp : R.drawable.ic_location_off_white_36dp));
+    }
+
     ////// LoggedActivity //////////////////////////////////////////////////////////////////////////
     @Override
     protected void onLoggedResume() {
         Logs.add(Logs.Type.V, null);
 
+        // Register DB observer
+        mUserObserver.register(getContentResolver(), mUserUri);
 
-
-
-
-        // Register data service
-        /*
+        // Register data service (user info)
         Intent intent = DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri);
-        intent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO,
-                Preferences.getString(Preferences.SETTINGS_LOGIN_PSEUDO));
+        intent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO, mPseudo);
         sendBroadcast(intent);
-        */
-
-
-
-
-
-
     }
 
     //////
@@ -350,7 +357,9 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
     //////
     private Uri mFollowersUri; // Followers location URI
+    private Uri mUserUri; // Connected user URI
     private final QueryLoader mFollowers = new QueryLoader(this, this); // Followers list query loader
+    private DataObserver mUserObserver; // User info DB update observer (observe remote DB updates)
 
     private void refresh(@Nullable Long memberId) { // Refresh followers location query (markers)
         Logs.add(Logs.Type.V, "memberId: " + memberId);
@@ -452,9 +461,15 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
             }
         }); // To display member profile
 
+        // Set followers & user URI
+        mFollowersUri = Uris.getUri(Uris.ID_USER_LOCATION, mPseudo);
+        mUserUri = Uris.getUri(Uris.ID_USER_MEMBERS,
+                String.valueOf(Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID)));
+
+        mUserObserver = new DataObserver(new Handler(Looper.getMainLooper()), this);
+
         // Initialize locations loader
         Bundle followData = new Bundle();
-        mFollowersUri = Uris.getUri(Uris.ID_USER_LOCATION, mPseudo);
         followData.putParcelable(QueryLoader.DATA_KEY_URI, mFollowersUri);
         mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
     }
@@ -464,6 +479,18 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         Logs.add(Logs.Type.V, null);
         mClient.connect();
         super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Logs.add(Logs.Type.V, null);
+
+        // Unregister data service (user info)
+        sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUserUri));
+
+        // Unregister DB observer
+        mUserObserver.unregister(getContentResolver());
     }
 
     @Override
