@@ -279,9 +279,11 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         mUserObserver.register(getContentResolver(), mUserUri);
 
         // Register data service (user info)
-        Intent intent = DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri);
-        intent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO, mPseudo);
-        sendBroadcast(intent);
+        Intent userIntent = DataService.getIntent(true, Tables.ID_CAMARADES, mUserUri);
+        userIntent.putExtra(CamaradesRequest.EXTRA_DATA_PSEUDO, mPseudo);
+        sendBroadcast(userIntent);
+
+        sendBroadcast(DataService.getIntent(true, Tables.ID_ABONNEMENTS, mFollowersUri));
     }
 
     //////
@@ -488,6 +490,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
         // Unregister data service (user info)
         sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUserUri));
+        sendBroadcast(DataService.getIntent(false, Tables.ID_ABONNEMENTS, mFollowersUri));
 
         // Unregister DB observer
         mUserObserver.unregister(getContentResolver());

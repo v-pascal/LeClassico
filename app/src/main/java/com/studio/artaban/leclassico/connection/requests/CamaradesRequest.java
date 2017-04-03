@@ -105,7 +105,6 @@ public class CamaradesRequest extends DataRequest {
         // Synchronization (from remote to local DB)
         DataTable.SyncResult result;
         synchronized (Database.getTable(CamaradesTable.TABLE_NAME)) {
-
             result = Database.getTable(CamaradesTable.TABLE_NAME)
                     .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT,
                             syncData, postData);
