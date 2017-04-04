@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Location -->
 
+    <string name="location_share_enabled">Location share enabled</string>
+    <string name="location_share_disabled">Location share disabled</string>
+
     <!-- Settings -->
     <string name="pref_location_way">Location share</string>
     <string name="current_device">Current device (%1$s)</string>

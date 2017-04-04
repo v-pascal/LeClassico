@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
-import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -55,9 +54,9 @@ public class SettingsActivity extends BasePreferenceActivity implements DataObse
         if (getIntent().hasExtra(Login.EXTRA_DATA_PSEUDO))
             Preferences.setString(Preferences.SETTINGS_LOGIN_PSEUDO,
                     getIntent().getStringExtra(Login.EXTRA_DATA_PSEUDO));
-        if (getIntent().hasExtra(Login.EXTRA_DATA_PSEUDO_ID))
-            Preferences.setInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID,
-                    getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
+        //if (getIntent().hasExtra(Login.EXTRA_DATA_PSEUDO_ID)) // Already set in PrefsUserFragment.getData
+        //    Preferences.setInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID,
+        //            getIntent().getIntExtra(Login.EXTRA_DATA_PSEUDO_ID, Constants.NO_DATA));
         // NB: Needed coz intent is replaced by new one at preference header selection (without extras)
 
         // Enable to display back arrow (toolbar)

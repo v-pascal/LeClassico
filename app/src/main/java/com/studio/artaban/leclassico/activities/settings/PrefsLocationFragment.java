@@ -1,14 +1,17 @@
 package com.studio.artaban.leclassico.activities.settings;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.SwitchPreference;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 
@@ -37,12 +40,119 @@ import java.util.Date;
  */
 public class PrefsLocationFragment extends BasePreferenceFragment {
 
-    private void updateData(String deviceId, String device) {
-        Logs.add(Logs.Type.V, "deviceId: " + deviceId + ";device: " + device);
+    public interface OnSetResult {
+        void onSet(boolean newShare);
+    }
+    public static void set(Activity activity, final boolean share, @NonNull final OnSetResult result,
+                           @Nullable final Uri uri, @Nullable final ContentObserver observer) {
 
-        Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID, deviceId);
-        Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE, device);
-        updateData(null, (deviceId == null)? Boolean.FALSE : Boolean.TRUE);
+        Logs.add(Logs.Type.V, "activity: " + activity + ";share: " + share + ";result: " + result +
+                ";uri: " + uri + ";observer: " + observer);
+        final String currentId = Tools.getDeviceId(activity);
+        final ContentResolver resolver = activity.getContentResolver();
+        if (!share) {
+
+            String deviceId = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
+            if ((deviceId == null) || (currentId == null) || (deviceId.equals(currentId))) {
+                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID, null);
+                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE, null);
+
+                updateData(resolver, share, currentId, uri, observer);
+                result.onSet(share);
+
+            } else // Confirm disabling location share defined on another device
+                new AlertDialog.Builder(activity)
+                        .setIcon(R.drawable.question_red)
+                        .setTitle(R.string.confirm)
+                        .setMessage(activity.getString(R.string.confirm_disable_location,
+                                Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE)))
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
+                                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID, null);
+                                Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE, null);
+
+                                updateData(resolver, share, currentId, uri, observer);
+                                result.onSet(share);
+                            }
+                        })
+                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
+                                result.onSet(!share); // No change
+                            }
+                        })
+                        .create()
+                        .show();
+
+        } else {
+            String device = Tools.getDeviceName();
+            Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE_ID, currentId);
+            Preferences.setString(Preferences.SETTINGS_LOCATION_DEVICE, device);
+
+            updateData(resolver, share, currentId, uri, observer);
+            result.onSet(share);
+        }
+    }
+    private static void updateData(final ContentResolver resolver, final boolean share, final String deviceId,
+                                   @Nullable final Uri uri, @Nullable final ContentObserver observer) {
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";share: " + share + ";deviceId: " + deviceId);
+        new Thread(new Runnable() { // Background process
+            @Override
+            public void run() {
+                Logs.add(Logs.Type.V, null);
+
+                Uri memberUri = Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME);
+                String where = DataTable.DataField.COLUMN_ID + '=' +
+                        Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID);
+
+                synchronized (Database.getTable(CamaradesTable.TABLE_NAME)) {
+                    ContentValues values = new ContentValues();
+
+                    Date now = new Date();
+                    DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
+                    String currentDate = dateFormat.format(now);
+                    values.put(CamaradesTable.COLUMN_DEVICE_UPD, currentDate);
+                    values.put(CamaradesTable.COLUMN_DEVICE_ID_UPD, currentDate);
+
+                    Cursor status = resolver.query(memberUri,
+                            new String[]{Constants.DATA_COLUMN_STATUS_DATE}, where, null, null);
+                    status.moveToFirst();
+                    values.put(Constants.DATA_COLUMN_STATUS_DATE, status.getString(0));
+                    status.close();
+                    // NB: Needed to keep current status date entry (allow to find fields to update)
+
+                    if (share) {
+                        try {
+                            values.put(CamaradesTable.COLUMN_DEVICE, Tools.getDeviceName());
+                            values.put(CamaradesTable.COLUMN_DEVICE_ID, deviceId);
+
+                        } catch (Exception e) {
+                            Logs.add(Logs.Type.E, "Unable to get device Name & ID");
+                            values.put(CamaradesTable.COLUMN_DEVICE, "UNKNOWN");
+                            values.put(CamaradesTable.COLUMN_DEVICE_ID, "NO-DEVICE-ID");
+                        }
+
+                    } else {
+                        values.putNull(CamaradesTable.COLUMN_DEVICE);
+                        values.putNull(CamaradesTable.COLUMN_DEVICE_ID);
+
+                        values.put(CamaradesTable.COLUMN_LATITUDE_UPD, currentDate);
+                        values.put(CamaradesTable.COLUMN_LONGITUDE_UPD, currentDate);
+                        values.putNull(CamaradesTable.COLUMN_LATITUDE);
+                        values.putNull(CamaradesTable.COLUMN_LONGITUDE);
+                    }
+                    resolver.update(memberUri, values, where, null);
+
+                    if (uri != null) // Notify changes (if requested)
+                        resolver.notifyChange(uri, observer);
+                }
+            }
+        }).start();
     }
 
     ////// OnPreferenceChangeListener //////////////////////////////////////////////////////////////
@@ -50,43 +160,27 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
     public boolean onPreferenceChange(final Preference preference, Object newValue) {
         Logs.add(Logs.Type.V, "preference: " + preference + ";newValue: " + newValue);
 
-        String deviceId = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID);
-        String currentId = Tools.getDeviceId(getActivity());
-        Boolean locate = (Boolean)newValue;
-        if (!locate) {
-            if ((deviceId == null) || (currentId == null) || (deviceId.equals(currentId))) {
-                preference.setSummary(getString(R.string.disabled));
-                updateData(null, null);
-                return true;
+        final Boolean share = (Boolean)newValue;
+        final ContentResolver resolver = getActivity().getContentResolver();
+        set(getActivity(), share, new OnSetResult() {
+
+            @Override
+            public void onSet(boolean newShare) {
+                Logs.add(Logs.Type.V, "newShare: " + newShare);
+                if (share != newShare)
+                    return; // No change
+
+                if (!newShare)
+                    preference.setSummary(getString(R.string.disabled));
+                else {
+                    String device = Tools.getDeviceName();
+                    preference.setSummary(getString(R.string.current_device, device));
+                }
+                ((SwitchPreference)preference).setChecked(newShare);
+                preference.getEditor().apply();
             }
-            // Confirm disabling location share defined on another device
-            new AlertDialog.Builder(getActivity())
-                    .setIcon(R.drawable.question_red)
-                    .setTitle(R.string.confirm)
-                    .setMessage(getString(R.string.confirm_disable_location,
-                            Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE)))
-                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Logs.add(Logs.Type.V, "dialog: " + dialog + ";which: " + which);
-
-                            preference.setSummary(getString(R.string.disabled));
-                            ((SwitchPreference)preference).setChecked(false);
-                            preference.getEditor().apply();
-                            updateData(null, null);
-                        }
-                    })
-                    .setNegativeButton(R.string.no, null)
-                    .create()
-                    .show();
-
-        } else {
-            String device = Tools.getDeviceName();
-            preference.setSummary(getString(R.string.current_device, device));
-            updateData(currentId, device);
-            return true;
-        }
+        }, mUri, mObserver);
         return false;
     }
 
@@ -124,51 +218,7 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
     }
     @Override
     protected void onUpdateData(String key, Object newValue) {
-        Logs.add(Logs.Type.V, "key: " + key + ";newValue: " + newValue);
 
-        Uri uri = Uri.parse(DataProvider.CONTENT_URI + CamaradesTable.TABLE_NAME);
-        String where = DataTable.DataField.COLUMN_ID + '=' +
-                Preferences.getInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID);
-
-        synchronized (Database.getTable(CamaradesTable.TABLE_NAME)) {
-            ContentValues values = new ContentValues();
-
-            Date now = new Date();
-            DateFormat dateFormat = new SimpleDateFormat(Constants.FORMAT_DATE_TIME);
-            String currentDate = dateFormat.format(now);
-            values.put(CamaradesTable.COLUMN_DEVICE_UPD, currentDate);
-            values.put(CamaradesTable.COLUMN_DEVICE_ID_UPD, currentDate);
-
-            Cursor status = getActivity().getContentResolver().query(uri,
-                    new String[]{Constants.DATA_COLUMN_STATUS_DATE}, where, null, null);
-            status.moveToFirst();
-            values.put(Constants.DATA_COLUMN_STATUS_DATE, status.getString(0));
-            status.close();
-            // NB: Needed to keep current status date entry (allow to find fields to update)
-
-            if ((Boolean)newValue) {
-                try {
-                    values.put(CamaradesTable.COLUMN_DEVICE, Tools.getDeviceName());
-                    values.put(CamaradesTable.COLUMN_DEVICE_ID, Tools.getDeviceId(getActivity()));
-
-                } catch (Exception e) {
-                    Logs.add(Logs.Type.E, "Unable to get device Name & ID");
-                    values.put(CamaradesTable.COLUMN_DEVICE, "UNKNOWN");
-                    values.put(CamaradesTable.COLUMN_DEVICE_ID, "NO-DEVICE-ID");
-                }
-
-            } else {
-                values.putNull(CamaradesTable.COLUMN_DEVICE);
-                values.putNull(CamaradesTable.COLUMN_DEVICE_ID);
-
-                values.put(CamaradesTable.COLUMN_LATITUDE_UPD, currentDate);
-                values.put(CamaradesTable.COLUMN_LONGITUDE_UPD, currentDate);
-                values.putNull(CamaradesTable.COLUMN_LATITUDE);
-                values.putNull(CamaradesTable.COLUMN_LONGITUDE);
-            }
-            getActivity().getContentResolver().update(uri, values, where, null);
-            getActivity().getContentResolver().notifyChange(mUri, mObserver); // Notify changes
-        }
     }
 
     ////// PreferenceFragment //////////////////////////////////////////////////////////////////////

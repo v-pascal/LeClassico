@@ -34,6 +34,7 @@ import com.studio.artaban.leclassico.LeClassicoApp;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.activities.LoggedActivity;
 import com.studio.artaban.leclassico.activities.profile.ProfileActivity;
+import com.studio.artaban.leclassico.activities.settings.PrefsLocationFragment;
 import com.studio.artaban.leclassico.animations.InOutScreen;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
@@ -130,16 +131,15 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     private boolean mSelected; // Member selection flag
 
     //////
-    public void onSearch(View sender) {
+    public void onSearch(View sender) { // On search member requested
         Logs.add(Logs.Type.V, "sender: " + sender);
 
 
 
 
 
-
     }
-    public void onToday(View sender) {
+    public void onToday(View sender) { // On today criteria change
         Logs.add(Logs.Type.V, "sender: " + sender);
         mToday = !mToday;
 
@@ -151,16 +151,31 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         Toast.makeText(this, (mToday)? R.string.location_today_filter:R.string.location_no_filter,
                 Toast.LENGTH_SHORT).show(); // Display filter info
     }
-    public void onShare(View sender) {
+    public void onShare(View sender) { // On user location share set
         Logs.add(Logs.Type.V, "sender: " + sender);
 
+        final boolean share = Preferences.getString(Preferences.SETTINGS_LOCATION_DEVICE_ID) != null;
+        PrefsLocationFragment.set(this, !share,
+                new PrefsLocationFragment.OnSetResult() {
+                    @Override
+                    public void onSet(boolean newShare) {
+                        Logs.add(Logs.Type.V, "newShare: " + newShare);
+                        if (share == newShare)
+                            return; // No change
 
+                        ((ImageView)findViewById(R.id.image_share))
+                                .setImageDrawable(getDrawable((newShare) ?
+                                        R.drawable.ic_location_on_white_36dp :
+                                        R.drawable.ic_location_off_white_36dp));
 
-
-
-
+                        // Inform user share location changed
+                        Toast.makeText(LocationActivity.this, (newShare)?
+                                R.string.location_share_enabled:R.string.location_share_disabled,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }, mUserUri, mUserObserver);
     }
-    public void onLocate(View sender) {
+    public void onLocate(View sender) { // On connected user location requested
         Logs.add(Logs.Type.V, "sender: " + sender);
         locate();
     }
@@ -284,6 +299,11 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         sendBroadcast(userIntent);
 
         sendBroadcast(DataService.getIntent(true, Tables.ID_ABONNEMENTS, mFollowersUri));
+
+
+        // TODO: Register location data service
+
+
     }
 
     //////
@@ -491,6 +511,10 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         // Unregister data service (user info)
         sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUserUri));
         sendBroadcast(DataService.getIntent(false, Tables.ID_ABONNEMENTS, mFollowersUri));
+
+
+        // TODO: Unregister location data service
+
 
         // Unregister DB observer
         mUserObserver.unregister(getContentResolver());

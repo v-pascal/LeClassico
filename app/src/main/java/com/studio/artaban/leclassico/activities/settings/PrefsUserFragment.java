@@ -14,6 +14,7 @@ import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.IDataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
@@ -46,6 +47,9 @@ public class PrefsUserFragment extends BasePreferenceFragment {
     public static void getData(Cursor user) { // Store connected user info into preferences (from DB)
         Logs.add(Logs.Type.V, "user: " + user);
         user.moveToFirst();
+
+        Preferences.setInt(Preferences.SETTINGS_LOGIN_PSEUDO_ID, user.getInt(IDataTable.DataField.COLUMN_INDEX_ID));
+        // NB: Needed when connected user key is only available with its pseudo (e.g location activity)
 
         ////// Personal info
         Preferences.setString(Preferences.SETTINGS_USER_PASSWORD, user.getString(CamaradesTable.COLUMN_INDEX_CODE_CONF));

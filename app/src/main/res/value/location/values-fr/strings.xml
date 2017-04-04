@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><!-- Location -->
 
+    <string name="location_share_enabled">Partage de la géolocalisation activé</string>
+    <string name="location_share_disabled">Partage de la géolocalisation désactivé</string>
+
     <!-- Settings -->
     <string name="pref_location_way">Partage de la géolocalisation</string>
     <string name="current_device">Périphérique actuel (%1$s)</string>

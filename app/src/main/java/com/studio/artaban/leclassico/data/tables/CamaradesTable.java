@@ -273,9 +273,9 @@ public class CamaradesTable extends DataTable {
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_DEVICE_ID_UPD + " OR " +
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LATITUDE_UPD + " OR " +
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LONGITUDE_UPD + ") AND (" +
-                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_UPDATE.getValue() + " OR " +
-                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_UPDATE.getValue() |
-                        Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
+                Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_UPDATE.getValue() + " OR " +
+                Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_UPDATE.getValue() |
+                Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
         if (cursor.moveToFirst()) {
             try {
 
@@ -297,11 +297,11 @@ public class CamaradesTable extends DataTable {
                         status.put(JSON_KEY_CODE_CONF_UPD, cursor.getString(COLUMN_INDEX_CODE_CONF_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_NOM_UPD)) < 0) {
-                        update.put(JSON_KEY_NOM, (!cursor.isNull(COLUMN_INDEX_NOM))? cursor.getString(COLUMN_INDEX_NOM):null);
+                        update.put(JSON_KEY_NOM, (!cursor.isNull(COLUMN_INDEX_NOM))? cursor.getString(COLUMN_INDEX_NOM):JSONObject.NULL);
                         status.put(JSON_KEY_NOM_UPD, cursor.getString(COLUMN_INDEX_NOM_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PRENOM_UPD)) < 0) {
-                        update.put(JSON_KEY_PRENOM, (!cursor.isNull(COLUMN_INDEX_PRENOM))? cursor.getString(COLUMN_INDEX_PRENOM):null);
+                        update.put(JSON_KEY_PRENOM, (!cursor.isNull(COLUMN_INDEX_PRENOM))? cursor.getString(COLUMN_INDEX_PRENOM):JSONObject.NULL);
                         status.put(JSON_KEY_PRENOM_UPD, cursor.getString(COLUMN_INDEX_PRENOM_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_SEXE_UPD)) < 0) {
@@ -309,35 +309,35 @@ public class CamaradesTable extends DataTable {
                         status.put(JSON_KEY_SEXE_UPD, cursor.getString(COLUMN_INDEX_SEXE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_BORN_DATE_UPD)) < 0) {
-                        update.put(JSON_KEY_BORN_DATE, (!cursor.isNull(COLUMN_INDEX_BORN_DATE))? cursor.getString(COLUMN_INDEX_BORN_DATE):null);
+                        update.put(JSON_KEY_BORN_DATE, (!cursor.isNull(COLUMN_INDEX_BORN_DATE))? cursor.getString(COLUMN_INDEX_BORN_DATE):JSONObject.NULL);
                         status.put(JSON_KEY_BORN_DATE_UPD, cursor.getString(COLUMN_INDEX_BORN_DATE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_ADRESSE_UPD)) < 0) {
-                        update.put(JSON_KEY_ADRESSE, (!cursor.isNull(COLUMN_INDEX_ADRESSE))? cursor.getString(COLUMN_INDEX_ADRESSE):null);
+                        update.put(JSON_KEY_ADRESSE, (!cursor.isNull(COLUMN_INDEX_ADRESSE))? cursor.getString(COLUMN_INDEX_ADRESSE):JSONObject.NULL);
                         status.put(JSON_KEY_ADRESSE_UPD, cursor.getString(COLUMN_INDEX_ADRESSE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_VILLE_UPD)) < 0) {
-                        update.put(JSON_KEY_VILLE, (!cursor.isNull(COLUMN_INDEX_VILLE))? cursor.getString(COLUMN_INDEX_VILLE):null);
+                        update.put(JSON_KEY_VILLE, (!cursor.isNull(COLUMN_INDEX_VILLE))? cursor.getString(COLUMN_INDEX_VILLE):JSONObject.NULL);
                         status.put(JSON_KEY_VILLE_UPD, cursor.getString(COLUMN_INDEX_VILLE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_POSTAL_UPD)) < 0) {
-                        update.put(JSON_KEY_POSTAL, (!cursor.isNull(COLUMN_INDEX_POSTAL))? cursor.getString(COLUMN_INDEX_POSTAL):null);
+                        update.put(JSON_KEY_POSTAL, (!cursor.isNull(COLUMN_INDEX_POSTAL))? cursor.getString(COLUMN_INDEX_POSTAL):JSONObject.NULL);
                         status.put(JSON_KEY_POSTAL_UPD, cursor.getString(COLUMN_INDEX_POSTAL_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PHONE_UPD)) < 0) {
-                        update.put(JSON_KEY_PHONE, (!cursor.isNull(COLUMN_INDEX_PHONE))? cursor.getString(COLUMN_INDEX_PHONE):null);
+                        update.put(JSON_KEY_PHONE, (!cursor.isNull(COLUMN_INDEX_PHONE))? cursor.getString(COLUMN_INDEX_PHONE):JSONObject.NULL);
                         status.put(JSON_KEY_PHONE_UPD, cursor.getString(COLUMN_INDEX_PHONE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_EMAIL_UPD)) < 0) {
-                        update.put(JSON_KEY_EMAIL, (!cursor.isNull(COLUMN_INDEX_EMAIL))? cursor.getString(COLUMN_INDEX_EMAIL):null);
+                        update.put(JSON_KEY_EMAIL, (!cursor.isNull(COLUMN_INDEX_EMAIL))? cursor.getString(COLUMN_INDEX_EMAIL):JSONObject.NULL);
                         status.put(JSON_KEY_EMAIL_UPD, cursor.getString(COLUMN_INDEX_EMAIL_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_HOBBIES_UPD)) < 0) {
-                        update.put(JSON_KEY_HOBBIES, (!cursor.isNull(COLUMN_INDEX_HOBBIES))? cursor.getString(COLUMN_INDEX_HOBBIES):null);
+                        update.put(JSON_KEY_HOBBIES, (!cursor.isNull(COLUMN_INDEX_HOBBIES))? cursor.getString(COLUMN_INDEX_HOBBIES):JSONObject.NULL);
                         status.put(JSON_KEY_HOBBIES_UPD, cursor.getString(COLUMN_INDEX_HOBBIES_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_A_PROPOS_UPD)) < 0) {
-                        update.put(JSON_KEY_A_PROPOS, (!cursor.isNull(COLUMN_INDEX_A_PROPOS))? cursor.getString(COLUMN_INDEX_A_PROPOS):null);
+                        update.put(JSON_KEY_A_PROPOS, (!cursor.isNull(COLUMN_INDEX_A_PROPOS))? cursor.getString(COLUMN_INDEX_A_PROPOS):JSONObject.NULL);
                         status.put(JSON_KEY_A_PROPOS_UPD, cursor.getString(COLUMN_INDEX_A_PROPOS_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LOG_DATE_UPD)) < 0) {
@@ -349,27 +349,27 @@ public class CamaradesTable extends DataTable {
                         status.put(JSON_KEY_ADMIN_UPD, cursor.getString(COLUMN_INDEX_ADMIN_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_PROFILE_UPD)) < 0) {
-                        update.put(JSON_KEY_PROFILE, (!cursor.isNull(COLUMN_INDEX_PROFILE))? cursor.getString(COLUMN_INDEX_PROFILE):null);
+                        update.put(JSON_KEY_PROFILE, (!cursor.isNull(COLUMN_INDEX_PROFILE))? cursor.getString(COLUMN_INDEX_PROFILE):JSONObject.NULL);
                         status.put(JSON_KEY_PROFILE_UPD, cursor.getString(COLUMN_INDEX_PROFILE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_BANNER_UPD)) < 0) {
-                        update.put(JSON_KEY_BANNER, (!cursor.isNull(COLUMN_INDEX_BANNER))? cursor.getString(COLUMN_INDEX_BANNER):null);
+                        update.put(JSON_KEY_BANNER, (!cursor.isNull(COLUMN_INDEX_BANNER))? cursor.getString(COLUMN_INDEX_BANNER):JSONObject.NULL);
                         status.put(JSON_KEY_BANNER_UPD, cursor.getString(COLUMN_INDEX_BANNER_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_DEVICE_UPD)) < 0) {
-                        update.put(JSON_KEY_DEVICE, (!cursor.isNull(COLUMN_INDEX_DEVICE))? cursor.getString(COLUMN_INDEX_DEVICE):null);
+                        update.put(JSON_KEY_DEVICE, (!cursor.isNull(COLUMN_INDEX_DEVICE))? cursor.getString(COLUMN_INDEX_DEVICE):JSONObject.NULL);
                         status.put(JSON_KEY_DEVICE_UPD, cursor.getString(COLUMN_INDEX_DEVICE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_DEVICE_ID_UPD)) < 0) {
-                        update.put(JSON_KEY_DEVICE_ID, (!cursor.isNull(COLUMN_INDEX_DEVICE_ID))? cursor.getString(COLUMN_INDEX_DEVICE_ID):null);
+                        update.put(JSON_KEY_DEVICE_ID, (!cursor.isNull(COLUMN_INDEX_DEVICE_ID))? cursor.getString(COLUMN_INDEX_DEVICE_ID):JSONObject.NULL);
                         status.put(JSON_KEY_DEVICE_ID_UPD, cursor.getString(COLUMN_INDEX_DEVICE_ID_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LATITUDE_UPD)) < 0) {
-                        update.put(JSON_KEY_LATITUDE, cursor.getDouble(COLUMN_INDEX_LATITUDE));
+                        update.put(JSON_KEY_LATITUDE, (!cursor.isNull(COLUMN_INDEX_LATITUDE))? cursor.getDouble(COLUMN_INDEX_LATITUDE):JSONObject.NULL);
                         status.put(JSON_KEY_LATITUDE_UPD, cursor.getString(COLUMN_INDEX_LATITUDE_UPD));
                     }
                     if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) < 0) {
-                        update.put(JSON_KEY_LONGITUDE, cursor.getDouble(COLUMN_INDEX_LONGITUDE));
+                        update.put(JSON_KEY_LONGITUDE, (!cursor.isNull(COLUMN_INDEX_LONGITUDE))? cursor.getDouble(COLUMN_INDEX_LONGITUDE):JSONObject.NULL);
                         status.put(JSON_KEY_LONGITUDE_UPD, cursor.getString(COLUMN_INDEX_LONGITUDE_UPD));
                     }
 

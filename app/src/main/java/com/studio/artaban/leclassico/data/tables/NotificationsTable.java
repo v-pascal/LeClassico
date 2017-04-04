@@ -170,9 +170,9 @@ public class NotificationsTable extends DataTable {
                     key.put(JSON_KEY_DATE, cursor.getString(COLUMN_INDEX_DATE));
                     key.put(JSON_KEY_OBJECT_TYPE, cursor.getString(COLUMN_INDEX_OBJECT_TYPE));
                     key.put(JSON_KEY_OBJECT_ID, (!cursor.isNull(COLUMN_INDEX_OBJECT_ID)) ?
-                            cursor.getInt(COLUMN_INDEX_OBJECT_ID) : null);
+                            cursor.getInt(COLUMN_INDEX_OBJECT_ID) : JSONObject.NULL);
                     key.put(JSON_KEY_OBJECT_DATE, (!cursor.isNull(COLUMN_INDEX_OBJECT_DATE)) ?
-                            cursor.getString(COLUMN_INDEX_OBJECT_DATE) : null);
+                            cursor.getString(COLUMN_INDEX_OBJECT_DATE) : JSONObject.NULL);
                     key.put(JSON_KEY_OBJECT_FROM, cursor.getString(COLUMN_INDEX_OBJECT_FROM));
 
                     // Status
@@ -326,7 +326,10 @@ public class NotificationsTable extends DataTable {
                                         values.put(COLUMN_PSEUDO, pseudo);
                                         values.put(COLUMN_DATE, date);
                                         values.put(COLUMN_OBJECT_TYPE, objType);
-                                        values.put(COLUMN_OBJECT_ID, (objID != Constants.NO_DATA)? objID:null);
+                                        if (objID != Constants.NO_DATA)
+                                            values.put(COLUMN_OBJECT_ID, objID);
+                                        else
+                                            values.putNull(COLUMN_OBJECT_ID);
                                         values.put(COLUMN_OBJECT_FROM, objFrom);
                                         values.put(COLUMN_OBJECT_DATE, objDate);
                                         resolver.insert(tableUri, values);
