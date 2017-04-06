@@ -31,6 +31,11 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDarkLocation</item>
         <item name="colorAccent">@color/colorAccentLocation</item>
 
+        <!-- Default activity transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowEnterTransition">@android:transition/fade</item>
+        <item name="android:windowExitTransition">@android:transition/fade</item>
+
         <!-- Translucent navigation bar -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
@@ -40,17 +45,14 @@
         <item name="colorAccent">@color/colorAccentMailbox</item>
     </style>
     <style name="EventAppTheme" parent="LocationAppTheme">
-        <item name="android:windowActivityTransitions">true</item>
-
-        <!-- Default activity transitions -->
-        <item name="android:windowEnterTransition">@android:transition/fade</item>
-        <item name="android:windowExitTransition">@android:transition/fade</item>
-
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+    <style name="MemberPickAppTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item>
     </style>
 
     <!-- Custom themes -->

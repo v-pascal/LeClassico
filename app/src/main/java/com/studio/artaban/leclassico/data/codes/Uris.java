@@ -88,6 +88,9 @@ public class Uris {
             case ID_MAIN_EVENTS:
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_EVENTS); // Events
+            case ID_PICK_MEMBER:
+                return Uri.parse(DataProvider.CONTENT_URI +
+                        PATH_MEMBER); // Member
 
             default:
                 throw new IllegalArgumentException("Unexpected URI id: " + id);
@@ -99,6 +102,7 @@ public class Uris {
     private static final String PATH_SQL = "SQL"; // SQL path for raw query (reserved)
     private static final String PATH_BEST_PHOTOS = "BestPhotos"; // Best photos URI path
     private static final String PATH_EVENTS = "Events"; // Events URI path
+    private static final String PATH_MEMBER = "Member"; // Member URI path
 
     private static final String PATH_USER = "User/"; // User URI path following with member ID
     private static final String PATH_SHORTCUT = "/Shortcut/"; // Shortcut URI path
@@ -118,6 +122,7 @@ public class Uris {
     public static final short ID_MAIN_SHORTCUT_MEMBER = 8; // User/#/Shortcut/Camarades
     public static final short ID_MAIN_BEST_PHOTOS = 9;     // BestPhotos
     public static final short ID_MAIN_EVENTS = 10;         // Events
+    public static final short ID_PICK_MEMBER = 11;         // Member
 
     ////// URI Matcher /////////////////////////////////////////////////////////////////////////////
 

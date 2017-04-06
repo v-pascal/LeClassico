@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.main;
 
+import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -260,7 +261,7 @@ public class MainActivity extends LoggedActivity implements
                 Intent location = new Intent(this, LocationActivity.class);
                 Login.copyExtraData(getIntent(), location);
                 location.putExtra(LoggedActivity.EXTRA_DATA_ID, pseudoId);
-                startActivity(location);
+                startActivity(location, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
                 break;
             }
             case R.id.navig_mailbox: { // Display mailbox activity

@@ -8,18 +8,17 @@ import android.app.Activity;
  */
 public final class Requests {
 
-    //private static final int REQUEST_EVENT_DISPLAY_2_MAIN = 1; // Event display to main activity request
+    private static final int REQUEST_PICK_MEMBER = 1; // Pick member activity request
 
     //////
-    /*
-    public static final class EVENT_DISPLAY_2_MAIN {
-        public static final int CODE = REQUEST_EVENT_DISPLAY_2_MAIN;
+    public static final class PICK_MEMBER {
+        public static final int CODE = REQUEST_PICK_MEMBER;
 
         // Results
-        public static final int RESULT_ID = Activity.RESULT_FIRST_USER;
+        //public static final int RESULT_ID = Activity.RESULT_FIRST_USER;
+        // NB: Not needed coz only RESULT_OK will be used
 
-        // Data keys
-        public static final String DATA_KEY_ID = "id";
+        // Extra data keys
+        public static final String EXTRA_DATA_ID = "id";
     };
-    */
 }

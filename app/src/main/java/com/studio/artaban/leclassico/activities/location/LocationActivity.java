@@ -42,6 +42,7 @@ import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Queries;
+import com.studio.artaban.leclassico.data.codes.Requests;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
@@ -134,10 +135,10 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     public void onSearch(View sender) { // On search member requested
         Logs.add(Logs.Type.V, "sender: " + sender);
 
-
-
-
-
+        ////// Start pick member activity
+        Intent intent = new Intent(Intent.ACTION_PICK, Uris.getUri(Uris.ID_PICK_MEMBER));
+        startActivityForResult(intent, Requests.PICK_MEMBER.CODE);
+        // NB: Activity could be called explicitly
     }
     public void onToday(View sender) { // On today criteria change
         Logs.add(Logs.Type.V, "sender: " + sender);
@@ -501,6 +502,29 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         Logs.add(Logs.Type.V, null);
         mClient.connect();
         super.onStart();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Logs.add(Logs.Type.V, "requestCode: " + requestCode + ";resultCode: " + resultCode + ";data: " + data);
+
+        if ((requestCode == Requests.PICK_MEMBER.CODE) && (resultCode == RESULT_OK)) {
+            if (!data.hasExtra(Requests.PICK_MEMBER.EXTRA_DATA_ID))
+                throw new IllegalArgumentException("Unexpected member pick activity result");
+
+            Logs.add(Logs.Type.I, "Member picked: #" + data.getIntExtra(Requests.PICK_MEMBER.EXTRA_DATA_ID,
+                    Constants.NO_DATA));
+
+
+
+
+
+
+
+
+
+        }
     }
 
     @Override

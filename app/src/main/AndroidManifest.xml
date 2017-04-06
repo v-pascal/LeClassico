@@ -113,6 +113,18 @@
             android:name=".activities.event.EventDisplayActivity"
             android:label="@string/title_activity_event"
             android:theme="@style/EventAppTheme"/>
+        <activity
+            android:name=".activities.profile.MemberPickActivity"
+            android:theme="@style/MemberPickAppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.PICK"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data
+                    android:scheme="content"
+                    android:host="com.studio.artaban.provider.leclassico"
+                    android:pathPattern="/Member"/>
+            </intent-filter>
+        </activity>
 
         <!-- Content providers -->
         <provider
