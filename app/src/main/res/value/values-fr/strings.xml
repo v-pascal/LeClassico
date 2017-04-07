@@ -34,6 +34,7 @@
     <string name="title_activity_publication">Publication</string>
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_event">Evénement</string>
+    <string name="title_activity_pick_member">Sélectionnez un membre</string>
 
     <string name="error">Erreur</string>
     <string name="warning">Attention</string>

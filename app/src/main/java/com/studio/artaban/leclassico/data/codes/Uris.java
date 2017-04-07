@@ -89,8 +89,8 @@ public class Uris {
                 return Uri.parse(DataProvider.CONTENT_URI +
                         PATH_EVENTS); // Events
             case ID_PICK_MEMBER:
-                return Uri.parse(DataProvider.CONTENT_URI +
-                        PATH_MEMBER); // Member
+                return Uri.parse(DataProvider.CONTENT_URI + // Member & Member/*
+                        PATH_MEMBER + ((arguments.length > 0)? '/' + Uri.encode(arguments[0]):""));
 
             default:
                 throw new IllegalArgumentException("Unexpected URI id: " + id);
@@ -147,5 +147,11 @@ public class Uris {
                 PATH_USER + '*' + PATH_LOCATION, ID_USER_LOCATION);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // User/*/Location/#
                 PATH_USER + '*' + PATH_LOCATION + DataProvider.SINGLE_ROW, ID_USER_LOCATION);
+
+        ////// ID_PICK_MEMBER
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // Member
+                PATH_MEMBER, ID_PICK_MEMBER);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, // Member/*
+                PATH_MEMBER + DataProvider.FILTER_ROW, ID_PICK_MEMBER);
     }
 }

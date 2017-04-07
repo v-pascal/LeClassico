@@ -122,7 +122,8 @@
                 <data
                     android:scheme="content"
                     android:host="com.studio.artaban.provider.leclassico"
-                    android:pathPattern="/Member"/>
+                    android:pathPrefix="/Member"
+                    android:pathPattern="(?:/.*)?"/>
             </intent-filter>
         </activity>
 

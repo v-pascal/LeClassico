@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <!-- Profile -->
+    <ImageView
+        android:id="@+id/image_pseudo"
+        android:clickable="true"
+        android:layout_width="@dimen/user_item_height"
+        android:layout_height="@dimen/user_item_height">
+
+        <tag android:id="@+id/tag_pseudo_id"/>
+    </ImageView>
+
+    <!-- Member info -->
+    <LinearLayout
+        android:id="@+id/layout_pseudo"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:layout_toEndOf="@id/image_pseudo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Pseudo -->
+        <TextView
+            android:id="@+id/text_pseudo"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/user_info_text_size"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/user_text_margin"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/user_info_height"/>
+
+        <!-- Info -->
+        <TextView
+            android:id="@+id/text_info"
+            android:textSize="@dimen/user_date_text_size"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/user_text_margin"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/user_date_height"/>
+
+        <tag android:id="@id/tag_pseudo_id"/>
+    </LinearLayout>
+
+</RelativeLayout>

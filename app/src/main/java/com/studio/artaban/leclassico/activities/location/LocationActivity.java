@@ -136,7 +136,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         Logs.add(Logs.Type.V, "sender: " + sender);
 
         ////// Start pick member activity
-        Intent intent = new Intent(Intent.ACTION_PICK, Uris.getUri(Uris.ID_PICK_MEMBER));
+        Intent intent = new Intent(Intent.ACTION_PICK, Uris.getUri(Uris.ID_PICK_MEMBER, mPseudo));
         startActivityForResult(intent, Requests.PICK_MEMBER.CODE);
         // NB: Activity could be called explicitly
     }
@@ -510,11 +510,9 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         Logs.add(Logs.Type.V, "requestCode: " + requestCode + ";resultCode: " + resultCode + ";data: " + data);
 
         if ((requestCode == Requests.PICK_MEMBER.CODE) && (resultCode == RESULT_OK)) {
-            if (!data.hasExtra(Requests.PICK_MEMBER.EXTRA_DATA_ID))
-                throw new IllegalArgumentException("Unexpected member pick activity result");
+            int pseudoId = Integer.valueOf(data.getData().getLastPathSegment());
 
-            Logs.add(Logs.Type.I, "Member picked: #" + data.getIntExtra(Requests.PICK_MEMBER.EXTRA_DATA_ID,
-                    Constants.NO_DATA));
+            Logs.add(Logs.Type.I, "Member picked: #" + pseudoId);
 
 
 

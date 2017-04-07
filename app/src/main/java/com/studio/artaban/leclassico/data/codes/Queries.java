@@ -32,7 +32,7 @@ public class Queries {
         switch (Uris.getId(uri)) {
             case Uris.ID_USER_MEMBERS: { // MAIN_MEMBERS_LIST
 
-                Logs.add(Logs.Type.I, "Members list query");
+                Logs.add(Logs.Type.I, "Followers list query");
                 int pseudoId = Integer.valueOf(uri.getPathSegments().get(1)); // User/#/Camarades/Shortcut
                 Cursor cursor = db.query(CamaradesTable.TABLE_NAME, new String[]{CamaradesTable.COLUMN_PSEUDO},
                         IDataTable.DataField.COLUMN_ID + '=' + pseudoId, null, null, null, null);
@@ -177,6 +177,26 @@ public class Queries {
                         ((filter != Constants.NO_DATA) ?
                                 " AND " + DataTable.DataField.COLUMN_ID + '=' + filter : ""), null);
             }
+            case Uris.ID_PICK_MEMBER: { // MEMBER_PICK_LIST
+
+                Logs.add(Logs.Type.I, "Members list query");
+                String followersCriteria = "";
+
+                if (uri.getPathSegments().size() > 1) // Followers filter
+                    followersCriteria = " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
+                            AbonnementsTable.COLUMN_PSEUDO + "='" + Uri.decode(uri.getLastPathSegment()) + "' AND " +
+                            AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO;
+
+                return db.rawQuery("SELECT " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +
+                        CamaradesTable.COLUMN_PSEUDO + ',' +
+                        CamaradesTable.COLUMN_SEXE + ',' +
+                        CamaradesTable.COLUMN_PROFILE + ',' +
+                        Tools.getUserInfoFields() +
+                        " FROM " + CamaradesTable.TABLE_NAME +
+                        followersCriteria +
+                        " WHERE " + DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) +
+                        " ORDER BY " + CamaradesTable.COLUMN_PSEUDO + " ASC", null);
+            }
             case Uris.ID_RAW_QUERY:
             default: { // Raw query (for multiple table selection)
                 return db.rawQuery(selection, selectionArgs);
@@ -205,6 +225,9 @@ public class Queries {
 
     ////// Location
     public static final int LOCATION_FOLLOWERS = Tables.ID_MAX + 10;
+
+    ////// Member pick
+    public static final int MEMBER_PICK_LIST = Tables.ID_MAX + 11;
 
 
     ////// Limit ///////////////////////////////////////////////////////////////////////////////////

@@ -153,7 +153,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             //Logs.add(Logs.Type.V, "context: " + context + ";cursor: " + cursor + ";parent: " + parent);
-            View rootView = LayoutInflater.from(context).inflate(R.layout.layout_member_item, null);
+            View rootView = LayoutInflater.from(context).inflate(R.layout.layout_follower_item, null);
 
             ViewHolder holder = new ViewHolder();
             holder.character = (TextView) rootView.findViewById(R.id.text_letter);
@@ -338,7 +338,7 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
         mListLoader.restart(getActivity(), Queries.MAIN_MEMBERS_LIST, membersData);
     }
 
-    ////// MainFragment ////////////////////////////////////////////////////////////////////////////
+    ////// ListFragment ////////////////////////////////////////////////////////////////////////////
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

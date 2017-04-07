@@ -19,6 +19,7 @@ public final class Requests {
         // NB: Not needed coz only RESULT_OK will be used
 
         // Extra data keys
-        public static final String EXTRA_DATA_ID = "id";
+        //public static final String EXTRA_DATA_ID = "id";
+        // NB: Not needed coz only member ID will be added at end of URI (using 'getData' method)
     };
 }
