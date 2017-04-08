@@ -317,22 +317,23 @@ public final class Tools { /////////////////////////////////////////////////////
                 CamaradesTable.COLUMN_ADRESSE + ',' +
                 CamaradesTable.COLUMN_ADMIN;
     }
-    public static String getUserInfo(Resources resource, Cursor cursor, int phoneColumn) {
+    public static String getUserInfo(Resources resource, DataTable.DataType source, int rank, int phoneColumn) {
     // Return user info
 
-        Logs.add(Logs.Type.V, "cursor: " + cursor + ";phoneColumn: " + phoneColumn);
-        if (!cursor.isNull(phoneColumn))
-            return cursor.getString(phoneColumn);
-        else if (!cursor.isNull(phoneColumn + 1)) // Email
-            return cursor.getString(phoneColumn + 1);
-        else if (!cursor.isNull(phoneColumn + 2)) // Name
-            return cursor.getString(phoneColumn + 2);
-        else if (!cursor.isNull(phoneColumn + 3)) // Town
-            return cursor.getString(phoneColumn + 3);
-        else if (!cursor.isNull(phoneColumn + 4)) // Address
-            return cursor.getString(phoneColumn + 4);
+        Logs.add(Logs.Type.V, "resource: " + resource + ";source: " + source + ";rank: " + rank +
+                ";phoneColumn: " + phoneColumn);
+        if (!source.isNull(rank, phoneColumn))
+            return source.getString(rank, phoneColumn);
+        else if (!source.isNull(rank, phoneColumn + 1)) // Email
+            return source.getString(rank, phoneColumn + 1);
+        else if (!source.isNull(rank, phoneColumn + 2)) // Name
+            return source.getString(rank, phoneColumn + 2);
+        else if (!source.isNull(rank, phoneColumn + 3)) // Town
+            return source.getString(rank, phoneColumn + 3);
+        else if (!source.isNull(rank, phoneColumn + 4)) // Address
+            return source.getString(rank, phoneColumn + 4);
         else // Admin info
-            return resource.getString((cursor.getInt(phoneColumn + 5) == 1) ?
+            return resource.getString((source.getInt(rank, phoneColumn + 5) == 1) ?
                     R.string.admin_privilege : R.string.no_admin_privilege);
     }
 
@@ -372,28 +373,15 @@ public final class Tools { /////////////////////////////////////////////////////
     }
 
     //////
-    public static short getPubType(RecyclerAdapter.DataView data, int rank, int linkIndex, int imageIndex) {
+    public static short getPubType(DataTable.DataType source, int rank, int linkIndex, int imageIndex) {
     // Return the wall type resource string ID according notification link & image fields
 
-        Logs.add(Logs.Type.V, "data: " + data + ";rank: " + rank + ";linkIndex: " + linkIndex +
+        Logs.add(Logs.Type.V, "source: " + source + ";rank: " + rank + ";linkIndex: " + linkIndex +
                 ";imageIndex: " + imageIndex);
-        if (!data.isNull(rank, linkIndex))
+        if (!source.isNull(rank, linkIndex))
             return ActualitesTable.TYPE_LINK;
 
-        if (!data.isNull(rank, imageIndex))
-            return ActualitesTable.TYPE_IMAGE;
-
-        return ActualitesTable.TYPE_TEXT;
-    }
-    public static short getPubType(Cursor data, int linkIndex, int imageIndex) {
-    // Return the wall type resource string ID according notification link & image fields
-    // NB: Same as method above but with cursor as data
-
-        Logs.add(Logs.Type.V, "cursor: " + data + ";linkIndex: " + linkIndex + ";imageIndex: " + imageIndex);
-        if (!data.isNull(linkIndex))
-            return ActualitesTable.TYPE_LINK;
-
-        if (!data.isNull(imageIndex))
+        if (!source.isNull(rank, imageIndex))
             return ActualitesTable.TYPE_IMAGE;
 
         return ActualitesTable.TYPE_TEXT;

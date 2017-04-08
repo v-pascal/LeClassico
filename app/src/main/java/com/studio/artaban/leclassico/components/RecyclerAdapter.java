@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.animations.RecyclerItemAnimator;
 import com.studio.artaban.leclassico.data.Constants;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 
 import java.util.ArrayList;
@@ -138,8 +139,7 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
         public final ArrayList<Integer> columnChanged = new ArrayList<>(); // Item column change indexes
     }
 
-    ////// DataView ////////////////////////////////////////////////////////////////////////////////
-    public static class DataView {
+    public static class DataView implements DataTable.DataType { ///////////////////////////////////
 
         private final int mColumnKey; // Key column index (column index containing unique entries Id)
         private final boolean mDescending; // Descending order flag
@@ -389,20 +389,26 @@ public abstract class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapt
             return swapResult;
         }
 
+        ////// DataType ////////////////////////////////////////////////////////////////////////////
+        @Override
         public boolean isNull(int rank, int column) {
             return (mData.get(rank).get(column) == null);
         }
+        @Override
         public int getCount() {
             return mData.size();
         }
 
         //////
+        @Override
         public String getString(int rank, int column) {
             return (String)mData.get(rank).get(column);
         }
+        @Override
         public int getInt(int rank, int column) {
             return (Integer)mData.get(rank).get(column);
         }
+        @Override
         public float getFloat(int rank, int column) {
             return (Float)mData.get(rank).get(column);
         }

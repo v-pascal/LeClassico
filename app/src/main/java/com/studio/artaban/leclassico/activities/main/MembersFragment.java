@@ -204,7 +204,8 @@ public class MembersFragment extends ListFragment implements QueryLoader.OnResul
             }
             // Set pseudo & info
             holder.pseudo.setText(pseudo);
-            holder.info.setText(Tools.getUserInfo(getResources(), cursor, COLUMN_INDEX_PHONE));
+            holder.info.setText(Tools.getUserInfo(getResources(), DataTable.getDataType(cursor),
+                    Constants.NO_DATA, COLUMN_INDEX_PHONE));
 
             // Set followed info
             int colorId = (cursor.isNull(COLUMN_INDEX_FOLLOWED))?

@@ -1,5 +1,6 @@
 package com.studio.artaban.leclassico.activities.profile;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.components.RecyclerAdapter;
@@ -41,15 +43,17 @@ public class MemberPickActivity extends AppCompatActivity implements QueryLoader
             Logs.add(Logs.Type.V, "sender: " + sender);
             switch (sender.getId()) {
 
-                case R.id.layout_pseudo:
+                case R.id.layout_member:
                 case R.id.image_pseudo: {
                     int pseudoId = (int)sender.getTag(R.id.tag_pseudo_id);
                     Logs.add(Logs.Type.I, "Pseudo #" + pseudoId + " selected");
 
-
-
-
-
+                    ////// Apply selection
+                    Intent intent = new Intent();
+                    intent.setData(Uri.withAppendedPath(MemberPickActivity.this.getIntent().getData(),
+                            String.valueOf(pseudoId)));
+                    MemberPickActivity.this.setResult(RESULT_OK, intent);
+                    MemberPickActivity.this.finishAfterTransition();
                     break;
                 }
             }
@@ -68,11 +72,20 @@ public class MemberPickActivity extends AppCompatActivity implements QueryLoader
             Tools.setProfile(MemberPickActivity.this, (ImageView) holder.rootView.findViewById(R.id.image_pseudo),
                     female, profile, R.dimen.user_item_height, true);
 
+            // Set member info
+            ((TextView) holder.rootView.findViewById(R.id.text_info))
+                    .setText(Tools.getUserInfo(getResources(), mDataSource, position, COLUMN_INDEX_PHONE));
+            ((TextView) holder.rootView.findViewById(R.id.text_pseudo))
+                    .setText(mDataSource.getString(position, COLUMN_INDEX_PSEUDO));
 
+            ////// Events
+            View imagePseudo = holder.rootView.findViewById(R.id.image_pseudo);
+            View layoutMember = holder.rootView.findViewById(R.id.layout_member);
 
-
-
-
+            imagePseudo.setTag(R.id.tag_pseudo_id, mDataSource.getInt(position, COLUMN_INDEX_ID));
+            imagePseudo.setOnClickListener(this);
+            layoutMember.setTag(R.id.tag_pseudo_id, mDataSource.getInt(position, COLUMN_INDEX_ID));
+            layoutMember.setOnClickListener(this);
         }
     }
 

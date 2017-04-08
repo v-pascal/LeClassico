@@ -103,7 +103,8 @@ public class PublicationsFragment extends MainFragment implements
                 mPubCursor.getString(COLUMN_INDEX_PROFILE) : null;
         result.date = mPubCursor.getString(COLUMN_INDEX_DATE);
 
-        short type = Tools.getPubType(mPubCursor, COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER);
+        short type = Tools.getPubType(DataTable.getDataType(mPubCursor), Constants.NO_DATA,
+                COLUMN_INDEX_LINK, COLUMN_INDEX_FICHIER);
         result.message = getInfo(mPubCursor.getString(COLUMN_INDEX_PSEUDO), type, R.color.yellow);
         result.info = new SpannableStringBuilder((!mPubCursor.isNull(COLUMN_INDEX_TEXT))?
                 mPubCursor.getString(COLUMN_INDEX_TEXT) : getString(R.string.no_publication_text));

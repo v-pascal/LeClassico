@@ -110,6 +110,54 @@ public abstract class DataTable implements IDataTable {
         values.put(Constants.DATA_COLUMN_SYNCHRONIZED, sync);
     }
 
+    public interface DataType { ////////////////////////////////////////////////////////////////////
+
+        boolean isNull(int rank, int column);
+        int getCount();
+
+        //////
+        String getString(int rank, int column);
+        int getInt(int rank, int column);
+        float getFloat(int rank, int column);
+    }
+    private static class DataCursor implements DataType {
+
+        private final Cursor mCursor;
+        public DataCursor(Cursor cursor) {
+            Logs.add(Logs.Type.V, "cursor: " + cursor);
+            mCursor = cursor;
+        }
+
+        ////// DataType
+        @Override
+        public boolean isNull(int rank, int column) {
+            return mCursor.isNull(column);
+        }
+        @Override
+        public int getCount() {
+            return mCursor.getCount();
+        }
+
+        //////
+        @Override
+        public String getString(int rank, int column) {
+            return mCursor.getString(column);
+        }
+        @Override
+        public int getInt(int rank, int column) {
+            return mCursor.getInt(column);
+        }
+        @Override
+        public float getFloat(int rank, int column) {
+            return mCursor.getFloat(column);
+        }
+    }
+
+    //////
+    public static DataType getDataType(Cursor cursor) {
+        return new DataCursor(cursor);
+    }
+
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
 
     protected static final String IS_NULL = " is null";

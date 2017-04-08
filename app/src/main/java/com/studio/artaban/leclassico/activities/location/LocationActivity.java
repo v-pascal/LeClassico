@@ -40,6 +40,7 @@ import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataObserver;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Preferences;
 import com.studio.artaban.leclassico.data.codes.Queries;
 import com.studio.artaban.leclassico.data.codes.Requests;
@@ -361,7 +362,8 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
             marker.setTag(new MarkerInfo(cursor.getInt(COLUMN_INDEX_ID), profile, female,
                     cursor.getString(COLUMN_INDEX_PSEUDO),
-                    Tools.getUserInfo(getResources(), cursor, COLUMN_INDEX_PHONE),
+                    Tools.getUserInfo(getResources(), DataTable.getDataType(cursor),
+                            Constants.NO_DATA, COLUMN_INDEX_PHONE),
                     MEMBER_COLORS[colorIdx]));
 
         } while (cursor.moveToNext());
