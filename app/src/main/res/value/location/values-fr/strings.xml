@@ -14,5 +14,6 @@
     <string name="location_today_filter">Filtre localisation 24h activé</string>
     <string name="location_no_filter">Filtre localisation 24h désactivé</string>
     <string name="location_user_failed">Géolocalisation impossible! Vérifiez son activation sur votre périphérique.</string>
+    <string name="location_member_none">Membre non géolocalisé!</string>
 
 </resources>

@@ -115,11 +115,11 @@ public class MemberPickActivity extends AppCompatActivity implements QueryLoader
     private static final int COLUMN_INDEX_SEX = 2;
     private static final int COLUMN_INDEX_PROFILE = 3;
     private static final int COLUMN_INDEX_PHONE = 4;
-    private static final int COLUMN_INDEX_EMAIL = 5;
-    private static final int COLUMN_INDEX_TOWN = 6;
-    private static final int COLUMN_INDEX_NAME = 7;
-    private static final int COLUMN_INDEX_ADDRESS = 8;
-    private static final int COLUMN_INDEX_ADMIN = 9;
+    //private static final int COLUMN_INDEX_EMAIL = 5;
+    //private static final int COLUMN_INDEX_TOWN = 6;
+    //private static final int COLUMN_INDEX_NAME = 7;
+    //private static final int COLUMN_INDEX_ADDRESS = 8;
+    //private static final int COLUMN_INDEX_ADMIN = 9;
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override

@@ -147,54 +147,30 @@ public class Queries {
                         " GROUP BY " + fields +
                         " ORDER BY " + EvenementsTable.COLUMN_DATE + " ASC", null);
             }
-            case Uris.ID_USER_LOCATION: { // LOCATION_FOLLOWERS
-
-                Logs.add(Logs.Type.I, "locations query");
-                String pseudo = Uri.decode(uri.getPathSegments().get(1)); // User/*/Location
-                int filter = Constants.NO_DATA; // User/*/Location/#
-
-                if ((uri.getPathSegments().size() > 3) && (!uri.getPathSegments().get(3).isEmpty()))
-                    filter = Integer.valueOf(uri.getPathSegments().get(3));
-
-                return db.rawQuery("SELECT " +
-                        CamaradesTable.TABLE_NAME + '.' + DataTable.DataField.COLUMN_ID + ',' +
-                        CamaradesTable.COLUMN_PSEUDO + ',' +
-                        CamaradesTable.COLUMN_SEXE + ',' +
-                        CamaradesTable.COLUMN_PROFILE + ',' +
-                        Tools.getUserInfoFields() + ',' +
-                        CamaradesTable.COLUMN_LATITUDE + ',' +
-                        CamaradesTable.COLUMN_LATITUDE_UPD + ',' +
-                        CamaradesTable.COLUMN_LONGITUDE + ',' +
-                        CamaradesTable.COLUMN_LONGITUDE_UPD +
-                        " FROM " + CamaradesTable.TABLE_NAME +
-                        " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
-                        AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
-                        AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO +
-                        " WHERE " +
-                        DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) + " AND " +
-                        CamaradesTable.COLUMN_LATITUDE + " IS NOT NULL AND " +
-                        CamaradesTable.COLUMN_LONGITUDE + " IS NOT NULL" +
-                        ((filter != Constants.NO_DATA) ?
-                                " AND " + DataTable.DataField.COLUMN_ID + '=' + filter : ""), null);
-            }
             case Uris.ID_PICK_MEMBER: { // MEMBER_PICK_LIST
 
                 Logs.add(Logs.Type.I, "Members list query");
+                String followersJoin = "";
                 String followersCriteria = "";
 
-                if (uri.getPathSegments().size() > 1) // Followers filter
-                    followersCriteria = " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
-                            AbonnementsTable.COLUMN_PSEUDO + "='" + Uri.decode(uri.getLastPathSegment()) + "' AND " +
-                            AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO;
+                if (uri.getPathSegments().size() > 1) { // Followers filter
+                    String pseudo = Uri.decode(uri.getLastPathSegment());
 
+                    followersJoin = " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
+                            AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                            AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO;
+                    followersCriteria = " AND " + CamaradesTable.TABLE_NAME + '.' +
+                            CamaradesTable.COLUMN_PSEUDO + "<>'" + pseudo + '\'';
+                }
                 return db.rawQuery("SELECT " + CamaradesTable.TABLE_NAME + '.' + IDataTable.DataField.COLUMN_ID + ',' +
                         CamaradesTable.COLUMN_PSEUDO + ',' +
                         CamaradesTable.COLUMN_SEXE + ',' +
                         CamaradesTable.COLUMN_PROFILE + ',' +
                         Tools.getUserInfoFields() +
                         " FROM " + CamaradesTable.TABLE_NAME +
-                        followersCriteria +
+                        followersJoin +
                         " WHERE " + DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) +
+                        followersCriteria +
                         " ORDER BY " + CamaradesTable.COLUMN_PSEUDO + " ASC", null);
             }
             case Uris.ID_RAW_QUERY:
