@@ -113,10 +113,6 @@ public class CamaradesTable extends DataTable {
     public static final String COLUMN_DEVICE_UPD = "CAM_DeviceUPD";
     public static final String COLUMN_DEVICE_ID = "CAM_DevId";
     public static final String COLUMN_DEVICE_ID_UPD = "CAM_DevIdUPD";
-    public static final String COLUMN_LATITUDE = "CAM_Latitude";
-    public static final String COLUMN_LATITUDE_UPD = "CAM_LatitudeUPD";
-    public static final String COLUMN_LONGITUDE = "CAM_Longitude";
-    public static final String COLUMN_LONGITUDE_UPD = "CAM_LongitudeUPD";
     private static final String COLUMN_STATUS_DATE = "CAM_StatusDate";
 
     // Columns index
@@ -157,12 +153,8 @@ public class CamaradesTable extends DataTable {
     private static final short COLUMN_INDEX_DEVICE_UPD = 35;
     public static final short COLUMN_INDEX_DEVICE_ID = 36;
     private static final short COLUMN_INDEX_DEVICE_ID_UPD = 37;
-    private static final short COLUMN_INDEX_LATITUDE = 38;
-    private static final short COLUMN_INDEX_LATITUDE_UPD = 39;
-    private static final short COLUMN_INDEX_LONGITUDE = 40;
-    private static final short COLUMN_INDEX_LONGITUDE_UPD = 41;
-    private static final short COLUMN_INDEX_STATUS_DATE = 42;
-    private static final short COLUMN_INDEX_SYNCHRONIZED = 43;
+    private static final short COLUMN_INDEX_STATUS_DATE = 38;
+    private static final short COLUMN_INDEX_SYNCHRONIZED = 39;
 
     //
     private CamaradesTable() { }
@@ -212,10 +204,6 @@ public class CamaradesTable extends DataTable {
                 COLUMN_DEVICE_UPD + " TEXT NOT NULL," +
                 COLUMN_DEVICE_ID + " TEXT," +
                 COLUMN_DEVICE_ID_UPD + " TEXT NOT NULL," +
-                COLUMN_LATITUDE + " REAL," +
-                COLUMN_LATITUDE_UPD + " TEXT NOT NULL," +
-                COLUMN_LONGITUDE + " REAL," +
-                COLUMN_LONGITUDE_UPD + " TEXT NOT NULL," +
 
                 Constants.DATA_COLUMN_STATUS_DATE + " TEXT NOT NULL," +
                 Constants.DATA_COLUMN_SYNCHRONIZED + " INTEGER NOT NULL" +
@@ -270,9 +258,7 @@ public class CamaradesTable extends DataTable {
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_PROFILE_UPD + " OR " +
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_BANNER_UPD + " OR " +
                 Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_DEVICE_UPD + " OR " +
-                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_DEVICE_ID_UPD + " OR " +
-                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LATITUDE_UPD + " OR " +
-                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_LONGITUDE_UPD + ") AND (" +
+                Constants.DATA_COLUMN_STATUS_DATE + '<' + COLUMN_DEVICE_ID_UPD + ") AND (" +
                 Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_UPDATE.getValue() + " OR " +
                 Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_UPDATE.getValue() |
                 Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
@@ -364,14 +350,6 @@ public class CamaradesTable extends DataTable {
                         update.put(JSON_KEY_DEVICE_ID, (!cursor.isNull(COLUMN_INDEX_DEVICE_ID))? cursor.getString(COLUMN_INDEX_DEVICE_ID):JSONObject.NULL);
                         status.put(JSON_KEY_DEVICE_ID_UPD, cursor.getString(COLUMN_INDEX_DEVICE_ID_UPD));
                     }
-                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LATITUDE_UPD)) < 0) {
-                        update.put(JSON_KEY_LATITUDE, (!cursor.isNull(COLUMN_INDEX_LATITUDE))? cursor.getDouble(COLUMN_INDEX_LATITUDE):JSONObject.NULL);
-                        status.put(JSON_KEY_LATITUDE_UPD, cursor.getString(COLUMN_INDEX_LATITUDE_UPD));
-                    }
-                    if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) < 0) {
-                        update.put(JSON_KEY_LONGITUDE, (!cursor.isNull(COLUMN_INDEX_LONGITUDE))? cursor.getDouble(COLUMN_INDEX_LONGITUDE):JSONObject.NULL);
-                        status.put(JSON_KEY_LONGITUDE_UPD, cursor.getString(COLUMN_INDEX_LONGITUDE_UPD));
-                    }
 
                     //////
                     keysArray.put(key);
@@ -441,10 +419,6 @@ public class CamaradesTable extends DataTable {
     private static final String JSON_KEY_DEVICE_UPD = COLUMN_DEVICE_UPD.substring(4);
     private static final String JSON_KEY_DEVICE_ID = COLUMN_DEVICE_ID.substring(4);
     private static final String JSON_KEY_DEVICE_ID_UPD = COLUMN_DEVICE_ID_UPD.substring(4);
-    private static final String JSON_KEY_LATITUDE = COLUMN_LATITUDE.substring(4);
-    private static final String JSON_KEY_LATITUDE_UPD = COLUMN_LATITUDE_UPD.substring(4);
-    private static final String JSON_KEY_LONGITUDE = COLUMN_LONGITUDE.substring(4);
-    private static final String JSON_KEY_LONGITUDE_UPD = COLUMN_LONGITUDE_UPD.substring(4);
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
     // TODO: Replace JSON keys by column indexes
 
@@ -581,16 +555,6 @@ public class CamaradesTable extends DataTable {
                             else
                                 values.putNull(COLUMN_DEVICE_ID);
                             values.put(COLUMN_DEVICE_ID_UPD, entry.getString(JSON_KEY_DEVICE_ID_UPD));
-                            if (!entry.isNull(JSON_KEY_LATITUDE))
-                                values.put(COLUMN_LATITUDE, entry.getDouble(JSON_KEY_LATITUDE));
-                            else
-                                values.putNull(COLUMN_LATITUDE);
-                            values.put(COLUMN_LATITUDE_UPD, entry.getString(JSON_KEY_LATITUDE_UPD));
-                            if (!entry.isNull(JSON_KEY_LONGITUDE))
-                                values.put(COLUMN_LONGITUDE, entry.getDouble(JSON_KEY_LONGITUDE));
-                            else
-                                values.putNull(COLUMN_LONGITUDE);
-                            values.put(COLUMN_LONGITUDE_UPD, entry.getString(JSON_KEY_LONGITUDE_UPD));
 
                             values.put(Constants.DATA_COLUMN_STATUS_DATE, entry.getString(JSON_KEY_STATUS_DATE));
                             values.put(Constants.DATA_COLUMN_SYNCHRONIZED, Synchronized.DONE.getValue());
@@ -725,18 +689,6 @@ public class CamaradesTable extends DataTable {
                                             .compareTo(entry.getString(JSON_KEY_DEVICE_ID_UPD)) > 0) {
                                         values.remove(COLUMN_DEVICE_ID);
                                         values.remove(COLUMN_DEVICE_ID_UPD);
-                                        removed = true;
-                                    }
-                                    if (cursor.getString(COLUMN_INDEX_LATITUDE_UPD)
-                                            .compareTo(entry.getString(JSON_KEY_LATITUDE_UPD)) > 0) {
-                                        values.remove(COLUMN_LATITUDE);
-                                        values.remove(COLUMN_LATITUDE_UPD);
-                                        removed = true;
-                                    }
-                                    if (cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)
-                                            .compareTo(entry.getString(JSON_KEY_LONGITUDE_UPD)) > 0) {
-                                        values.remove(COLUMN_LONGITUDE);
-                                        values.remove(COLUMN_LONGITUDE_UPD);
                                         removed = true;
                                     }
 

@@ -13,6 +13,7 @@ import com.studio.artaban.leclassico.data.tables.AlbumsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.EvenementsTable;
+import com.studio.artaban.leclassico.data.tables.LocationsTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.MusicTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
@@ -32,7 +33,7 @@ import java.util.Map;
 public class Database extends SQLiteOpenHelper {
 
     private static final String NAME = Constants.APP_NAME + ".db"; // Database name
-    public static final int VERSION = 5;
+    public static final int VERSION = 6;
     // Database versions:
     // #1: Following application version 1.0
     // #2: Following application version 1.1
@@ -42,6 +43,7 @@ public class Database extends SQLiteOpenHelper {
     //     * Synchronization field values changed
     // #6: Following application version 1.6
     //     * Members table fields 'CAM_Located' & 'CAM_LocatedUPD' replaced by fields 'CAM_Device', 'CAM_DeviceUPD', 'CAM_DevId' & 'CAM_DevIdUPD'
+    //     * Moved location fields from member table to new locations table
 
     public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss.000"; // SQLite date & time format
 
@@ -61,6 +63,7 @@ public class Database extends SQLiteOpenHelper {
         mTableMap.put(PresentsTable.TABLE_NAME, PresentsTable.newInstance());
         mTableMap.put(VotesTable.TABLE_NAME, VotesTable.newInstance());
         mTableMap.put(NotificationsTable.TABLE_NAME, NotificationsTable.newInstance());
+        mTableMap.put(LocationsTable.TABLE_NAME, LocationsTable.newInstance());
 
         // Persistent tables
         mTableMap.put(LinksTable.TABLE_NAME, LinksTable.newInstance());

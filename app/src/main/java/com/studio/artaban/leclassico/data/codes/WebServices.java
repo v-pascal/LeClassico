@@ -20,6 +20,7 @@ public final class WebServices {
     public static final String URL_PHOTOS = "/photos.php"; // Photos web service
     public static final String URL_EVENTS = "/evenements.php"; // Events web service
     public static final String URL_PRESENTS = "/presents.php"; // Presents web service
+    public static final String URL_LOCATIONS = "/locations.php"; // Locations web service
 
 
     ////// DB Operations ///////////////////////////////////////////////////////////////////////////

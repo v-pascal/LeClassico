@@ -6,6 +6,7 @@ import com.studio.artaban.leclassico.data.tables.AlbumsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.EvenementsTable;
+import com.studio.artaban.leclassico.data.tables.LocationsTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.MusicTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
@@ -32,11 +33,12 @@ public final class Tables {
     public static final byte ID_COMMENTAIRES = 10; // NB: Must be > ID_ACTUALITES & ID_PHOTOS coz fill
     public static final byte ID_PRESENTS = 11;     //     comments according publications & photos
     public static final byte ID_NOTIFICATIONS = 12;
+    public static final byte ID_LOCATIONS = 13;
 
-    public static final byte ID_LAST = ID_NOTIFICATIONS;
+    public static final byte ID_LAST = ID_LOCATIONS;
 
     // Persistent tables
-    public static final byte ID_LINKS = 13;
+    public static final byte ID_LINKS = 14;
 
     //////
     public static final int ID_MAX = 127; // Max positive byte value
@@ -57,6 +59,7 @@ public final class Tables {
             case Tables.ID_PRESENTS: return PresentsTable.TABLE_NAME;
             case Tables.ID_VOTES: return VotesTable.TABLE_NAME;
             case Tables.ID_NOTIFICATIONS: return NotificationsTable.TABLE_NAME;
+            case Tables.ID_LOCATIONS: return LocationsTable.TABLE_NAME;
 
             // Persistent tables
             case Tables.ID_LINKS: return LinksTable.TABLE_NAME;

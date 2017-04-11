@@ -48,6 +48,7 @@ import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.tables.AbonnementsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.data.tables.LocationsTable;
 import com.studio.artaban.leclassico.helpers.Logs;
 import com.studio.artaban.leclassico.helpers.QueryLoader;
 import com.studio.artaban.leclassico.services.DataService;
@@ -394,11 +395,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
 
         } else if ((mToday == TodayFilter.ENABLING) || (mToday == TodayFilter.DISABLING)) { // Check today filter
             do {
-                String date = (mCursor.getString(COLUMN_INDEX_LATITUDE_UPD)
-                        .compareTo(mCursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) > 0) ?
-                        mCursor.getString(COLUMN_INDEX_LATITUDE_UPD) :
-                        mCursor.getString(COLUMN_INDEX_LONGITUDE_UPD);
-
+                String date = mCursor.getString(COLUMN_INDEX_STATUS_DATE);
                 if (mToday == TodayFilter.ENABLING) {
                     if (!date.startsWith(today)) // Apply today filter
                         mMarkers.get(mCursor.getInt(COLUMN_INDEX_ID)).setVisible(false);
@@ -419,10 +416,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                     continue; // Do not display user location (with common marker)
                 // NB: Let user locate himself using the locate option
 
-                String date = (mCursor.getString(COLUMN_INDEX_LATITUDE_UPD)
-                        .compareTo(mCursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) > 0) ?
-                        mCursor.getString(COLUMN_INDEX_LATITUDE_UPD) :
-                        mCursor.getString(COLUMN_INDEX_LONGITUDE_UPD);
+                String date = mCursor.getString(COLUMN_INDEX_STATUS_DATE);
                 StringBuilder title = new StringBuilder();
                 try {
                     Date locationDate = dateFormat.parse(date);
@@ -479,9 +473,8 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     //private static final int COLUMN_INDEX_ADRESSE = 8;
     //private static final int COLUMN_INDEX_ADMIN = 9;
     private static final int COLUMN_INDEX_LATITUDE = 10;
-    private static final int COLUMN_INDEX_LATITUDE_UPD = 11;
-    private static final int COLUMN_INDEX_LONGITUDE = 12;
-    private static final int COLUMN_INDEX_LONGITUDE_UPD = 13;
+    private static final int COLUMN_INDEX_LONGITUDE = 11;
+    private static final int COLUMN_INDEX_STATUS_DATE = 12;
 
     ////// AppCompatActivity ///////////////////////////////////////////////////////////////////////
     @Override
@@ -567,18 +560,18 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                         CamaradesTable.COLUMN_SEXE + ',' +
                         CamaradesTable.COLUMN_PROFILE + ',' +
                         Tools.getUserInfoFields() + ',' +
-                        CamaradesTable.COLUMN_LATITUDE + ',' +
-                        CamaradesTable.COLUMN_LATITUDE_UPD + ',' +
-                        CamaradesTable.COLUMN_LONGITUDE + ',' +
-                        CamaradesTable.COLUMN_LONGITUDE_UPD +
+                        LocationsTable.COLUMN_LATITUDE + ',' +
+                        LocationsTable.COLUMN_LONGITUDE + ',' +
+                        LocationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE +
                         " FROM " + CamaradesTable.TABLE_NAME +
                         " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
                         AbonnementsTable.COLUMN_PSEUDO + "='" + mPseudo + "' AND " +
                         AbonnementsTable.COLUMN_CAMARADE + '=' + CamaradesTable.COLUMN_PSEUDO +
+                        " INNER JOIN " + LocationsTable.TABLE_NAME + " ON " +
+                        LocationsTable.COLUMN_PSEUDO + '=' + CamaradesTable.COLUMN_PSEUDO +
                         " WHERE " +
                         DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) + " AND " +
-                        CamaradesTable.COLUMN_LATITUDE + " IS NOT NULL AND " +
-                        CamaradesTable.COLUMN_LONGITUDE + " IS NOT NULL");
+                        CamaradesTable.COLUMN_DEVICE_ID + " IS NOT NULL");
 
         mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
     }
