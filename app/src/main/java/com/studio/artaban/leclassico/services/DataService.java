@@ -25,6 +25,7 @@ import com.studio.artaban.leclassico.connection.requests.AlbumsRequest;
 import com.studio.artaban.leclassico.connection.requests.CamaradesRequest;
 import com.studio.artaban.leclassico.connection.requests.CommentairesRequest;
 import com.studio.artaban.leclassico.connection.requests.EvenementsRequest;
+import com.studio.artaban.leclassico.connection.requests.LocationsRequest;
 import com.studio.artaban.leclassico.connection.requests.MessagerieRequest;
 import com.studio.artaban.leclassico.connection.requests.MusicRequest;
 import com.studio.artaban.leclassico.connection.requests.NotificationsRequest;
@@ -456,6 +457,7 @@ public class DataService extends Service implements Internet.OnConnectivityListe
                 case Tables.ID_PHOTOS: mDataRequests.add(new PhotosRequest(this)); break;
                 case Tables.ID_PRESENTS: mDataRequests.add(new PresentsRequest(this)); break;
                 case Tables.ID_VOTES: mDataRequests.add(new VotesRequest(this)); break;
+                case Tables.ID_LOCATIONS: mDataRequests.add(new LocationsRequest(this)); break;
             }
         }
         mRequestTimer = new Timer();
