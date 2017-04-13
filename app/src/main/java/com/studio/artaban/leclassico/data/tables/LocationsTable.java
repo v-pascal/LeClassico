@@ -3,6 +3,7 @@ package com.studio.artaban.leclassico.data.tables;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -133,22 +134,47 @@ public class LocationsTable extends DataTable {
     public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
         Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
-
-
-        /*
-        if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LATITUDE_UPD)) < 0) {
-            update.put(JSON_KEY_LATITUDE, (!cursor.isNull(COLUMN_INDEX_LATITUDE))? cursor.getDouble(COLUMN_INDEX_LATITUDE):JSONObject.NULL);
-            status.put(JSON_KEY_LATITUDE_UPD, cursor.getString(COLUMN_INDEX_LATITUDE_UPD));
-        }
-        if (cursor.getString(COLUMN_INDEX_STATUS_DATE).compareTo(cursor.getString(COLUMN_INDEX_LONGITUDE_UPD)) < 0) {
-            update.put(JSON_KEY_LONGITUDE, (!cursor.isNull(COLUMN_INDEX_LONGITUDE))? cursor.getDouble(COLUMN_INDEX_LONGITUDE):JSONObject.NULL);
-            status.put(JSON_KEY_LONGITUDE_UPD, cursor.getString(COLUMN_INDEX_LONGITUDE_UPD));
-        }
-        */
-
-
-
         ContentValues updated = new ContentValues();
+        Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME), null,
+                COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) + " AND (" +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_UPDATE.getValue() + " OR " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_UPDATE.getValue() |
+                        Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
+        if (cursor.moveToFirst()) {
+            try {
+
+                JSONArray keysArray = new JSONArray();
+                JSONArray updatesArray = new JSONArray();
+                do {
+
+                    // Keys
+                    JSONObject key = new JSONObject();
+                    key.put(JSON_KEY_PSEUDO, cursor.getString(COLUMN_INDEX_PSEUDO));
+
+                    // Updates
+                    JSONObject update = new JSONObject();
+                    update.put(JSON_KEY_LATITUDE, cursor.getDouble(COLUMN_INDEX_LATITUDE));
+                    update.put(JSON_KEY_LONGITUDE, cursor.getDouble(COLUMN_INDEX_LONGITUDE));
+
+                    //////
+                    keysArray.put(key);
+                    updatesArray.put(update);
+
+                } while (cursor.moveToNext());
+
+                //////
+                //Logs.add(Logs.Type.I, "Keys: " + keysArray.toString());
+                //Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
+                //Logs.add(Logs.Type.I, "Updates: " + updatesArray.toString());
+
+                updated.put(WebServices.DATA_KEYS, keysArray.toString());
+                updated.put(WebServices.DATA_UPDATES, updatesArray.toString());
+
+            } catch (JSONException e) {
+                Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
+            }
+        }
+        cursor.close();
         return updated;
     }
     @Override
