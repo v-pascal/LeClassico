@@ -1,6 +1,7 @@
 package com.studio.artaban.leclassico.activities.location;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.location.Location;
@@ -544,7 +545,8 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         getWindowManager().getDefaultDisplay().getSize(screenSize);
         int padding = (int) getResources().getDimension(R.dimen.location_panel_padding);
         ((RelativeLayout.LayoutParams) findViewById(R.id.layout_member).getLayoutParams())
-                .width =  (screenSize.x >> 1) - (padding + (padding >> 1));
+                .width =  ((getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)?
+                screenSize.x - (padding << 1):(screenSize.x >> 1) - (padding + (padding >> 1)));
 
         findViewById(R.id.image_pseudo).setOnClickListener(new View.OnClickListener() {
 

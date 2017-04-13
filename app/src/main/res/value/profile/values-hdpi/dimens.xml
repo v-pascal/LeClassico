@@ -2,7 +2,7 @@
 <resources><!-- Profile -->
 
     <!-- Pick member -->
-    <dimen name="pick_member_margin">8dp</dimen>
-    <dimen name="pick_member_title_size">22sp</dimen>
+    <dimen name="pick_member_margin">7dp</dimen>
+    <dimen name="pick_member_title_size">20sp</dimen>
 
 </resources>

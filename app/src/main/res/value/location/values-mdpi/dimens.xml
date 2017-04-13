@@ -2,6 +2,6 @@
 <resources><!-- Location -->
 
     <dimen name="location_panel_padding">8dp</dimen>
-    <dimen name="location_panel_padding_top">12dp</dimen>
+    <dimen name="location_panel_padding_top">11dp</dimen>
 
 </resources>

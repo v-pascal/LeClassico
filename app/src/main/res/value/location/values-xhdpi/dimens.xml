@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><!-- Location -->
+
+    <dimen name="location_panel_padding">7dp</dimen>
+    <dimen name="location_panel_padding_top">9dp</dimen>
+
+</resources>
