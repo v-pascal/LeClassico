@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.Uris;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
@@ -163,6 +164,26 @@ public class LocationsTable extends DataTable {
     private static final String JSON_KEY_LONGITUDE = COLUMN_LONGITUDE.substring(4);
     private static final String JSON_KEY_STATUS_DATE = COLUMN_STATUS_DATE.substring(4);
 
+    //////
+    private static String getMaxStatusDate(ContentResolver resolver, String pseudo) {
+    // Return newest status date of location entries for connected user (passed in parameters)
+
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
+        Cursor cursor = resolver.query(Uris.getUri(Uris.ID_RAW_QUERY), null,
+                "SELECT" +
+                        " max(" + LocationsTable.TABLE_NAME + '.' + Constants.DATA_COLUMN_STATUS_DATE + ')' +
+                        " FROM " + LocationsTable.TABLE_NAME +
+                        " INNER JOIN " + AbonnementsTable.TABLE_NAME + " ON " +
+                        AbonnementsTable.COLUMN_PSEUDO + "='" + pseudo + "' AND " +
+                        AbonnementsTable.COLUMN_CAMARADE + '=' + LocationsTable.COLUMN_PSEUDO, null, null);
+
+        String statusDate = null;
+        if (cursor.moveToFirst())
+            statusDate = cursor.getString(0);
+        cursor.close();
+        return statusDate;
+    }
+
     @Override
     public @Nullable SyncResult synchronize(final ContentResolver resolver, final byte operation,
                                             Bundle syncData, @Nullable ContentValues postData) {
@@ -180,8 +201,8 @@ public class LocationsTable extends DataTable {
         syncData.putByte(DATA_KEY_OPERATION, operation);
         syncData.putString(DATA_KEY_TABLE_NAME, TABLE_NAME);
 
-        syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
         syncData.remove(DATA_KEY_FIELD_DATE); // No date field criteria for this table
+        syncData.putString(DATA_KEY_STATUS_DATE, getMaxStatusDate(resolver, syncData.getString(DATA_KEY_PSEUDO)));
         String url = getSyncUrlRequest(resolver, syncData);
 
         // Send remote DB request
@@ -266,9 +287,11 @@ public class LocationsTable extends DataTable {
         if (result != Internet.DownloadResult.SUCCEEDED) {
 
             Logs.add(Logs.Type.E, "Table '" + TABLE_NAME + "' synchronization request error");
-            if (operation != WebServices.OPERATION_SELECT)
-                resetSyncInProgress(resolver, syncData);
+            if (operation != WebServices.OPERATION_SELECT) {
 
+                syncData.putString(DATA_KEY_FIELD_PSEUDO, COLUMN_PSEUDO);
+                resetSyncInProgress(resolver, syncData);
+            }
             return null;
         }
         return syncResult;

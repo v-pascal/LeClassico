@@ -102,6 +102,10 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     private Marker mUserMarker; // User location marker
     private final Map<Integer, Marker> mMarkers = new HashMap<>(); // Markers list (Member Id -> Marker)
 
+    private final Map<Integer, Integer> mColors = new HashMap<>(); // Marker colors list (Member Id -> Color index)
+    // NB: Needed to keep color on same member even if he moved (location changed)
+    // TODO: Remove entries when not needed (member has disabled its location option)
+
     private void locate() { // Locate connected user
         Logs.add(Logs.Type.V, null);
         try {
@@ -109,7 +113,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mClient);
             if (lastLocation != null) {
                 mUserLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-                displayUserLocation();
+                displayUserLocation(true);
 
             } else
                 Toast.makeText(this, R.string.location_user_failed, Toast.LENGTH_LONG).show();
@@ -120,20 +124,22 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
             mUserLocation = null;
         }
     }
-    private void displayUserLocation() { // Display & move camera to user location marker
-        Logs.add(Logs.Type.V, null);
+    private void displayUserLocation(boolean zoom) { // Display & move camera to user location marker
+        Logs.add(Logs.Type.V, "zoom: " + zoom);
+
         if (mUserMarker != null)
             mUserMarker.remove();
 
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .position(mUserLocation)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location_black_24dp)));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mUserLocation, 18));
+        if (zoom)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mUserLocation, 18));
     }
     private String mPseudo; // Connected user pseudo
     private enum TodayFilter { ENABLING, ENABLED, DISABLING, DISABLED }
     private TodayFilter mToday = TodayFilter.DISABLED; // Today filter flag
-    private boolean mSelected; // Member selection flag
+    private int mSelected = Constants.NO_DATA; // Member selection flag (member ID)
 
     private void selectMember(Marker marker) { // Select member info (from marker data tag)
         Logs.add(Logs.Type.V, "marker: " + marker);
@@ -147,13 +153,13 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         image.setTag(R.id.tag_pseudo_id, data.id);
         Tools.setProfile(this, image, data.female, data.profile, R.dimen.user_item_height, true);
 
-        if (!mSelected) // Display selection with animation
+        if (mSelected == Constants.NO_DATA) // Display selection with animation
             InOutScreen.with(this)
                     .setLocation(InOutScreen.Location.LEFT)
                     .setDuration(DELAY_DISPLAY_MEMBER)
                     .in(findViewById(R.id.layout_member));
 
-        mSelected = true;
+        mSelected = data.id;
     }
 
     //////
@@ -281,13 +287,13 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
     @Override
     public void onMapClick(LatLng latLng) {
         Logs.add(Logs.Type.V, "latLng: " + latLng);
-        if (mSelected)
+        if (mSelected != Constants.NO_DATA)
             InOutScreen.with(this) // Hide selection
                     .setLocation(InOutScreen.Location.LEFT)
                     .setDuration(DELAY_DISPLAY_MEMBER)
                     .out(findViewById(R.id.layout_member));
 
-        mSelected = false;
+        mSelected = Constants.NO_DATA;
     }
 
     ////// OnMapReadyCallback //////////////////////////////////////////////////////////////////////
@@ -329,11 +335,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         sendBroadcast(userIntent);
 
         sendBroadcast(DataService.getIntent(true, Tables.ID_ABONNEMENTS, mFollowersUri));
-
-
-        // TODO: Register location data service
-
-
+        sendBroadcast(DataService.getIntent(true, Tables.ID_LOCATIONS, mFollowersUri));
     }
 
     //////
@@ -391,6 +393,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(memberLat, memberLng), 18));
             else if (mMemberId != Constants.NO_DATA)
                 Toast.makeText(this, R.string.location_member_none, Toast.LENGTH_SHORT).show();
+
             mMemberId = Constants.NO_DATA; // Remove selection
 
         } else if ((mToday == TodayFilter.ENABLING) || (mToday == TodayFilter.DISABLING)) { // Check today filter
@@ -411,14 +414,13 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
             mMarkers.clear();
             mMap.clear(); // Remove all previous markers
 
+            boolean selected = false;
             do {
-                if (mPseudo.compareTo(mCursor.getString(COLUMN_INDEX_PSEUDO)) == 0)
-                    continue; // Do not display user location (with common marker)
-                // NB: Let user locate himself using the locate option
 
                 String date = mCursor.getString(COLUMN_INDEX_STATUS_DATE);
                 StringBuilder title = new StringBuilder();
                 try {
+
                     Date locationDate = dateFormat.parse(date);
                     title.append(DateFormat.getDateFormat(this).format(locationDate));
                     title.append(' ');
@@ -428,7 +430,15 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                     Logs.add(Logs.Type.E, "Wrong location date format: " + date);
                     title.append(date);
                 }
-                int colorIdx = LeClassicoApp.getRandom().nextInt(MARKER_COLORS.length);
+                // Set marker color
+                int colorIdx;
+                if (!(mColors.containsKey(mCursor.getInt(COLUMN_INDEX_ID)))) {
+                    colorIdx = LeClassicoApp.getRandom().nextInt(MARKER_COLORS.length);
+                    mColors.put(mCursor.getInt(COLUMN_INDEX_ID), colorIdx);
+
+                } else
+                    colorIdx = mColors.get(mCursor.getInt(COLUMN_INDEX_ID));
+
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .icon(BitmapDescriptorFactory.defaultMarker(MARKER_COLORS[colorIdx]))
                         .title(title.toString())
@@ -451,13 +461,22 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                 // Add marker into list
                 mMarkers.put(mCursor.getInt(COLUMN_INDEX_ID), marker);
 
+                // Select member (if needed)
+                if (mSelected == mCursor.getInt(COLUMN_INDEX_ID)) {
+                    marker.showInfoWindow();
+                    selected = true;
+                }
+
             } while (mCursor.moveToNext());
             mCursor.moveToFirst();
 
             // Add user location (if it was requested)
             if (mUserLocation != null)
-                displayUserLocation();
+                displayUserLocation(false);
             // NB: Needed coz the map clear causes to remove all marker even user location marker
+
+            if ((mSelected != Constants.NO_DATA) && (!selected))
+                onMapClick(null); // Deselect member (no more located)
         }
     }
 
@@ -571,7 +590,8 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                         LocationsTable.COLUMN_PSEUDO + '=' + CamaradesTable.COLUMN_PSEUDO +
                         " WHERE " +
                         DataTable.getNotDeletedCriteria(CamaradesTable.TABLE_NAME) + " AND " +
-                        CamaradesTable.COLUMN_DEVICE_ID + " IS NOT NULL");
+                        CamaradesTable.COLUMN_DEVICE_ID + " IS NOT NULL AND " +
+                        CamaradesTable.COLUMN_PSEUDO + "<>'" + mPseudo + '\'');
 
         mFollowers.init(this, Queries.LOCATION_FOLLOWERS, followData);
     }
@@ -604,10 +624,7 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
         // Unregister data service (user info)
         sendBroadcast(DataService.getIntent(false, Tables.ID_CAMARADES, mUserUri));
         sendBroadcast(DataService.getIntent(false, Tables.ID_ABONNEMENTS, mFollowersUri));
-
-
-        // TODO: Unregister location data service
-
+        sendBroadcast(DataService.getIntent(false, Tables.ID_LOCATIONS, mFollowersUri));
 
         // Unregister DB observer
         mUserObserver.unregister(getContentResolver());

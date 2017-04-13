@@ -20,6 +20,7 @@ import com.studio.artaban.leclassico.data.tables.AlbumsTable;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
 import com.studio.artaban.leclassico.data.tables.CommentairesTable;
 import com.studio.artaban.leclassico.data.tables.EvenementsTable;
+import com.studio.artaban.leclassico.data.tables.LocationsTable;
 import com.studio.artaban.leclassico.data.tables.MessagerieTable;
 import com.studio.artaban.leclassico.data.tables.MusicTable;
 import com.studio.artaban.leclassico.data.tables.NotificationsTable;
@@ -67,6 +68,7 @@ public class DataProvider extends ContentProvider {
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_PRESENTS);
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME + SINGLE_ROW, Tables.ID_VOTES);
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_NOTIFICATIONS);
+        URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, LocationsTable.TABLE_NAME + SINGLE_ROW, Tables.ID_LOCATIONS);
 
         // Persistent tables
         URI_MATCHER_SINGLE.addURI(Constants.DATA_CONTENT_URI, LinksTable.TABLE_NAME + SINGLE_ROW, Tables.ID_LINKS);
@@ -84,6 +86,7 @@ public class DataProvider extends ContentProvider {
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, PresentsTable.TABLE_NAME, Tables.ID_PRESENTS);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, VotesTable.TABLE_NAME, Tables.ID_VOTES);
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, NotificationsTable.TABLE_NAME, Tables.ID_NOTIFICATIONS);
+        URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, LocationsTable.TABLE_NAME, Tables.ID_LOCATIONS);
 
         // Persistent tables
         URI_MATCHER.addURI(Constants.DATA_CONTENT_URI, LinksTable.TABLE_NAME, Tables.ID_LINKS);
@@ -153,6 +156,7 @@ public class DataProvider extends ContentProvider {
             case Tables.ID_PRESENTS: return MIME_TYPE_SINGLE + PresentsTable.TABLE_NAME;
             case Tables.ID_VOTES: return MIME_TYPE_SINGLE + VotesTable.TABLE_NAME;
             case Tables.ID_NOTIFICATIONS: return MIME_TYPE_SINGLE + NotificationsTable.TABLE_NAME;
+            case Tables.ID_LOCATIONS: return MIME_TYPE_SINGLE + LocationsTable.TABLE_NAME;
 
             // Persistent tables
             case Tables.ID_LINKS: return MIME_TYPE_SINGLE + LinksTable.TABLE_NAME;
@@ -170,6 +174,7 @@ public class DataProvider extends ContentProvider {
             case Tables.ID_PRESENTS: return MIME_TYPE + PresentsTable.TABLE_NAME;
             case Tables.ID_VOTES: return MIME_TYPE + VotesTable.TABLE_NAME;
             case Tables.ID_NOTIFICATIONS: return MIME_TYPE + NotificationsTable.TABLE_NAME;
+            case Tables.ID_LOCATIONS: return MIME_TYPE + LocationsTable.TABLE_NAME;
 
             // Persistent tables
             case Tables.ID_LINKS: return MIME_TYPE + LinksTable.TABLE_NAME;

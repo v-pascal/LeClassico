@@ -5,7 +5,9 @@ import android.os.Bundle;
 
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.data.DataTable;
+import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.LocationsTable;
+import com.studio.artaban.leclassico.helpers.Database;
 import com.studio.artaban.leclassico.services.DataService;
 import com.studio.artaban.leclassico.connection.Login;
 import com.studio.artaban.leclassico.data.codes.Tables;
@@ -19,13 +21,13 @@ import com.studio.artaban.leclassico.helpers.Logs;
 public class LocationsRequest extends DataRequest {
 
     public LocationsRequest(DataService service) {
-        super(service, Tables.ID_LOCATIONS, LocationsTable.COLUMN_PSEUDO, true);
+        super(service, Tables.ID_LOCATIONS, LocationsTable.COLUMN_PSEUDO, false);
     }
 
     ////// DataRequest /////////////////////////////////////////////////////////////////////////////
     @Override
     public long getDelay() {
-        return DEFAULT_DELAY;
+        return 60000; // 1 minute
     }
     @Override
     public void register(Uri uri, Bundle data) {
@@ -51,13 +53,22 @@ public class LocationsRequest extends DataRequest {
         mService.copyLoginData(dataLogin);
 
         ////// Data updates requested (inserted, deleted or updated)
+        Bundle syncData = new Bundle();
+        syncData.putString(DataTable.DATA_KEY_TOKEN, dataLogin.token.get());
+        syncData.putString(DataTable.DATA_KEY_PSEUDO, dataLogin.pseudo);
+
+        // Synchronization (from remote to local DB)
         DataTable.SyncResult result;
+        synchronized (Database.getTable(LocationsTable.TABLE_NAME)) {
+            result = Database.getTable(LocationsTable.TABLE_NAME)
+                    .synchronize(mService.getContentResolver(), WebServices.OPERATION_SELECT,
+                            syncData, null);
+        }
+        if (DataTable.SyncResult.hasChanged(result)) {
 
-
-
-
-
-
+            Logs.add(Logs.Type.I, "Remote table #" + mTableId + " has changed");
+            notifyChange(); // Notify DB change to observer URI
+        }
         return Result.NOT_FOUND; // Unused
     }
 }
