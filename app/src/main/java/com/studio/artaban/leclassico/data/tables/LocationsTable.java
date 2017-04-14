@@ -120,25 +120,18 @@ public class LocationsTable extends DataTable {
     }
 
     ////// DataTable ///////////////////////////////////////////////////////////////////////////////
-    @Override
-    public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
 
+    private ContentValues syncAction(ContentResolver resolver, String pseudo, boolean updateOpe) {
+    // Update or insert synchronization
 
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo + ";updateOpe: " + updateOpe);
+        byte syncValue = (updateOpe)? Synchronized.TO_UPDATE.getValue():Synchronized.TO_INSERT.getValue();
 
-
-        ContentValues inserted = new ContentValues();
-        return inserted;
-    }
-    @Override
-    public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
-        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
-
-        ContentValues updated = new ContentValues();
+        ContentValues postData = new ContentValues();
         Cursor cursor = resolver.query(Uri.parse(DataProvider.CONTENT_URI + TABLE_NAME), null,
                 COLUMN_PSEUDO + '=' + DatabaseUtils.sqlEscapeString(pseudo) + " AND (" +
-                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + Synchronized.TO_UPDATE.getValue() + " OR " +
-                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (Synchronized.TO_UPDATE.getValue() |
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + syncValue + " OR " +
+                        Constants.DATA_COLUMN_SYNCHRONIZED + '=' + (syncValue |
                         Synchronized.IN_PROGRESS.getValue()) + ')', null, null);
         if (cursor.moveToFirst()) {
             try {
@@ -167,15 +160,26 @@ public class LocationsTable extends DataTable {
                 //Logs.add(Logs.Type.I, "Status: " + statusArray.toString());
                 //Logs.add(Logs.Type.I, "Updates: " + updatesArray.toString());
 
-                updated.put(WebServices.DATA_KEYS, keysArray.toString());
-                updated.put(WebServices.DATA_UPDATES, updatesArray.toString());
+                postData.put(WebServices.DATA_KEYS, keysArray.toString());
+                postData.put(WebServices.DATA_UPDATES, updatesArray.toString());
 
             } catch (JSONException e) {
                 Logs.add(Logs.Type.F, "Unexpected error: " + e.getMessage());
             }
         }
         cursor.close();
-        return updated;
+        return postData;
+    }
+
+    @Override
+    public ContentValues syncInserted(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
+        return syncAction(resolver, pseudo, false);
+    }
+    @Override
+    public ContentValues syncUpdated(ContentResolver resolver, String pseudo) {
+        Logs.add(Logs.Type.V, "resolver: " + resolver + ";pseudo: " + pseudo);
+        return syncAction(resolver, pseudo, true);
     }
     @Override
     public ContentValues syncDeleted(ContentResolver resolver, String pseudo) {
