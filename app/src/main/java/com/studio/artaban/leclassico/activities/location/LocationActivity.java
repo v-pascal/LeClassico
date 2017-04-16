@@ -66,7 +66,7 @@ import java.util.Map;
  * Location activity
  */
 public class LocationActivity extends LoggedActivity implements OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener,  GoogleApiClient.ConnectionCallbacks,
+        GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, DataObserver.OnContentListener {
 
     // Extra data keys (see 'LoggedActivity' & 'Login' extra data keys)
@@ -212,6 +212,9 @@ public class LocationActivity extends LoggedActivity implements OnMapReadyCallba
                                 .setImageDrawable(getDrawable((newShare) ?
                                         R.drawable.ic_location_on_white_36dp :
                                         R.drawable.ic_location_off_white_36dp));
+
+                        // Update location service
+                        sendBroadcast(DataService.getIntent(newShare));
 
                         // Inform user share location changed
                         Toast.makeText(LocationActivity.this, (newShare)?

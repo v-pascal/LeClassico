@@ -173,6 +173,9 @@ public class PrefsLocationFragment extends BasePreferenceFragment {
                 }
                 ((SwitchPreference)preference).setChecked(newShare);
                 preference.getEditor().apply();
+
+                // Update location service
+                getActivity().sendBroadcast(DataService.getIntent(newShare));
             }
 
         }, mUri, mObserver);

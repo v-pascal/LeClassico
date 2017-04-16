@@ -226,7 +226,6 @@ public final class Internet {
                 bw.write(getPostContent(postData));
                 bw.flush();
             }
-
             httpConnection.connect();
             int code = httpConnection.getResponseCode();
             if (code != HttpURLConnection.HTTP_OK)

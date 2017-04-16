@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
@@ -14,7 +15,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.Nullable;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.studio.artaban.leclassico.R;
 import com.studio.artaban.leclassico.connection.DataRequest;
 import com.studio.artaban.leclassico.connection.Login;
@@ -34,9 +41,11 @@ import com.studio.artaban.leclassico.connection.requests.PresentsRequest;
 import com.studio.artaban.leclassico.connection.requests.VotesRequest;
 import com.studio.artaban.leclassico.data.Constants;
 import com.studio.artaban.leclassico.data.DataProvider;
+import com.studio.artaban.leclassico.data.DataTable;
 import com.studio.artaban.leclassico.data.codes.Tables;
 import com.studio.artaban.leclassico.data.codes.WebServices;
 import com.studio.artaban.leclassico.data.tables.CamaradesTable;
+import com.studio.artaban.leclassico.data.tables.LocationsTable;
 import com.studio.artaban.leclassico.helpers.Internet;
 import com.studio.artaban.leclassico.helpers.Logs;
 
@@ -51,7 +60,8 @@ import java.util.TimerTask;
  * Created by pascal on 14/08/16.
  * Data service that manage synchronization with remote DB
  */
-public class DataService extends Service implements Internet.OnConnectivityListener {
+public class DataService extends Service implements Internet.OnConnectivityListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     public static final String EXTRA_DATA_RECEIVED = "received";
     public static final String EXTRA_DATA_REQUEST_RESULT = "requestResult";
@@ -59,6 +69,8 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     private static final String EXTRA_DATA_TOKEN = "token";
     private static final String EXTRA_DATA_TIME_LAG = "timeLag";
     private static final String EXTRA_DATA_TABLE_ID = "tableId";
+
+    private static final String EXTRA_DATA_ENABLE = "enable";
     // Extra data keys
 
     private static boolean isRunning; // Service running flag
@@ -97,12 +109,16 @@ public class DataService extends Service implements Internet.OnConnectivityListe
     ////// Broadcast actions
     public static final String REQUEST_LOGOUT = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REQUEST_LOGOUT";
+
     public static final String REQUEST_OLD_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REQUEST_OLD_DATA";
     private static final String REGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.REGISTER_NEW_DATA";
     private static final String UNREGISTER_NEW_DATA = "com." + Constants.APP_URI_COMPANY + '.' +
             Constants.APP_URI + ".action.UNREGISTER_NEW_DATA";
+
+    private static final String REQUEST_LOCATION = "com." + Constants.APP_URI_COMPANY + '.' +
+            Constants.APP_URI + ".action.REQUEST_LOCATION";
 
     //
     public static Intent getIntent(Intent action, byte tableId, Uri uri) {
@@ -119,6 +135,13 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         Logs.add(Logs.Type.V, "register: " + register + ";tableId: " + tableId + ";uri: " + uri);
         return getIntent(new Intent((register)? REGISTER_NEW_DATA:UNREGISTER_NEW_DATA), tableId, uri);
     }
+    public static Intent getIntent(boolean locate) { // Return intent to set location request
+        Logs.add(Logs.Type.V, "locate: " + locate);
+
+        Intent intent = new Intent(REQUEST_LOCATION);
+        intent.putExtra(EXTRA_DATA_ENABLE, locate);
+        return intent;
+    }
     private final DataReceiver mDataReceiver = new DataReceiver(); // Data broadcast receiver
     private final ArrayList<DataRequest> mDataRequests = new ArrayList<>(); // Data request task list
     private Timer mRequestTimer; // Timer to manage data request tasks
@@ -131,7 +154,26 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             if (intent.getAction().equals(REQUEST_LOGOUT)) // Logout
                 stopSelf();
 
-            else {
+            else if (intent.getAction().equals(REQUEST_LOCATION)) { ////// Location
+                if (intent.getBooleanExtra(EXTRA_DATA_ENABLE, false)) { // Enable
+
+                    LocationRequest locationRequest = new LocationRequest();
+                    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                    try {
+                        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApi,
+                                locationRequest, DataService.this);
+                    } catch (SecurityException e) {
+                        Logs.add(Logs.Type.F, "Location permission not granted");
+                    }
+
+                } else { // Disable
+                    LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApi, DataService.this);
+
+                    mLatitude = null;
+                    mLongitude = null;
+                }
+
+            } else {
 
                 int tableIdx = intent.getByteExtra(EXTRA_DATA_TABLE_ID, (byte)0) - 1;
                 if (tableIdx == Constants.NO_DATA)
@@ -213,6 +255,69 @@ public class DataService extends Service implements Internet.OnConnectivityListe
             Logs.add(Logs.Type.I, "Old request thread stopped");
         }
     }
+
+    ////// ConnectionCallbacks /////////////////////////////////////////////////////////////////////
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Logs.add(Logs.Type.V, "bundle: " + bundle);
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Logs.add(Logs.Type.V, "cause: " + cause);
+        mGoogleApi.connect();
+    }
+    private GoogleApiClient mGoogleApi; // Google API client
+
+    ////// OnConnectionFailedListener //////////////////////////////////////////////////////////////
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Logs.add(Logs.Type.E, "connectionResult: " + connectionResult);
+    }
+
+    ////// LocationListener ////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onLocationChanged(Location location) {
+
+        Logs.add(Logs.Type.V, "location: " + location);
+        if ((mLatitude == null) || (Math.abs(location.getLatitude() - mLatitude) > LOCATION_PRECISION) ||
+            (mLongitude == null) || (Math.abs(location.getLongitude() - mLongitude) > LOCATION_PRECISION)) {
+
+            mLatitude = location.getLatitude();
+            mLongitude = location.getLongitude();
+
+            // Update local DB
+            Uri uri = Uri.parse(DataProvider.CONTENT_URI + LocationsTable.TABLE_NAME);
+            String selection = LocationsTable.COLUMN_PSEUDO + "='" + mDataLogin.pseudo + '\'';
+            int id = DataTable.getEntryId(getContentResolver(), LocationsTable.TABLE_NAME, selection);
+
+            ContentValues values = new ContentValues();
+            values.put(LocationsTable.COLUMN_LATITUDE, mLatitude);
+            values.put(LocationsTable.COLUMN_LONGITUDE, mLongitude);
+            if (id == Constants.NO_DATA) {
+
+                values.put(LocationsTable.COLUMN_PSEUDO, mDataLogin.pseudo);
+                DataTable.addSyncFields(values, DataTable.Synchronized.TO_INSERT.getValue());
+                getContentResolver().insert(uri, values);
+
+            } else
+                getContentResolver().update(uri, values, selection, null);
+
+            // Update remote DB
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Logs.add(Logs.Type.V, null);
+                    mDataRequests.get(Tables.ID_LOCATIONS - 1).synchronize();
+                }
+            }).start();
+        }
+    }
+    private static final double LOCATION_PRECISION = 0.0001; // 10 meters
+
+    private Double mLatitude;
+    private Double mLongitude;
+    // User location coordinates
 
     ////// OnConnectivityListener //////////////////////////////////////////////////////////////////
     @Override
@@ -464,10 +569,20 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         mRequestLooper = new LooperThread();
         mRequestLooper.start();
 
+        // Register broadcast
         registerReceiver(mDataReceiver, new IntentFilter(REQUEST_LOGOUT));
         registerReceiver(mDataReceiver, new IntentFilter(REGISTER_NEW_DATA));
         registerReceiver(mDataReceiver, new IntentFilter(UNREGISTER_NEW_DATA));
         registerReceiver(mDataReceiver, new IntentFilter(REQUEST_OLD_DATA));
+        registerReceiver(mDataReceiver, new IntentFilter(REQUEST_LOCATION));
+
+        // Start google API service
+        mGoogleApi = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        mGoogleApi.connect();
 
         return START_NOT_STICKY;
     }
@@ -486,6 +601,9 @@ public class DataService extends Service implements Internet.OnConnectivityListe
         // Remove broadcast receiver & request management
         unregisterReceiver(mDataReceiver);
         stopDataRequests(true);
+
+        // Stop google API service
+        mGoogleApi.disconnect();
 
         mRequestLooper.quit();
     }
